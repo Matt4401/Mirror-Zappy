@@ -1,0 +1,27 @@
+name: New feature request
+description: File a new feature request.
+labels: enhancement
+title: "[Feature] "
+type: feature
+body:
+  - type: 'markdown'
+    attributes:
+      value: |
+        Please fill the necessary data to write the issue.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What is the description of the new feature?
+      placeholder: Support multiple users...
+    validations:
+      required: true
+  - type: dropdown
+    id: type
+    attributes:
+      label: Feature type
+      options:
+        - Subject
+        - Bonus
+    validations:
+      required: true
