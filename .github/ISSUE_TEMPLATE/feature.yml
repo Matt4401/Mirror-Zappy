@@ -21,7 +21,9 @@ body:
     attributes:
       label: Feature type
       options:
-        - Subject
+        - Server
+        - Client/AI
+        - GUI
         - Bonus
     validations:
       required: true

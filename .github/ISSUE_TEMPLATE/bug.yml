@@ -19,6 +19,15 @@ body:
   - type: dropdown
     id: type
     attributes:
+      label: Feature type
+      options:
+        - Server
+        - Client/AI
+        - GUI
+        - Bonus
+  - type: dropdown
+    id: type
+    attributes:
       label: Bug type
       options:
         - Subject specification non-compliance
