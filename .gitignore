@@ -4,3 +4,6 @@
 /Testing/
 /binaries
 *.so
+/zappy_ai
+/zappy_gui
+/zappy_server
