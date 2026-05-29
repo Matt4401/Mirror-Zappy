@@ -1,0 +1,169 @@
+name: Zappy mirror CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  BUILD_TYPE: Release
+  CCACHE_DIR: ${{ github.workspace }}/.ccache
+  TARGET_REPO_URL: "git@github.com:EpitechPGE2-2025/G-YEP-400-NAN-4-1-zappy-3.git"
+  EXECUTABLES: "zappy_server,zappy_gui,zappy_ai"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cpp-linter:
+    name: Check linter cpp
+    runs-on: self-hosted
+    container: 'epitechcontent/epitest-docker'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends build-essential cmake clang-format-20 clang-tidy-20 libconfig++-dev libmbedtls-dev libssh2-1-dev
+
+      - name: Configure CMake for Linter
+        run: cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+      - name: Run cpp-linter
+        uses: cpp-linter/cpp-linter-action@v2
+        id: linter
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          version: '22'
+          style: 'file'
+          tidy-checks: ''
+          database: 'build'
+          ignore: '.github|libs'
+
+      - name: Fail fast if checks failed
+        if: steps.linter.outputs.checks-failed > 0
+        run: exit 1
+
+  python-linter:
+    name: Check linter python
+    runs-on: self-hosted
+    container: 'epitechcontent/epitest-docker'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Ruff
+        run: pip install ruff
+      - name: Run Ruff Linter
+        run: ruff check .
+      - name: Run Ruff Formatter Check
+        run: ruff format --check .
+
+  check_program_compilation:
+    name: Build & Verify Binaries
+    needs: cpp-linter
+    runs-on: self-hosted
+    container: 'epitechcontent/epitest-docker'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends build-essential cmake libmbedtls-dev libssh2-1-dev libconfig++-dev ccache
+
+      - name: Cache ccache
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: ccache-${{ github.ref }}-${{ github.sha }}
+          restore-keys: |
+            ccache-${{ github.ref }}-
+            ccache-
+
+      - name: Configure CMake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+
+      - name: Build Zappy Binaries
+        timeout-minutes: 10
+        run: cmake --build build --config ${{env.BUILD_TYPE}}
+
+  check_binaries:
+    name: Verify Zappy Binaries
+    needs: check_program_compilation      
+    runs-on: self-hosted
+    container: 'epitechcontent/epitest-docker'
+    steps:
+      - name: Check Zappy Executables Exist
+        shell: bash
+        run: |
+          IFS=','
+          read -ra prog <<< "${{env.EXECUTABLES}}"
+          for val in "${prog[@]}"; do
+            if [ ! -x "$val" ]; then
+              echo "::error title=\"Missing Binary\"::Le binaire $val n'existe pas ou n'est pas exécutable."
+              exit 1
+            fi
+          done
+
+  run_tests:
+    name: Run CTest
+    needs: check_binaries
+    runs-on: self-hosted
+    container: 'epitechcontent/epitest-docker'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache ccache (Read-only pour les tests)
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: ccache-${{ github.ref }}-${{ github.sha }}
+          restore-keys: |
+            ccache-${{ github.ref }}-
+            ccache-
+
+      - name: Configure CMake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+
+      - name: Build (Quick catchup)
+        run: cmake --build build --config ${{env.BUILD_TYPE}}
+
+      - name: Run CTest
+        working-directory: build
+        run: ctest -C ${{env.BUILD_TYPE}} --output-on-failure --output-junit results.xml
+
+      - name: Summary Test Results
+        if: always()
+        uses: test-summary/action@v2
+        with:
+          paths: "build/results.xml"
+
+  push_to_mirror:
+    name: Push to Target Main Repository
+    needs: run_tests
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Mirroring Action
+        uses: pixta-dev/repository-mirroring-action@v1
+        with:
+          target_repo_url: ${{ env.TARGET_REPO_URL }}
+          ssh_private_key: ${{ secrets.GIT_SSH_PRIVATE_KEY }}
