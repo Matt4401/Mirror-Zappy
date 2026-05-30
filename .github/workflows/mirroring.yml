@@ -21,8 +21,7 @@ concurrency:
 jobs:
   cpp-linter:
     name: Check linter cpp
-    runs-on: self-hosted
-    container: 'epitechcontent/epitest-docker'
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -53,8 +52,7 @@ jobs:
 
   python-linter:
     name: Check linter python
-    runs-on: self-hosted
-    container: 'epitechcontent/epitest-docker'
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -72,8 +70,7 @@ jobs:
   check_program_compilation:
     name: Build & Verify Binaries
     needs: cpp-linter
-    runs-on: self-hosted
-    container: 'epitechcontent/epitest-docker'
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -120,8 +117,7 @@ jobs:
   run_tests:
     name: Run CTest
     needs: check_binaries
-    runs-on: self-hosted
-    container: 'epitechcontent/epitest-docker'
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
