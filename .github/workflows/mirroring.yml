@@ -126,20 +126,13 @@ jobs:
             ccache-
 
       - name: Configure CMake
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+        run: cmake -S . -B build_tests
 
       - name: Build (Quick catchup)
-        run: cmake --build build --config ${{env.BUILD_TYPE}}
+        run: cmake --build build_tests
 
       - name: Run CTest
-        working-directory: build
-        run: ctest -C ${{env.BUILD_TYPE}} --output-on-failure --output-junit results.xml
-
-      - name: Summary Test Results
-        if: always()
-        uses: test-summary/action@v2
-        with:
-          paths: "build/results.xml"
+        run: ctest --test-dir build_tests --output-on-failure
 
   push_to_mirror:
     name: Push to Target Main Repository
