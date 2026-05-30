@@ -99,8 +99,7 @@ jobs:
   check_binaries:
     name: Verify Zappy Binaries
     needs: check_program_compilation      
-    runs-on: self-hosted
-    container: 'epitechcontent/epitest-docker'
+    runs-on: ubuntu-latest
     steps:
       - name: Check Zappy Executables Exist
         shell: bash
