@@ -110,7 +110,7 @@ jobs:
 
   run_tests:
     name: Run CTest
-    needs: check_binaries
+    needs: check_program_compilation
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
