@@ -68,7 +68,7 @@ jobs:
         run: ruff format --check .
 
   check_program_compilation:
-    name: Build & Verify Binaries
+    name: Build & check binaries
     needs: cpp-linter
     runs-on: ubuntu-latest
     steps:
@@ -95,12 +95,7 @@ jobs:
       - name: Build Zappy Binaries
         timeout-minutes: 10
         run: cmake --build build --config ${{env.BUILD_TYPE}}
-
-  check_binaries:
-    name: Verify Zappy Binaries
-    needs: check_program_compilation      
-    runs-on: ubuntu-latest
-    steps:
+      
       - name: Check Zappy Executables Exist
         shell: bash
         run: |
