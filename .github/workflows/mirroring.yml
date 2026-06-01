@@ -145,9 +145,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Push to main repository
-        run: |
-          git config --global user.name "GitHub Action Bot"
-          git config --global user.email "actions@github.com"
-          git remote add upstream https://x-access-token:${{ secrets.GIT_SSH_PRIVATE_KEY }}@github.com/EpitechPGE2-2025/G-YEP-400-NAN-4-1-zappy-3.git
-          git push upstream main --force-with-lease
+      - uses: pixta-dev/repository-mirroring-action@v1
+        with:
+          target_repo_url:
+            ${{ env.TARGET_REPO_URL }}
+          ssh_private_key:                              # <-- use 'secrets' to pass credential information.
+            ${{ secrets.GIT_SSH_PRIVATE_KEY }}
+      
