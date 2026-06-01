@@ -48,15 +48,3 @@ body:
         * It needs to integrate into the main execution loop.
     validations:
       required: true
-  - type: textarea
-    id: code_examples
-    attributes:
-      label: Code examples
-      description: Provide code snippets demonstrating the intended behavior.
-      placeholder: |
-        ```cpp
-        int main(int argc, char** argv) {
-            ArgParser parser{argc, argv};
-            auto inputFile = parser.get<std::string_view>("input");
-        }
-        ```
