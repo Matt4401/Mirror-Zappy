@@ -43,7 +43,7 @@ Socket& Socket::operator=(Socket&& other) noexcept {
     return *this;
 }
 
-void shared::Socket::send(const std::string_view& message) const {
+std::size_t shared::Socket::send(const std::string_view& message) const {
     if (_fd < 0) {
         throw exception::SocketError("Invalid socket file descriptor.");
     }
@@ -68,6 +68,7 @@ void shared::Socket::send(const std::string_view& message) const {
         }
         totalSent += static_cast<size_t>(bytesSent);
     }
+    return totalSent;
 }
 
 std::string Socket::receive() const {

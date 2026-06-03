@@ -5,6 +5,7 @@
 ** Socket class
 */
 
+#include <cstddef>
 #include <string>
 #include <string_view>
 
@@ -21,7 +22,7 @@ class Socket {
     Socket(Socket&& other) noexcept;
     Socket& operator=(Socket&& other) noexcept;
 
-    void send(const std::string_view& message) const;
+    [[nodiscard]] std::size_t send(const std::string_view& message) const;
     [[nodiscard]] std::string receive() const;
 
     [[nodiscard]] int fd() const;
