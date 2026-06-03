@@ -5,6 +5,8 @@
 ** Socket class
 */
 
+#pragma once
+
 #include <cstddef>
 #include <string>
 #include <string_view>
