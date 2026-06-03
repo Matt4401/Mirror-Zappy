@@ -7,19 +7,22 @@
 
 #include <string>
 #include <string_view>
+
 namespace zappy::shared {
+
 class Socket {
   public:
     Socket() = default;
-    ~Socket() = default;
+    explicit Socket(int fd);
+    ~Socket();
 
     Socket(const Socket& other) = delete;
     Socket& operator=(const Socket& other) = delete;
-    Socket(Socket&& other) noexcept = default;
-    Socket& operator=(Socket&& other) noexcept = default;
+    Socket(Socket&& other) noexcept;
+    Socket& operator=(Socket&& other) noexcept;
 
     void send(const std::string_view& message) const;
-    std::string receive();
+    [[nodiscard]] std::string receive() const;
 
     [[nodiscard]] int fd() const;
 
