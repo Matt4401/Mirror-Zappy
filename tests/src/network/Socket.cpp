@@ -45,8 +45,10 @@ TEST_F(ServerSocketTest, AcceptClientReturnsValidClientSocket) {
 
     sockaddr_in boundAddress{};
     socklen_t addressLength{sizeof(boundAddress)};
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-    ::getsockname(server.fd(), reinterpret_cast<sockaddr*>(&boundAddress), &addressLength);
+    const int getSocknameResult =
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+        ::getsockname(server.fd(), reinterpret_cast<sockaddr*>(&boundAddress), &addressLength);
+    ASSERT_NE(getSocknameResult, -1);
 
     _mockClientFd = ::socket(AF_INET, SOCK_STREAM, 0);
     ASSERT_NE(_mockClientFd, -1);
@@ -69,6 +71,8 @@ TEST_F(ServerSocketTest, AcceptClientOnNonBlockingWithNoConnectionsReturnsInvali
     server.bindAndListen(0);
 
     const int flags = ::fcntl(server.fd(), F_GETFL, 0);
+    ASSERT_NE(flags, -1);
+
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
     ::fcntl(server.fd(), F_SETFL, flags | O_NONBLOCK);
 
