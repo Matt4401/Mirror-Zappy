@@ -5,14 +5,11 @@
 ** socket tests
 */
 
-#include <arpa/inet.h>
 #include <fcntl.h>
 #include <gtest/gtest.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <unistd.h>
-
-#include <stdexcept>
 
 #include "network/ServerSocket.hpp"
 #include "src/exception/SocketError.hpp"
@@ -52,11 +49,15 @@ TEST_F(ServerSocketTest, AcceptClientReturnsValidClientSocket) {
     ::getsockname(server.fd(), reinterpret_cast<sockaddr*>(&boundAddress), &addressLength);
 
     _mockClientFd = ::socket(AF_INET, SOCK_STREAM, 0);
+    ASSERT_NE(_mockClientFd, -1);
+
     boundAddress.sin_family = AF_INET;
     boundAddress.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-    auto i = ::connect(_mockClientFd, reinterpret_cast<const sockaddr*>(&boundAddress), sizeof(boundAddress));
+    const auto connectResult =
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+        ::connect(_mockClientFd, reinterpret_cast<const sockaddr*>(&boundAddress), sizeof(boundAddress));
+    ASSERT_NE(connectResult, -1);
 
     const shared::network::ClientSocket acceptedClient = server.acceptClient();
 
