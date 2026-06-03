@@ -7,7 +7,6 @@
 
 #include "ServerSocket.hpp"
 
-#include <asm-generic/socket.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 
@@ -28,6 +27,7 @@ void ServerSocket::bindAndListen(const std::uint16_t port) {
         throw shared::exception::SocketError{"failed to create server socket"};
     }
     setFd(newFd);
+    // NOLINTNEXTLINE(misc-include-cleaner)
     if (::setsockopt(fd(), SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
         throw shared::exception::SocketError{"failed to set socket options"};
     }
