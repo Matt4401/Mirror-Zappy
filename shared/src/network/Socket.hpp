@@ -11,7 +11,7 @@
 #include <string>
 #include <string_view>
 
-namespace zappy::shared {
+namespace zappy::shared::network {
 
 class Socket {
   public:
@@ -32,4 +32,4 @@ class Socket {
   private:
     int _fd{-1};
 };
-}  // namespace zappy::shared
+}  // namespace zappy::shared::network

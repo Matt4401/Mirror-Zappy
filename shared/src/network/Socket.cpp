@@ -20,7 +20,7 @@
 
 #include "exception/SocketError.hpp"
 
-namespace zappy::shared {
+namespace zappy::shared::network {
 
 Socket::Socket(int fd) : _fd{fd} {}
 
@@ -43,7 +43,7 @@ Socket& Socket::operator=(Socket&& other) noexcept {
     return *this;
 }
 
-std::size_t shared::Socket::send(const std::string_view& message) const {
+std::size_t Socket::send(const std::string_view& message) const {
     if (_fd < 0) {
         throw exception::SocketError("Invalid socket file descriptor.");
     }
@@ -90,4 +90,4 @@ std::string Socket::receive() const {
     return {buffer.data(), static_cast<size_t>(bytesReceived)};
 }
 
-}  // namespace zappy::shared
+}  // namespace zappy::shared::network
