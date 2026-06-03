@@ -18,7 +18,7 @@ namespace zappy::shared::network {
 BaseSocket::BaseSocket(int fd) : _fd{fd} {}
 
 BaseSocket::~BaseSocket() {
-    if (_fd >= 0) {
+    if (_fd != -1) {
         ::close(_fd);
     }
 }
@@ -37,24 +37,22 @@ BaseSocket& BaseSocket::operator=(BaseSocket&& other) noexcept {
 }
 
 int BaseSocket::fd() const {
-    if (_fd < 0) {
+    if (_fd == -1) {
         throw exception::SocketError("Invalid socket file descriptor.");
     }
     return _fd;
 }
 
 void BaseSocket::close() {
-    if (_fd < 0) {
+    if (_fd == -1) {
         throw exception::SocketError("Invalid socket file descriptor.");
     }
-    if (_fd >= 0) {
-        ::close(_fd);
-        _fd = -1;
-    }
+    ::close(_fd);
+    _fd = -1;
 }
 
 void BaseSocket::setFd(int fd) {
-    if (_fd >= 0) {
+    if (_fd != -1) {
         ::close(_fd);
     }
     _fd = fd;
