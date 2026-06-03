@@ -1,8 +1,10 @@
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 add_library(zappy_shared STATIC
-    src/network/Socket.cpp
-    src/network/Socket.hpp
+    src/network/ClientSocket.cpp
+    src/network/ClientSocket.hpp
+    src/network/BaseSocket.cpp
+    src/network/BaseSocket.hpp
     src/exception/Exception.cpp
     src/exception/Exception.hpp
     src/exception/SocketError.hpp
