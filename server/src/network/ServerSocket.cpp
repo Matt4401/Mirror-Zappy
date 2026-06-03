@@ -7,7 +7,7 @@
 
 #include "ServerSocket.hpp"
 
-#include <netinet/in.h>
+#include <netinet/in.h>  // IWYU pragma: keep
 #include <sys/socket.h>  // IWYU pragma: keep
 
 #include <cerrno>
