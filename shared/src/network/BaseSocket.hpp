@@ -11,8 +11,6 @@ namespace zappy::shared::network {
 
 class BaseSocket {
   public:
-    BaseSocket() = default;
-    explicit BaseSocket(int fd);
     virtual ~BaseSocket();
 
     BaseSocket(const BaseSocket&) = delete;
@@ -25,6 +23,8 @@ class BaseSocket {
     void close();
 
   protected:
+    BaseSocket() = default;
+    explicit BaseSocket(int fd);
     void setFd(int fd);
 
   private:
