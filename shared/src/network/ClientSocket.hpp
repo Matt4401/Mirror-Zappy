@@ -22,6 +22,8 @@ class ClientSocket : public BaseSocket {
 
     [[nodiscard]] std::size_t send(std::string_view message) const;
     [[nodiscard]] std::string receive() const;
+
+    void setNonBlocking() const;
 };
 
 }  // namespace zappy::shared::network

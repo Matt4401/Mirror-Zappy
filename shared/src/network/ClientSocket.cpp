@@ -7,6 +7,7 @@
 
 #include "ClientSocket.hpp"
 
+#include <fcntl.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -14,11 +15,11 @@
 #include <array>
 #include <cerrno>
 #include <cstddef>
-#include <stdexcept>
 #include <string>
 #include <string_view>
 
 #include "BaseSocket.hpp"
+#include "exception/SocketError.hpp"
 
 namespace zappy::shared::network {
 
@@ -39,7 +40,7 @@ std::size_t ClientSocket::send(const std::string_view message) const {
             if (errno == EAGAIN || errno == EWOULDBLOCK) {
                 return totalSent;
             }
-            throw std::runtime_error{"failed to send data"};
+            throw exception::SocketError{"failed to send data"};
         }
         if (bytesSent == 0) {
             break;
@@ -58,13 +59,24 @@ std::string ClientSocket::receive() const {
         if (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK) {
             return "";
         }
-        throw std::runtime_error{"failed to receive data"};
+        throw exception::SocketError{"failed to receive data"};
     }
     if (bytesRead == 0) {
-        throw std::runtime_error{"client disconnected"};
+        throw exception::SocketError{"client disconnected"};
     }
 
     return std::string{buffer.data(), static_cast<std::size_t>(bytesRead)};
+}
+
+void ClientSocket::setNonBlocking() const {
+    const int flags = ::fcntl(fd(), F_GETFL, 0);
+    if (flags == -1) {
+        throw exception::SocketError{"unable to get socket flags"};
+    }
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
+    if (::fcntl(fd(), F_SETFL, flags | O_NONBLOCK) == -1) {
+        throw exception::SocketError{"unable to set non-blocking mode"};
+    }
 }
 
 }  // namespace zappy::shared::network
