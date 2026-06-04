@@ -7,7 +7,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
-# add_subdirectory(shared)
+add_subdirectory(shared)
 add_subdirectory(server)
 add_subdirectory(ai)
 add_subdirectory(gui)
