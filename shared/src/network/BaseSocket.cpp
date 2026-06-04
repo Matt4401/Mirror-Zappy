@@ -5,7 +5,7 @@
 ** Socket base
 */
 
-#include "BaseSocket.hpp"
+#include "network/BaseSocket.hpp"
 
 #include <unistd.h>
 

@@ -5,7 +5,7 @@
 ** socket class
 */
 
-#include "ClientSocket.hpp"
+#include "network/ClientSocket.hpp"
 
 #include <fcntl.h>
 #include <sys/socket.h>
@@ -17,8 +17,8 @@
 #include <string>
 #include <string_view>
 
-#include "BaseSocket.hpp"
 #include "exception/SocketError.hpp"
+#include "network/BaseSocket.hpp"
 
 namespace zappy::shared::network {
 
