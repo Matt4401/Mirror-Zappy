@@ -60,7 +60,7 @@ class SessionManager {
 
     std::unordered_map<int, std::string> _readBuffers;
     std::unordered_map<int, std::string> _writeBuffers;
-    std::queue<NetworkEvent> _messageQueue;
+    std::queue<NetworkEvent> _eventQueue;
 };
 
 }  // namespace zappy::server::network

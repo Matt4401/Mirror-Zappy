@@ -84,6 +84,7 @@ void SessionManager::acceptNewConnection() {
     }
     _clients.emplace(clientId, std::move(newClient));
     _pollFds.push_back({.fd = clientId, .events = POLLIN | POLLOUT, .revents = 0});
+    _eventQueue.push({.type = EventType::CLIENT_CONNECTED, .clientId = clientId, .message = ""});
 }
 
 void SessionManager::disconnectClient(const int clientId) {
@@ -96,6 +97,7 @@ void SessionManager::disconnectClient(const int clientId) {
     _readBuffers.erase(clientId);
     _writeBuffers.erase(clientId);
     _clients.erase(clientId);
+    _eventQueue.push({.type = EventType::CLIENT_DISCONNECTED, .clientId = clientId, .message = ""});
 }
 
 }  // namespace zappy::server::network
