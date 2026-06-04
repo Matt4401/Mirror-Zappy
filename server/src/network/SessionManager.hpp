@@ -24,11 +24,13 @@ namespace zappy::server::network {
 
 class SessionManager {
   public:
-    struct NetworkMessage {
+    enum class EventType : std::uint8_t { CLIENT_CONNECTED, CLIENT_DISCONNECTED, MESSAGE_RECEIVED };
+
+    struct NetworkEvent {
+        EventType type;
         int clientId;
         std::string message;
     };
-
     explicit SessionManager(std::uint16_t port);
     ~SessionManager() = default;
 
@@ -38,7 +40,7 @@ class SessionManager {
     SessionManager& operator=(SessionManager&& other) = delete;
 
     void pollNetwork();
-    [[nodiscard]] bool tryPopMessage(NetworkMessage& message);
+    [[nodiscard]] bool tryPopMessage(NetworkEvent& message);
     void sendMessage(int clientId, std::string_view message);
 
     void disconnectClient(int clientId);
@@ -58,7 +60,7 @@ class SessionManager {
 
     std::unordered_map<int, std::string> _readBuffers;
     std::unordered_map<int, std::string> _writeBuffers;
-    std::queue<NetworkMessage> _messageQueue;
+    std::queue<NetworkEvent> _messageQueue;
 };
 
 }  // namespace zappy::server::network
