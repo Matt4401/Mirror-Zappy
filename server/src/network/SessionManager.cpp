@@ -10,8 +10,10 @@
 #include <sys/poll.h>
 
 #include <cerrno>
+#include <cstddef>
 #include <cstdint>
-#include <stdexcept>
+
+#include "exception/PollError.hpp"
 
 namespace zappy::server::network {
 
@@ -27,10 +29,22 @@ void SessionManager::pollNetwork() {
         if (errno == EINTR) {
             return;
         }
-        throw std::runtime_error{"fatal error during poll"};
+        throw exception::PollError{"fatal error during poll"};
     }
     if (readyFds == 0) {
         return;
+    }
+    for (std::size_t i = _pollFds.size(); i > 0; i--) {
+        const struct pollfd pfd = _pollFds.at(i - 1);
+        if (pfd.revents == 0) {
+            continue;
+        }
+
+        if (pfd.fd == _serverSocket.fd()) {
+            handleServerEvent(pfd.revents);
+        } else {
+            handleClientEvent(pfd);
+        }
     }
 }
 

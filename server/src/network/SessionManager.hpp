@@ -44,6 +44,13 @@ class SessionManager {
     void disconnectClient(int clientId);
 
   private:
+    void acceptNewConnection();
+    void handleClientRead(int clientId);
+    void handleClientWrite(int clientId);
+    void extractCompleteMessages(int clientId);
+    void handleServerEvent(short revents);
+    void handleClientEvent(struct pollfd pfd);
+
     ServerSocket _serverSocket{};
     std::vector<struct pollfd> _pollFds;
 
