@@ -13,9 +13,12 @@
 #include <cerrno>
 #include <cstddef>
 #include <cstdint>
+#include <exception>
+#include <string>
 #include <utility>
 
 #include "exception/PollError.hpp"
+#include "exception/SocketError.hpp"
 #include "network/ClientSocket.hpp"
 
 namespace zappy::server::network {
@@ -98,6 +101,33 @@ void SessionManager::disconnectClient(const int clientId) {
     _writeBuffers.erase(clientId);
     _clients.erase(clientId);
     _eventQueue.push({.type = EventType::CLIENT_DISCONNECTED, .clientId = clientId, .message = ""});
+}
+
+void SessionManager::handleClientRead(const int clientId) {
+    try {
+        const std::string data = _clients.at(clientId).receive();
+
+        if (data.empty()) {
+            return;
+        }
+        _readBuffers.at(clientId) += data;
+        extractCompleteMessages(clientId);
+
+    } catch (const std::exception& /*e*/) {
+        disconnectClient(clientId);
+    }
+}
+
+void SessionManager::extractCompleteMessages(const int clientId) {
+    std::string& buffer = _readBuffers.at(clientId);
+
+    std::size_t pos = 0;
+    while ((pos = buffer.find('\n')) != std::string::npos) {
+        const std::string completeMessage = buffer.substr(0, pos);
+        _eventQueue.push(
+            NetworkEvent{.type = EventType::MESSAGE_RECEIVED, .clientId = clientId, .message = completeMessage});
+        buffer.erase(0, pos + 1);
+    }
 }
 
 }  // namespace zappy::server::network
