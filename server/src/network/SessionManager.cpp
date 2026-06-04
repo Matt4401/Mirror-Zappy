@@ -9,11 +9,14 @@
 
 #include <sys/poll.h>
 
+#include <algorithm>
 #include <cerrno>
 #include <cstddef>
 #include <cstdint>
+#include <utility>
 
 #include "exception/PollError.hpp"
+#include "network/ClientSocket.hpp"
 
 namespace zappy::server::network {
 
@@ -46,6 +49,53 @@ void SessionManager::pollNetwork() {
             handleClientEvent(pfd);
         }
     }
+}
+
+void SessionManager::handleServerEvent(const short revents) {
+    if ((revents & POLLIN) != 0) {
+        acceptNewConnection();
+    }
+}
+
+void SessionManager::handleClientEvent(const struct pollfd pfd) {
+    const int clientId = pfd.fd;
+
+    if ((pfd.revents & (POLLERR | POLLHUP | POLLNVAL)) != 0) {
+        disconnectClient(clientId);
+        return;
+    }
+    if ((pfd.revents & POLLIN) != 0) {
+        handleClientRead(clientId);
+        if (!_clients.contains(clientId)) {
+            return;
+        }
+    }
+    if ((pfd.revents & POLLOUT) != 0) {
+        handleClientWrite(clientId);
+    }
+}
+
+void SessionManager::acceptNewConnection() {
+    shared::network::ClientSocket newClient = _serverSocket.acceptClient();
+    const int clientId = newClient.fd();
+
+    if (clientId == -1) {
+        return;
+    }
+    _clients.emplace(clientId, std::move(newClient));
+    _pollFds.push_back({.fd = clientId, .events = POLLIN | POLLOUT, .revents = 0});
+}
+
+void SessionManager::disconnectClient(const int clientId) {
+    auto it = std::ranges::find_if(_pollFds.begin(), _pollFds.end(),
+                                   [clientId](const struct pollfd& pfd) { return pfd.fd == clientId; });
+
+    if (it != _pollFds.end()) {
+        _pollFds.erase(it);
+    }
+    _readBuffers.erase(clientId);
+    _writeBuffers.erase(clientId);
+    _clients.erase(clientId);
 }
 
 }  // namespace zappy::server::network
