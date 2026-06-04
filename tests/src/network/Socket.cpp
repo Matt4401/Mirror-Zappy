@@ -11,9 +11,9 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include "exception/SocketError.hpp"
+#include "network/ClientSocket.hpp"
 #include "network/ServerSocket.hpp"
-#include "src/exception/SocketError.hpp"
-#include "src/network/ClientSocket.hpp"
 
 namespace {
 

@@ -9,8 +9,8 @@
 
 #include <cstdint>
 
-#include "src/network/BaseSocket.hpp"
-#include "src/network/ClientSocket.hpp"
+#include "network/BaseSocket.hpp"
+#include "network/ClientSocket.hpp"
 
 namespace zappy::server::network {
 

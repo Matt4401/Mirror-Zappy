@@ -2,12 +2,12 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 add_library(zappy_shared STATIC
     src/network/ClientSocket.cpp
-    src/network/ClientSocket.hpp
+    include/network/ClientSocket.hpp
     src/network/BaseSocket.cpp
-    src/network/BaseSocket.hpp
+    include/network/BaseSocket.hpp
     src/exception/Exception.cpp
-    src/exception/Exception.hpp
-    src/exception/SocketError.hpp
+    include/exception/Exception.hpp
+    include/exception/SocketError.hpp
 )
 
 target_include_directories(zappy_shared PRIVATE

@@ -13,8 +13,8 @@
 #include <cerrno>
 #include <cstdint>
 
-#include "src/exception/SocketError.hpp"
-#include "src/network/ClientSocket.hpp"
+#include "exception/SocketError.hpp"
+#include "network/ClientSocket.hpp"
 
 namespace zappy::server::network {
 

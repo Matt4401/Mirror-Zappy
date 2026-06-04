@@ -5,7 +5,7 @@
 ** exceptions
 */
 
-#include "Exception.hpp"
+#include "exception/Exception.hpp"
 
 #include <string>
 #include <utility>
