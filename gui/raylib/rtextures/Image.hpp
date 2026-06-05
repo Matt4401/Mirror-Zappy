@@ -73,7 +73,7 @@ class Image {
     void tint(Color color) { ImageColorTint(&_image, color); }
     void invert() { ImageColorInvert(&_image); }
     void grayscale() { ImageColorGrayscale(&_image); }
-    void contrast(int value) { ImageColorContrast(&_image, value); }
+    void contrast(float value) { ImageColorContrast(&_image, value); }
     void brightness(int value) { ImageColorBrightness(&_image, value); }
     void replaceColor(Color color, Color replacement) { ImageColorReplace(&_image, color, replacement); }
 

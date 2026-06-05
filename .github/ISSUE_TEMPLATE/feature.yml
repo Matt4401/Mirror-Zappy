@@ -1,3 +1,4 @@
+---
 name: Feature Request
 description: Propose a new feature or architectural change.
 labels: enhancement
@@ -6,7 +7,7 @@ body:
     attributes:
       value: |
         # New feature proposal
-        
+
         Ensure the proposal provides all necessary information for the development team to understand and implement the feature effectively.
   - type: textarea
     id: description
@@ -42,7 +43,7 @@ body:
     id: implementation
     attributes:
       label: Implementation
-      description: How should the feature be implemented? 
+      description: How should the feature be implemented?
       placeholder: |
         * The class should use std::unique_ptr for ownership.
         * It needs to integrate into the main execution loop.
