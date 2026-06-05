@@ -71,6 +71,9 @@ void SessionManager::sendMessage(int clientId, std::string_view message) {
 }
 
 void SessionManager::disconnectClient(const int clientId) {
+    if (!_clients.contains(clientId)) {
+        return;
+    }
     auto it = std::ranges::find_if(_pollFds.begin(), _pollFds.end(),
                                    [clientId](const struct pollfd& pfd) { return pfd.fd == clientId; });
 
