@@ -13,8 +13,7 @@
 namespace zappy::gui::raylib::rcore {
 class Window {
   public:
-    Window(int width = 800, int height = 600, const char* title = "Zappy", uint32_t flags = 0)
-        : _width(width), _height(height) {
+    Window(int width = 800, int height = 600, const char* title = "Zappy", uint32_t flags = 0) {
         if (!IsWindowReady()) {
             initWindow(width, height, title, flags);
             _ownsWindow = true;
@@ -46,13 +45,11 @@ class Window {
 
     static void setTargetFPS(int fps) { SetTargetFPS(fps); }
 
-    [[nodiscard]] int width() const { return _width; }
-    [[nodiscard]] int height() const { return _height; }
+    static double getScreenWidth() { return GetScreenWidth(); }
+    static double getScreenHeight() { return GetScreenHeight(); }
 
   protected:
   private:
-    int _width;
-    int _height;
     bool _ownsWindow = false;
 };
 }  // namespace zappy::gui::raylib::rcore

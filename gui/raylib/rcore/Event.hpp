@@ -8,6 +8,8 @@
 #pragma once
 #include <raylib.h>
 
+#include "rmath/Vector2.hpp"
+
 namespace zappy::gui::raylib::rcore {
 class Event {
   public:
@@ -26,7 +28,7 @@ class Event {
     static bool isMouseButtonDown(int button) { return IsMouseButtonDown(button); }
     static bool isMouseButtonReleased(int button) { return IsMouseButtonReleased(button); }
 
-    static Vector2 getMousePosition() { return GetMousePosition(); }
+    static rmath::Vector2 getMousePosition() { return GetMousePosition(); }
     static double getMouseWheelMove() { return GetMouseWheelMove(); }
 
   protected:

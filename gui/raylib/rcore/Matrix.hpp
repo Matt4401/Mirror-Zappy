@@ -27,6 +27,6 @@ class Matrix {
 
   protected:
   private:
-    ::Matrix _matrix;
+    ::Matrix _matrix{};
 };
 }  // namespace zappy::gui::raylib::rcore

@@ -35,7 +35,7 @@ class Camera {
     void updateCamera(int mode) { UpdateCamera(&_camera, mode); }
 
     void cameraYaw(float angle, bool rotateAroundTarget) { CameraYaw(&_camera, angle, rotateAroundTarget); }
-    void cameraPitch(float angle, bool rotateAroundTarget, bool lockView, bool rotateUp) {
+    void cameraPitch(float angle, bool lockView, bool rotateAroundTarget, bool rotateUp) {
         CameraPitch(&_camera, angle, lockView, rotateAroundTarget, rotateUp);
     }
 
