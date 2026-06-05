@@ -11,6 +11,8 @@
 #include <string>
 #include <utility>
 
+#include "rmath/Vector2.hpp"
+
 namespace zappy::gui::raylib::rtextures {
 class Texture2D {
   public:
@@ -37,12 +39,12 @@ class Texture2D {
     [[nodiscard]] int height() const { return _texture.height; }
     [[nodiscard]] ::Texture2D texture() const { return _texture; }
 
-    void draw(::Vector2 position, Color tint) const { DrawTextureV(_texture, position, tint); }
-    void draw(::Vector2 position, float rotation, float scale, Color tint) const {
-        DrawTextureEx(_texture, position, rotation, scale, tint);
+    void draw(rmath::Vector2 position, Color tint) const { DrawTextureV(_texture, position.vector(), tint); }
+    void draw(rmath::Vector2 position, float rotation, float scale, Color tint) const {
+        DrawTextureEx(_texture, position.vector(), rotation, scale, tint);
     }
-    void draw(Rectangle source, ::Vector2 position, Color tint) const {
-        DrawTextureRec(_texture, source, position, tint);
+    void draw(Rectangle source, rmath::Vector2 position, Color tint) const {
+        DrawTextureRec(_texture, source, position.vector(), tint);
     }
 
   protected:

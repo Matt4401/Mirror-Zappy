@@ -11,6 +11,7 @@
 #include <string>
 #include <utility>
 
+#include "rmath/Vector2.hpp"
 #include "rtext/Font.hpp"
 
 namespace zappy::gui::raylib::rtext {
@@ -24,18 +25,18 @@ class Text {
 
     void draw(int x, int y, int fontSize, Color color) const { DrawText(_text.c_str(), x, y, fontSize, color); }
 
-    void draw(const Font& font, ::Vector2 position, float fontSize, float spacing, Color tint) const {
-        DrawTextEx(font.font(), _text.c_str(), position, fontSize, spacing, tint);
+    void draw(const Font& font, rmath::Vector2 position, float fontSize, float spacing, Color tint) const {
+        DrawTextEx(font.font(), _text.c_str(), position.vector(), fontSize, spacing, tint);
     }
 
-    void drawPro(const Font& font, ::Vector2 position, ::Vector2 origin, float rotation, float fontSize, float spacing,
-                 Color tint) const {
-        DrawTextPro(font.font(), _text.c_str(), position, origin, rotation, fontSize, spacing, tint);
+    void draw(const Font& font, rmath::Vector2 position, rmath::Vector2 origin, float rotation, float fontSize,
+                 float spacing, Color tint) const {
+        DrawTextPro(font.font(), _text.c_str(), position.vector(), origin.vector(), rotation, fontSize, spacing, tint);
     }
 
     [[nodiscard]] int measure(int fontSize) const { return MeasureText(_text.c_str(), fontSize); }
 
-    [[nodiscard]] ::Vector2 measure(const Font& font, float fontSize, float spacing) const {
+    [[nodiscard]] rmath::Vector2 measure(const Font& font, float fontSize, float spacing) const {
         return MeasureTextEx(font.font(), _text.c_str(), fontSize, spacing);
     }
 

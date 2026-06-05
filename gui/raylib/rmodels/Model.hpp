@@ -11,7 +11,7 @@
 #include <string>
 #include <utility>
 
-#include "rcamera.h"
+#include "rmath/Vector3.hpp"
 #include "rmodels/Mesh.hpp"
 
 namespace zappy::gui::raylib::rmodels {
@@ -40,16 +40,19 @@ class Model {
     [[nodiscard]] ::Model model() const { return _model; }
     [[nodiscard]] ::Model& model() { return _model; }
 
-    void drawModel(Vector3 position, float scale, Color tint) const { DrawModel(_model, position, scale, tint); }
-    void drawModelEx(Vector3 position, Vector3 rotationAxis, float rotationAngle, Vector3 scale, Color tint) const {
-        DrawModelEx(_model, position, rotationAxis, rotationAngle, scale, tint);
+    void drawModel(rmath::Vector3 position, float scale, Color tint) const {
+        DrawModel(_model, position.vector(), scale, tint);
     }
-    void drawModelWires(Vector3 position, float scale, Color tint) const {
-        DrawModelWires(_model, position, scale, tint);
+    void drawModelEx(rmath::Vector3 position, rmath::Vector3 rotationAxis, float rotationAngle, rmath::Vector3 scale,
+                     Color tint) const {
+        DrawModelEx(_model, position.vector(), rotationAxis.vector(), rotationAngle, scale.vector(), tint);
     }
-    void drawModelWiresEx(Vector3 position, Vector3 rotationAxis, float rotationAngle, Vector3 scale,
-                          Color tint) const {
-        DrawModelWiresEx(_model, position, rotationAxis, rotationAngle, scale, tint);
+    void drawModelWires(rmath::Vector3 position, float scale, Color tint) const {
+        DrawModelWires(_model, position.vector(), scale, tint);
+    }
+    void drawModelWiresEx(rmath::Vector3 position, rmath::Vector3 rotationAxis, float rotationAngle,
+                          rmath::Vector3 scale, Color tint) const {
+        DrawModelWiresEx(_model, position.vector(), rotationAxis.vector(), rotationAngle, scale.vector(), tint);
     }
 
   protected:

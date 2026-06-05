@@ -9,11 +9,12 @@
 #include <raylib.h>
 
 #include "rcamera.h"
+#include "rmath/Vector3.hpp"
 
 namespace zappy::gui::raylib::rcore {
 class Camera {
   public:
-    Camera(Vector3 position) : _camera{} { _camera.position = position; }
+    Camera(rmath::Vector3 position) : _camera{} { _camera.position = position.vector(); }
     Camera() = default;
     ~Camera() = default;
     Camera(const Camera& other) = delete;
@@ -26,9 +27,9 @@ class Camera {
 
     [[nodiscard]] Camera3D camera() const { return _camera; }
 
-    void setPosition(Vector3 position) { _camera.position = position; }
-    void setTarget(Vector3 target) { _camera.target = target; }
-    void setUp(Vector3 up) { _camera.up = up; }
+    void setPosition(rmath::Vector3 position) { _camera.position = position.vector(); }
+    void setTarget(rmath::Vector3 target) { _camera.target = target.vector(); }
+    void setUp(rmath::Vector3 up) { _camera.up = up.vector(); }
     void setFovy(float fovy) { _camera.fovy = fovy; }
     void setProjection(int projection) { _camera.projection = projection; }
 

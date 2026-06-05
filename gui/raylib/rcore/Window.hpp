@@ -13,7 +13,10 @@
 namespace zappy::gui::raylib::rcore {
 class Window {
   public:
-    Window(int width = 800, int height = 600, const char* title = "Zappy", uint32_t flags = 0) {
+    static constexpr int WIDTH = 800;
+    static constexpr int HEIGHT = 600;
+
+    Window(int width = WIDTH, int height = HEIGHT, const char* title = "Zappy", uint32_t flags = 0) {
         if (!IsWindowReady()) {
             initWindow(width, height, title, flags);
             _ownsWindow = true;
@@ -30,7 +33,7 @@ class Window {
     Window(Window&& other) = delete;
     Window& operator=(Window&& other) = delete;
 
-    static void initWindow(int width = 800, int height = 600, const char* title = "Zappy", uint32_t flags = 0) {
+    static void initWindow(int width = WIDTH, int height = HEIGHT, const char* title = "Zappy", uint32_t flags = 0) {
         if (flags != 0) {
             SetConfigFlags(flags);
         }
