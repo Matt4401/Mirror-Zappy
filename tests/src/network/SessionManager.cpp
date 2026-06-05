@@ -10,6 +10,7 @@
 #include <gtest/gtest.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 #include <array>
@@ -81,6 +82,9 @@ TEST_F(SessionManagerTest, ReceivesCompleteMessageAndGeneratesEvent) {
 
     const std::string command = "Forward\n";
     ::send(_mockClientFd, command.data(), command.size(), MSG_NOSIGNAL);
+    const ::ssize_t bytesSent = ::send(_mockClientFd, command.data(), command.size(), MSG_NOSIGNAL);
+    ASSERT_EQ(bytesSent, static_cast<::ssize_t>(command.size()));
+
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
     manager.pollNetwork();
@@ -103,13 +107,16 @@ TEST_F(SessionManagerTest, HandlesTCPFragmentationPerfectly) {
     ASSERT_TRUE(received);
 
     const std::string part1 = "For";
-    ::send(_mockClientFd, part1.data(), part1.size(), MSG_NOSIGNAL);
+    const ::ssize_t bytesSent1 = ::send(_mockClientFd, part1.data(), part1.size(), MSG_NOSIGNAL);
+    ASSERT_EQ(bytesSent1, static_cast<::ssize_t>(part1.size()));
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
     manager.pollNetwork();
 
     EXPECT_FALSE(manager.tryPopMessage(event));
     const std::string part2 = "ward\n";
+    const ::ssize_t bytesSent2 = ::send(_mockClientFd, part2.data(), part2.size(), MSG_NOSIGNAL);
+    ASSERT_EQ(bytesSent2, static_cast<::ssize_t>(part2.size()));
     ::send(_mockClientFd, part2.data(), part2.size(), MSG_NOSIGNAL);
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
@@ -137,10 +144,10 @@ TEST_F(SessionManagerTest, SendsDataToClient) {
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
     std::array<char, 32> buffer{};
-    const std::size_t bytesRead = ::recv(_mockClientFd, buffer.data(), buffer.size(), 0);
+    const ::ssize_t bytesRead = ::recv(_mockClientFd, buffer.data(), buffer.size(), 0);
 
     ASSERT_GT(bytesRead, 0);
-    EXPECT_EQ(std::string(buffer.data(), bytesRead), response);
+    EXPECT_EQ(std::string(buffer.data(), static_cast<std::size_t>(bytesRead)), response);
 }
 
 TEST_F(SessionManagerTest, HandlesClientDisconnection) {
