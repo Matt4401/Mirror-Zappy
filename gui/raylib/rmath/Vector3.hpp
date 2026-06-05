@@ -13,7 +13,7 @@ namespace zappy::gui::raylib::rmath {
 class Vector3 {
   public:
     constexpr Vector3() = default;
-    constexpr Vector3(float x, float y, float z) : _vector{x, y, z} {}
+    constexpr Vector3(float x, float y, float z) : _vector(x, y, z) {}
     constexpr Vector3(::Vector3 vector) : _vector{vector} {}
 
     [[nodiscard]] constexpr float x() const { return _vector.x; }
@@ -45,7 +45,12 @@ class Vector3 {
     [[nodiscard]] Vector3 operator+(const Vector3& other) const { return Vector3Add(_vector, other._vector); }
     [[nodiscard]] Vector3 operator-(const Vector3& other) const { return Vector3Subtract(_vector, other._vector); }
     [[nodiscard]] Vector3 operator*(float scalar) const { return Vector3Scale(_vector, scalar); }
-    [[nodiscard]] Vector3 operator/(float scalar) const { return Vector3Scale(_vector, 1.0F / scalar); }
+    [[nodiscard]] Vector3 operator/(float scalar) const {
+        if (scalar != 0.0F) {
+            return Vector3Scale(_vector, 1.0F / scalar);
+        }
+        return Vector3{0.0F, 0.0F, 0.0F};
+    }
     [[nodiscard]] Vector3 operator-() const { return Vector3Negate(_vector); }
     [[nodiscard]] bool operator==(const Vector3& other) const { return Vector3Equals(_vector, other._vector) != 0; }
 
@@ -62,7 +67,11 @@ class Vector3 {
         return *this;
     }
     Vector3& operator/=(float scalar) {
-        _vector = Vector3Scale(_vector, 1.0F / scalar);
+        if (scalar != 0.0F) {
+            _vector = Vector3Scale(_vector, 1.0F / scalar);
+        } else {
+            _vector = ::Vector3(0.0F, 0.0F, 0.0F);
+        }
         return *this;
     }
 
