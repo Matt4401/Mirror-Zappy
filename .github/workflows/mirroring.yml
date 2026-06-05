@@ -44,6 +44,29 @@ jobs:
       - name: Configure CMake for Linter
         run: cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
+      - name: Register clang-tidy annotations
+        run: |
+          cat > "$RUNNER_TEMP/clang-tidy-matcher.json" <<'JSON'
+          {
+            "problemMatcher": [
+              {
+                "owner": "clang-tidy",
+                "pattern": [
+                  {
+                    "regexp": "^([^:\\n]+):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                  }
+                ]
+              }
+            ]
+          }
+          JSON
+          echo "::add-matcher::$RUNNER_TEMP/clang-tidy-matcher.json"
+
       - name: Run cpp-linter
         uses: cpp-linter/cpp-linter-action@v2
         id: linter
@@ -55,6 +78,8 @@ jobs:
           tidy-checks: ""
           database: "build"
           ignore: ".github|libs"
+          file-annotations: "true"
+          step-summary: "true"
 
       - name: Fail fast if checks failed
         if: steps.linter.outputs.checks-failed > 0
