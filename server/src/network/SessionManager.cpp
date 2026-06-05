@@ -8,6 +8,7 @@
 #include "SessionManager.hpp"
 
 #include <sys/poll.h>
+#include <sys/types.h>
 
 #include <algorithm>
 #include <cerrno>
@@ -15,10 +16,10 @@
 #include <cstdint>
 #include <exception>
 #include <string>
+#include <string_view>
 #include <utility>
 
 #include "exception/PollError.hpp"
-#include "exception/SocketError.hpp"
 #include "network/ClientSocket.hpp"
 
 namespace zappy::server::network {
@@ -52,6 +53,35 @@ void SessionManager::pollNetwork() {
             handleClientEvent(pfd);
         }
     }
+}
+
+bool SessionManager::tryPopMessage(NetworkEvent& message) {
+    if (_eventQueue.empty()) {
+        return false;
+    }
+    message = std::move(_eventQueue.front());
+    _eventQueue.pop();
+    return true;
+}
+
+void SessionManager::sendMessage(int clientId, const std::string_view& message) {
+    if (!_clients.contains(clientId)) {
+        return;
+    }
+    _writeBuffers[clientId] += message;
+}
+
+void SessionManager::disconnectClient(const int clientId) {
+    auto it = std::ranges::find_if(_pollFds.begin(), _pollFds.end(),
+                                   [clientId](const struct pollfd& pfd) { return pfd.fd == clientId; });
+
+    if (it != _pollFds.end()) {
+        _pollFds.erase(it);
+    }
+    _readBuffers.erase(clientId);
+    _writeBuffers.erase(clientId);
+    _clients.erase(clientId);
+    _eventQueue.push({.type = EventType::CLIENT_DISCONNECTED, .clientId = clientId, .message = ""});
 }
 
 void SessionManager::handleServerEvent(const short revents) {
@@ -90,19 +120,6 @@ void SessionManager::acceptNewConnection() {
     _eventQueue.push({.type = EventType::CLIENT_CONNECTED, .clientId = clientId, .message = ""});
 }
 
-void SessionManager::disconnectClient(const int clientId) {
-    auto it = std::ranges::find_if(_pollFds.begin(), _pollFds.end(),
-                                   [clientId](const struct pollfd& pfd) { return pfd.fd == clientId; });
-
-    if (it != _pollFds.end()) {
-        _pollFds.erase(it);
-    }
-    _readBuffers.erase(clientId);
-    _writeBuffers.erase(clientId);
-    _clients.erase(clientId);
-    _eventQueue.push({.type = EventType::CLIENT_DISCONNECTED, .clientId = clientId, .message = ""});
-}
-
 void SessionManager::handleClientRead(const int clientId) {
     try {
         const std::string data = _clients.at(clientId).receive();
@@ -110,10 +127,30 @@ void SessionManager::handleClientRead(const int clientId) {
         if (data.empty()) {
             return;
         }
-        _readBuffers.at(clientId) += data;
+        _readBuffers[clientId] += data;
         extractCompleteMessages(clientId);
 
     } catch (const std::exception& /*e*/) {
+        disconnectClient(clientId);
+    }
+}
+
+void SessionManager::handleClientWrite(const int clientId) {
+    if (!_clients.contains(clientId)) {
+        return;
+    }
+    std::string& buffer = _writeBuffers.at(clientId);
+
+    if (buffer.empty()) {
+        return;
+    }
+    try {
+        const std::size_t bytesSent = _clients.at(clientId).send(buffer);
+
+        if (bytesSent > 0) {
+            buffer.erase(0, bytesSent);
+        }
+    } catch (const std::exception&) {
         disconnectClient(clientId);
     }
 }
