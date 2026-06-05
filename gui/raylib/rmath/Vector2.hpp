@@ -13,6 +13,7 @@ namespace zappy::gui::raylib::rmath {
 class Vector2 {
   public:
     constexpr Vector2() = default;
+    constexpr Vector2(int x, int y) : _vector(static_cast<float>(x), static_cast<float>(y)) {}
     constexpr Vector2(float x, float y) : _vector(x, y) {}
     constexpr Vector2(::Vector2 vector) : _vector{vector} {}
 

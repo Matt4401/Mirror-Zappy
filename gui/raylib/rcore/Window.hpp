@@ -45,8 +45,8 @@ class Window {
 
     static void setTargetFPS(int fps) { SetTargetFPS(fps); }
 
-    static double getScreenWidth() { return GetScreenWidth(); }
-    static double getScreenHeight() { return GetScreenHeight(); }
+    static int getScreenWidth() { return GetScreenWidth(); }
+    static int getScreenHeight() { return GetScreenHeight(); }
 
   protected:
   private:
