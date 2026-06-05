@@ -7,7 +7,6 @@
 
 #include "network/SessionManager.hpp"
 
-#include <arpa/inet.h>
 #include <gtest/gtest.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
@@ -78,6 +77,7 @@ TEST_F(SessionManagerTest, ReceivesCompleteMessageAndGeneratesEvent) {
     manager.pollNetwork();
     SessionManager::NetworkEvent event;
     auto received = manager.tryPopMessage(event);
+    ASSERT_TRUE(received);
 
     const std::string command = "Forward\n";
     ::send(_mockClientFd, command.data(), command.size(), MSG_NOSIGNAL);
@@ -100,6 +100,7 @@ TEST_F(SessionManagerTest, HandlesTCPFragmentationPerfectly) {
 
     SessionManager::NetworkEvent event;
     const auto received = manager.tryPopMessage(event);
+    ASSERT_TRUE(received);
 
     const std::string part1 = "For";
     ::send(_mockClientFd, part1.data(), part1.size(), MSG_NOSIGNAL);
@@ -127,6 +128,7 @@ TEST_F(SessionManagerTest, SendsDataToClient) {
 
     SessionManager::NetworkEvent event;
     auto received = manager.tryPopMessage(event);
+    ASSERT_TRUE(received);
     const int clientId = event.clientId;
 
     const std::string response = "WELCOME\n";
@@ -149,6 +151,7 @@ TEST_F(SessionManagerTest, HandlesClientDisconnection) {
 
     SessionManager::NetworkEvent event;
     auto received = manager.tryPopMessage(event);
+    ASSERT_TRUE(received);
 
     ::close(_mockClientFd);
     _mockClientFd = -1;

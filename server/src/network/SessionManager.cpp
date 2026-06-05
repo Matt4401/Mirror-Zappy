@@ -8,7 +8,6 @@
 #include "SessionManager.hpp"
 
 #include <sys/poll.h>
-#include <sys/types.h>
 
 #include <algorithm>
 #include <cerrno>
