@@ -1,3 +1,4 @@
+---
 name: Zappy mirror CI/CD
 
 on:
@@ -10,6 +11,7 @@ on:
 
 env:
   BUILD_TYPE: Release
+  RAYLIB_VERSION: "6.0"
   CCACHE_DIR: ${{ github.workspace }}/.ccache
   TARGET_REPO_URL: "git@github.com:EpitechPGE2-2025/G-YEP-400-NAN-4-1-zappy-3.git"
   EXECUTABLES: "zappy_server,zappy_gui,zappy_ai"
@@ -29,7 +31,15 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends build-essential cmake clang-format-20 clang-tidy-20 libconfig++-dev libmbedtls-dev libssh2-1-dev
+          sudo apt-get install -y --no-install-recommends build-essential cmake git clang-format-20 clang-tidy-20 libconfig++-dev libmbedtls-dev libssh2-1-dev libasound2-dev libx11-dev libxrandr-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev libxcursor-dev libxinerama-dev libwayland-dev libxkbcommon-dev
+
+      - name: Install raylib
+        run: |
+          git clone --depth 1 --branch "${RAYLIB_VERSION}" https://github.com/raysan5/raylib.git /tmp/raylib
+          cmake -S /tmp/raylib -B /tmp/raylib/build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DBUILD_EXAMPLES=OFF
+          cmake --build /tmp/raylib/build --config Release --parallel
+          sudo cmake --install /tmp/raylib/build --config Release
+          sudo ldconfig
 
       - name: Configure CMake for Linter
         run: cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
@@ -40,11 +50,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          version: '22'
-          style: 'file'
-          tidy-checks: ''
-          database: 'build'
-          ignore: '.github|libs'
+          version: "22"
+          style: "file"
+          tidy-checks: ""
+          database: "build"
+          ignore: ".github|libs"
 
       - name: Fail fast if checks failed
         if: steps.linter.outputs.checks-failed > 0
@@ -59,7 +69,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
       - name: Install Ruff
         run: pip install ruff
       - name: Run Ruff Linter
@@ -78,7 +88,15 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends build-essential cmake libmbedtls-dev libssh2-1-dev libconfig++-dev ccache
+          sudo apt-get install -y --no-install-recommends build-essential cmake git libmbedtls-dev libssh2-1-dev libconfig++-dev ccache libasound2-dev libx11-dev libxrandr-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev libxcursor-dev libxinerama-dev libwayland-dev libxkbcommon-dev
+
+      - name: Install raylib
+        run: |
+          git clone --depth 1 --branch "${RAYLIB_VERSION}" https://github.com/raysan5/raylib.git /tmp/raylib
+          cmake -S /tmp/raylib -B /tmp/raylib/build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DBUILD_EXAMPLES=OFF
+          cmake --build /tmp/raylib/build --config Release --parallel
+          sudo cmake --install /tmp/raylib/build --config Release
+          sudo ldconfig
 
       - name: Cache ccache
         uses: actions/cache@v5
@@ -95,7 +113,7 @@ jobs:
       - name: Build Zappy Binaries
         timeout-minutes: 10
         run: cmake --build build --config ${{env.BUILD_TYPE}}
-      
+
       - name: Check Zappy Executables Exist
         shell: bash
         run: |
@@ -115,6 +133,19 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends build-essential cmake git libmbedtls-dev libssh2-1-dev libconfig++-dev libasound2-dev libx11-dev libxrandr-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev libxcursor-dev libxinerama-dev libwayland-dev libxkbcommon-dev
+
+      - name: Install raylib
+        run: |
+          git clone --depth 1 --branch "${RAYLIB_VERSION}" https://github.com/raysan5/raylib.git /tmp/raylib
+          cmake -S /tmp/raylib -B /tmp/raylib/build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DBUILD_EXAMPLES=OFF
+          cmake --build /tmp/raylib/build --config Release --parallel
+          sudo cmake --install /tmp/raylib/build --config Release
+          sudo ldconfig
 
       - name: Cache ccache (Read-only pour les tests)
         uses: actions/cache@v5
@@ -147,7 +178,5 @@ jobs:
 
       - uses: pixta-dev/repository-mirroring-action@v1
         with:
-          target_repo_url:
-            ${{ env.TARGET_REPO_URL }}
-          ssh_private_key:
-            ${{ secrets.GIT_SSH_PRIVATE_KEY }}
+          target_repo_url: ${{ env.TARGET_REPO_URL }}
+          ssh_private_key: ${{ secrets.GIT_SSH_PRIVATE_KEY }}
