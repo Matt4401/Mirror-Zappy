@@ -64,7 +64,7 @@ bool SessionManager::tryPopMessage(NetworkEvent& message) {
     return true;
 }
 
-void SessionManager::sendMessage(int clientId, const std::string_view& message) {
+void SessionManager::sendMessage(int clientId, std::string_view message) {
     if (!_clients.contains(clientId)) {
         return;
     }
@@ -136,7 +136,7 @@ void SessionManager::handleClientRead(const int clientId) {
 }
 
 void SessionManager::handleClientWrite(const int clientId) {
-    if (!_clients.contains(clientId)) {
+    if (!_clients.contains(clientId) || !_writeBuffers.contains(clientId)) {
         return;
     }
     std::string& buffer = _writeBuffers.at(clientId);
@@ -160,9 +160,9 @@ void SessionManager::extractCompleteMessages(const int clientId) {
 
     std::size_t pos = 0;
     while ((pos = buffer.find('\n')) != std::string::npos) {
-        const std::string completeMessage = buffer.substr(0, pos);
-        _eventQueue.push(
-            NetworkEvent{.type = EventType::MESSAGE_RECEIVED, .clientId = clientId, .message = completeMessage});
+        std::string completeMessage = buffer.substr(0, pos);
+        _eventQueue.push(NetworkEvent{
+            .type = EventType::MESSAGE_RECEIVED, .clientId = clientId, .message = std::move(completeMessage)});
         buffer.erase(0, pos + 1);
     }
 }

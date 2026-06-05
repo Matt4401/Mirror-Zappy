@@ -41,7 +41,7 @@ class SessionManager {
 
     void pollNetwork();
     [[nodiscard]] bool tryPopMessage(NetworkEvent& message);
-    void sendMessage(int clientId, const std::string_view& message);
+    void sendMessage(int clientId, std::string_view message);
 
     void disconnectClient(int clientId);
 
