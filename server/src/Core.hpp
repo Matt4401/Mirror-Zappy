@@ -15,7 +15,7 @@ namespace zappy::server {
 
 class Core {
   public:
-    explicit Core(util::Config& config);
+    explicit Core(util::Config config);
     ~Core() = default;
 
     Core(const Core& other) = delete;
