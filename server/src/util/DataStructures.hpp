@@ -17,8 +17,8 @@ struct Config {
     std::uint32_t width{};
     std::uint32_t height{};
     std::vector<std::string> teamNames;
-    std::uint32_t clientLimit;
-    std::uint32_t freq;
+    std::uint32_t clientLimit{};
+    std::uint32_t freq{};
 };
 
 }  // namespace zappy::server::util
