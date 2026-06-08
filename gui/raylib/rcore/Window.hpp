@@ -16,15 +16,19 @@ class Window {
     static constexpr int WIDTH = 800;
     static constexpr int HEIGHT = 600;
 
-    Window(int width = WIDTH, int height = HEIGHT, const char* title = "Zappy", uint32_t flags = 0) {
+    Window(int width = WIDTH, int height = HEIGHT, const char* title = "Zappy", uint32_t flags = 0)
+        : _width(width), _height(height) {
         if (!IsWindowReady()) {
-            initWindow(width, height, title, flags);
+            if (flags != 0) {
+                SetConfigFlags(flags);
+            }
+            InitWindow(width, height, title);
             _ownsWindow = true;
         }
     }
     ~Window() {
         if (_ownsWindow && IsWindowReady()) {
-            closeWindow();
+            CloseWindow();
         }
     }
 
@@ -33,26 +37,32 @@ class Window {
     Window(Window&& other) = delete;
     Window& operator=(Window&& other) = delete;
 
-    static void initWindow(int width = WIDTH, int height = HEIGHT, const char* title = "Zappy", uint32_t flags = 0) {
-        if (flags != 0) {
-            SetConfigFlags(flags);
-        }
-        InitWindow(width, height, title);
-    }
-    static void closeWindow() { CloseWindow(); }
-    static bool shouldClose() { return WindowShouldClose(); }
+    [[nodiscard]] bool shouldClose() const { return _ownsWindow && WindowShouldClose(); }
 
     static void beginDrawing() { BeginDrawing(); }
     static void endDrawing() { EndDrawing(); }
-    static void clearBackground(Color color) { ClearBackground(color); }
+    void clearBackground() { ClearBackground(_backgroundColor); }
 
-    static void setTargetFPS(int fps) { SetTargetFPS(fps); }
+    void setTargetFPS(int fps) {
+        _fps = fps;
+        SetTargetFPS(_fps);
+    }
 
-    static int getScreenWidth() { return GetScreenWidth(); }
-    static int getScreenHeight() { return GetScreenHeight(); }
+    int getScreenWidth() {
+        _width = GetScreenWidth();
+        return _width;
+    }
+    int getScreenHeight() {
+        _height = GetScreenHeight();
+        return _height;
+    }
 
   protected:
   private:
     bool _ownsWindow = false;
+    int _fps{60};
+    Color _backgroundColor{BLACK};
+    int _width{WIDTH};
+    int _height{HEIGHT};
 };
 }  // namespace zappy::gui::raylib::rcore

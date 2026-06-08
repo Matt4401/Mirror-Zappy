@@ -15,17 +15,16 @@ namespace zappy::gui::raylib::rcore {
 class Camera {
   public:
     Camera(rmath::Vector3 position) : _camera{} { _camera.position = position.vector(); }
-    Camera() = default;
     ~Camera() = default;
     Camera(const Camera& other) = delete;
     Camera& operator=(const Camera& other) = delete;
     Camera(Camera&& other) = delete;
     Camera& operator=(Camera&& other) = delete;
 
-    static void beginMode3D(Camera3D camera) { BeginMode3D(camera); }
-    static void endMode3D() { EndMode3D(); }
-
     [[nodiscard]] Camera3D camera() const { return _camera; }
+
+    void beginMode3D() const { BeginMode3D(_camera); }
+    static void endMode3D() { EndMode3D(); }
 
     void setPosition(rmath::Vector3 position) { _camera.position = position.vector(); }
     void setTarget(rmath::Vector3 target) { _camera.target = target.vector(); }

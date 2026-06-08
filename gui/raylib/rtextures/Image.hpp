@@ -8,11 +8,11 @@
 #pragma once
 #include <raylib.h>
 
-#include <span>
 #include <string>
-#include <string_view>
 #include <utility>
 
+#include "rmath/Vector3.hpp"
+#include "rmodels/Mesh.hpp"
 #include "rtextures/Texture2D.hpp"
 
 namespace zappy::gui::raylib::rtextures {
@@ -34,22 +34,6 @@ class Image {
             _image = std::exchange(other._image, {});
         }
         return *this;
-    }
-
-    [[nodiscard]] static Image fromMemory(std::string_view fileType, std::span<const unsigned char> data) {
-        const std::string extension{fileType};
-        return Image{LoadImageFromMemory(extension.c_str(), data.data(), static_cast<int>(data.size()))};
-    }
-
-    [[nodiscard]] static Image fromScreen() { return Image{LoadImageFromScreen()}; }
-    [[nodiscard]] static Image color(int width, int height, Color color) {
-        return Image{GenImageColor(width, height, color)};
-    }
-    [[nodiscard]] static Image checked(int width, int height, int checksX, int checksY, Color first, Color second) {
-        return Image{GenImageChecked(width, height, checksX, checksY, first, second)};
-    }
-    [[nodiscard]] static Image perlinNoise(int width, int height, int offsetX, int offsetY, float scale) {
-        return Image{GenImagePerlinNoise(width, height, offsetX, offsetY, scale)};
     }
 
     [[nodiscard]] bool valid() const { return IsImageValid(_image); }
@@ -76,6 +60,13 @@ class Image {
     void contrast(float value) { ImageColorContrast(&_image, value); }
     void brightness(int value) { ImageColorBrightness(&_image, value); }
     void replaceColor(Color color, Color replacement) { ImageColorReplace(&_image, color, replacement); }
+
+    rmodels::Mesh genMeshHeightmap(rmath::Vector3 size) {
+        return rmodels::Mesh{GenMeshHeightmap(_image, size.vector())};
+    }
+    rmodels::Mesh genMeshCubicmap(rmath::Vector3 cubeSize) {
+        return rmodels::Mesh{GenMeshCubicmap(_image, cubeSize.vector())};
+    }
 
   protected:
   private:

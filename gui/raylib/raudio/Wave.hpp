@@ -13,6 +13,8 @@
 #include <string_view>
 #include <utility>
 
+#include "raudio/Sound.hpp"
+
 namespace zappy::gui::raylib::raudio {
 class Wave {
   public:
@@ -40,10 +42,8 @@ class Wave {
     }
 
     [[nodiscard]] bool valid() const { return IsWaveValid(_wave); }
-    [[nodiscard]] ::Wave wave() const { return _wave; }
-    [[nodiscard]] ::Wave& wave() { return _wave; }
-
     [[nodiscard]] bool exportTo(const std::string& path) const { return ExportWave(_wave, path.c_str()); }
+    [[nodiscard]] Sound toSound() const { return Sound{LoadSoundFromWave(_wave)}; }
 
     void crop(int firstFrame, int lastFrame) { WaveCrop(&_wave, firstFrame, lastFrame); }
     void format(int sampleRate, int sampleSize, int channels) { WaveFormat(&_wave, sampleRate, sampleSize, channels); }

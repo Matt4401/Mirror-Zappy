@@ -8,6 +8,9 @@
 #pragma once
 #include <raylib.h>
 
+#include <algorithm>
+#include <vector>
+
 #include "rmath/Vector2.hpp"
 
 namespace zappy::gui::raylib::rcore {
@@ -20,18 +23,30 @@ class Event {
     Event(Event&& other) = delete;
     Event& operator=(Event&& other) = delete;
 
-    static bool isKeyPressed(int key) { return IsKeyPressed(key); }
-    static bool isKeyDown(int key) { return IsKeyDown(key); }
-    static bool isKeyReleased(int key) { return IsKeyReleased(key); }
+    void update() {
+        _pressedKeys.clear();
 
-    static bool isMouseButtonPressed(int button) { return IsMouseButtonPressed(button); }
-    static bool isMouseButtonDown(int button) { return IsMouseButtonDown(button); }
-    static bool isMouseButtonReleased(int button) { return IsMouseButtonReleased(button); }
+        int key = GetKeyPressed();
+        while (key != 0) {
+            _pressedKeys.push_back(key);
+            key = GetKeyPressed();
+        }
 
-    static rmath::Vector2 getMousePosition() { return GetMousePosition(); }
-    static double getMouseWheelMove() { return GetMouseWheelMove(); }
+        _mousePosition = GetMousePosition();
+        _mouseWheelMove = GetMouseWheelMove();
+    }
+
+    [[nodiscard]] bool isKeyPressed(int key) const {
+        return std::ranges::find(_pressedKeys, key) != _pressedKeys.end();
+    }
+
+    [[nodiscard]] rmath::Vector2 getMousePosition() const { return _mousePosition; }
+    [[nodiscard]] float getMouseWheelMove() const { return _mouseWheelMove; }
 
   protected:
   private:
+    std::vector<int> _pressedKeys;
+    rmath::Vector2 _mousePosition;
+    float _mouseWheelMove = 0.0F;
 };
 }  // namespace zappy::gui::raylib::rcore

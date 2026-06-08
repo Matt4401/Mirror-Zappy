@@ -48,9 +48,6 @@ class Material {
         return *this;
     }
 
-    [[nodiscard]] const std::vector<::Material>& materials() const { return _materials; }
-    [[nodiscard]] std::vector<::Material>& materials() { return _materials; }
-
     void setTexture(int mapType, const rtextures::Texture2D& texture) {
         for (auto& material : _materials) {
             SetMaterialTexture(&material, mapType, texture.texture());

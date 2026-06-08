@@ -11,8 +11,6 @@
 #include <utility>
 
 #include "rcore/Matrix.hpp"
-#include "rmath/Vector3.hpp"
-#include "rtextures/Image.hpp"
 
 namespace zappy::gui::raylib::rmodels {
 class Mesh {
@@ -59,12 +57,6 @@ class Mesh {
     }
     void genMeshKnot(float radius, float size, int radSeg, int sides) {
         replace(GenMeshKnot(radius, size, radSeg, sides));
-    }
-    void genMeshHeightmap(const rtextures::Image& heightmap, rmath::Vector3 size) {
-        replace(GenMeshHeightmap(heightmap.image(), size.vector()));
-    }
-    void genMeshCubicmap(const rtextures::Image& cubicmap, rmath::Vector3 cubeSize) {
-        replace(GenMeshCubicmap(cubicmap.image(), cubeSize.vector()));
     }
 
   protected:

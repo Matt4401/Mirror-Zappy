@@ -12,13 +12,10 @@
 #include <string>
 #include <utility>
 
-#include "raudio/Wave.hpp"
-
 namespace zappy::gui::raylib::raudio {
 class Sound {
   public:
     explicit Sound(const std::string& path) : _sound{LoadSound(path.c_str())} {}
-    explicit Sound(const Wave& wave) : _sound{LoadSoundFromWave(wave.wave())} {}
     explicit Sound(::Sound sound) : _sound{sound} {}
 
     ~Sound() { reset(); }
@@ -38,7 +35,6 @@ class Sound {
 
     [[nodiscard]] bool valid() const { return IsSoundValid(_sound); }
     [[nodiscard]] bool playing() const { return IsSoundPlaying(_sound); }
-    [[nodiscard]] ::Sound sound() const { return _sound; }
 
     void play() const { PlaySound(_sound); }
     void stop() const { StopSound(_sound); }

@@ -30,7 +30,7 @@ class Text {
     }
 
     void draw(const Font& font, rmath::Vector2 position, rmath::Vector2 origin, float rotation, float fontSize,
-                 float spacing, Color tint) const {
+              float spacing, Color tint) const {
         DrawTextPro(font.font(), _text.c_str(), position.vector(), origin.vector(), rotation, fontSize, spacing, tint);
     }
 
@@ -42,11 +42,11 @@ class Text {
 
     [[nodiscard]] int codepointCount() const { return GetCodepointCount(_text.c_str()); }
 
-    [[nodiscard]] static std::string upper(const std::string& text) { return TextToUpper(text.c_str()); }
-    [[nodiscard]] static std::string lower(const std::string& text) { return TextToLower(text.c_str()); }
-    [[nodiscard]] static std::string pascal(const std::string& text) { return TextToPascal(text.c_str()); }
-    [[nodiscard]] static std::string snake(const std::string& text) { return TextToSnake(text.c_str()); }
-    [[nodiscard]] static std::string camel(const std::string& text) { return TextToCamel(text.c_str()); }
+    [[nodiscard]] std::string upper() { return TextToUpper(_text.c_str()); }
+    [[nodiscard]] std::string lower() { return TextToLower(_text.c_str()); }
+    [[nodiscard]] std::string pascal() { return TextToPascal(_text.c_str()); }
+    [[nodiscard]] std::string snake() { return TextToSnake(_text.c_str()); }
+    [[nodiscard]] std::string camel() { return TextToCamel(_text.c_str()); }
 
   protected:
   private:

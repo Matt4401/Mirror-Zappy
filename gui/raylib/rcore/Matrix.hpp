@@ -7,6 +7,7 @@
 
 #pragma once
 #include <raylib.h>
+#include <raymath.h>
 
 namespace zappy::gui::raylib::rcore {
 class Matrix {
@@ -23,7 +24,6 @@ class Matrix {
     Matrix& operator=(Matrix&& other) = default;
 
     [[nodiscard]] ::Matrix matrix() const { return _matrix; }
-    [[nodiscard]] ::Matrix& matrix() { return _matrix; }
 
   protected:
   private:
