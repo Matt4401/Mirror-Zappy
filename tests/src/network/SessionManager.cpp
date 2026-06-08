@@ -81,7 +81,6 @@ TEST_F(SessionManagerTest, ReceivesCompleteMessageAndGeneratesEvent) {
     ASSERT_TRUE(received);
 
     const std::string command = "Forward\n";
-    ::send(_mockClientFd, command.data(), command.size(), MSG_NOSIGNAL);
     const ::ssize_t bytesSent = ::send(_mockClientFd, command.data(), command.size(), MSG_NOSIGNAL);
     ASSERT_EQ(bytesSent, static_cast<::ssize_t>(command.size()));
 
@@ -117,7 +116,6 @@ TEST_F(SessionManagerTest, HandlesTCPFragmentationPerfectly) {
     const std::string part2 = "ward\n";
     const ::ssize_t bytesSent2 = ::send(_mockClientFd, part2.data(), part2.size(), MSG_NOSIGNAL);
     ASSERT_EQ(bytesSent2, static_cast<::ssize_t>(part2.size()));
-    ::send(_mockClientFd, part2.data(), part2.size(), MSG_NOSIGNAL);
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
     manager.pollNetwork();
