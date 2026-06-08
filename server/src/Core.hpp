@@ -24,11 +24,13 @@ class Core {
     Core& operator=(Core&& other) = delete;
 
     void run();
+    void stop();
 
   private:
     util::Config _config;
     network::SessionManager _sessionManager;
     game::World _world;
+    bool _isRunning{true};
 };
 
 }  // namespace zappy::server

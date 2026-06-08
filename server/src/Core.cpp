@@ -19,7 +19,7 @@ Core::Core(util::Config& config) : _config(std::move(config)), _sessionManager(_
 
 void Core::run() {
     network::SessionManager::NetworkEvent message{};
-    while (true) {
+    while (_isRunning) {
         _sessionManager.pollNetwork();
         while (_sessionManager.tryPopMessage(message)) {
             std::cout << "Received message from client " << message.clientId
@@ -28,5 +28,7 @@ void Core::run() {
         }
     }
 }
+
+void Core::stop() { _isRunning = false; }
 
 }  // namespace zappy::server
