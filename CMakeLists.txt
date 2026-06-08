@@ -7,6 +7,18 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
+include(CTest)
+
+option(ENABLE_COVERAGE "Enable code coverage instrumentation" OFF)
+
+if(ENABLE_COVERAGE)
+    message(STATUS "Code coverage instrumentation enabled (-g -O0 --coverage)")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 --coverage")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 --coverage")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
+endif()
+
 add_subdirectory(shared)
 add_subdirectory(server)
 add_subdirectory(ai)
