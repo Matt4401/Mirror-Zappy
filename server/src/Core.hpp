@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "command/CommandFactory.hpp"
 #include "game/World.hpp"
 #include "network/SessionManager.hpp"
 #include "util/DataStructures.hpp"
@@ -30,6 +31,7 @@ class Core {
     util::Config _config;
     network::SessionManager _sessionManager;
     game::World _world;
+    command::CommandFactory _commandFactory;
     bool _isRunning{true};
 };
 
