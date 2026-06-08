@@ -7,7 +7,6 @@
 
 #include <iostream>
 
-#include "rcore/Camera.hpp"
 #include "rcore/Window.hpp"
 
 // NOLINTNEXTLINE

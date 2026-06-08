@@ -7,7 +7,6 @@
 
 #pragma once
 #include <raylib.h>
-#include <raymath.h>
 
 namespace zappy::gui::raylib::rcore {
 class Matrix {
