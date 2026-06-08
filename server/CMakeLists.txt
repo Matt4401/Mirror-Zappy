@@ -5,6 +5,8 @@ add_library(zappy_server_objects OBJECT
     src/network/SessionManager.hpp
     src/network/ServerSocket.cpp
     src/network/ServerSocket.hpp
+    src/game/World.cpp
+    src/game/World.hpp
     src/Core.cpp
     src/Core.hpp
     src/util/DataStructures.hpp

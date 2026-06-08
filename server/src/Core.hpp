@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "game/World.hpp"
 #include "network/SessionManager.hpp"
 #include "util/DataStructures.hpp"
 
@@ -27,6 +28,7 @@ class Core {
   private:
     util::Config _config;
     network::SessionManager _sessionManager;
+    game::World _world;
 };
 
 }  // namespace zappy::server
