@@ -9,9 +9,6 @@
 
 #include <gtest/gtest.h>
 
-#include <chrono>
-#include <thread>
-
 #include "util/DataStructures.hpp"
 
 namespace zappy::server::tests {
