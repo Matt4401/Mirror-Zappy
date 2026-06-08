@@ -25,10 +25,10 @@ std::unique_ptr<ICommand> CommandFactory::createCommand(std::string_view rawComm
     const std::string firstWord = extractFirstWord(rawCommand);
     auto it = _creators.find(firstWord);
 
-    if (it != _creators.end()) {
-        return it->second(rawCommand);
+    if (it == _creators.end()) {
+        return nullptr;
     }
-    return nullptr;
+    return it->second(rawCommand);
 }
 
 std::string CommandFactory::extractFirstWord(std::string_view rawCommand) {
