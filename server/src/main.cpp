@@ -5,10 +5,25 @@
 ** main
 */
 
+#include <exception>
 #include <iostream>
+
+#include "Core.hpp"
+#include "util/DataStructures.hpp"
 
 // NOLINTNEXTLINE
 int main(int ac, char** av) {
-    std::cout << "Hey, I am a zappy server!" << std::endl;
+    // TODO: implement argument parsing
+    zappy::server::util::Config config{
+        .port = 4242, .width = 10, .height = 10, .teamNames = {"Team1", "Team2"}, .clientLimit = 100, .freq = 100};
+
+    try {
+        zappy::server::Core core(config);
+
+        core.run();
+    } catch (const std::exception& e) {
+        std::cerr << "Fatal error: " << e.what() << std::endl;
+        return 1;
+    }
     return 0;
 }
