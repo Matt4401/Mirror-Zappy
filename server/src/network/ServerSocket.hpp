@@ -18,6 +18,7 @@ class ServerSocket : public shared::network::BaseSocket {
   public:
     ServerSocket() = delete;
     explicit ServerSocket(std::uint16_t port);
+
     [[nodiscard]] shared::network::ClientSocket acceptClient() const;
 
   private:

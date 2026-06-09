@@ -8,7 +8,6 @@
 #include "network/ClientSocket.hpp"
 
 #include <arpa/inet.h>
-#include <fcntl.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -97,17 +96,6 @@ std::string ClientSocket::receive() const {
     }
 
     return std::string{buffer.data(), static_cast<std::size_t>(bytesRead)};
-}
-
-void ClientSocket::setNonBlocking() const {
-    const int flags = ::fcntl(fd(), F_GETFL, 0);
-    if (flags == -1) {
-        throw exception::SocketError{"unable to get socket flags"};
-    }
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
-    if (::fcntl(fd(), F_SETFL, flags | O_NONBLOCK) == -1) {
-        throw exception::SocketError{"unable to set non-blocking mode"};
-    }
 }
 
 }  // namespace zappy::shared::network

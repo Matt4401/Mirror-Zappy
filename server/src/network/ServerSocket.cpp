@@ -29,6 +29,7 @@ void ServerSocket::bindAndListen(const std::uint16_t port) {
         throw shared::exception::SocketError{"failed to create server socket"};
     }
     setFd(newFd);
+    setNonBlocking();
     // NOLINTNEXTLINE(misc-include-cleaner)
     if (::setsockopt(fd(), SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
         throw shared::exception::SocketError{"failed to set socket options"};
