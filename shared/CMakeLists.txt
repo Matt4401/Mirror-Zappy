@@ -8,6 +8,15 @@ add_library(zappy_shared STATIC
     src/exception/Exception.cpp
     include/exception/Exception.hpp
     include/exception/SocketError.hpp
+    include/exception/ParsingError.hpp
+        include/parsing/Parser.hpp
+        include/parsing/IParseStrategy.hpp
+        include/parsing/strategy/GUIStrategy.hpp
+        include/parsing/strategy/ServerStrategy.hpp
+        src/parsing/strategy/GUIStrategy.cpp
+        src/parsing/strategy/ServerStrategy.cpp
+        include/encapsulation/GetoptWrapper.hpp
+        src/encapsulation/GetoptWrapper.cpp
 )
 
 target_include_directories(zappy_shared PRIVATE
