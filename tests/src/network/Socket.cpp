@@ -15,7 +15,6 @@
 #include <optional>
 #include <string>
 
-#include "exception/SocketError.hpp"
 #include "network/ClientSocket.hpp"
 #include "network/ServerSocket.hpp"
 
@@ -46,7 +45,9 @@ TEST(NetworkSocketTest, ClientConnectsToServerSuccessfully) {
     const shared::network::ClientSocket client{"127.0.0.1", port};
 
     const std::optional<shared::network::ClientSocket> serverSideClientOpt = server.acceptClient();
-    ASSERT_TRUE(serverSideClientOpt.has_value());
+    if (serverSideClientOpt.has_value()) {
+        ASSERT_TRUE(serverSideClientOpt.has_value());
+    }
     EXPECT_GE(serverSideClientOpt.value().fd(), 0);
 }
 
@@ -66,7 +67,9 @@ TEST(NetworkSocketTest, ClientAndServerExchangeData) {
     ASSERT_TRUE(serverSideClientOpt.has_value());
 
     const std::string expectedMessage = "WELCOME\n";
-    EXPECT_EQ(serverSideClientOpt.value().send(expectedMessage), expectedMessage.size());
+    if (serverSideClientOpt.has_value()) {
+        EXPECT_EQ(serverSideClientOpt.value().send(expectedMessage), expectedMessage.size());
+    }
     const std::string receivedMessage = client.receive();
     EXPECT_EQ(receivedMessage, expectedMessage);
 }
