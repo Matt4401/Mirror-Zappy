@@ -43,7 +43,7 @@ void Player::pushCommand(std::unique_ptr<command::ICommand> command) {
     if (_commands.size() >= 10) {
         throw exception::ToMuchCmd{"Player " + std::to_string(_id) + " has too much commands queued"};
     }
-    if (_commands.empty()) {
+    if (_currentCommand == nullptr) {
         _currentCommand = std::move(command);
         _cmdTick = _currentCommand->requiredTicks();
         return;
@@ -53,10 +53,8 @@ void Player::pushCommand(std::unique_ptr<command::ICommand> command) {
 
 void Player::update(World& world) {
     _lifeTick--;
-    if (_lifeTick == 0) {
-    }
     if (_cmdTick == 0) {
-        if (!_commands.empty()) {
+        if (_commands.empty()) {
             return;
         }
         _currentCommand = std::move(_commands.front());

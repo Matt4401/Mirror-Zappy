@@ -22,7 +22,7 @@ namespace zappy::server::game {
 
 enum class orientation : uint8_t { NORTH = 0, EAST, SOUTH, WEST };
 
-constexpr std::array<std::pair<std::size_t, std::size_t>, 4> playerMove = {{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}};
+constexpr std::array<std::pair<int, int>, 4> playerMove = {{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}};
 
 enum class ItemType : uint8_t { Food, Linemate, Deraumere, Sibur, Mendiane, Phiras, Thystame, COUNT };
 
