@@ -8,7 +8,7 @@
 #pragma once
 
 #include "command/ACommand.hpp"
-#include "game/World.hpp"
+#include "command/ICommand.hpp"
 
 class Player;
 
@@ -23,7 +23,7 @@ class Forward : public ACommand {
     Forward(Forward&& other) = delete;
     Forward& operator=(Forward&& other) = delete;
 
-    void execute(game::World& world, Player& player) override;
+    void execute(game::World& world, game::Player& player) override;
 };
 
 }  // namespace zappy::server::command
