@@ -46,7 +46,7 @@ void Parser::parseArgs() {
         }
     }
 }
-
+// NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 std::uint16_t Parser::getPort(const std::string &value) {
     char *endPtr = nullptr;
     const long port = std::strtol(value.c_str(), &endPtr, 10);
@@ -58,5 +58,8 @@ std::uint16_t Parser::getPort(const std::string &value) {
     return static_cast<std::uint16_t>(port);
 }
 
-std::string Parser::getMachine(const std::string &value) { return value; }
+std::string Parser::getMachine(const std::string &value) {
+    return value;
+}
+// NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 }  // namespace zappy::cli
