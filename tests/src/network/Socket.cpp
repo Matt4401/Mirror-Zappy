@@ -26,8 +26,7 @@ TEST(ServerSocketTest, AcceptClientOnNonBlockingWithNoConnectionsReturnsInvalidS
     const int flags = ::fcntl(server.fd(), F_GETFL, 0);
     ASSERT_NE(flags, -1);
 
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
-    ::fcntl(server.fd(), F_SETFL, flags | O_NONBLOCK);
+    EXPECT_NE(flags & O_NONBLOCK, 0);
     const std::optional<shared::network::ClientSocket> phantomClient = server.acceptClient();
     EXPECT_FALSE(phantomClient.has_value());
 }
