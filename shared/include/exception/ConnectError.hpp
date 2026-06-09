@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2026
 ** zappy
 ** File description:
-** Socket exception
+** Connect exception
 */
 
 #pragma once
@@ -11,7 +11,7 @@
 
 namespace zappy::shared::exception {
 
-class SocketError : public Exception {
+class ConnectError : public Exception {
   public:
     using Exception::Exception;
 };

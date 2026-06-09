@@ -22,6 +22,7 @@ void Core::run() {
     while (_isRunning) {
         _sessionManager.pollNetwork();
         while (_sessionManager.tryPopMessage(message)) {
+            // TODO: should be removed, is of course temporary for testing purposes
             std::cout << "Received message from client " << message.clientId
                       << " of type: " << static_cast<int>(message.type) << ". Message: " << message.message
                       << std::endl;

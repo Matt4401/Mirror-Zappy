@@ -2,13 +2,12 @@
 name: Feature Request
 description: Propose a new feature or architectural change.
 labels: enhancement
+title: "[FEATURE] -"
 body:
   - type: markdown
     attributes:
       value: |
-        # New feature proposal
-
-        Ensure the proposal provides all necessary information for the development team to understand and implement the feature effectively.
+        [FEATURE]
   - type: textarea
     id: description
     attributes:
