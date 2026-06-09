@@ -8,6 +8,7 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 
 #include "network/BaseSocket.hpp"
 #include "network/ClientSocket.hpp"
@@ -16,8 +17,13 @@ namespace zappy::server::network {
 
 class ServerSocket : public shared::network::BaseSocket {
   public:
+    ServerSocket() = delete;
+    explicit ServerSocket(std::uint16_t port);
+
+    [[nodiscard]] std::optional<shared::network::ClientSocket> acceptClient() const;
+
+  private:
     void bindAndListen(std::uint16_t port);
-    [[nodiscard]] shared::network::ClientSocket acceptClient() const;
 };
 
 }  // namespace zappy::server::network
