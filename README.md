@@ -18,7 +18,7 @@ Ensure you have the following installed on your system before compiling:
 
 ```bash
 sudo apt-get update
-sudo apt-get install build-essential cmake libconfig++-dev raylib
+sudo apt-get install build-essential cmake libconfig++-dev libraylib-dev
 ```
 
 ### Python Environment (For AI)
@@ -104,4 +104,4 @@ chmod +x run.sh
 
 ## 🤝 Contributing
 
-Please refer to `CONTRIBUTING.md` for guidelines regarding our strict Conventional Commits policy, pre-commit configuration hooks, and code review workflows.
+Please refer to [CONTRIBUTING.md](docs/CONTRIBUTING.md) for guidelines regarding our strict Conventional Commits policy, pre-commit configuration hooks, and code review workflows.
