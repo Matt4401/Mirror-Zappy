@@ -7,22 +7,52 @@
 
 #include "network/ClientSocket.hpp"
 
+#include <arpa/inet.h>
 #include <fcntl.h>
+#include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 
 #include <array>
 #include <cerrno>
 #include <cstddef>
+#include <cstdint>
 #include <string>
 #include <string_view>
 
+#include "exception/ConnectError.hpp"
 #include "exception/SocketError.hpp"
 #include "network/BaseSocket.hpp"
 
 namespace zappy::shared::network {
 
 ClientSocket::ClientSocket(const int fd) : BaseSocket{fd} {}
+
+void ClientSocket::connectToServer(const std::string_view host, const std::uint16_t port) {
+    const std::string hostStr{host};
+    sockaddr_in servAddr{};
+    servAddr.sin_family = AF_INET;
+    servAddr.sin_port = ::htons(port);
+
+    if (::inet_pton(AF_INET, hostStr.c_str(), &servAddr.sin_addr) <= 0) {
+        throw exception::SocketError("invalid address or hostname not supported");
+    }
+    const int newFd = ::socket(AF_INET, SOCK_STREAM, 0);
+    if (newFd < 0) {
+        throw exception::SocketError("failed to create socket");
+    }
+    setFd(newFd);
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+    if (::connect(fd(), reinterpret_cast<const sockaddr*>(&servAddr), sizeof(servAddr)) < 0) {
+        if (errno == ECONNREFUSED) {
+            throw exception::ConnectError("connection refused");
+        }
+        if (errno == ETIMEDOUT) {
+            throw exception::ConnectError("connection timeout");
+        }
+        throw exception::SocketError("cannot connect: unknown error");
+    }
+}
 
 std::size_t ClientSocket::send(const std::string_view message) const {
     std::size_t totalSent = 0;

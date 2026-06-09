@@ -11,6 +11,9 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include <cstdint>
+#include <string>
+
 #include "exception/SocketError.hpp"
 #include "network/ClientSocket.hpp"
 #include "network/ServerSocket.hpp"
@@ -79,6 +82,44 @@ TEST_F(ServerSocketTest, AcceptClientOnNonBlockingWithNoConnectionsReturnsInvali
     const shared::network::ClientSocket phantomClient = server.acceptClient();
 
     EXPECT_THROW({ [[maybe_unused]] const int fd = phantomClient.fd(); }, shared::exception::SocketError);
+}
+
+TEST(NetworkSocketTest, ClientConnectsToServerSuccessfully) {
+    server::network::ServerSocket server{};
+    server.bindAndListen(0);
+
+    sockaddr_in serverAddress{};
+    socklen_t length = sizeof(serverAddress);
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+    ASSERT_EQ(::getsockname(server.fd(), reinterpret_cast<sockaddr*>(&serverAddress), &length), 0);
+    const std::uint16_t port = ::ntohs(serverAddress.sin_port);
+
+    shared::network::ClientSocket client{};
+    EXPECT_NO_THROW(client.connectToServer("127.0.0.1", port));
+
+    const shared::network::ClientSocket serverSideClient = server.acceptClient();
+    EXPECT_GE(serverSideClient.fd(), 0);
+}
+
+TEST(NetworkSocketTest, ClientAndServerExchangeData) {
+    server::network::ServerSocket server{};
+    server.bindAndListen(0);
+
+    sockaddr_in serverAddress{};
+    socklen_t length = sizeof(serverAddress);
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+    ASSERT_EQ(::getsockname(server.fd(), reinterpret_cast<sockaddr*>(&serverAddress), &length), 0);
+    const std::uint16_t port = ::ntohs(serverAddress.sin_port);
+
+    shared::network::ClientSocket client{};
+    client.connectToServer("127.0.0.1", port);
+    const shared::network::ClientSocket serverSideClient = server.acceptClient();
+
+    const std::string expectedMessage = "WELCOME\n";
+    EXPECT_EQ(serverSideClient.send(expectedMessage), expectedMessage.size());
+
+    const std::string receivedMessage = client.receive();
+    EXPECT_EQ(receivedMessage, expectedMessage);
 }
 
 }  // namespace zappy::network::tests
