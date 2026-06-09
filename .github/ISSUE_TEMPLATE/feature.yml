@@ -5,10 +5,7 @@ labels: enhancement
 body:
   - type: markdown
     attributes:
-      value: |
-        # New feature proposal
-
-        Ensure the proposal provides all necessary information for the development team to understand and implement the feature effectively.
+      value: [FEATURE]
   - type: textarea
     id: description
     attributes:
