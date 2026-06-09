@@ -25,7 +25,7 @@ def main():
 
     trantorian = Trantorian("matt4401")
     main_class = AITeam(trantorian, machine)
-    main_class.run()
+    #main_class.run()
 
 
 if __name__ == "__main__":
