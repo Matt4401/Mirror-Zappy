@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import sys
 import argparse
+from AITeamClass import AITeam
+from TrantorianClass import Trantorian
 
 def main():
     parser = argparse.ArgumentParser(
@@ -9,10 +11,8 @@ def main():
     )
     parser.add_value_provider = False
     parser.add_argument('--help', action='help', help='Show this help message -> exit')
-
     parser.add_argument('-p', type=int, required=True, metavar='port')
     parser.add_argument('-n', type=str, required=True, metavar='name')
-
     parser.add_argument('-h', type=str, required=True, metavar='machine')
 
     try:
@@ -23,7 +23,10 @@ def main():
     name = args.n
     machine = args.h
 
-    print(f"Starting Zappy AI with Name: {name}, Port: {port}, Machine: {machine}")
+    trantorian = Trantorian("matt4401")
+    main_class = AITeam(trantorian, machine)
+    main_class.run()
+
 
 if __name__ == "__main__":
     main()
