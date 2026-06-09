@@ -10,8 +10,6 @@
 #include "command/ACommand.hpp"
 #include "command/ICommand.hpp"
 
-class Player;
-
 namespace zappy::server::command {
 
 class Forward : public ACommand {
