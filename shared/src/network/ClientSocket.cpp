@@ -27,9 +27,9 @@ namespace zappy::shared::network {
 
 ClientSocket::ClientSocket(const int fd) : BaseSocket{fd} {}
 
-ClientSocket::ClientSocket(const std::string_view host, const std::uint16_t port) { connectToServer(host, port); }
+ClientSocket::ClientSocket(std::string_view host, const std::uint16_t port) { connectToServer(host, port); }
 
-void ClientSocket::connectToServer(const std::string_view host, const std::uint16_t port) {
+void ClientSocket::connectToServer(std::string_view host, const std::uint16_t port) {
     const std::string hostStr{host};
     sockaddr_in servAddr{};
     servAddr.sin_family = AF_INET;
@@ -55,7 +55,7 @@ void ClientSocket::connectToServer(const std::string_view host, const std::uint1
     }
 }
 
-std::size_t ClientSocket::send(const std::string_view message) const {
+std::size_t ClientSocket::send(std::string_view message) const {
     std::size_t totalSent = 0;
     const std::size_t toSend = message.size();
 
