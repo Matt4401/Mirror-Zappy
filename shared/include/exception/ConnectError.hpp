@@ -1,6 +1,6 @@
 /*
 ** EPITECH PROJECT, 2026
-** myteams
+** zappy
 ** File description:
 ** Connect exception
 */
