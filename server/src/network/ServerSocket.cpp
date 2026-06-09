@@ -12,11 +12,14 @@
 
 #include <cerrno>
 #include <cstdint>
+#include <optional>
 
 #include "exception/SocketError.hpp"
 #include "network/ClientSocket.hpp"
 
 namespace zappy::server::network {
+
+ServerSocket::ServerSocket(const std::uint16_t port) { bindAndListen(port); }
 
 void ServerSocket::bindAndListen(const std::uint16_t port) {
     sockaddr_in serverAddress{};
@@ -27,6 +30,7 @@ void ServerSocket::bindAndListen(const std::uint16_t port) {
         throw shared::exception::SocketError{"failed to create server socket"};
     }
     setFd(newFd);
+    setNonBlocking();
     // NOLINTNEXTLINE(misc-include-cleaner)
     if (::setsockopt(fd(), SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
         throw shared::exception::SocketError{"failed to set socket options"};
@@ -44,7 +48,7 @@ void ServerSocket::bindAndListen(const std::uint16_t port) {
     }
 }
 
-shared::network::ClientSocket ServerSocket::acceptClient() const {
+std::optional<shared::network::ClientSocket> ServerSocket::acceptClient() const {
     sockaddr_in clientAddress{};
     socklen_t clientLength{sizeof(clientAddress)};
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
@@ -52,7 +56,7 @@ shared::network::ClientSocket ServerSocket::acceptClient() const {
 
     if (clientFd == -1) {
         if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR) {
-            return shared::network::ClientSocket{};
+            return std::nullopt;
         }
         throw shared::exception::SocketError{"failed to accept client"};
     }
