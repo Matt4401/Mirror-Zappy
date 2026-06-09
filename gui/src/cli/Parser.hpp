@@ -16,6 +16,8 @@ namespace zappy::cli {
 class Parser {
   public:
     static constexpr std::int32_t kPortMax = std::numeric_limits<std::uint16_t>::max();
+    static constexpr int nbArgs = 4;
+    static constexpr const char* DefaultMachine = "127.0.0.1";
 
     Parser(std::span<char*> args) : _args(args.subspan(1).begin(), args.subspan(1).end()) {};
     ~Parser() = default;
@@ -40,6 +42,6 @@ class Parser {
     static std::string printHelp();
     std::vector<std::string> _args;
     std::uint16_t _port{0};
-    std::string _machine{"127.0.0.1"};
+    std::string _machine{DefaultMachine};
 };
 }  // namespace zappy::cli

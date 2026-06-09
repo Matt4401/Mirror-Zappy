@@ -26,6 +26,7 @@ void Render::start() {
 void Render::render3D() {
     _camera.beginMode3D();
 
+    // Temporary rendering of a grid of tiles for testing purposes
     for (int x = -6; x <= 6; x += 2) {
         for (int z = -6; z <= 6; z += 2) {
             _tile.draw({static_cast<float>(x), 0.0F, static_cast<float>(z)});

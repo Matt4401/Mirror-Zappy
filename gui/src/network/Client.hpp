@@ -12,6 +12,8 @@
 namespace zappy::gui::network {
 class Client {
   public:
+    static constexpr const char* DefaultTeamName = "GRAPHIC";
+
     explicit Client(const cli::Parser::Config& config);
     ~Client() = default;
     Client(const Client& other) = delete;

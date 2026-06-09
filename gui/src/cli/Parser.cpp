@@ -20,7 +20,7 @@ bool Parser::parse() {
         std::cout << printHelp() << std::endl;
         return false;
     }
-    if (_args.empty() || _args.size() < 4) {
+    if (_args.empty() || _args.size() < nbArgs) {
         throw shared::exception::ParserError(printHelp());
     }
     parseArgs();
