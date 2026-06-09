@@ -4,10 +4,7 @@ labels: enhancement
 body:
   - type: markdown
     attributes:
-      value: |
-        # New feature proposal
-        
-        Ensure the proposal provides all necessary information for the development team to understand and implement the feature effectively.
+      value: [FEATURE]
   - type: textarea
     id: description
     attributes:
@@ -42,7 +39,7 @@ body:
     id: implementation
     attributes:
       label: Implementation
-      description: How should the feature be implemented? 
+      description: How should the feature be implemented?
       placeholder: |
         * The class should use std::unique_ptr for ownership.
         * It needs to integrate into the main execution loop.

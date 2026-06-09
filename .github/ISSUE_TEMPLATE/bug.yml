@@ -4,10 +4,7 @@ labels: bug
 body:
   - type: markdown
     attributes:
-      value: |
-        # Bug Report
-        
-        Provide clear steps to reproduce the issue and attach memory diagnostics.
+      value: [BUG]
   - type: textarea
     id: description
     attributes:
