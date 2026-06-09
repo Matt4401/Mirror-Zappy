@@ -1,28 +1,31 @@
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
-#include <memory>
 #include "game/Player.hpp"
+
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+
+#include <cstddef>
+#include <memory>
+#include <utility>
+
+#include "command/ICommand.hpp"
 #include "game/World.hpp"
 
 namespace zappy::server::command {
-    class [[maybe_unused]] MockCommand : public ICommand {
-    public:
-        MOCK_METHOD(bool, start, (game::World& world, game::Player& player), (override));
-        MOCK_METHOD(void, execute, (game::World& world, game::Player& player), (override));
-        MOCK_METHOD(std::size_t, requiredTicks, (), (const));
-    };
-}
+class [[maybe_unused]] MockCommand : public ICommand {
+  public:
+    MOCK_METHOD(bool, start, (game::World & world, game::Player& player), (override));
+    MOCK_METHOD(void, execute, (game::World & world, game::Player& player), (override));
+    MOCK_METHOD(std::size_t, requiredTicks, (), (const));
+};
+}  // namespace zappy::server::command
 
 using namespace zappy::server::game;
-using testing::Return;
-using testing::StrictMock;
 
 class PlayerTest : public testing::Test {
-protected:
-    void SetUp() override {
-        player = std::make_unique<Player>(1, 5, 5);
-    }
+  protected:
+    void SetUp() override { player = std::make_unique<Player>(1, 5, 5); }
 
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     std::unique_ptr<Player> player;
 };
 
@@ -51,12 +54,11 @@ TEST_F(PlayerTest, ResponsesHandling) {
 
     const auto responses = player->getResponses();
     ASSERT_EQ(responses.size(), 2);
-    EXPECT_EQ(responses[0], "message 1\n");
-    EXPECT_EQ(responses[1], "message 2\n");
+    EXPECT_EQ(responses.at(0), "message 1\n");
+    EXPECT_EQ(responses.at(1), "message 2\n");
     const auto emptyResponses = player->getResponses();
     EXPECT_TRUE(emptyResponses.empty());
 }
-
 
 TEST_F(PlayerTest, MoveUpNorth) {
     const std::pair<std::size_t, std::size_t> limit = {9, 9};
