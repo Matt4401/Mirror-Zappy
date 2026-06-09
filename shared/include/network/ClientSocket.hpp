@@ -18,15 +18,17 @@ namespace zappy::shared::network {
 
 class ClientSocket : public BaseSocket {
   public:
-    ClientSocket() = default;
+    ClientSocket() = delete;
+    ClientSocket(std::string_view host, std::uint16_t port);
     explicit ClientSocket(int fd);
-
-    void connectToServer(std::string_view host, std::uint16_t port);
 
     [[nodiscard]] std::size_t send(std::string_view message) const;
     [[nodiscard]] std::string receive() const;
 
     void setNonBlocking() const;
+
+  private:
+    void connectToServer(std::string_view host, std::uint16_t port);
 };
 
 }  // namespace zappy::shared::network

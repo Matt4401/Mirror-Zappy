@@ -18,6 +18,8 @@
 
 namespace zappy::server::network {
 
+ServerSocket::ServerSocket(const std::uint16_t port) { bindAndListen(port); }
+
 void ServerSocket::bindAndListen(const std::uint16_t port) {
     sockaddr_in serverAddress{};
     const int opt{1};
@@ -52,7 +54,7 @@ shared::network::ClientSocket ServerSocket::acceptClient() const {
 
     if (clientFd == -1) {
         if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR) {
-            return shared::network::ClientSocket{};
+            return shared::network::ClientSocket{-1};
         }
         throw shared::exception::SocketError{"failed to accept client"};
     }

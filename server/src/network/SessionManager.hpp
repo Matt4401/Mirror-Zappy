@@ -53,7 +53,7 @@ class SessionManager {
     void handleServerEvent(short revents);
     void handleClientEvent(struct pollfd pfd);
 
-    ServerSocket _serverSocket{};
+    ServerSocket _serverSocket;
     std::vector<struct pollfd> _pollFds;
 
     std::unordered_map<int, shared::network::ClientSocket> _clients;

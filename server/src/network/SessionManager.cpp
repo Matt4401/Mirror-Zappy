@@ -23,8 +23,7 @@
 
 namespace zappy::server::network {
 
-SessionManager::SessionManager(std::uint16_t port) {
-    _serverSocket.bindAndListen(port);
+SessionManager::SessionManager(std::uint16_t port) : _serverSocket{port} {
     _pollFds.push_back({.fd = _serverSocket.fd(), .events = POLLIN});
 }
 

@@ -16,8 +16,12 @@ namespace zappy::server::network {
 
 class ServerSocket : public shared::network::BaseSocket {
   public:
-    void bindAndListen(std::uint16_t port);
+    ServerSocket() = delete;
+    explicit ServerSocket(std::uint16_t port);
     [[nodiscard]] shared::network::ClientSocket acceptClient() const;
+
+  private:
+    void bindAndListen(std::uint16_t port);
 };
 
 }  // namespace zappy::server::network

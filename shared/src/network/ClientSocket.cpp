@@ -28,6 +28,8 @@ namespace zappy::shared::network {
 
 ClientSocket::ClientSocket(const int fd) : BaseSocket{fd} {}
 
+ClientSocket::ClientSocket(const std::string_view host, const std::uint16_t port) { connectToServer(host, port); }
+
 void ClientSocket::connectToServer(const std::string_view host, const std::uint16_t port) {
     const std::string hostStr{host};
     sockaddr_in servAddr{};
