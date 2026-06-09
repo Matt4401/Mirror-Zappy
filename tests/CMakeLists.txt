@@ -9,6 +9,7 @@ add_executable(unit_tests
     src/server/Core.cpp
     src/server/command/CommandFactory.cpp
     src/server/command/Forward.cpp
+    src/server/parsing/Parser.cpp
 )
 target_include_directories(unit_tests PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src

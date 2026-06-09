@@ -14,7 +14,7 @@
 namespace zappy::server::tests {
 
 TEST(CoreTest, ConstructionSucceeds) {
-    util::Config config;
+    util::ServerConfig config;
     config.port = 4243;
 
     EXPECT_NO_THROW({ const Core core{config}; });
