@@ -14,6 +14,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -110,7 +111,11 @@ void SessionManager::handleClientEvent(const struct pollfd pfd) {
 }
 
 void SessionManager::acceptNewConnection() {
-    shared::network::ClientSocket newClient = _serverSocket.acceptClient();
+    std::optional<shared::network::ClientSocket> newClientOpt = _serverSocket.acceptClient();
+    if (!newClientOpt.has_value()) {
+        return;
+    }
+    shared::network::ClientSocket newClient = std::move(newClientOpt.value());
     const int clientId = newClient.fd();
 
     if (clientId == -1) {
