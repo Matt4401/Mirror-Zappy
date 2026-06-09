@@ -18,7 +18,7 @@
 
 namespace zappy::server::command {
 
-class MockCommand : public ICommand {
+class [[maybe_unused]] MockCommand : public ICommand {
   public:
     MOCK_METHOD(bool, start, (game::World & world, game::Player& player), (override));
     MOCK_METHOD(void, execute, (game::World & world, game::Player& player), (override));
@@ -76,6 +76,17 @@ TEST(PlayerTest, MoveUpNorth) {
     const std::pair<std::size_t, std::size_t> limit = {9, 9};
 
     player.moveUp(limit);
+}
+
+TEST(PlayerTest, MoveUpNegativeWraparound) {
+    Player player{1, 0, 0};
+    const std::pair<std::size_t, std::size_t> limit = {9, 9};
+
+    player.moveUp(limit);
+
+    const std::pair<std::size_t, std::size_t> position = player.getPosition();
+    EXPECT_EQ(position.first, 0);
+    (void)position;
 }
 
 }  // namespace

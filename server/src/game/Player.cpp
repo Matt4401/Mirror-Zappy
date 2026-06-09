@@ -82,4 +82,6 @@ std::vector<std::string> Player::getResponses() {
     return tmpResponses;
 }
 
+std::pair<std::size_t, std::size_t> Player::getPosition() { return _pos; }
+
 }  // namespace zappy::server::game

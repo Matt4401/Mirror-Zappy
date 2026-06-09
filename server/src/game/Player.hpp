@@ -47,6 +47,7 @@ class Player {
 
     void addResponse(const std::string&);
     std::vector<std::string> getResponses();
+    std::pair<std::size_t, std::size_t> getPosition();
 
   private:
     std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> _inventory{};

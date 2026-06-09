@@ -15,7 +15,7 @@ namespace zappy::server::command {
 
 class ACommand : public ICommand {
   public:
-    explicit ACommand(const int requiredTicks) : _requiredTicks{requiredTicks} {}
+    explicit ACommand(const std::size_t requiredTicks) : _requiredTicks{requiredTicks} {}
     ~ACommand() override = default;
 
     ACommand(const ACommand& other) = delete;
@@ -31,7 +31,7 @@ class ACommand : public ICommand {
     void setRequiredTicks(const int ticks) { _requiredTicks = ticks; }
 
   private:
-    int _requiredTicks;
+    std::size_t _requiredTicks;
 };
 
 }  // namespace zappy::server::command
