@@ -8,15 +8,17 @@
 #pragma once
 #include <raylib.h>
 
+#include <memory>
 #include <string>
 #include <utility>
-#include <memory>
+
 #include "Model.hpp"
 
 namespace zappy::gui::raylib::rmodels {
 class ModelAnimation {
   public:
-    explicit ModelAnimation(const std::string& file) : _animations{LoadModelAnimations(file.c_str(), &_animationCount)} {}
+    explicit ModelAnimation(const std::string& file)
+        : _animations{LoadModelAnimations(file.c_str(), &_animationCount)} {}
 
     ~ModelAnimation() { reset(); }
 

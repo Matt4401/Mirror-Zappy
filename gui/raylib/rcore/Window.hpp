@@ -62,7 +62,6 @@ class Window {
         return _height;
     }
 
-
   protected:
   private:
     bool _ownsWindow = false;

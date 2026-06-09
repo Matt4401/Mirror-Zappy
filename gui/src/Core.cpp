@@ -9,6 +9,9 @@
 
 #include <exception>
 #include <iostream>
+#include <memory>
+
+#include "network/Client.hpp"
 
 namespace zappy::gui {
 int Core::run() {
@@ -16,6 +19,7 @@ int Core::run() {
         if (!_cliParser.parse()) {
             return 0;
         }
+        _client = std::make_unique<network::Client>(_cliParser.config());
         _render.start();
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;

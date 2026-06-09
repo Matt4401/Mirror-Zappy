@@ -23,14 +23,16 @@ class Text {
     [[nodiscard]] const std::string& value() const { return _text; }
     void setValue(std::string text) { _text = std::move(text); }
 
-    void draw(int fontSize, Color color) const { DrawText(_text.c_str(), static_cast<int>(_position.x()), static_cast<int>(_position.y()), fontSize, color); }
+    void draw(int fontSize, Color color) const {
+        DrawText(_text.c_str(), static_cast<int>(_position.x()), static_cast<int>(_position.y()), fontSize, color);
+    }
 
     void draw(const Font& font, float fontSize, float spacing, Color tint) const {
         DrawTextEx(font.font(), _text.c_str(), _position.vector(), fontSize, spacing, tint);
     }
 
-    void draw(const Font& font, rmath::Vector2 origin, float rotation, float fontSize,
-              float spacing, Color tint) const {
+    void draw(const Font& font, rmath::Vector2 origin, float rotation, float fontSize, float spacing,
+              Color tint) const {
         DrawTextPro(font.font(), _text.c_str(), _position.vector(), origin.vector(), rotation, fontSize, spacing, tint);
     }
 

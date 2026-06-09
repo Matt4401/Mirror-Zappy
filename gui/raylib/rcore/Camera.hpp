@@ -14,8 +14,13 @@
 namespace zappy::gui::raylib::rcore {
 class Camera {
   public:
-    Camera(rmath::Vector3 position) : _camera{} { _camera.position = position.vector();
-    _camera.target = rmath::Vector3(0, 0.0, 0); _camera.up = rmath::Vector3(0, 1.0, 0); _camera.fovy = 60.0; _camera.projection = CAMERA_PERSPECTIVE; }
+    Camera(rmath::Vector3 position) : _camera{} {
+        _camera.position = position.vector();
+        _camera.target = rmath::Vector3(0, 0.0, 0);
+        _camera.up = rmath::Vector3(0, 1.0, 0);
+        _camera.fovy = 60.0;
+        _camera.projection = CAMERA_PERSPECTIVE;
+    }
     ~Camera() = default;
     Camera(const Camera& other) = delete;
     Camera& operator=(const Camera& other) = delete;

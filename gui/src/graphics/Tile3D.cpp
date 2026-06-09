@@ -6,6 +6,7 @@
 */
 
 #include "Tile3D.hpp"
+
 #include "rmath/Vector3.hpp"
 
 namespace zappy::gui::graphics {

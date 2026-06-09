@@ -24,6 +24,12 @@ class Parser {
     Parser(Parser&& other) = delete;
     Parser& operator=(Parser&& other) = delete;
 
+    struct Config {
+        std::uint16_t port;
+        std::string machine;
+    };
+
+    [[nodiscard]] Config config() const { return Config(_port, _machine); }
     bool parse();
 
   protected:

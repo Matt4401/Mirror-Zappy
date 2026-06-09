@@ -6,10 +6,12 @@
 */
 
 #pragma once
+#include <memory>
 #include <span>
 
 #include "cli/Parser.hpp"
 #include "graphics/Render.hpp"
+#include "network/Client.hpp"
 
 namespace zappy::gui {
 class Core {
@@ -27,5 +29,6 @@ class Core {
   private:
     cli::Parser _cliParser;
     graphics::Render _render;
+    std::unique_ptr<network::Client> _client;
 };
 }  // namespace zappy::gui
