@@ -11,6 +11,9 @@
 #include <cstdint>
 #include <memory>
 #include <queue>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "command/ICommand.hpp"
 #include "game/World.hpp"
@@ -31,6 +34,7 @@ class Player {
     Player& operator=(Player&& other) = delete;
 
     explicit Player(int id, std::size_t x, std::size_t y);
+    ~Player() = default;
 
     void addItem(ItemType item, std::size_t quantity = 1);
     void subItem(ItemType item, std::size_t quantity = 1);
@@ -47,7 +51,7 @@ class Player {
   private:
     std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> _inventory{};
     orientation _orientation;
-    std::queue<std::unique_ptr<command::ICommand>> _commands{};
+    std::queue<std::unique_ptr<command::ICommand>> _commands;
     std::unique_ptr<command::ICommand> _currentCommand{nullptr};
     std::size_t _cmdTick{0};
     std::size_t _lifeTick{0};

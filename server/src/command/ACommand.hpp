@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <cstddef>
+
 #include "ICommand.hpp"
 
 namespace zappy::server::command {
