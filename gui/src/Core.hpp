@@ -9,6 +9,7 @@
 #include <span>
 
 #include "cli/Parser.hpp"
+#include "graphics/Render.hpp"
 
 namespace zappy::gui {
 class Core {
@@ -25,5 +26,6 @@ class Core {
   protected:
   private:
     cli::Parser _cliParser;
+    graphics::Render _render;
 };
 }  // namespace zappy::gui

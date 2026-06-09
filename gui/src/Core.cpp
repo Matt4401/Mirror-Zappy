@@ -16,6 +16,7 @@ int Core::run() {
         if (!_cliParser.parse()) {
             return 0;
         }
+        _render.start();
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
         return 84;
