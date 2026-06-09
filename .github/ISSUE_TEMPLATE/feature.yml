@@ -5,7 +5,8 @@ labels: enhancement
 body:
   - type: markdown
     attributes:
-      value: [FEATURE]
+      value: |
+        [FEATURE]
   - type: textarea
     id: description
     attributes:
