@@ -16,20 +16,16 @@
 #include "command/ICommand.hpp"
 #include "game/World.hpp"
 
-namespace zappy::server::command {
+namespace zappy::server::game::tests {
 
-class [[maybe_unused]] MockCommand : public ICommand {
+namespace {
+
+class [[maybe_unused]] MockCommand : public command::ICommand {
   public:
     MOCK_METHOD(bool, start, (game::World & world, game::Player& player), (override));
     MOCK_METHOD(void, execute, (game::World & world, game::Player& player), (override));
     MOCK_METHOD(std::size_t, requiredTicks, (), (const, override));
 };
-
-}  // namespace zappy::server::command
-
-namespace zappy::server::game::tests {
-
-namespace {
 
 TEST(PlayerTest, InitialState) {
     const Player player{1, 5, 5};
