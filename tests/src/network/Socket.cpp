@@ -48,7 +48,9 @@ TEST(NetworkSocketTest, ClientConnectsToServerSuccessfully) {
     if (serverSideClientOpt.has_value()) {
         ASSERT_TRUE(serverSideClientOpt.has_value());
     }
-    EXPECT_GE(serverSideClientOpt.value().fd(), 0);
+    if (serverSideClientOpt.has_value()) {
+        EXPECT_GE(serverSideClientOpt.value().fd(), 0);
+    }
 }
 
 TEST(NetworkSocketTest, ClientAndServerExchangeData) {
