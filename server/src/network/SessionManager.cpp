@@ -118,9 +118,6 @@ void SessionManager::acceptNewConnection() {
     shared::network::ClientSocket newClient = std::move(newClientOpt.value());
     const int clientId = newClient.fd();
 
-    if (clientId == -1) {
-        return;
-    }
     _clients.emplace(clientId, std::move(newClient));
     _pollFds.push_back({.fd = clientId, .events = POLLIN | POLLOUT, .revents = 0});
     _eventQueue.push({.type = EventType::CLIENT_CONNECTED, .clientId = clientId, .message = ""});
