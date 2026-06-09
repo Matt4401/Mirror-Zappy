@@ -38,6 +38,7 @@ class Texture2D {
     [[nodiscard]] int width() const { return _texture.width; }
     [[nodiscard]] int height() const { return _texture.height; }
     [[nodiscard]] ::Texture2D texture() const { return _texture; }
+    [[nodiscard]] unsigned int id() const { return _texture.id; }
 
     void draw(rmath::Vector2 position, Color tint) const { DrawTextureV(_texture, position.vector(), tint); }
     void draw(rmath::Vector2 position, float rotation, float scale, Color tint) const {

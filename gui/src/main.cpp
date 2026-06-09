@@ -5,18 +5,13 @@
 ** main
 */
 
-#include <iostream>
+#include <cstddef>
+#include <span>
 
-#include "rcore/Window.hpp"
+#include "Core.hpp"
 
-// NOLINTNEXTLINE
 int main(int ac, char** av) {
-    zappy::gui::raylib::rcore::Window window(800, 600, "Zappy GUI");
+    auto args = std::span{av, static_cast<std::size_t>(ac)};
 
-    window.setTargetFPS(60);
-    while (!window.shouldClose()) {
-    }
-
-    std::cout << "Hey, I am a zappy gui!" << std::endl;
-    return 0;
+    return zappy::gui::Core(args).run();
 }
