@@ -9,8 +9,8 @@
 #include <memory>
 #include <span>
 
+#include "Render.hpp"
 #include "cli/Parser.hpp"
-#include "graphics/Render.hpp"
 #include "network/Client.hpp"
 
 namespace zappy::gui {
@@ -28,7 +28,7 @@ class Core {
   protected:
   private:
     cli::Parser _cliParser;
-    graphics::Render _render;
+    std::unique_ptr<graphics::Render> _render;
     std::unique_ptr<network::Client> _client;
 };
 }  // namespace zappy::gui

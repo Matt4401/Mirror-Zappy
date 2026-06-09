@@ -56,7 +56,6 @@ class ModelAnimation {
         if (_animations != nullptr) {
             UnloadModelAnimations(_animations.get(), _animationCount);
         }
-        _animations.reset();
         _animationCount = 0;
     }
 

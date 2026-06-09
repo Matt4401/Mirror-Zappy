@@ -30,17 +30,28 @@ bool Parser::parse() {
 std::string Parser::printHelp() { return "USAGE: ./zappy_gui -p port -h machine"; }
 
 void Parser::parseArgs() {
+    bool portSet = false;
+    bool machineSet = false;
+
     for (std::size_t i = 0; i < _args.size(); i += 2) {
         if (_args.at(i) == "-p") {
             if (i + 1 >= _args.size()) {
                 throw shared::exception::ParserError("Port number is missing");
             }
+            if (portSet) {
+                throw shared::exception::ParserError("Port number is already set");
+            }
             _port = getPort(_args.at(i + 1));
+            portSet = true;
         } else if (_args.at(i) == "-h") {
             if (i + 1 >= _args.size()) {
                 throw shared::exception::ParserError("Machine address is missing");
             }
+            if (machineSet) {
+                throw shared::exception::ParserError("Machine address is already set");
+            }
             _machine = getMachine(_args.at(i + 1));
+            machineSet = true;
         } else {
             throw shared::exception::ParserError("Unknown argument: " + _args.at(i));
         }

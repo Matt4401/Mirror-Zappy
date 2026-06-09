@@ -6,15 +6,16 @@
 */
 
 #pragma once
+
 #include "rmath/Vector3.hpp"
 #include "rmodels/Model.hpp"
 
 namespace zappy::gui::graphics {
 class Tile3D {
   public:
-    static constexpr const char* MODEL_PATH = "assets/minecraft-grass-block/source/Grass_Block.obj";
+    static constexpr const char* MODEL_RESOURCE = "assets/minecraft-grass-block/source/Grass_Block.obj";
 
-    Tile3D();
+    explicit Tile3D();
     ~Tile3D() = default;
     Tile3D(const Tile3D& other) = delete;
     Tile3D& operator=(const Tile3D& other) = delete;

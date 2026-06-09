@@ -7,12 +7,14 @@
 
 #include "Tile3D.hpp"
 
+#include <string>
+
 #include "Color.hpp"
 #include "rmath/Vector3.hpp"
 
 namespace zappy::gui::graphics {
 
-Tile3D::Tile3D() : _model{MODEL_PATH} {}
+Tile3D::Tile3D() : _model{MODEL_RESOURCE} {}
 
 void Tile3D::draw(raylib::rmath::Vector3 position) const {
     _model.drawModel(position, 1.0F, raylib::Color::White().color());
