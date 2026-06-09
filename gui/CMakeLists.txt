@@ -14,6 +14,7 @@ add_subdirectory(raylib)
 
 add_executable(zappy_gui
         src/main.cpp
+        src/util/DataStructures.hpp
 )
 target_link_libraries(zappy_gui PRIVATE
         zappy_gui_raylib
