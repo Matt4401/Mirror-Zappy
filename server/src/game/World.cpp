@@ -12,6 +12,6 @@
 namespace zappy::server::game {
 
 // TODO: implement world logic and storage once the player, team and world classes are defined
-World::World(const util::Config& /*config*/) {}
+World::World(const util::ServerConfig& /*config*/) {}
 
 }  // namespace zappy::server::game

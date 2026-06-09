@@ -14,7 +14,7 @@ namespace zappy::server::game {
 // TODO: implement world logic and storage once the player, team and world classes are defined
 class World {
   public:
-    explicit World(const util::Config& config);
+    explicit World(const util::ServerConfig& config);
     ~World() = default;
 
     World(const World& other) = delete;

@@ -14,7 +14,7 @@
 // NOLINTNEXTLINE
 int main(int ac, char** av) {
     // TODO: implement argument parsing
-    const zappy::server::util::Config config{
+    const zappy::server::util::ServerConfig config{
         .port = 4242, .width = 10, .height = 10, .teamNames = {"Team1", "Team2"}, .clientLimit = 100, .freq = 100};
 
     try {
