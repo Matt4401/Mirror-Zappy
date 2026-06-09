@@ -15,7 +15,7 @@
 
 namespace zappy::server {
 
-Core::Core(util::Config config) : _config(std::move(config)), _sessionManager(_config.port), _world(_config) {}
+Core::Core(util::ServerConfig config) : _config(std::move(config)), _sessionManager(_config.port), _world(_config) {}
 
 void Core::run() {
     network::SessionManager::NetworkEvent message{};
