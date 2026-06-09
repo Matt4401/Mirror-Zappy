@@ -5,6 +5,7 @@ target_sources(zappy_gui_raylib_rmodels INTERFACE
         FILES   Material.hpp
                 Mesh.hpp
                 Model.hpp
+                ModelAnimation.hpp
 )
 target_include_directories(zappy_gui_raylib_rmodels INTERFACE
         ${CMAKE_CURRENT_SOURCE_DIR}/..
