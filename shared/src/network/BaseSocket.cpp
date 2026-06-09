@@ -7,6 +7,7 @@
 
 #include "network/BaseSocket.hpp"
 
+#include <fcntl.h>
 #include <unistd.h>
 
 #include <utility>
@@ -49,6 +50,17 @@ void BaseSocket::close() {
     }
     ::close(_fd);
     _fd = -1;
+}
+
+void BaseSocket::setNonBlocking() const {
+    const int flags = ::fcntl(fd(), F_GETFL, 0);
+    if (flags == -1) {
+        throw exception::SocketError{"unable to get socket flags"};
+    }
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
+    if (::fcntl(fd(), F_SETFL, flags | O_NONBLOCK) == -1) {
+        throw exception::SocketError{"unable to set non-blocking mode"};
+    }
 }
 
 void BaseSocket::setFd(int fd) {

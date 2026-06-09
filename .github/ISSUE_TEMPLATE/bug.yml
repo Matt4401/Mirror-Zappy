@@ -1,13 +1,12 @@
 name: Bug Report
 description: Report a bug, crash, or memory leak.
 labels: bug
+title: "[BUG] -"
 body:
   - type: markdown
     attributes:
       value: |
-        # Bug Report
-        
-        Provide clear steps to reproduce the issue and attach memory diagnostics.
+        [BUG]
   - type: textarea
     id: description
     attributes:
