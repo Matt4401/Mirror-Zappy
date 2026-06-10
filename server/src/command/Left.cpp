@@ -21,7 +21,9 @@ void Left::execute(game::World& /*world*/, game::Player& player) {
     setRequiredTicks(kTimeLimit);
 
     const auto currentOrientation = static_cast<std::uint8_t>(player.orientation());
-    const auto newOrientation = static_cast<game::cardinalPoint>((currentOrientation + 3) % 4);
+    constexpr auto nbCardinalPoint = static_cast<std::uint8_t>(game::cardinalPoint::COUNT);
+    const auto newOrientation =
+        static_cast<game::cardinalPoint>((currentOrientation + (nbCardinalPoint - 1)) % nbCardinalPoint);
     player.setOrientation(newOrientation);
     player.addResponse("ok\n");
 }

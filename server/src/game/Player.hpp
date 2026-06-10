@@ -20,7 +20,7 @@
 
 namespace zappy::server::game {
 
-enum class cardinalPoint : uint8_t { NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3 };
+enum class cardinalPoint : uint8_t { NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3, COUNT = 4 };
 
 constexpr std::array<std::pair<int, int>, 4> playerMove = {{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}};
 
@@ -47,11 +47,11 @@ class Player {
 
     void pushCommand(std::unique_ptr<command::ICommand> command);
     void update(World& world);
-    void moveUp(const std::pair<std::size_t, std::size_t>& limit);
+    void moveUp(const pos& limit);
 
     void addResponse(const std::string&);
     std::vector<std::string> responses();
-    std::pair<std::size_t, std::size_t> position();
+    [[nodiscard]] pos position() const;
 
     void setOrientation(cardinalPoint orient);
     [[nodiscard]] cardinalPoint orientation() const;
@@ -63,7 +63,7 @@ class Player {
     std::unique_ptr<command::ICommand> _currentCommand{nullptr};
     std::size_t _cmdTick{0};
     std::size_t _lifeTick{0};
-    std::pair<std::size_t, std::size_t> _pos{0, 0};
+    pos _pos{.x = 0, .y = 0};
     std::vector<std::string> _buffersResponses;
     int _id;
 };

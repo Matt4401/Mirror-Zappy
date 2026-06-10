@@ -20,8 +20,9 @@ Right::Right() : ACommand{kTimeLimit} {}
 void Right::execute(game::World& /*world*/, game::Player& player) {
     setRequiredTicks(kTimeLimit);
 
+    constexpr auto nbCardinalPoint = static_cast<std::uint8_t>(game::cardinalPoint::COUNT);
     const auto newOrientation =
-        static_cast<game::cardinalPoint>((static_cast<std::uint8_t>(player.orientation()) + 1) % 4);
+        static_cast<game::cardinalPoint>((static_cast<std::uint8_t>(player.orientation()) + 1) % nbCardinalPoint);
     player.setOrientation(newOrientation);
     player.addResponse("ok\n");
 }

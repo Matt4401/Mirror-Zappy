@@ -44,7 +44,7 @@ TEST(RightTest, CheckTurnMovement) {
 TEST(RightTest, CheckTurnMovementBordure) {
     const std::unique_ptr<ICommand> right = std::make_unique<Right>();
     const std::unique_ptr<ICommand> forward = std::make_unique<Forward>();
-    auto [maxX, maxY] = game::World::getLimitMap();
+    auto [maxX, maxY] = game::World::limitMap();
     game::Player player{0, maxX, maxY};
     const util::Config config{};
     game::World world{config};
