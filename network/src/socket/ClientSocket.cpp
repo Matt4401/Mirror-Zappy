@@ -103,7 +103,14 @@ std::string ClientSocket::receive() const {
 }
 
 std::optional<std::string> ClientSocket::tryPopMessage() {
-    const std::string newData = receive();
+    std::string newData;
+    try {
+        newData = receive();
+
+    } catch (const exception::SocketError& e) {
+        return std::nullopt;
+    }
+
     if (newData.size() + _buffer.size() > 8192) {
         throw exception::SocketError{"read buffer overflow, disconnecting client"};
     }
