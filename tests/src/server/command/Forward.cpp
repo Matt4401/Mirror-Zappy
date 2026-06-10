@@ -31,7 +31,7 @@ TEST(ForwardTest, CheckMovement) {
     game::World world{config};
 
     forward->execute(world, player);
-    auto [fst, snd] = player.getPosition();
+    auto [fst, snd] = player.position();
     ASSERT_EQ(fst, 5);
     ASSERT_EQ(snd, 6);
 }
@@ -44,7 +44,7 @@ TEST(ForwardTest, CheckMovementBordure) {
     game::World world{config};
 
     forward->execute(world, player);
-    auto [fst, snd] = player.getPosition();
+    auto [fst, snd] = player.position();
     ASSERT_EQ(fst, 16);
     ASSERT_EQ(snd, 0);
 }

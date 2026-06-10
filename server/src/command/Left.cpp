@@ -20,8 +20,8 @@ Left::Left() : ACommand{kTimeLimit} {}
 void Left::execute(game::World& /*world*/, game::Player& player) {
     setRequiredTicks(kTimeLimit);
 
-    const auto currentOrientation = static_cast<std::uint8_t>(player.getOrientation());
-    const auto newOrientation = static_cast<game::orientation>((currentOrientation + 3) % 4);
+    const auto currentOrientation = static_cast<std::uint8_t>(player.orientation());
+    const auto newOrientation = static_cast<game::cardinalPoint>((currentOrientation + 3) % 4);
     player.setOrientation(newOrientation);
     player.addResponse("ok\n");
 }

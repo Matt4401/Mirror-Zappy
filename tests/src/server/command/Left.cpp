@@ -33,10 +33,10 @@ TEST(LeftTest, CheckTurnMovement) {
     game::World world{config};
 
     left->execute(world, player);
-    const auto newOrient = player.getOrientation();
-    ASSERT_EQ(newOrient, game::orientation::WEST);
+    const auto newOrient = player.orientation();
+    ASSERT_EQ(newOrient, game::cardinalPoint::WEST);
     forward->execute(world, player);
-    auto [fst, snd] = player.getPosition();
+    auto [fst, snd] = player.position();
     ASSERT_EQ(fst, 4);
     ASSERT_EQ(snd, 5);
 }
@@ -50,9 +50,9 @@ TEST(LeftTest, CheckTurnMovementBordure) {
     game::World world{config};
 
     left->execute(world, player);
-    ASSERT_EQ(player.getOrientation(), game::orientation::WEST);
+    ASSERT_EQ(player.orientation(), game::cardinalPoint::WEST);
     forward->execute(world, player);
-    auto [fst, snd] = player.getPosition();
+    auto [fst, snd] = player.position();
     ASSERT_EQ(fst, 15);
     ASSERT_EQ(snd, 16);
 }

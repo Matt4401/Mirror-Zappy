@@ -58,12 +58,12 @@ TEST(PlayerTest, ResponsesHandling) {
     player.addResponse("message 1\n");
     player.addResponse("message 2\n");
 
-    const auto responses = player.getResponses();
+    const auto responses = player.responses();
     ASSERT_EQ(responses.size(), 2);
     EXPECT_EQ(responses.at(0), "message 1\n");
     EXPECT_EQ(responses.at(1), "message 2\n");
 
-    const auto emptyResponses = player.getResponses();
+    const auto emptyResponses = player.responses();
     EXPECT_TRUE(emptyResponses.empty());
 }
 
@@ -80,7 +80,7 @@ TEST(PlayerTest, MoveUpNegativeWraparound) {
 
     player.moveUp(limit);
 
-    const std::pair<std::size_t, std::size_t> position = player.getPosition();
+    const std::pair<std::size_t, std::size_t> position = player.position();
     EXPECT_EQ(position.first, 0);
     EXPECT_EQ(position.second, 1);
 }
