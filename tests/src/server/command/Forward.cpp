@@ -37,7 +37,8 @@ TEST(ForwardTest, CheckMovement) {
 
 TEST(ForwardTest, CheckMovementBordure) {
     std::unique_ptr<ICommand> forward = std::make_unique<Forward>();
-    game::Player player{0, 16, 16};
+    auto [maxX, maxY] = game::World::getLimitMap();
+    game::Player player{0, maxX, maxY};
     const util::Config config{};
     game::World world{config};
 
