@@ -14,6 +14,7 @@
 
 #include "SessionManager.hpp"
 #include "network/ISessionManager.hpp"
+#include "parsing/strategy/ServerStrategy.hpp"
 
 namespace zappy::server {
 

@@ -7,6 +7,9 @@
 
 #include <exception>
 #include <iostream>
+#include <memory>
+#include <string>
+#include <utility>
 
 #include "Core.hpp"
 #include "parsing/Parser.hpp"
