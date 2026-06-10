@@ -11,7 +11,7 @@
 
 namespace zappy::server::exception {
 
-class ToMuchCmd : public shared::exception::Exception {
+class TooMuchCmd : public shared::exception::Exception {
   public:
     using Exception::Exception;
 };

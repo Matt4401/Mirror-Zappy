@@ -15,19 +15,19 @@
 #include <vector>
 
 #include "command/ICommand.hpp"
-#include "exception/ToMuchCmd.hpp"
+#include "exception/TooMuchCmd.hpp"
 #include "game/World.hpp"
 
 namespace zappy::server::game {
 Player::Player(const int id, std::size_t x, std::size_t y) : _orientation(orientation::NORTH), _pos({x, y}), _id(id) {
     _inventory.fill(0);
-    setItem(ItemType::Food, 10);
+    setItem(ItemType::Food, kNbStartFood);
 }
 
 void Player::addItem(ItemType item, const std::size_t quantity) {
     _inventory.at(static_cast<uint8_t>(item)) += quantity;
     if (item == ItemType::Food) {
-        _lifeTick += 126 * quantity;
+        _lifeTick += kNbLifeTickFood * quantity;
     }
 }
 
@@ -43,8 +43,8 @@ std::size_t Player::getItem(ItemType item) const { return _inventory.at(static_c
 void Player::setItem(ItemType item, const size_t amount) { _inventory.at(static_cast<size_t>(item)) = amount; }
 
 void Player::pushCommand(std::unique_ptr<command::ICommand> command) {
-    if (_commands.size() >= 10) {
-        throw exception::ToMuchCmd{"Player " + std::to_string(_id) + " has too much commands queued"};
+    if (_commands.size() >= kMaxNbCmd) {
+        throw exception::TooMuchCmd{"Player " + std::to_string(_id) + " has too much commands queued"};
     }
     if (_currentCommand == nullptr) {
         _currentCommand = std::move(command);

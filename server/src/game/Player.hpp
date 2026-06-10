@@ -26,6 +26,10 @@ constexpr std::array<std::pair<int, int>, 4> playerMove = {{{0, 1}, {1, 0}, {0, 
 
 enum class ItemType : uint8_t { Food, Linemate, Deraumere, Sibur, Mendiane, Phiras, Thystame, COUNT };
 
+static constexpr std::uint8_t kNbLifeTickFood = 126;
+static constexpr std::uint8_t kNbStartFood = 10;
+static constexpr std::uint8_t kMaxNbCmd = 10;
+
 class Player {
   public:
     Player(const Player& other) = delete;
