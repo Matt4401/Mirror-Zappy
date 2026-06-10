@@ -7,6 +7,7 @@
 
 #include "Core.hpp"
 
+#include <exception>
 #include <iostream>
 #include <memory>
 #include <utility>
@@ -26,12 +27,16 @@ void Core::run() {
     shared::network::ISessionManager::NetworkEvent message{};
 
     while (_isRunning) {
-        _sessionManager->pollNetwork();
-        while (_sessionManager->tryPopMessage(message)) {
-            // TODO: should be removed, is of course temporary for testing purposes
-            std::cout << "Received message from client " << message.clientId
-                      << " of type: " << static_cast<int>(message.type) << ". Message: " << message.message
-                      << std::endl;
+        try {
+            _sessionManager->pollNetwork();
+            while (_sessionManager->tryPopMessage(message)) {
+                // TODO: should be removed, is of course temporary for testing purposes
+                std::cout << "Received message from client " << message.clientId
+                          << " of type: " << static_cast<int>(message.type) << ". Message: " << message.message
+                          << std::endl;
+            }
+        } catch (const std::exception& e) {
+            std::cerr << "Error in main loop: " << e.what() << std::endl;
         }
     }
 }
