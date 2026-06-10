@@ -54,7 +54,7 @@ class Player {
     std::pair<std::size_t, std::size_t> getPosition();
 
     void setOrientation(orientation orient);
-    orientation getOrientation() const;
+    [[nodiscard]] orientation getOrientation() const;
 
   private:
     std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> _inventory{};

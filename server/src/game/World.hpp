@@ -7,6 +7,9 @@
 
 #pragma once
 
+#include <cstddef>
+#include <utility>
+
 #include "util/DataStructures.hpp"
 
 namespace zappy::server::game {
@@ -22,8 +25,9 @@ class World {
     World(World&& other) = delete;
     World& operator=(World&& other) = delete;
 
-    std::pair<std::size_t, std::size_t> getLimitMap() {
-        return {16, 16};  // FIXME: put reel map limit get by the parser.
+    static std::pair<std::size_t, std::size_t> getLimitMap() {  // TODO : don't forget to remove the static when u have
+                                                                // real limit and also change so test that use that
+        return {16, 16};                                        // FIXME: put real map limit get by the parser.
     }
 
   private:

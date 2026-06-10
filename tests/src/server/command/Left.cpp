@@ -19,20 +19,20 @@
 
 namespace zappy::server::command {
 TEST(LeftTest, CheckRequiredTicks) {
-    std::unique_ptr<ICommand> left = std::make_unique<Left>();
-    auto ticks = left->requiredTicks();
+    const std::unique_ptr<ICommand> left = std::make_unique<Left>();
+    const auto ticks = left->requiredTicks();
     ASSERT_EQ(ticks, 7);
 }
 
 TEST(LeftTest, CheckTurnMovement) {
-    std::unique_ptr<ICommand> left = std::make_unique<Left>();
-    std::unique_ptr<ICommand> forward = std::make_unique<Forward>();
+    const std::unique_ptr<ICommand> left = std::make_unique<Left>();
+    const std::unique_ptr<ICommand> forward = std::make_unique<Forward>();
     game::Player player{0, 5, 5};
-    util::Config config{};
+    const util::Config config{};
     game::World world{config};
 
     left->execute(world, player);
-    auto newOrient = player.getOrientation();
+    const auto newOrient = player.getOrientation();
     ASSERT_EQ(newOrient, game::orientation::WEST);
     forward->execute(world, player);
     auto [fst, snd] = player.getPosition();
@@ -41,8 +41,8 @@ TEST(LeftTest, CheckTurnMovement) {
 }
 
 TEST(LeftTest, CheckTurnMovementBordure) {
-    std::unique_ptr<ICommand> left = std::make_unique<Left>();
-    std::unique_ptr<ICommand> forward = std::make_unique<Forward>();
+    const std::unique_ptr<ICommand> left = std::make_unique<Left>();
+    const std::unique_ptr<ICommand> forward = std::make_unique<Forward>();
     game::Player player{0, 16, 16};
     const util::Config config{};
     game::World world{config};

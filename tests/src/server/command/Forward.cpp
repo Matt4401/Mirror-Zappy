@@ -18,15 +18,15 @@
 namespace zappy::server::command {
 
 TEST(ForwardTest, CheckRequiredTicks) {
-    std::unique_ptr<ICommand> forward = std::make_unique<Forward>();
-    auto ticks = forward->requiredTicks();
+    const std::unique_ptr<ICommand> forward = std::make_unique<Forward>();
+    const auto ticks = forward->requiredTicks();
     ASSERT_EQ(ticks, 7);
 }
 
 TEST(ForwardTest, CheckMovement) {
     std::unique_ptr<ICommand> forward = std::make_unique<Forward>();
     game::Player player{0, 5, 5};
-    util::Config config{};
+    const util::Config config{};
     game::World world{config};
 
     forward->execute(world, player);
