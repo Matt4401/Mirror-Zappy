@@ -20,7 +20,7 @@
 
 namespace zappy::server::game {
 
-enum class orientation : uint8_t { NORTH = 0, EAST, SOUTH, WEST };
+enum class orientation : uint8_t { NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3 };
 
 constexpr std::array<std::pair<int, int>, 4> playerMove = {{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}};
 
@@ -52,6 +52,9 @@ class Player {
     void addResponse(const std::string&);
     std::vector<std::string> getResponses();
     std::pair<std::size_t, std::size_t> getPosition();
+
+    void setOrientation(orientation orient);
+    orientation getOrientation() const;
 
   private:
     std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> _inventory{};

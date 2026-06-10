@@ -87,4 +87,8 @@ std::vector<std::string> Player::getResponses() {
 
 std::pair<std::size_t, std::size_t> Player::getPosition() { return _pos; }
 
+void Player::setOrientation(const orientation orient) { _orientation = orient; }
+
+orientation Player::getOrientation() const { return _orientation; }
+
 }  // namespace zappy::server::game
