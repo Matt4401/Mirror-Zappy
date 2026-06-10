@@ -9,12 +9,10 @@
 
 #include <gtest/gtest.h>
 
-#include "util/DataStructures.hpp"
-
 namespace zappy::server::tests {
 
 TEST(CoreTest, ConstructionSucceeds) {
-    zappy::shared::parsing::ServerConfig config;
+    zappy::parser::parsing::ServerConfig config;
     config.port = 4243;
 
     EXPECT_NO_THROW({ const Core core{config}; });

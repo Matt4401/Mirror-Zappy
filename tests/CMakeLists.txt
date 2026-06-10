@@ -17,6 +17,7 @@ target_include_directories(unit_tests PRIVATE
 )
 target_link_libraries(unit_tests PRIVATE
         zappy_shared
+        zappy_parser
         zappy_server_objects
         # zappy_gui_objects
         # zappy_ai_objects
