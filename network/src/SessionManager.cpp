@@ -29,8 +29,8 @@ SessionManager::SessionManager(std::uint16_t port) : _serverSocket{port} {
     _pollFds.push_back({.fd = _serverSocket.fd(), .events = POLLIN});
 }
 
-void SessionManager::pollNetwork() {
-    const int readyFds = ::poll(_pollFds.data(), _pollFds.size(), 0);
+void SessionManager::pollNetwork(int timeout) {
+    const int readyFds = ::poll(_pollFds.data(), _pollFds.size(), timeout);
 
     if (readyFds < 0) {
         if (errno == EINTR) {

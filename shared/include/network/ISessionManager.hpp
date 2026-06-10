@@ -29,7 +29,7 @@ class ISessionManager {
     ISessionManager& operator=(ISessionManager&&) = delete;
     virtual ~ISessionManager() = default;
 
-    virtual void pollNetwork() = 0;
+    virtual void pollNetwork(int timeout) = 0;
 
     [[nodiscard]] virtual bool tryPopMessage(NetworkEvent& event) = 0;
     virtual void sendMessage(int clientId, std::string_view message) = 0;
