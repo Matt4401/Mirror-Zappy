@@ -12,6 +12,7 @@
 #include <utility>
 
 #include "Core.hpp"
+#include "exception/Exception.hpp"
 #include "parsing/Parser.hpp"
 #include "parsing/strategy/ServerStrategy.hpp"
 

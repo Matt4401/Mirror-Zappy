@@ -27,6 +27,7 @@ GetOptWrapper::GetOptWrapper(const int argc, char** argv, std::string optString)
     }
 }
 
+// NOLINTNEXTLINE
 int GetOptWrapper::getNextOption() const { return getopt(_argc, _argv, _optString.c_str()); }
 
 std::string GetOptWrapper::getOptionArg() {

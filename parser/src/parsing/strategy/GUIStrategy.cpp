@@ -7,11 +7,11 @@
 
 #include "parsing/strategy/GUIStrategy.hpp"
 
+#include <exception>
 #include <iostream>
 #include <iterator>
 #include <ostream>
 #include <string>
-#include <exception>
 
 #include "encapsulation/GetoptWrapper.hpp"
 #include "exception/ParsingError.hpp"
