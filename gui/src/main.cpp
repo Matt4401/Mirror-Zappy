@@ -32,7 +32,7 @@ int main(int ac, char** av) {
         std::cerr << "Error: " << e.what() << std::endl;
         return zappy::parser::parsing::kExitFailure;
     } catch (const std::exception& e) {
-        std::cerr << "Unknow error: " << e.what() << std::endl;
+        std::cerr << "Unknown error: " << e.what() << std::endl;
         return zappy::parser::parsing::kExitFailure;
     }
     return zappy::parser::parsing::kExitSuccess;
