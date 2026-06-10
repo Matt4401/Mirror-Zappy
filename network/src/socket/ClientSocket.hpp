@@ -14,19 +14,20 @@
 #include <string_view>
 
 #include "BaseSocket.hpp"
+#include "network/IClientSocket.hpp"
 
 namespace network::socket {
 
-class ClientSocket : public BaseSocket {
+class ClientSocket : public BaseSocket, public shared::network::IClientSocket {
   public:
     ClientSocket() = delete;
     ClientSocket(std::string_view host, std::uint16_t port);
     explicit ClientSocket(int fd);
 
-    [[nodiscard]] std::size_t send(std::string_view message) const;
-    [[nodiscard]] std::string receive() const;
+    [[nodiscard]] std::size_t send(std::string_view message) const override;
+    [[nodiscard]] std::string receive() const override;
 
-    [[nodiscard]] std::optional<std::string> tryPopMessage();
+    [[nodiscard]] std::optional<std::string> tryPopMessage() override;
 
   private:
     void connectToServer(std::string_view host, std::uint16_t port);

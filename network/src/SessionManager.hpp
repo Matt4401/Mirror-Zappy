@@ -17,33 +17,21 @@
 #include <unordered_map>
 #include <vector>
 
+#include "network/ISessionManager.hpp"
 #include "socket/ClientSocket.hpp"
 #include "socket/ServerSocket.hpp"
 
 namespace network {
 
-class SessionManager {
+class SessionManager : public shared::network::ISessionManager {
   public:
-    enum class EventType : std::uint8_t { CLIENT_CONNECTED, CLIENT_DISCONNECTED, MESSAGE_RECEIVED };
-
-    struct NetworkEvent {
-        EventType type;
-        int clientId;
-        std::string message;
-    };
     explicit SessionManager(std::uint16_t port);
-    ~SessionManager() = default;
 
-    SessionManager(const SessionManager& other) = delete;
-    SessionManager& operator=(const SessionManager& other) = delete;
-    SessionManager(SessionManager&& other) = delete;
-    SessionManager& operator=(SessionManager&& other) = delete;
+    void pollNetwork() override;
+    [[nodiscard]] bool tryPopMessage(NetworkEvent& message) override;
+    void sendMessage(int clientId, std::string_view message) override;
 
-    void pollNetwork();
-    [[nodiscard]] bool tryPopMessage(NetworkEvent& message);
-    void sendMessage(int clientId, std::string_view message);
-
-    void disconnectClient(int clientId);
+    void disconnectClient(int clientId) override;
 
   private:
     void acceptNewConnection();
