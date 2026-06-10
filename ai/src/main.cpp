@@ -4,12 +4,6 @@
 ** File description:
 ** main
 */
-/*
-** EPITECH PROJECT, 2026
-** zappy
-** File description:
-** main
-*/
 
 #include <sys/wait.h>
 #include <unistd.h>
