@@ -12,7 +12,6 @@
 #include "command/CommandFactory.hpp"
 #include "game/World.hpp"
 #include "network/ISessionManager.hpp"
-#include "util/DataStructures.hpp"
 
 namespace zappy::server {
 

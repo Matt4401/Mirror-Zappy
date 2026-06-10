@@ -8,7 +8,6 @@
 #include "Client.hpp"
 #include <memory>
 
-#include "cli/Parser.hpp"
 #include "exception/SocketError.hpp"
 #include "socket/ClientSocket.hpp"
 

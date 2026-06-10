@@ -14,7 +14,6 @@
 
 #include "command/ICommand.hpp"
 #include "game/Player.hpp"
-#include "util/DataStructures.hpp"
 
 namespace zappy::server::command {
 
@@ -27,7 +26,7 @@ TEST(ForwardTest, CheckRequiredTicks) {
 TEST(ForwardTest, CheckMovement) {
     std::unique_ptr<ICommand> forward = std::make_unique<Forward>();
     game::Player player{0, 5, 5};
-    const util::Config config{};
+    const zappy::parser::parsing::ServerConfig config{};
     game::World world{config};
 
     forward->execute(world, player);
@@ -40,7 +39,7 @@ TEST(ForwardTest, CheckMovementBordure) {
     const std::unique_ptr<ICommand> forward = std::make_unique<Forward>();
     auto [maxX, maxY] = game::World::limitMap();
     game::Player player{0, maxX, maxY};
-    const util::Config config{};
+    const zappy::parser::parsing::ServerConfig config{};
     game::World world{config};
 
     forward->execute(world, player);
