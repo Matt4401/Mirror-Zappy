@@ -25,7 +25,7 @@ namespace zappy::server::network::tests {
 namespace {
 class SessionManagerTest : public ::testing::Test {
   protected:
-    static constexpr std::uint16_t TEST_PORT = 4242;
+    static constexpr std::uint16_t TEST_PORT = 4243;
 
     void SetUp() override {
         _mockClientFd = ::socket(AF_INET, SOCK_STREAM, 0);

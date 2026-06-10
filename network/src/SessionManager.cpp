@@ -75,6 +75,12 @@ void SessionManager::sendMessage(int clientId, std::string_view message) {
         throw exception::SocketError{"write buffer overflow, disconnecting client"};
     }
     buffer += message;
+    for (auto& pfd : _pollFds) {
+        if (pfd.fd == clientId) {
+            pfd.events |= POLLOUT;
+            break;
+        }
+    }
 }
 
 void SessionManager::disconnectClient(const int clientId) {
@@ -162,6 +168,14 @@ void SessionManager::handleClientWrite(const int clientId) {
 
         if (bytesSent > 0) {
             buffer.erase(0, bytesSent);
+        }
+        if (buffer.empty()) {
+            for (auto& pfd : _pollFds) {
+                if (pfd.fd == clientId) {
+                    pfd.events &= ~POLLOUT;
+                    break;
+                }
+            }
         }
     } catch (const std::exception&) {
         disconnectClient(clientId);
