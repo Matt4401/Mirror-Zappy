@@ -18,20 +18,22 @@ namespace zappy::gui::raylib::rtext {
 class Text {
   public:
     Text() = default;
-    explicit Text(std::string text) : _text{std::move(text)} {}
+    explicit Text(std::string text, rmath::Vector2 position) : _text{std::move(text)}, _position{position} {}
 
     [[nodiscard]] const std::string& value() const { return _text; }
     void setValue(std::string text) { _text = std::move(text); }
 
-    void draw(int x, int y, int fontSize, Color color) const { DrawText(_text.c_str(), x, y, fontSize, color); }
-
-    void draw(const Font& font, rmath::Vector2 position, float fontSize, float spacing, Color tint) const {
-        DrawTextEx(font.font(), _text.c_str(), position.vector(), fontSize, spacing, tint);
+    void draw(int fontSize, Color color) const {
+        DrawText(_text.c_str(), static_cast<int>(_position.x()), static_cast<int>(_position.y()), fontSize, color);
     }
 
-    void draw(const Font& font, rmath::Vector2 position, rmath::Vector2 origin, float rotation, float fontSize,
-              float spacing, Color tint) const {
-        DrawTextPro(font.font(), _text.c_str(), position.vector(), origin.vector(), rotation, fontSize, spacing, tint);
+    void draw(const Font& font, float fontSize, float spacing, Color tint) const {
+        DrawTextEx(font.font(), _text.c_str(), _position.vector(), fontSize, spacing, tint);
+    }
+
+    void draw(const Font& font, rmath::Vector2 origin, float rotation, float fontSize, float spacing,
+              Color tint) const {
+        DrawTextPro(font.font(), _text.c_str(), _position.vector(), origin.vector(), rotation, fontSize, spacing, tint);
     }
 
     [[nodiscard]] int measure(int fontSize) const { return MeasureText(_text.c_str(), fontSize); }
@@ -51,5 +53,6 @@ class Text {
   protected:
   private:
     std::string _text;
+    rmath::Vector2 _position{0, 0};
 };
 }  // namespace zappy::gui::raylib::rtext
