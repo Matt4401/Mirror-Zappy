@@ -6,9 +6,11 @@
 */
 
 #include "Client.hpp"
+
 #include <memory>
 
 #include "exception/SocketError.hpp"
+#include "parsing/strategy/GUIStrategy.hpp"
 #include "socket/ClientSocket.hpp"
 
 namespace zappy::gui::network {

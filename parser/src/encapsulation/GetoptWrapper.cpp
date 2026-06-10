@@ -7,7 +7,7 @@
 
 #include "encapsulation/GetoptWrapper.hpp"
 
-#include <getopt.h>
+#include <unistd.h>
 
 #include <iterator>
 #include <string>

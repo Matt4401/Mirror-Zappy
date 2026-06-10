@@ -11,6 +11,7 @@
 #include <iterator>
 #include <ostream>
 #include <string>
+#include <exception>
 
 #include "encapsulation/GetoptWrapper.hpp"
 #include "exception/ParsingError.hpp"

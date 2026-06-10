@@ -7,9 +7,10 @@
 
 #pragma once
 
-#include "parsing/strategy/GUIStrategy.hpp"
 #include <memory>
+
 #include "network/IClientSocket.hpp"
+#include "parsing/strategy/GUIStrategy.hpp"
 
 namespace zappy::gui::network {
 class Client {

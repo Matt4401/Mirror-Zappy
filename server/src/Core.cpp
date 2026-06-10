@@ -12,7 +12,6 @@
 #include <memory>
 #include <utility>
 
-
 #include "SessionManager.hpp"
 #include "network/ISessionManager.hpp"
 

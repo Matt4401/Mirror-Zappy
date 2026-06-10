@@ -7,8 +7,9 @@
 
 #pragma once
 
-#include "parsing/strategy/ServerStrategy.hpp"
 #include <cstddef>
+
+#include "parsing/strategy/ServerStrategy.hpp"
 
 namespace zappy::server::game {
 
