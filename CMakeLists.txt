@@ -5,8 +5,8 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
@@ -23,9 +23,9 @@ if(ENABLE_COVERAGE)
 endif()
 
 add_subdirectory(shared)
-# add_subdirectory(server)
+add_subdirectory(server)
 # add_subdirectory(ai)
-# add_subdirectory(gui)
+add_subdirectory(gui)
 add_subdirectory(network)
 
 include(SetupGoogleTest)

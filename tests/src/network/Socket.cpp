@@ -15,24 +15,24 @@
 #include <optional>
 #include <string>
 
-#include "network/ClientSocket.hpp"
-#include "network/ServerSocket.hpp"
+#include "socket/ClientSocket.hpp"
+#include "socket/ServerSocket.hpp"
 
-namespace zappy::server::network {
+namespace network::socket {
 
 TEST(ServerSocketTest, AcceptClientOnNonBlockingWithNoConnectionsReturnsInvalidSocket) {
-    const network::ServerSocket server{0};
+    const ServerSocket server{0};
 
     const int flags = ::fcntl(server.fd(), F_GETFL, 0);
     ASSERT_NE(flags, -1);
 
     EXPECT_NE(flags & O_NONBLOCK, 0);
-    const std::optional<shared::network::ClientSocket> phantomClient = server.acceptClient();
+    const std::optional<ClientSocket> phantomClient = server.acceptClient();
     EXPECT_FALSE(phantomClient.has_value());
 }
 
 TEST(NetworkSocketTest, ClientConnectsToServerSuccessfully) {
-    const network::ServerSocket server{0};
+    const ServerSocket server{0};
 
     sockaddr_in serverAddress{};
     socklen_t length = sizeof(serverAddress);
@@ -41,9 +41,9 @@ TEST(NetworkSocketTest, ClientConnectsToServerSuccessfully) {
     ASSERT_EQ(::getsockname(server.fd(), reinterpret_cast<sockaddr*>(&serverAddress), &length), 0);
     const std::uint16_t port = ::ntohs(serverAddress.sin_port);
 
-    const shared::network::ClientSocket client{"127.0.0.1", port};
+    const ClientSocket client{"127.0.0.1", port};
 
-    const std::optional<shared::network::ClientSocket> serverSideClientOpt = server.acceptClient();
+    const std::optional<ClientSocket> serverSideClientOpt = server.acceptClient();
     if (serverSideClientOpt.has_value()) {
         ASSERT_TRUE(serverSideClientOpt.has_value());
     }
@@ -53,7 +53,7 @@ TEST(NetworkSocketTest, ClientConnectsToServerSuccessfully) {
 }
 
 TEST(NetworkSocketTest, ClientAndServerExchangeData) {
-    const network::ServerSocket server{0};
+    const ServerSocket server{0};
 
     sockaddr_in serverAddress{};
     socklen_t length = sizeof(serverAddress);
@@ -62,9 +62,9 @@ TEST(NetworkSocketTest, ClientAndServerExchangeData) {
     ASSERT_EQ(::getsockname(server.fd(), reinterpret_cast<sockaddr*>(&serverAddress), &length), 0);
     const std::uint16_t port = ::ntohs(serverAddress.sin_port);
 
-    const shared::network::ClientSocket client{"127.0.0.1", port};
+    const ClientSocket client{"127.0.0.1", port};
 
-    const std::optional<shared::network::ClientSocket> serverSideClientOpt = server.acceptClient();
+    const std::optional<ClientSocket> serverSideClientOpt = server.acceptClient();
     ASSERT_TRUE(serverSideClientOpt.has_value());
 
     const std::string expectedMessage = "WELCOME\n";
@@ -74,4 +74,4 @@ TEST(NetworkSocketTest, ClientAndServerExchangeData) {
     const std::string receivedMessage = client.receive();
     EXPECT_EQ(receivedMessage, expectedMessage);
 }
-}  // namespace zappy::server::network
+}  // namespace network::socket

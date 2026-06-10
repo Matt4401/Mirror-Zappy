@@ -1,4 +1,4 @@
-add_library(network STATIC
+add_library(network SHARED
     src/socket/BaseSocket.cpp
     src/socket/ClientSocket.cpp
     src/socket/ServerSocket.cpp

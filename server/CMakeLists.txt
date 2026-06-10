@@ -16,9 +16,11 @@ add_library(zappy_server_objects OBJECT
 target_include_directories(zappy_server_objects PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_SOURCE_DIR}/shared/
+        ${CMAKE_SOURCE_DIR}/network/
 )
 target_link_libraries(zappy_server_objects PUBLIC
         zappy_shared
+        network
 )
 
 add_executable(zappy_server

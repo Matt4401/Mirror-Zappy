@@ -7,9 +7,9 @@
 
 #pragma once
 
+#include "SessionManager.hpp"
 #include "command/CommandFactory.hpp"
 #include "game/World.hpp"
-#include "network/SessionManager.hpp"
 #include "util/DataStructures.hpp"
 
 namespace zappy::server {

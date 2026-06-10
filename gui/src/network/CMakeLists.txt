@@ -13,6 +13,7 @@ target_include_directories(zappy_gui_network PUBLIC
 )
 target_link_libraries(zappy_gui_network PUBLIC
         zappy_shared
+        network
         zappy_gui_raylib
         zappy_gui_cli
 )

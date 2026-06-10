@@ -10,7 +10,7 @@
 #include <iostream>
 #include <utility>
 
-#include "network/SessionManager.hpp"
+#include "SessionManager.hpp"
 #include "util/DataStructures.hpp"
 
 namespace zappy::server {

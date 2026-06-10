@@ -6,8 +6,8 @@
 */
 
 #pragma once
-#include "ClientSocket.hpp"
 #include "cli/Parser.hpp"
+#include "socket/ClientSocket.hpp"
 
 namespace zappy::gui::network {
 class Client {
@@ -21,10 +21,10 @@ class Client {
     Client(Client&& other) = delete;
     Client& operator=(Client&& other) = delete;
 
-    [[nodiscard]] const shared::network::ClientSocket& socket() const { return _socket; }
+    [[nodiscard]] const ::network::socket::ClientSocket& socket() const { return _socket; }
 
   protected:
   private:
-    shared::network::ClientSocket _socket;
+    ::network::socket::ClientSocket _socket;
 };
 }  // namespace zappy::gui::network
