@@ -15,18 +15,9 @@
 #include "network/Client.hpp"
 
 namespace zappy::gui {
-int Core::run() {
-    try {
-        if (!_cliParser.parse()) {
-            return 0;
-        }
-        _client = std::make_unique<network::Client>(_cliParser.config());
-        _render = std::make_unique<graphics::Render>();
-        _render->start();
-    } catch (const std::exception& e) {
-        std::cerr << e.what() << std::endl;
-        return 84;
-    }
-    return 0;
+void Core::run() {
+    _client = std::make_unique<network::Client>(_config);
+    _render = std::make_unique<graphics::Render>();
+    _render->start();
 }
 }  // namespace zappy::gui

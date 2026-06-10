@@ -11,8 +11,10 @@
 #include <string>
 
 namespace zappy::gui::util {
-struct GUIConfig {
+
+struct Config {
     std::uint16_t port = 0;
-    std::string machine = "localhost";
+    std::string machine = "127.0.0.1";
 };
+
 }  // namespace zappy::gui::util

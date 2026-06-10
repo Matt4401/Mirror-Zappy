@@ -6,15 +6,16 @@
 */
 
 #pragma once
-#include "cli/Parser.hpp"
+
 #include "network/ClientSocket.hpp"
+#include "util/DataStructures.hpp"
 
 namespace zappy::gui::network {
 class Client {
   public:
-    static constexpr const char* DefaultTeamName = "GRAPHIC";
+    static constexpr auto DefaultTeamName = "GRAPHIC";
 
-    explicit Client(const cli::Parser::Config& config);
+    explicit Client(const util::Config& config);
     ~Client() = default;
     Client(const Client& other) = delete;
     Client& operator=(const Client& other) = delete;
@@ -23,7 +24,6 @@ class Client {
 
     [[nodiscard]] const shared::network::ClientSocket& socket() const { return _socket; }
 
-  protected:
   private:
     shared::network::ClientSocket _socket;
 };
