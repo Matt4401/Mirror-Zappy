@@ -7,7 +7,7 @@
 
 #pragma once
 
-namespace zappy::shared::network {
+namespace network::socket {
 
 class BaseSocket {
   public:
@@ -33,4 +33,4 @@ class BaseSocket {
     int _fd{-1};
 };
 
-}  // namespace zappy::shared::network
+}  // namespace network::socket

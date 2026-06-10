@@ -6,8 +6,8 @@
 */
 
 #pragma once
+#include "ClientSocket.hpp"
 #include "cli/Parser.hpp"
-#include "network/ClientSocket.hpp"
 
 namespace zappy::gui::network {
 class Client {

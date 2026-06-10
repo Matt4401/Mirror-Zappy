@@ -20,9 +20,9 @@
 #include <utility>
 
 #include "exception/PollError.hpp"
-#include "network/ClientSocket.hpp"
+#include "socket/ClientSocket.hpp"
 
-namespace zappy::server::network {
+namespace network {
 
 SessionManager::SessionManager(std::uint16_t port) : _serverSocket{port} {
     _pollFds.push_back({.fd = _serverSocket.fd(), .events = POLLIN});
@@ -111,11 +111,11 @@ void SessionManager::handleClientEvent(const struct pollfd pfd) {
 }
 
 void SessionManager::acceptNewConnection() {
-    std::optional<shared::network::ClientSocket> newClientOpt = _serverSocket.acceptClient();
+    std::optional<socket::ClientSocket> newClientOpt = _serverSocket.acceptClient();
     if (!newClientOpt.has_value()) {
         return;
     }
-    shared::network::ClientSocket newClient = std::move(newClientOpt.value());
+    socket::ClientSocket newClient = std::move(newClientOpt.value());
     const int clientId = newClient.fd();
 
     _clients.emplace(clientId, std::move(newClient));
@@ -170,4 +170,4 @@ void SessionManager::extractCompleteMessages(const int clientId) {
     }
 }
 
-}  // namespace zappy::server::network
+}  // namespace network

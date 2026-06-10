@@ -5,7 +5,7 @@
 ** socket class
 */
 
-#include "network/ClientSocket.hpp"
+#include "ClientSocket.hpp"
 
 #include <arpa/inet.h>
 #include <netinet/in.h>
@@ -19,11 +19,11 @@
 #include <string>
 #include <string_view>
 
+#include "BaseSocket.hpp"
 #include "exception/ConnectError.hpp"
 #include "exception/SocketError.hpp"
-#include "network/BaseSocket.hpp"
 
-namespace zappy::shared::network {
+namespace network::socket {
 
 ClientSocket::ClientSocket(const int fd) : BaseSocket{fd} {}
 
@@ -80,22 +80,4 @@ std::size_t ClientSocket::send(std::string_view message) const {
 
     return totalSent;
 }
-
-std::string ClientSocket::receive() const {
-    std::array<char, 4096> buffer{};
-    const ::ssize_t bytesRead = ::recv(fd(), buffer.data(), buffer.size(), 0);
-
-    if (bytesRead < 0) {
-        if (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK) {
-            return "";
-        }
-        throw exception::SocketError{"failed to receive data"};
-    }
-    if (bytesRead == 0) {
-        throw exception::SocketError{"client disconnected"};
-    }
-
-    return std::string{buffer.data(), static_cast<std::size_t>(bytesRead)};
-}
-
-}  // namespace zappy::shared::network
+}  // namespace network::socket

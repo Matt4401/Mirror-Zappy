@@ -14,10 +14,10 @@
 #include <cstdint>
 #include <optional>
 
+#include "ClientSocket.hpp"
 #include "exception/SocketError.hpp"
-#include "network/ClientSocket.hpp"
 
-namespace zappy::server::network {
+namespace network::socket {
 
 ServerSocket::ServerSocket(const std::uint16_t port) { bindAndListen(port); }
 
@@ -27,13 +27,13 @@ void ServerSocket::bindAndListen(const std::uint16_t port) {
     const int newFd = ::socket(AF_INET, SOCK_STREAM, 0);
 
     if (newFd == -1) {
-        throw shared::exception::SocketError{"failed to create server socket"};
+        throw exception::SocketError{"failed to create server socket"};
     }
     setFd(newFd);
     setNonBlocking();
     // NOLINTNEXTLINE(misc-include-cleaner)
     if (::setsockopt(fd(), SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
-        throw shared::exception::SocketError{"failed to set socket options"};
+        throw exception::SocketError{"failed to set socket options"};
     }
 
     serverAddress.sin_family = AF_INET;
@@ -41,14 +41,14 @@ void ServerSocket::bindAndListen(const std::uint16_t port) {
     serverAddress.sin_port = ::htons(port);
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     if (::bind(fd(), reinterpret_cast<const sockaddr*>(&serverAddress), sizeof(serverAddress)) == -1) {
-        throw shared::exception::SocketError{"failed to bind server socket"};
+        throw exception::SocketError{"failed to bind server socket"};
     }
     if (::listen(fd(), SOMAXCONN) == -1) {
-        throw shared::exception::SocketError{"failed to listen on server socket"};
+        throw exception::SocketError{"failed to listen on server socket"};
     }
 }
 
-std::optional<shared::network::ClientSocket> ServerSocket::acceptClient() const {
+std::optional<ClientSocket> ServerSocket::acceptClient() const {
     sockaddr_in clientAddress{};
     socklen_t clientLength{sizeof(clientAddress)};
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
@@ -58,12 +58,12 @@ std::optional<shared::network::ClientSocket> ServerSocket::acceptClient() const 
         if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR) {
             return std::nullopt;
         }
-        throw shared::exception::SocketError{"failed to accept client"};
+        throw exception::SocketError{"failed to accept client"};
     }
 
-    shared::network::ClientSocket clientSocket{clientFd};
+    ClientSocket clientSocket{clientFd};
     clientSocket.setNonBlocking();
     return clientSocket;
 }
 
-}  // namespace zappy::server::network
+}  // namespace network::socket

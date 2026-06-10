@@ -14,7 +14,7 @@
 
 #include "BaseSocket.hpp"
 
-namespace zappy::shared::network {
+namespace network::socket {
 
 class ClientSocket : public BaseSocket {
   public:
@@ -29,4 +29,4 @@ class ClientSocket : public BaseSocket {
     void connectToServer(std::string_view host, std::uint16_t port);
 };
 
-}  // namespace zappy::shared::network
+}  // namespace network::socket

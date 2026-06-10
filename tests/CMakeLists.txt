@@ -5,8 +5,8 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
 add_executable(unit_tests
     src/gui/Parser.cpp
-    src/network/Socket.cpp
-    src/network/SessionManager.cpp
+    # src/network/Socket.cpp
+    # src/network/SessionManager.cpp
     src/server/Core.cpp
     src/server/command/CommandFactory.cpp
     src/server/command/Forward.cpp

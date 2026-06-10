@@ -17,10 +17,10 @@
 #include <unordered_map>
 #include <vector>
 
-#include "network/ClientSocket.hpp"
-#include "network/ServerSocket.hpp"
+#include "socket/ClientSocket.hpp"
+#include "socket/ServerSocket.hpp"
 
-namespace zappy::server::network {
+namespace network {
 
 class SessionManager {
   public:
@@ -53,14 +53,14 @@ class SessionManager {
     void handleServerEvent(short revents);
     void handleClientEvent(struct pollfd pfd);
 
-    ServerSocket _serverSocket;
+    socket::ServerSocket _serverSocket;
     std::vector<struct pollfd> _pollFds;
 
-    std::unordered_map<int, shared::network::ClientSocket> _clients;
+    std::unordered_map<int, socket::ClientSocket> _clients;
 
     std::unordered_map<int, std::string> _readBuffers;
     std::unordered_map<int, std::string> _writeBuffers;
     std::queue<NetworkEvent> _eventQueue;
 };
 
-}  // namespace zappy::server::network
+}  // namespace network

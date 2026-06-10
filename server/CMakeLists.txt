@@ -1,10 +1,6 @@
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 add_library(zappy_server_objects OBJECT
-    src/network/SessionManager.cpp
-    src/network/SessionManager.hpp
-    src/network/ServerSocket.cpp
-    src/network/ServerSocket.hpp
     src/game/World.cpp
     src/game/World.hpp
     src/Core.cpp

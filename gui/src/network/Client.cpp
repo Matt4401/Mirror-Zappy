@@ -8,7 +8,6 @@
 #include "Client.hpp"
 
 #include "cli/Parser.hpp"
-#include "exception/SocketError.hpp"
 
 namespace zappy::gui::network {
 Client::Client(const cli::Parser::Config& config) : _socket{config.machine, config.port} {
