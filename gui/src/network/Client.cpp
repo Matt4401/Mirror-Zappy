@@ -8,10 +8,9 @@
 #include "Client.hpp"
 
 #include "exception/SocketError.hpp"
-#include "util/DataStructures.hpp"
 
 namespace zappy::gui::network {
-Client::Client(const shared::parsing::GuiConfig& config) : _socket{config.machine, config.port} {
+Client::Client(const parser::parsing::GuiConfig& config) : _socket{config.machine, config.port} {
     if (_socket.send(DefaultTeamName) == -1) {
         throw shared::exception::SocketError("Failed to send GRAPHIC command");
     }

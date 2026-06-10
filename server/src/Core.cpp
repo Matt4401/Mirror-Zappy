@@ -14,7 +14,7 @@
 
 namespace zappy::server {
 
-Core::Core(shared::parsing::ServerConfig config)
+Core::Core(parser::parsing::ServerConfig config)
     : _config(std::move(config)), _sessionManager(_config.port), _world(_config) {}
 
 void Core::run() {

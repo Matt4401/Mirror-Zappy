@@ -15,7 +15,7 @@ class Client {
   public:
     static constexpr auto DefaultTeamName = "GRAPHIC";
 
-    explicit Client(const shared::parsing::GuiConfig & config);
+    explicit Client(const parser::parsing::GuiConfig& config);
     ~Client() = default;
     Client(const Client& other) = delete;
     Client& operator=(const Client& other) = delete;

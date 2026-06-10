@@ -15,11 +15,11 @@ add_subdirectory(src)
 
 add_executable(zappy_gui
         src/main.cpp
-        src/util/DataStructures.hpp
 )
 target_link_libraries(zappy_gui PRIVATE
         zappy_gui_core
         zappy_gui_raylib
+        zappy_parser
 )
 target_link_libraries(zappy_gui PUBLIC
         zappy_shared

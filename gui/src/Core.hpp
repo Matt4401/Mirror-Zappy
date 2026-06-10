@@ -17,7 +17,7 @@
 namespace zappy::gui {
 class Core {
   public:
-    explicit Core(shared::parsing::GuiConfig config) : _config(std::move(config)) {};
+    explicit Core(parser::parsing::GuiConfig config) : _config(std::move(config)) {};
     ~Core() = default;
     Core(const Core& other) = delete;
     Core& operator=(const Core& other) = delete;
@@ -27,7 +27,7 @@ class Core {
     void run();
 
   private:
-    shared::parsing::GuiConfig _config;
+    parser::parsing::GuiConfig _config;
     std::unique_ptr<graphics::Render> _render;
     std::unique_ptr<network::Client> _client;
 };

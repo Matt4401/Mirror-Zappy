@@ -15,7 +15,7 @@ namespace zappy::server {
 
 class Core {
   public:
-    explicit Core(shared::parsing::ServerConfig config);
+    explicit Core(parser::parsing::ServerConfig config);
     ~Core() = default;
 
     Core(const Core& other) = delete;
@@ -27,7 +27,7 @@ class Core {
     void stop();
 
   private:
-    shared::parsing::ServerConfig _config;
+    parser::parsing::ServerConfig _config;
     network::SessionManager _sessionManager;
     game::World _world;
     command::CommandFactory _commandFactory;
