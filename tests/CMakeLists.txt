@@ -5,11 +5,13 @@ set(FIXTURES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/fixtures")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
 add_executable(unit_tests
-    src/network/Socket.cpp
-    src/network/SessionManager.cpp
-    src/server/Core.cpp
-    src/server/command/CommandFactory.cpp
-    src/server/command/Forward.cpp
+        src/gui/Parser.cpp
+        src/network/Socket.cpp
+        src/network/SessionManager.cpp
+        src/server/Core.cpp
+        src/server/command/CommandFactory.cpp
+        src/server/command/Forward.cpp
+        src/server/Player.cpp
 )
 target_include_directories(unit_tests PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -17,7 +19,7 @@ target_include_directories(unit_tests PRIVATE
 target_link_libraries(unit_tests PRIVATE
         zappy_shared
         zappy_server_objects
-        # zappy_gui_objects
+        zappy_gui_core
         # zappy_ai_objects
         GTest::gtest
         GTest::gmock
