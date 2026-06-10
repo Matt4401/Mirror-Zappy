@@ -9,11 +9,11 @@
 
 #include <iostream>
 #include <ostream>
-#include <parsing/Parser.hpp>
 
-#include "../../gui/src/util/DataStructures.hpp"
 #include "encapsulation/GetoptWrapper.hpp"
 #include "exception/ParsingError.hpp"
+#include "gui/src/util/DataStructures.hpp"
+#include "parsing/Parser.hpp"
 
 namespace zappy::shared::parsing {
 void GUIStrategy::parse(const int argc, char** argv, gui::util::Config& config) {

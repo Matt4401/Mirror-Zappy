@@ -10,12 +10,12 @@
 #include <functional>
 #include <iostream>
 #include <ostream>
-#include <parsing/Parser.hpp>
 #include <unordered_map>
 
-#include "../../server/src/util/DataStructures.hpp"
 #include "encapsulation/GetoptWrapper.hpp"
 #include "exception/ParsingError.hpp"
+#include "parsing/Parser.hpp"
+#include "server/src/util/DataStructures.hpp"
 
 namespace zappy::shared::parsing {
 void ServerStrategy::parse(const int argc, char** argv, server::util::ServerConfig& config) {
