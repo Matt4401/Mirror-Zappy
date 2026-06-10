@@ -12,6 +12,8 @@ add_library(zappy_server_objects OBJECT
     src/command/CommandFactory.hpp
     src/command/Forward.cpp
     src/command/Forward.hpp
+    src/game/Player.cpp
+    src/game/Player.hpp
 )
 target_include_directories(zappy_server_objects PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src

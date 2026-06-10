@@ -7,14 +7,15 @@
 
 #pragma once
 
+#include <cstddef>
+
 #include "ICommand.hpp"
-#include "game/World.hpp"
 
 namespace zappy::server::command {
 
 class ACommand : public ICommand {
   public:
-    explicit ACommand(int requiredTicks) : _requiredTicks{requiredTicks} {}
+    explicit ACommand(const std::size_t requiredTicks) : _requiredTicks{requiredTicks} {}
     ~ACommand() override = default;
 
     ACommand(const ACommand& other) = delete;
@@ -22,15 +23,15 @@ class ACommand : public ICommand {
     ACommand(ACommand&& other) = delete;
     ACommand& operator=(ACommand&& other) = delete;
 
-    [[nodiscard]] int requiredTicks() const override { return _requiredTicks; }
+    [[nodiscard]] std::size_t requiredTicks() const override { return _requiredTicks; }
 
-    [[nodiscard]] bool start(game::World& /*world*/, Player& /*player*/) override { return true; }
+    [[nodiscard]] bool start(game::World& /*world*/, game::Player& /*player*/) override { return true; }
 
   protected:
-    void setRequiredTicks(int ticks) { _requiredTicks = ticks; }
+    void setRequiredTicks(const int ticks) { _requiredTicks = ticks; }
 
   private:
-    int _requiredTicks;
+    std::size_t _requiredTicks;
 };
 
 }  // namespace zappy::server::command
