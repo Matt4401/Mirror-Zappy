@@ -82,7 +82,7 @@ TEST(PlayerTest, MoveUpNegativeWraparound) {
 
     const std::pair<std::size_t, std::size_t> position = player.getPosition();
     EXPECT_EQ(position.first, 0);
-    (void)position;
+    EXPECT_EQ(position.second, 1);
 }
 
 }  // namespace
