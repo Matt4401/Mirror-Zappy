@@ -10,6 +10,7 @@
 #include <functional>
 #include <iostream>
 #include <ostream>
+#include <parsing/Parser.hpp>
 #include <unordered_map>
 
 #include "../../server/src/util/DataStructures.hpp"
@@ -18,18 +19,37 @@
 
 namespace zappy::shared::parsing {
 void ServerStrategy::parse(const int argc, char** argv, server::util::ServerConfig& config) {
+    if (handleUsage(argv, argc)) {
+        throw exception::ParsingError(kUsageThrowMessage);
+    }
+    processOptions(argc, argv, config);
+    validate(config);
+}
+
+int ServerStrategy::parseNumericArg(const std::string& arg, const std::string& flagName) {
+    try {
+        const int val = std::stoi(arg);
+
+        if (val <= 0) {
+            throw exception::ParsingError("Invalid value for " + flagName + ": must be greater than 0.");
+        }
+        return val;
+    } catch (const std::exception&) {
+        throw exception::ParsingError("Invalid formatting for " + flagName + ": '" + arg + "' is not a valid number.");
+    }
+}
+
+void ServerStrategy::processOptions(const int argc, char** argv, server::util::ServerConfig& config) {
     const encapsulation::GetOptWrapper optionParser(argc, argv, kServerConfigFlags);
     const std::unordered_map<char, std::function<void(const std::string&)>> argumentHandlers = {
-        {'p', [&config](const std::string& arg) { config.port = std::stoi(arg); }},
-        {'x', [&config](const std::string& arg) { config.width = std::stoi(arg); }},
-        {'y', [&config](const std::string& arg) { config.height = std::stoi(arg); }},
-        {'c', [&config](const std::string& arg) { config.clientLimit = std::stoi(arg); }},
-        {'f', [&config](const std::string& arg) { config.freq = std::stoi(arg); }}};
+        {'p', [&config](const std::string& arg) { config.port = parseNumericArg(arg, "-p"); }},
+        {'x', [&config](const std::string& arg) { config.width = parseNumericArg(arg, "-x"); }},
+        {'y', [&config](const std::string& arg) { config.height = parseNumericArg(arg, "-y"); }},
+        {'c', [&config](const std::string& arg) { config.clientLimit = parseNumericArg(arg, "-c"); }},
+        {'f', [&config](const std::string& arg) { config.freq = parseNumericArg(arg, "-f"); }},
+    };
     int opt = 0;
 
-    if (printUsage(argv, argc)) {
-        return;
-    }
     while ((opt = optionParser.getNextOption()) != -1) {
         if (opt == 'n') {
             config.teamNames = optionParser.getMultiArgs();
@@ -42,7 +62,6 @@ void ServerStrategy::parse(const int argc, char** argv, server::util::ServerConf
                                           std::string(1, encapsulation::GetOptWrapper::getUnknownOption()) + "'");
         }
     }
-    validate(config);
 }
 
 void ServerStrategy::validate(const server::util::ServerConfig& config) {
@@ -68,7 +87,7 @@ void ServerStrategy::validate(const server::util::ServerConfig& config) {
     }
 }
 
-bool ServerStrategy::printUsage(char** argv, const int argc) {
+bool ServerStrategy::handleUsage(char** argv, const int argc) {
     for (int i = 1; i < argc; ++i) {
         if (std::string(*std::next(argv, i)) == "--help") {
             std::cout << "USAGE: ./zappy_server -p port -x width -y height -n name1 name2 ... -c clientsNb -f freq"

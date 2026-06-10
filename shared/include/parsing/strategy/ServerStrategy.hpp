@@ -24,7 +24,9 @@ class ServerStrategy : public IParseStrategy<server::util::ServerConfig> {
     static constexpr std::string kServerConfigFlags = "p:x:y:c:f:n:";
     static constexpr std::string kReservedGraphicName = "GRAPHIC";
 
+    static int parseNumericArg(const std::string& arg, const std::string& flagName);
+    static void processOptions(int argc, char** argv, server::util::ServerConfig& config);
     static void validate(const server::util::ServerConfig& config);
-    static bool printUsage(char** argv, int argc);
+    static bool handleUsage(char** argv, int argc);
 };
 }  // namespace zappy::shared::parsing

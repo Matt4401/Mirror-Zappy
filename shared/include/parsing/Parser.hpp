@@ -13,6 +13,9 @@
 #include "parsing/IParseStrategy.hpp"
 
 namespace zappy::shared::parsing {
+static constexpr std::size_t kExitSuccess = 0;
+static constexpr std::size_t kExitFailure = 84;
+static constexpr std::string kUsageThrowMessage = "Help displayed";
 
 template <typename ConfigType>
 class Parser {

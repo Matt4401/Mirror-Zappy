@@ -9,21 +9,22 @@
 
 #include <iostream>
 #include <ostream>
+#include <parsing/Parser.hpp>
 
 #include "../../gui/src/util/DataStructures.hpp"
 #include "encapsulation/GetoptWrapper.hpp"
 #include "exception/ParsingError.hpp"
 
 namespace zappy::shared::parsing {
-void GUIStrategy::parse(const int argc, char** argv, gui::util::GUIConfig& config) {
+void GUIStrategy::parse(const int argc, char** argv, gui::util::Config& config) {
     if (handleUsage(argv, argc)) {
-        throw exception::ParsingError("Help displayed");
+        throw exception::ParsingError(kUsageThrowMessage);
     }
     processOptions(argc, argv, config);
     validate(config);
 }
 
-void GUIStrategy::processOptions(const int argc, char** argv, gui::util::GUIConfig& config) {
+void GUIStrategy::processOptions(const int argc, char** argv, gui::util::Config& config) {
     const encapsulation::GetOptWrapper optionParser(argc, argv, kGUIConfigFlags);
     int opt = 0;
 
@@ -41,7 +42,7 @@ void GUIStrategy::processOptions(const int argc, char** argv, gui::util::GUIConf
     }
 }
 
-void GUIStrategy::parsePort(const std::string& arg, gui::util::GUIConfig& config) {
+void GUIStrategy::parsePort(const std::string& arg, gui::util::Config& config) {
     try {
         const int val = std::stoi(arg);
 
@@ -54,7 +55,7 @@ void GUIStrategy::parsePort(const std::string& arg, gui::util::GUIConfig& config
     }
 }
 
-void GUIStrategy::validate(const gui::util::GUIConfig& config) {
+void GUIStrategy::validate(const gui::util::Config& config) {
     if (config.port <= 0) {
         throw exception::ParsingError("Missing or invalid port (-p)");
     }
