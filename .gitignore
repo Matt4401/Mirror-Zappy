@@ -7,4 +7,7 @@
 /zappy_ai
 /zappy_gui
 /zappy_server
+compile_flags.txt
 *.pdf
+test_binaries/
+*issues.md
