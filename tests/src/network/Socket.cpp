@@ -162,10 +162,9 @@ TEST(ClientSocketBufferTest, TryPopMessageHandlesMultipleMessages) {
         EXPECT_EQ(msg.value(), "Forward");
     }
 
-    ASSERT_TRUE(client.tryPopMessage().has_value());
-    if (client.tryPopMessage().has_value()) {
-        EXPECT_EQ(client.tryPopMessage().value(), "Right");
-    }
+    std::optional<std::string> msg2 = client.tryPopMessage();
+    ASSERT_TRUE(msg2.has_value());
+    EXPECT_EQ(msg2.value(), "Right");
 
     EXPECT_FALSE(client.tryPopMessage().has_value());
 }
