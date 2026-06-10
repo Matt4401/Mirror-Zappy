@@ -3,12 +3,11 @@ import os
 import pytest
 from unittest.mock import patch
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../ai/src')))
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../ai/src"))
+)
 
-from AITeamClass import AITeam
 from zappy_ai import main
-
-
 
 
 def test_main():
@@ -16,18 +15,20 @@ def test_main():
     with patch("sys.argv", test_args):
         main()
 
+
 def test_invalide_main_zero_args():
     test_wrong_args = ["zappy_ai"]
 
-    with patch('sys.argv', test_wrong_args):
+    with patch("sys.argv", test_wrong_args):
         with pytest.raises(SystemExit) as excinfo:
             main()
         assert excinfo.value.code == 84
 
+
 def test_invalide_main_zero_args():
     test_wrong_args = ["zappy_ai", "-p", "4242", "-n", "EquipeTest", "-h"]
 
-    with patch('sys.argv', test_wrong_args):
+    with patch("sys.argv", test_wrong_args):
         with pytest.raises(SystemExit) as excinfo:
             main()
         assert excinfo.value.code == 84

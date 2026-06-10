@@ -1,23 +1,36 @@
-#include <iostream>
-#include <cstdlib>
+#include <sys/wait.h>
 #include <unistd.h>
-#include <limits.h>
-#include <libgen.h>
-#include <string>
 
-int main(int argc, char *argv[]) {
-    char path[PATH_MAX];
-    ssize_t count = readlink("/proc/self/exe", path, PATH_MAX);
-    if (count == -1) return 1;
-    path[count] = '\0';
-    
-    std::string dir = dirname(path);
-    std::string scriptPath = "\"" + dir + "/ai/src/zappy_ai.py\"";
-    std::string command = "python3 " + scriptPath;
-    for (int i = 1; i < argc; ++i) {
-        command += " ";
-        command += argv[i];
+#include <filesystem>
+#include <iostream>
+#include <string>
+#include <vector>
+
+
+int main(const int argc, char* argv[]) {
+    std::error_code ec;
+    std::filesystem::path const exePath = std::filesystem::read_symlink("/proc/self/exe", ec);
+    if (ec) {
+        return 1;
     }
-    
-    return std::system(command.c_str());
+    std::filesystem::path const scriptPath = exePath.parent_path() / "ai" / "src" / "zappy_ai.py";
+    std::vector<std::string> args = {"python3", scriptPath.string()};
+    for (int i = 1; i < argc; ++i) {
+        args.emplace_back(argv[i]);  // NOLINT
+    }
+    std::vector<char*> c_args;
+    for (auto& arg : args) {
+        c_args.push_back(arg.data());
+    }
+    c_args.push_back(nullptr);
+    if (pid_t const pid = fork(); pid == 0) {
+        execvp(c_args.at(0), c_args.data());
+        exit(1);
+    } else if (pid > 0) {
+        int status = 0;
+        waitpid(pid, &status, 0);
+        return WIFEXITED(status) ? WEXITSTATUS(status) : 1;
+    } else {
+        return 1;
+    }
 }
