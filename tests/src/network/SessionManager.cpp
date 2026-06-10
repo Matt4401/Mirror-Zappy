@@ -5,7 +5,7 @@
 ** Session manager tests
 */
 
-#include "network/SessionManager.hpp"
+#include "SessionManager.hpp"
 
 #include <gtest/gtest.h>
 #include <netinet/in.h>
@@ -47,7 +47,7 @@ class SessionManagerTest : public ::testing::Test {
         const int result =
             // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
             ::connect(_mockClientFd, reinterpret_cast<const sockaddr*>(&serverAddress), sizeof(serverAddress));
-        ASSERT_NE(result, -1) << "Mock client failed to connect to SessionManager";
+        ASSERT_NE(result, -1) << "Mock client failed to connect to ::network::SessionManager";
     }
 
     // NOLINTNEXTLINE (cppcoreguidelines-non-private-member-variables-in-classes)
@@ -57,26 +57,26 @@ class SessionManagerTest : public ::testing::Test {
 }  // namespace
 
 TEST_F(SessionManagerTest, AcceptsNewConnectionAndGeneratesEvent) {
-    SessionManager manager{TEST_PORT};
+    ::network::SessionManager manager{TEST_PORT};
 
     connectMockClient();
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
     manager.pollNetwork();
 
-    SessionManager::NetworkEvent event;
+    ::network::SessionManager::NetworkEvent event;
     const bool hasEvent = manager.tryPopMessage(event);
 
     ASSERT_TRUE(hasEvent);
-    EXPECT_EQ(event.type, SessionManager::EventType::CLIENT_CONNECTED);
+    EXPECT_EQ(event.type, ::network::SessionManager::EventType::CLIENT_CONNECTED);
     EXPECT_GT(event.clientId, 0);
 }
 
 TEST_F(SessionManagerTest, ReceivesCompleteMessageAndGeneratesEvent) {
-    SessionManager manager{TEST_PORT};
+    ::network::SessionManager manager{TEST_PORT};
     connectMockClient();
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
     manager.pollNetwork();
-    SessionManager::NetworkEvent event;
+    ::network::SessionManager::NetworkEvent event;
     auto received = manager.tryPopMessage(event);
     ASSERT_TRUE(received);
 
@@ -91,17 +91,17 @@ TEST_F(SessionManagerTest, ReceivesCompleteMessageAndGeneratesEvent) {
     const bool hasEvent = manager.tryPopMessage(event);
 
     ASSERT_TRUE(hasEvent);
-    EXPECT_EQ(event.type, SessionManager::EventType::MESSAGE_RECEIVED);
+    EXPECT_EQ(event.type, ::network::SessionManager::EventType::MESSAGE_RECEIVED);
     EXPECT_EQ(event.message, "Forward");
 }
 
 TEST_F(SessionManagerTest, HandlesTCPFragmentationPerfectly) {
-    SessionManager manager{TEST_PORT};
+    ::network::SessionManager manager{TEST_PORT};
     connectMockClient();
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
     manager.pollNetwork();
 
-    SessionManager::NetworkEvent event;
+    ::network::SessionManager::NetworkEvent event;
     const auto received = manager.tryPopMessage(event);
     ASSERT_TRUE(received);
 
@@ -121,17 +121,17 @@ TEST_F(SessionManagerTest, HandlesTCPFragmentationPerfectly) {
     manager.pollNetwork();
     const bool hasEvent = manager.tryPopMessage(event);
     ASSERT_TRUE(hasEvent);
-    EXPECT_EQ(event.type, SessionManager::EventType::MESSAGE_RECEIVED);
+    EXPECT_EQ(event.type, ::network::SessionManager::EventType::MESSAGE_RECEIVED);
     EXPECT_EQ(event.message, "Forward");
 }
 
 TEST_F(SessionManagerTest, SendsDataToClient) {
-    SessionManager manager{TEST_PORT};
+    ::network::SessionManager manager{TEST_PORT};
     connectMockClient();
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
     manager.pollNetwork();
 
-    SessionManager::NetworkEvent event;
+    ::network::SessionManager::NetworkEvent event;
     auto received = manager.tryPopMessage(event);
     ASSERT_TRUE(received);
     const int clientId = event.clientId;
@@ -149,12 +149,12 @@ TEST_F(SessionManagerTest, SendsDataToClient) {
 }
 
 TEST_F(SessionManagerTest, HandlesClientDisconnection) {
-    SessionManager manager{TEST_PORT};
+    ::network::SessionManager manager{TEST_PORT};
     connectMockClient();
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
     manager.pollNetwork();
 
-    SessionManager::NetworkEvent event;
+    ::network::SessionManager::NetworkEvent event;
     auto received = manager.tryPopMessage(event);
     ASSERT_TRUE(received);
 
@@ -166,7 +166,7 @@ TEST_F(SessionManagerTest, HandlesClientDisconnection) {
     const bool hasEvent = manager.tryPopMessage(event);
 
     ASSERT_TRUE(hasEvent);
-    EXPECT_EQ(event.type, SessionManager::EventType::CLIENT_DISCONNECTED);
+    EXPECT_EQ(event.type, ::network::SessionManager::EventType::CLIENT_DISCONNECTED);
 }
 
 }  // namespace zappy::server::network::tests

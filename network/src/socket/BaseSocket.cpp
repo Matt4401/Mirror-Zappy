@@ -5,7 +5,7 @@
 ** Socket base
 */
 
-#include "network/BaseSocket.hpp"
+#include "BaseSocket.hpp"
 
 #include <fcntl.h>
 #include <unistd.h>
@@ -14,7 +14,7 @@
 
 #include "exception/SocketError.hpp"
 
-namespace zappy::shared::network {
+namespace network::socket {
 
 BaseSocket::BaseSocket(int fd) : _fd{fd} {}
 
@@ -70,4 +70,4 @@ void BaseSocket::setFd(int fd) {
     _fd = fd;
 }
 
-}  // namespace zappy::shared::network
+}  // namespace network::socket

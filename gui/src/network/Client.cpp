@@ -6,14 +6,17 @@
 */
 
 #include "Client.hpp"
+#include <memory>
 
+#include "cli/Parser.hpp"
 #include "exception/SocketError.hpp"
-#include "parsing/strategy/GUIStrategy.hpp"
+#include "socket/ClientSocket.hpp"
 
 namespace zappy::gui::network {
-Client::Client(const parser::parsing::GuiConfig& config) : _socket{config.machine, config.port} {
-    if (_socket.send(DefaultTeamName) == -1) {
-        throw shared::exception::SocketError("Failed to send GRAPHIC command");
+Client::Client(const parser::parsing::GuiConfig& config)
+    : _socket{std::make_unique<::network::socket::ClientSocket>(config.machine, config.port)} {
+    if (_socket->send(DefaultTeamName) == 0) {
+        throw ::network::exception::SocketError("failed to send team name");
     }
 }
 }  // namespace zappy::gui::network

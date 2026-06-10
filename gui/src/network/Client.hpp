@@ -7,8 +7,9 @@
 
 #pragma once
 
-#include "network/ClientSocket.hpp"
 #include "parsing/strategy/GUIStrategy.hpp"
+#include <memory>
+#include "network/IClientSocket.hpp"
 
 namespace zappy::gui::network {
 class Client {
@@ -22,9 +23,9 @@ class Client {
     Client(Client&& other) = delete;
     Client& operator=(Client&& other) = delete;
 
-    [[nodiscard]] const shared::network::ClientSocket& socket() const { return _socket; }
+    [[nodiscard]] shared::network::IClientSocket& socket() { return *_socket; }
 
   private:
-    shared::network::ClientSocket _socket;
+    std::unique_ptr<shared::network::IClientSocket> _socket;
 };
 }  // namespace zappy::gui::network
