@@ -68,11 +68,13 @@ void SessionManager::sendMessage(int clientId, std::string_view message) {
     if (!_clients.contains(clientId)) {
         return;
     }
-    _writeBuffers[clientId] += message;
-    if (_writeBuffers.size() > 8192) {
-        throw exception::SocketError{"write buffer overflow, disconnecting client"};
+    std::string& buffer = _writeBuffers[clientId];
+
+    if (message.size() + buffer.size() > 8192) {
         disconnectClient(clientId);
+        throw exception::SocketError{"write buffer overflow, disconnecting client"};
     }
+    buffer += message;
 }
 
 void SessionManager::disconnectClient(const int clientId) {
