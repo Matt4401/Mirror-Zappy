@@ -1,4 +1,4 @@
-add_library(zappy_gui_raylib_rtextures PUBLIC
+add_library(zappy_gui_raylib_rtextures
         Texture2D.cpp
 )
 target_sources(zappy_gui_raylib_rtextures PUBLIC
