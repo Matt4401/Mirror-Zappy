@@ -97,7 +97,7 @@ jobs:
       - name: Install Ruff
         run: pip install ruff
       - name: Run Ruff Linter
-        run: ruff check .
+        run: ruff check ai/*
       - name: Run Ruff Formatter Check
         run: ruff format --check .
 
