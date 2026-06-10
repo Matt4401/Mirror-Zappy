@@ -14,6 +14,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -23,8 +24,7 @@
 
 namespace zappy::server::network {
 
-SessionManager::SessionManager(std::uint16_t port) {
-    _serverSocket.bindAndListen(port);
+SessionManager::SessionManager(std::uint16_t port) : _serverSocket{port} {
     _pollFds.push_back({.fd = _serverSocket.fd(), .events = POLLIN});
 }
 
@@ -111,12 +111,13 @@ void SessionManager::handleClientEvent(const struct pollfd pfd) {
 }
 
 void SessionManager::acceptNewConnection() {
-    shared::network::ClientSocket newClient = _serverSocket.acceptClient();
-    const int clientId = newClient.fd();
-
-    if (clientId == -1) {
+    std::optional<shared::network::ClientSocket> newClientOpt = _serverSocket.acceptClient();
+    if (!newClientOpt.has_value()) {
         return;
     }
+    shared::network::ClientSocket newClient = std::move(newClientOpt.value());
+    const int clientId = newClient.fd();
+
     _clients.emplace(clientId, std::move(newClient));
     _pollFds.push_back({.fd = clientId, .events = POLLIN | POLLOUT, .revents = 0});
     _eventQueue.push({.type = EventType::CLIENT_CONNECTED, .clientId = clientId, .message = ""});

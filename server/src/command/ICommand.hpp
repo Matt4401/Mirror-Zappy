@@ -6,10 +6,12 @@
 */
 
 #pragma once
+#include <cstddef>
 
-#include "game/World.hpp"
-
+namespace zappy::server::game {
 class Player;
+class World;
+}  // namespace zappy::server::game
 
 namespace zappy::server::command {
 
@@ -22,10 +24,10 @@ class ICommand {
     ICommand& operator=(ICommand&& other) = delete;
     virtual ~ICommand() = default;
 
-    [[nodiscard]] virtual int requiredTicks() const = 0;
+    [[nodiscard]] virtual std::size_t requiredTicks() const = 0;
 
-    virtual bool start(game::World& world, Player& player) = 0;
-    virtual void execute(game::World& world, Player& player) = 0;
+    virtual bool start(game::World& world, game::Player& player) = 0;
+    virtual void execute(game::World& world, game::Player& player) = 0;
 };
 
 }  // namespace zappy::server::command

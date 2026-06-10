@@ -7,6 +7,7 @@ add_library(zappy_shared STATIC
     include/network/BaseSocket.hpp
     src/exception/Exception.cpp
     include/exception/Exception.hpp
+    include/exception/ParserError.hpp
     include/exception/SocketError.hpp
     include/exception/ParsingError.hpp
         include/parsing/Parser.hpp

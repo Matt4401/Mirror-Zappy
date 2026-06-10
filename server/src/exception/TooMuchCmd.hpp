@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2026
 ** zappy
 ** File description:
-** Poll exception
+** ToMuchCmd
 */
 
 #pragma once
@@ -11,7 +11,7 @@
 
 namespace zappy::server::exception {
 
-class PollError : public shared::exception::Exception {
+class TooMuchCmd : public shared::exception::Exception {
   public:
     using Exception::Exception;
 };

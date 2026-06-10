@@ -22,6 +22,8 @@ class BaseSocket {
     [[nodiscard]] int fd() const;
     void close();
 
+    void setNonBlocking() const;
+
   protected:
     BaseSocket() = default;
     explicit BaseSocket(int fd);
