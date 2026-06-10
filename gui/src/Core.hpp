@@ -8,7 +8,7 @@
 #pragma once
 
 #include <memory>
-#include <utility>
+#include <span>
 
 #include "Render.hpp"
 #include "network/Client.hpp"
@@ -17,16 +17,20 @@
 namespace zappy::gui {
 class Core {
   public:
-    explicit Core(parser::parsing::GuiConfig config) : _config(std::move(config)) {};
+    explicit Core(std::span<char*> args);
     ~Core() = default;
     Core(const Core& other) = delete;
     Core& operator=(const Core& other) = delete;
     Core(Core&& other) = delete;
     Core& operator=(Core&& other) = delete;
 
-    void run();
+    int run();
 
   private:
+    void setup();
+    void loop() const;
+
+    std::span<char*> _args;
     parser::parsing::GuiConfig _config;
     std::unique_ptr<graphics::Render> _render;
     std::unique_ptr<network::Client> _client;

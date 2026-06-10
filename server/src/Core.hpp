@@ -8,6 +8,7 @@
 #pragma once
 
 #include <memory>
+#include <span>
 
 #include "command/CommandFactory.hpp"
 #include "game/World.hpp"
@@ -18,7 +19,7 @@ namespace zappy::server {
 
 class Core {
   public:
-    explicit Core(parser::parsing::ServerConfig config);
+    explicit Core(std::span<char*> args);
     ~Core() = default;
 
     Core(const Core& other) = delete;
@@ -26,13 +27,17 @@ class Core {
     Core(Core&& other) = delete;
     Core& operator=(Core&& other) = delete;
 
-    void run();
+    int run();
     void stop();
 
   private:
+    void setup();
+    void loop() const;
+
+    std::span<char*> _args;
     parser::parsing::ServerConfig _config;
     std::unique_ptr<shared::network::ISessionManager> _sessionManager;
-    game::World _world;
+    std::unique_ptr<game::World> _world;
     command::CommandFactory _commandFactory;
     bool _isRunning{true};
 };
