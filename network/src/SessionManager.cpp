@@ -20,6 +20,7 @@
 #include <utility>
 
 #include "exception/PollError.hpp"
+#include "exception/SocketError.hpp"
 #include "socket/ClientSocket.hpp"
 
 namespace network {
@@ -68,6 +69,10 @@ void SessionManager::sendMessage(int clientId, std::string_view message) {
         return;
     }
     _writeBuffers[clientId] += message;
+    if (_writeBuffers.size() > 8192) {
+        throw exception::SocketError{"write buffer overflow, disconnecting client"};
+        disconnectClient(clientId);
+    }
 }
 
 void SessionManager::disconnectClient(const int clientId) {
@@ -131,6 +136,9 @@ void SessionManager::handleClientRead(const int clientId) {
             return;
         }
         _readBuffers[clientId] += data;
+        if (_readBuffers[clientId].size() > 8192) {
+            throw exception::SocketError{"read buffer overflow, disconnecting client"};
+        }
         extractCompleteMessages(clientId);
 
     } catch (const std::exception& /*e*/) {

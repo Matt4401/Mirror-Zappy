@@ -23,7 +23,7 @@ class Client {
     Client(Client&& other) = delete;
     Client& operator=(Client&& other) = delete;
 
-    [[nodiscard]] shared::network::IClientSocket& socket() const { return *_socket; }
+    [[nodiscard]] shared::network::IClientSocket& socket() { return *_socket; }
 
   protected:
   private:
