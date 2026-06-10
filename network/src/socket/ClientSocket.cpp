@@ -5,7 +5,7 @@
 ** socket class
 */
 
-#include "network/ClientSocket.hpp"
+#include "ClientSocket.hpp"
 
 #include <arpa/inet.h>
 #include <netinet/in.h>
@@ -16,18 +16,22 @@
 #include <cerrno>
 #include <cstddef>
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <string_view>
 
+#include "BaseSocket.hpp"
 #include "exception/ConnectError.hpp"
 #include "exception/SocketError.hpp"
-#include "network/BaseSocket.hpp"
 
-namespace zappy::shared::network {
+namespace network::socket {
 
-ClientSocket::ClientSocket(const int fd) : BaseSocket{fd} {}
+ClientSocket::ClientSocket(const int fd) : BaseSocket{fd} { setNonBlocking(); }
 
-ClientSocket::ClientSocket(std::string_view host, const std::uint16_t port) { connectToServer(host, port); }
+ClientSocket::ClientSocket(std::string_view host, const std::uint16_t port) {
+    connectToServer(host, port);
+    setNonBlocking();
+}
 
 void ClientSocket::connectToServer(std::string_view host, const std::uint16_t port) {
     const std::string hostStr{host};
@@ -98,4 +102,29 @@ std::string ClientSocket::receive() const {
     return std::string{buffer.data(), static_cast<std::size_t>(bytesRead)};
 }
 
-}  // namespace zappy::shared::network
+std::optional<std::string> ClientSocket::tryPopMessage() {
+    std::string newData;
+    try {
+        newData = receive();
+    } catch (const exception::SocketError& e) {
+        if (std::string_view{e.what()} == "client disconnected") {
+            throw;
+        }
+        return std::nullopt;
+    }
+
+    if (newData.size() + _buffer.size() > 8192) {
+        throw exception::SocketError{"read buffer overflow, disconnecting client"};
+    }
+    _buffer += newData;
+    const std::size_t newlinePos = _buffer.find('\n');
+
+    if (newlinePos == std::string::npos) {
+        return std::nullopt;
+    }
+    std::string message = _buffer.substr(0, newlinePos);
+    _buffer.erase(0, newlinePos + 1);
+    return message;
+}
+
+}  // namespace network::socket

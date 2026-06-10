@@ -10,20 +10,20 @@
 #include <cstdint>
 #include <optional>
 
-#include "network/BaseSocket.hpp"
-#include "network/ClientSocket.hpp"
+#include "BaseSocket.hpp"
+#include "ClientSocket.hpp"
 
-namespace zappy::server::network {
+namespace network::socket {
 
-class ServerSocket : public shared::network::BaseSocket {
+class ServerSocket : public BaseSocket {
   public:
     ServerSocket() = delete;
     explicit ServerSocket(std::uint16_t port);
 
-    [[nodiscard]] std::optional<shared::network::ClientSocket> acceptClient() const;
+    [[nodiscard]] std::optional<ClientSocket> acceptClient() const;
 
   private:
     void bindAndListen(std::uint16_t port);
 };
 
-}  // namespace zappy::server::network
+}  // namespace network::socket

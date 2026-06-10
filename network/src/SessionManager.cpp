@@ -20,9 +20,10 @@
 #include <utility>
 
 #include "exception/PollError.hpp"
-#include "network/ClientSocket.hpp"
+#include "exception/SocketError.hpp"
+#include "socket/ClientSocket.hpp"
 
-namespace zappy::server::network {
+namespace network {
 
 SessionManager::SessionManager(std::uint16_t port) : _serverSocket{port} {
     _pollFds.push_back({.fd = _serverSocket.fd(), .events = POLLIN});
@@ -67,7 +68,13 @@ void SessionManager::sendMessage(int clientId, std::string_view message) {
     if (!_clients.contains(clientId)) {
         return;
     }
-    _writeBuffers[clientId] += message;
+    std::string& buffer = _writeBuffers[clientId];
+
+    if (message.size() + buffer.size() > 8192) {
+        disconnectClient(clientId);
+        throw exception::SocketError{"write buffer overflow, disconnecting client"};
+    }
+    buffer += message;
 }
 
 void SessionManager::disconnectClient(const int clientId) {
@@ -111,11 +118,11 @@ void SessionManager::handleClientEvent(const struct pollfd pfd) {
 }
 
 void SessionManager::acceptNewConnection() {
-    std::optional<shared::network::ClientSocket> newClientOpt = _serverSocket.acceptClient();
+    std::optional<socket::ClientSocket> newClientOpt = _serverSocket.acceptClient();
     if (!newClientOpt.has_value()) {
         return;
     }
-    shared::network::ClientSocket newClient = std::move(newClientOpt.value());
+    socket::ClientSocket newClient = std::move(newClientOpt.value());
     const int clientId = newClient.fd();
 
     _clients.emplace(clientId, std::move(newClient));
@@ -131,6 +138,9 @@ void SessionManager::handleClientRead(const int clientId) {
             return;
         }
         _readBuffers[clientId] += data;
+        if (_readBuffers[clientId].size() > 8192) {
+            throw exception::SocketError{"read buffer overflow, disconnecting client"};
+        }
         extractCompleteMessages(clientId);
 
     } catch (const std::exception& /*e*/) {
@@ -170,4 +180,4 @@ void SessionManager::extractCompleteMessages(const int clientId) {
     }
 }
 
-}  // namespace zappy::server::network
+}  // namespace network

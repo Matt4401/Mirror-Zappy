@@ -11,28 +11,42 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include <chrono>
 #include <cstdint>
 #include <optional>
 #include <string>
+#include <thread>
 
-#include "network/ClientSocket.hpp"
-#include "network/ServerSocket.hpp"
+#include "socket/ClientSocket.hpp"
+#include "socket/ServerSocket.hpp"
 
-namespace zappy::server::network {
+namespace {
+
+std::uint16_t getServerPort(const network::socket::ServerSocket& server) {
+    sockaddr_in serverAddress{};
+    socklen_t length = sizeof(serverAddress);
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+    ::getsockname(server.fd(), reinterpret_cast<sockaddr*>(&serverAddress), &length);
+    return ::ntohs(serverAddress.sin_port);
+}
+
+}  // namespace
+
+namespace network::socket {
 
 TEST(ServerSocketTest, AcceptClientOnNonBlockingWithNoConnectionsReturnsInvalidSocket) {
-    const network::ServerSocket server{0};
+    const ServerSocket server{0};
 
     const int flags = ::fcntl(server.fd(), F_GETFL, 0);
     ASSERT_NE(flags, -1);
 
     EXPECT_NE(flags & O_NONBLOCK, 0);
-    const std::optional<shared::network::ClientSocket> phantomClient = server.acceptClient();
+    const std::optional<ClientSocket> phantomClient = server.acceptClient();
     EXPECT_FALSE(phantomClient.has_value());
 }
 
 TEST(NetworkSocketTest, ClientConnectsToServerSuccessfully) {
-    const network::ServerSocket server{0};
+    const ServerSocket server{0};
 
     sockaddr_in serverAddress{};
     socklen_t length = sizeof(serverAddress);
@@ -41,9 +55,9 @@ TEST(NetworkSocketTest, ClientConnectsToServerSuccessfully) {
     ASSERT_EQ(::getsockname(server.fd(), reinterpret_cast<sockaddr*>(&serverAddress), &length), 0);
     const std::uint16_t port = ::ntohs(serverAddress.sin_port);
 
-    const shared::network::ClientSocket client{"127.0.0.1", port};
+    const ClientSocket client{"127.0.0.1", port};
 
-    const std::optional<shared::network::ClientSocket> serverSideClientOpt = server.acceptClient();
+    const std::optional<ClientSocket> serverSideClientOpt = server.acceptClient();
     if (serverSideClientOpt.has_value()) {
         ASSERT_TRUE(serverSideClientOpt.has_value());
     }
@@ -53,7 +67,7 @@ TEST(NetworkSocketTest, ClientConnectsToServerSuccessfully) {
 }
 
 TEST(NetworkSocketTest, ClientAndServerExchangeData) {
-    const network::ServerSocket server{0};
+    const ServerSocket server{0};
 
     sockaddr_in serverAddress{};
     socklen_t length = sizeof(serverAddress);
@@ -62,9 +76,9 @@ TEST(NetworkSocketTest, ClientAndServerExchangeData) {
     ASSERT_EQ(::getsockname(server.fd(), reinterpret_cast<sockaddr*>(&serverAddress), &length), 0);
     const std::uint16_t port = ::ntohs(serverAddress.sin_port);
 
-    const shared::network::ClientSocket client{"127.0.0.1", port};
+    const ClientSocket client{"127.0.0.1", port};
 
-    const std::optional<shared::network::ClientSocket> serverSideClientOpt = server.acceptClient();
+    const std::optional<ClientSocket> serverSideClientOpt = server.acceptClient();
     ASSERT_TRUE(serverSideClientOpt.has_value());
 
     const std::string expectedMessage = "WELCOME\n";
@@ -74,4 +88,86 @@ TEST(NetworkSocketTest, ClientAndServerExchangeData) {
     const std::string receivedMessage = client.receive();
     EXPECT_EQ(receivedMessage, expectedMessage);
 }
-}  // namespace zappy::server::network
+
+// NOLINTBEGIN
+TEST(ClientSocketBufferTest, TryPopMessageExtractsCompleteMessage) {
+    const ServerSocket server{0};
+    ClientSocket client{"127.0.0.1", getServerPort(server)};
+
+    std::optional<ClientSocket> serverSideOpt = server.acceptClient();
+    ASSERT_TRUE(serverSideOpt.has_value());
+
+    client.setNonBlocking();
+
+    if (serverSideOpt.value().send("Forward\n") != 8) {
+        FAIL() << "Failed to send complete message to client";
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+    std::optional<std::string> msg = client.tryPopMessage();
+    ASSERT_TRUE(msg.has_value());
+    if (msg.has_value()) {
+        EXPECT_EQ(msg.value(), "Forward");
+    }
+    EXPECT_FALSE(client.tryPopMessage().has_value());
+}
+
+TEST(ClientSocketBufferTest, TryPopMessageExtractsMessage2times) {
+    const ServerSocket server{0};
+    ClientSocket client{"127.0.0.1", getServerPort(server)};
+
+    std::optional<ClientSocket> serverSideOpt = server.acceptClient();
+    ASSERT_TRUE(serverSideOpt.has_value());
+
+    client.setNonBlocking();
+
+    if (serverSideOpt.value().send("Forwar") != 6) {
+        FAIL() << "Failed to send complete message to client";
+    }
+    ASSERT_FALSE(client.tryPopMessage().has_value());
+
+    if (serverSideOpt.value().send("d\n") != 2) {
+        FAIL() << "Failed to send complete message to client";
+    }
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+    std::optional<std::string> msg = client.tryPopMessage();
+    ASSERT_TRUE(msg.has_value());
+    if (msg.has_value()) {
+        EXPECT_EQ(msg.value(), "Forward");
+    }
+    EXPECT_FALSE(client.tryPopMessage().has_value());
+}
+
+TEST(ClientSocketBufferTest, TryPopMessageHandlesMultipleMessages) {
+    const ServerSocket server{0};
+    ClientSocket client{"127.0.0.1", getServerPort(server)};
+
+    std::optional<ClientSocket> serverSideOpt = server.acceptClient();
+    ASSERT_TRUE(serverSideOpt.has_value());
+
+    client.setNonBlocking();
+
+    if (serverSideOpt.value().send("Forward\nRight\n") != 14) {
+        FAIL() << "Failed to send complete message to client";
+    }
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+    std::optional<std::string> msg = client.tryPopMessage();
+
+    ASSERT_TRUE(msg.has_value());
+    if (msg.has_value()) {
+        EXPECT_EQ(msg.value(), "Forward");
+    }
+
+    std::optional<std::string> msg2 = client.tryPopMessage();
+    ASSERT_TRUE(msg2.has_value());
+    EXPECT_EQ(msg2.value(), "Right");
+
+    EXPECT_FALSE(client.tryPopMessage().has_value());
+}
+// NOLINTEND
+
+}  // namespace network::socket

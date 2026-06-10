@@ -18,5 +18,6 @@ target_link_libraries(zappy_gui_core PUBLIC
         zappy_gui_raylib
         zappy_gui_cli
         zappy_gui_graphics
+        network
         zappy_gui_network
 )
