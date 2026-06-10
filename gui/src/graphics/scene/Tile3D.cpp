@@ -30,7 +30,7 @@ void Tile3D::addItem(std::unique_ptr<IObject> object, std::size_t quantity) {
 }
 
 void Tile3D::removeItem(std::size_t index) {
-    if (index < 0 || index >= _itemObjects.size()) {
+    if (index >= _itemObjects.size()) {
         return;
     }
     _itemObjects.erase(_itemObjects.begin() + static_cast<int>(index));

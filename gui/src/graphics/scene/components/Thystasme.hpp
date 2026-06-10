@@ -14,7 +14,10 @@
 namespace zappy::gui::graphics::scene {
 class Thystasme : public AObject {
   public:
-    Thystasme(raylib::rmath::Vector3 position) : AObject(position) { setName("Thystasme"); }
+    Thystasme(raylib::rmath::Vector3 position) : AObject(position) {
+        setName("Thystasme");
+        setDensity(0.05);
+    }
     ~Thystasme() override = default;
     Thystasme(const Thystasme& other) = delete;
     Thystasme& operator=(const Thystasme& other) = delete;
@@ -23,6 +26,5 @@ class Thystasme : public AObject {
 
   protected:
   private:
-    double _density{0.05};
 };
 }  // namespace zappy::gui::graphics::scene

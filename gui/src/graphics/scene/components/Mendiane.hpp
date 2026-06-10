@@ -14,7 +14,10 @@
 namespace zappy::gui::graphics::scene {
 class Mendiane : public AObject {
   public:
-    Mendiane(raylib::rmath::Vector3 position) : AObject(position) { setName("Mendiane"); }
+    Mendiane(raylib::rmath::Vector3 position) : AObject(position) {
+        setName("Mendiane");
+        setDensity(0.1);
+    }
     ~Mendiane() override = default;
     Mendiane(const Mendiane& other) = delete;
     Mendiane& operator=(const Mendiane& other) = delete;
@@ -23,6 +26,5 @@ class Mendiane : public AObject {
 
   protected:
   private:
-    double _density{0.1};
 };
 }  // namespace zappy::gui::graphics::scene

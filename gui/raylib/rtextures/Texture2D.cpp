@@ -13,6 +13,9 @@
 
 namespace zappy::gui::raylib::rtextures {
 void Texture2D::drawCoverPanned(int width, int height, float horizontalPan, zappy::gui::raylib::Color tint) const {
+    if (_texture.height == 0 || height == 0) {
+        return;
+    }
     const float textureRatio = static_cast<float>(_texture.width) / static_cast<float>(_texture.height);
     const float screenRatio = static_cast<float>(width) / static_cast<float>(height);
     Rectangle source(0.0F, 0.0F, static_cast<float>(_texture.width), static_cast<float>(_texture.height));

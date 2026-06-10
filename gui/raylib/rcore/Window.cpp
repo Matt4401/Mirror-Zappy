@@ -22,7 +22,6 @@ Window::Window(const char* title, uint32_t flags) {
         _width = GetMonitorWidth(_monitor);
         _height = GetMonitorHeight(_monitor);
         InitWindow(DEFAULT_WIDTH, DEFAULT_HEIGHT, title);
-        ToggleFullscreen();
         DisableCursor();
     }
 }

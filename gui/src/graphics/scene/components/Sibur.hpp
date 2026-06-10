@@ -14,7 +14,10 @@
 namespace zappy::gui::graphics::scene {
 class Sibur : public AObject {
   public:
-    Sibur(raylib::rmath::Vector3 position) : AObject(position) { setName("Sibur"); }
+    Sibur(raylib::rmath::Vector3 position) : AObject(position) {
+        setName("Sibur");
+        setDensity(0.1);
+    }
     ~Sibur() override = default;
     Sibur(const Sibur& other) = delete;
     Sibur& operator=(const Sibur& other) = delete;
@@ -23,6 +26,5 @@ class Sibur : public AObject {
 
   protected:
   private:
-    double _density{0.1};
 };
 }  // namespace zappy::gui::graphics::scene

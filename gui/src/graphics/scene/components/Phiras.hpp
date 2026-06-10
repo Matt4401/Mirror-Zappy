@@ -14,7 +14,10 @@
 namespace zappy::gui::graphics::scene {
 class Phiras : public AObject {
   public:
-    Phiras(raylib::rmath::Vector3 position) : AObject(position) { setName("Phiras"); }
+    Phiras(raylib::rmath::Vector3 position) : AObject(position) {
+        setName("Phiras");
+        setDensity(0.08);
+    }
     ~Phiras() override = default;
     Phiras(const Phiras& other) = delete;
     Phiras& operator=(const Phiras& other) = delete;
@@ -23,6 +26,5 @@ class Phiras : public AObject {
 
   protected:
   private:
-    double _density{0.08};
 };
 }  // namespace zappy::gui::graphics::scene

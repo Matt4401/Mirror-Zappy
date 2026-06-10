@@ -22,6 +22,7 @@ namespace zappy::gui::graphics {
 class Render {
   public:
     static constexpr const std::string WINDOW_NAME = "Zappy GUI";
+    static constexpr int FLAG_FULLSCREEN_MODE = 2;
 
     Render() = default;
     ~Render() = default;
@@ -38,7 +39,7 @@ class Render {
     void render2D();
     void render3D();
     void handleEvents();
-    raylib::rcore::Window _window{WINDOW_NAME.c_str()};
+    raylib::rcore::Window _window{WINDOW_NAME.c_str(), FLAG_FULLSCREEN_MODE};
     std::shared_ptr<raylib::rcore::Camera> _camera{
         std::make_shared<raylib::rcore::Camera>(raylib::rmath::Vector3{10.0F, 10.0F, 10.0F})};
     EventContext _eventContext{_camera};

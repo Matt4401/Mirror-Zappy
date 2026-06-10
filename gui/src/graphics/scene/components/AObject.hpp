@@ -30,6 +30,7 @@ class AObject : public IObject {
     [[nodiscard]] raylib::rmath::Vector3 position() const { return _position; }
     void setPosition(const raylib::rmath::Vector3& position) { _position = position; }
     [[nodiscard]] double density() const { return _density; }
+    void setDensity(double density) { _density = density; }
     [[nodiscard]] std::string name() const override { return _name; }
     void setName(const std::string& name) { _name = name; }
 

@@ -14,7 +14,10 @@
 namespace zappy::gui::graphics::scene {
 class Linemate : public AObject {
   public:
-    Linemate(raylib::rmath::Vector3 position) : AObject(position) { setName("Linemate"); }
+    Linemate(raylib::rmath::Vector3 position) : AObject(position) {
+        setName("Linemate");
+        setDensity(0.3);
+    }
     ~Linemate() override = default;
     Linemate(const Linemate& other) = delete;
     Linemate& operator=(const Linemate& other) = delete;
@@ -23,6 +26,5 @@ class Linemate : public AObject {
 
   protected:
   private:
-    double _density{0.3};
 };
 }  // namespace zappy::gui::graphics::scene

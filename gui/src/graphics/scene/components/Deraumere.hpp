@@ -16,7 +16,10 @@
 namespace zappy::gui::graphics::scene {
 class Deraumere : public AObject {
   public:
-    Deraumere(raylib::rmath::Vector3 position) : AObject(position) { setName("Deraumere"); }
+    Deraumere(raylib::rmath::Vector3 position) : AObject(position) {
+        setName("Deraumere");
+        setDensity(0.15);
+    }
     ~Deraumere() override = default;
     Deraumere(const Deraumere& other) = delete;
     Deraumere& operator=(const Deraumere& other) = delete;
@@ -29,6 +32,5 @@ class Deraumere : public AObject {
 
   protected:
   private:
-    double _density{0.15};
 };
 }  // namespace zappy::gui::graphics::scene
