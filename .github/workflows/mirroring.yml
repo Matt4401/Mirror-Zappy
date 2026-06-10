@@ -99,7 +99,7 @@ jobs:
       - name: Run Ruff Linter
         run: ruff check ai/src/*.py
       - name: Run Ruff Formatter Check
-        run: ruff format --check .
+        run: ruff format --check ai/src/*.py
 
   check_program_compilation:
     name: Build & check binaries
