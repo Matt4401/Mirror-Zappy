@@ -7,8 +7,6 @@
 
 #include "Forward.hpp"
 
-#include <iostream>
-
 #include "command/ACommand.hpp"
 #include "game/Player.hpp"
 #include "game/World.hpp"

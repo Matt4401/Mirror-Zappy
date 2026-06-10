@@ -7,8 +7,11 @@
 
 #include "Right.hpp"
 
+#include <cstdint>
+
 #include "command/ACommand.hpp"
 #include "game/Player.hpp"
+#include "game/World.hpp"
 
 namespace zappy::server::command {
 

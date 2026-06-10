@@ -7,6 +7,8 @@
 
 #pragma once
 #include "ACommand.hpp"
+#include "game/Player.hpp"
+#include "game/World.hpp"
 
 namespace zappy::server::command {
 class Right : public ACommand {
