@@ -22,7 +22,7 @@ Core::Core(util::Config config)
     : _config{std::move(config)},
       _sessionManager{std::make_unique<network::SessionManager>(_config.port)},
       _world{_config},
-      _timeUnit{static_cast<int>(1.0F / static_cast<float>(config.freq) * 1000)} {}
+      _timeUnit{static_cast<int>(1.0F / static_cast<float>(_config.freq) * 1000)} {}
 
 void Core::run() {
     shared::network::ISessionManager::NetworkEvent message{};
