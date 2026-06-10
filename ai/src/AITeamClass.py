@@ -5,7 +5,7 @@ class AITeam:
         self.socket = socket
 
     def run(self):
-        alive = True;
+        alive = True # noqa: F841
 
         while True:
             pass

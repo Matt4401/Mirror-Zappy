@@ -19,12 +19,12 @@ def main():
         args = parser.parse_args()
     except SystemExit:
         sys.exit(84)
-    port = args.p
-    name = args.n
+    port = args.p# noqa: F841
+    name = args.n# noqa: F841
     machine = args.h
 
     trantorian = Trantorian("matt4401")
-    main_class = AITeam(trantorian, machine)
+    main_class = AITeam(trantorian, machine)# noqa: F841
     #main_class.run()
 
 
