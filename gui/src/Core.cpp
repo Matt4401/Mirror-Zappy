@@ -7,8 +7,6 @@
 
 #include "Core.hpp"
 
-#include <exception>
-#include <iostream>
 #include <memory>
 
 #include "graphics/Render.hpp"

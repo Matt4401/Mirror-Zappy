@@ -23,7 +23,7 @@ int main(int ac, char** av) {
         core.run();
     } catch (const zappy::shared::exception::Exception& e) {
         if (std::string(e.what()) == zappy::parser::parsing::kUsageThrowMessage) {
-        return zappy::parser::parsing::kExitSuccess;
+            return zappy::parser::parsing::kExitSuccess;
         }
         std::cerr << "Error: " << e.what() << std::endl;
         return zappy::parser::parsing::kExitFailure;

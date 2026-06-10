@@ -30,4 +30,4 @@ class GUIStrategy : public IParseStrategy<GuiConfig> {
     static void parsePort(const std::string& arg, GuiConfig& config);
     static void processOptions(int argc, char** argv, GuiConfig& config);
 };
-}  // namespace zappy::shared::parsing
+}  // namespace zappy::parser::parsing

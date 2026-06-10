@@ -53,4 +53,4 @@ class GetOptWrapper {
     std::vector<std::string> _stringArgv;
     std::string _optString;
 };
-}  // namespace zappy::shared::encapsulation
+}  // namespace zappy::parser::encapsulation

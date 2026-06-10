@@ -36,4 +36,4 @@ class ServerStrategy : public IParseStrategy<ServerConfig> {
     static void validate(const ServerConfig& config);
     static bool handleUsage(char** argv, int argc);
 };
-}  // namespace zappy::shared::parsing
+}  // namespace zappy::parser::parsing

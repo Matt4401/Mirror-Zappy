@@ -69,4 +69,4 @@ bool GUIStrategy::handleUsage(char** argv, const int argc) {
     }
     return false;
 }
-}  // namespace zappy::shared::parsing
+}  // namespace zappy::parser::parsing

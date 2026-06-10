@@ -7,6 +7,7 @@
 
 #include "encapsulation/GetoptWrapper.hpp"
 
+// NOLINTNEXTLINE
 #include <unistd.h>
 
 #include <iterator>
@@ -47,4 +48,4 @@ std::vector<std::string> GetOptWrapper::getMultiArgs() const {
 }
 
 char GetOptWrapper::getUnknownOption() { return static_cast<char>(optopt); }
-}  // namespace zappy::shared::encapsulation
+}  // namespace zappy::parser::encapsulation

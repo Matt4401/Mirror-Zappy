@@ -7,7 +7,10 @@
 
 #pragma once
 
+#include <cstddef>
 #include <memory>
+#include <string>
+#include <utility>
 
 #include "exception/ParsingError.hpp"
 #include "parsing/IParseStrategy.hpp"
@@ -41,4 +44,4 @@ class Parser {
   private:
     std::unique_ptr<IParseStrategy<ConfigType>> _strategy;
 };
-}  // namespace zappy::shared::parsing
+}  // namespace zappy::parser::parsing
