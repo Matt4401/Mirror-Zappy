@@ -26,9 +26,12 @@
 
 namespace network::socket {
 
-ClientSocket::ClientSocket(const int fd) : BaseSocket{fd} {}
+ClientSocket::ClientSocket(const int fd) : BaseSocket{fd} { setNonBlocking(); }
 
-ClientSocket::ClientSocket(std::string_view host, const std::uint16_t port) { connectToServer(host, port); }
+ClientSocket::ClientSocket(std::string_view host, const std::uint16_t port) {
+    connectToServer(host, port);
+    setNonBlocking();
+}
 
 void ClientSocket::connectToServer(std::string_view host, const std::uint16_t port) {
     const std::string hostStr{host};
