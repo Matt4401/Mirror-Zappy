@@ -21,3 +21,6 @@ target_link_libraries(zappy_gui PRIVATE
         zappy_gui_core
         zappy_gui_raylib
 )
+target_link_libraries(zappy_gui PUBLIC
+        zappy_shared
+)

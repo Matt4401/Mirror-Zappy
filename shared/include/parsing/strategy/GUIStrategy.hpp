@@ -24,6 +24,8 @@ class GUIStrategy : public IParseStrategy<gui::util::GUIConfig> {
     static constexpr std::string kGUIConfigFlags = "p:h:";
 
     static void validate(const gui::util::GUIConfig& config);
-    static bool printUsage(char** argv, int argc);
+    static bool handleUsage(char** argv, int argc);
+    static void parsePort(const std::string& arg, gui::util::GUIConfig& config) ;
+    static void processOptions(int argc, char** argv, gui::util::GUIConfig& config);
 };
 }  // namespace zappy::shared::parsing

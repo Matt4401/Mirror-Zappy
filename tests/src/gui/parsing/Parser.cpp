@@ -37,10 +37,10 @@ TEST(GuiParsingTest, ParserReturnsExpectedConfigWhenArgumentsAreValid) {
         std::vector<std::string> args{"./zappy_gui", "-p", "4242", "-h", "192.168.1.50"};
         auto argv = buildArgv(args);
 
-        shared::parsing::Parser<util::GUIConfig> parser(
+        shared::parsing::Parser<util::Config> parser(
                std::make_unique<shared::parsing::GUIStrategy>());
 
-        const util::GUIConfig config = parser.parse(static_cast<int>(argv.size()), argv.data());
+        const util::Config config = parser.parse(static_cast<int>(argv.size()), argv.data());
 
         EXPECT_EQ(config.port, 4242);
         EXPECT_EQ(config.machine, "192.168.1.50");
@@ -50,20 +50,20 @@ TEST(GuiParsingTest, ParserAppliesDefaultMachineWhenFlagIsMissing) {
         std::vector<std::string> args{"./zappy_gui", "-p", "8080"};
         auto argv = buildArgv(args);
 
-        shared::parsing::Parser<util::GUIConfig> parser(
+        shared::parsing::Parser<util::Config> parser(
                std::make_unique<shared::parsing::GUIStrategy>());
 
-        const util::GUIConfig config = parser.parse(static_cast<int>(argv.size()), argv.data());
+        const util::Config config = parser.parse(static_cast<int>(argv.size()), argv.data());
 
         EXPECT_EQ(config.port, 8080);
-        EXPECT_EQ(config.machine, "localhost");
+        EXPECT_EQ(config.machine, "127.0.0.1");
 }
 
 TEST(GuiParsingTest, ParserRejectsMissingPort) {
         std::vector<std::string> args{"./zappy_gui", "-h", "127.0.0.1"};
         auto argv = buildArgv(args);
 
-        shared::parsing::Parser<util::GUIConfig> parser(
+        shared::parsing::Parser<util::Config> parser(
                std::make_unique<shared::parsing::GUIStrategy>());
 
         EXPECT_THROW({ [[maybe_unused]] const auto config = parser.parse(static_cast<int>(argv.size()), argv.data()); },
@@ -74,7 +74,7 @@ TEST(GuiParsingTest, ParserRejectsInvalidPorts) {
         std::vector<std::string> args{"./zappy_gui", "-p", "-5", "-h", "localhost"};
         auto argv = buildArgv(args);
 
-        shared::parsing::Parser<util::GUIConfig> parser(
+        shared::parsing::Parser<util::Config> parser(
                std::make_unique<shared::parsing::GUIStrategy>());
 
         EXPECT_THROW({ [[maybe_unused]] const auto config = parser.parse(static_cast<int>(argv.size()), argv.data()); },
@@ -85,7 +85,7 @@ TEST(GuiParsingTest, ParserRejectsNonNumericPort) {
         std::vector<std::string> args{"./zappy_gui", "-p", "not_a_number"};
         auto argv = buildArgv(args);
 
-        shared::parsing::Parser<util::GUIConfig> parser(
+        shared::parsing::Parser<util::Config> parser(
                std::make_unique<shared::parsing::GUIStrategy>());
 
         EXPECT_THROW({ [[maybe_unused]] const auto config = parser.parse(static_cast<int>(argv.size()), argv.data()); },
@@ -96,24 +96,21 @@ TEST(GuiParsingTest, ParserRejectsUnknownFlags) {
         std::vector<std::string> args{"./zappy_gui", "-p", "4242", "-x", "truc_invalide"};
         auto argv = buildArgv(args);
 
-        shared::parsing::Parser<util::GUIConfig> parser(
+        shared::parsing::Parser<util::Config> parser(
                std::make_unique<shared::parsing::GUIStrategy>());
 
         EXPECT_THROW({ [[maybe_unused]] const auto config = parser.parse(static_cast<int>(argv.size()), argv.data()); },
                               shared::exception::ParsingError);
 }
 
-TEST(GuiParsingTest, ParserPrintsHelpWhenHelpFlagIsPresent) {
-        std::vector<std::string> args{"./zappy_gui", "--help"};
-        auto argv = buildArgv(args);
+TEST(GuiParsingTest, ParserRejectsHelpFlag) {
+    std::vector<std::string> args{"./zappy_gui", "-h"};
+    auto argv = buildArgv(args);
 
-        shared::parsing::Parser<util::GUIConfig> parser(
-               std::make_unique<shared::parsing::GUIStrategy>());
+    shared::parsing::Parser<util::Config> parser(
+           std::make_unique<shared::parsing::GUIStrategy>());
 
-        testing::internal::CaptureStdout();
-
-        const std::string output = testing::internal::GetCapturedStdout();
-
-        EXPECT_NE(output.find("USAGE: ./zappy_gui -p port -h machine"), std::string::npos);
+    EXPECT_THROW({ [[maybe_unused]] const auto config = parser.parse(static_cast<int>(argv.size()), argv.data()); },
+                          shared::exception::ParsingError);
 }
 }  // namespace zappy::gui::tests

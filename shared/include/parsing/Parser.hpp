@@ -31,7 +31,7 @@ class Parser {
         }
 
         ConfigType config;
-      _strategy->parse(argc, argv, config);
+        _strategy->parse(argc, argv, config);
         return config;
     }
 
