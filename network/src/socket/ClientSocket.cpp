@@ -106,8 +106,10 @@ std::optional<std::string> ClientSocket::tryPopMessage() {
     std::string newData;
     try {
         newData = receive();
-
     } catch (const exception::SocketError& e) {
+        if (std::string_view{e.what()} == "client disconnected") {
+            throw;
+        }
         return std::nullopt;
     }
 
