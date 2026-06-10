@@ -16,6 +16,7 @@
 #include "command/ICommand.hpp"
 #include "game/Player.hpp"
 #include "game/World.hpp"
+#include "parsing/strategy/ServerStrategy.hpp"
 
 namespace zappy::server::command {
 TEST(RightTest, CheckRequiredTicks) {

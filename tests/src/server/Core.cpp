@@ -9,6 +9,8 @@
 
 #include <gtest/gtest.h>
 
+#include "parsing/strategy/ServerStrategy.hpp"
+
 namespace zappy::server::tests {
 
 TEST(CoreTest, ConstructionSucceeds) {

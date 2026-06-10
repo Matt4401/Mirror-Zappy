@@ -14,6 +14,7 @@
 
 #include "command/ICommand.hpp"
 #include "game/Player.hpp"
+#include "parsing/strategy/ServerStrategy.hpp"
 
 namespace zappy::server::command {
 
