@@ -8,11 +8,12 @@
 #pragma once
 #include <raylib.h>
 
+#include <functional>
 #include <map>
 #include <vector>
-#include <functional>
-#include "rmath/Vector2.hpp"
+
 #include "context/EventContext.hpp"
+#include "rmath/Vector2.hpp"
 
 namespace zappy::gui::raylib::rcore {
 class Event {
@@ -30,9 +31,9 @@ class Event {
 
     void handleEvent(EventContext& context);
 
-    [[nodiscard]] static bool isKeyPressed(int key)  { return IsKeyPressed(key); }
-    [[nodiscard]] static bool isKeyDown(int key)  { return IsKeyDown(key); }
-    [[nodiscard]] static bool isKeyReleased(int key)  { return IsKeyReleased(key); }
+    [[nodiscard]] static bool isKeyPressed(int key) { return IsKeyPressed(key); }
+    [[nodiscard]] static bool isKeyDown(int key) { return IsKeyDown(key); }
+    [[nodiscard]] static bool isKeyReleased(int key) { return IsKeyReleased(key); }
 
     [[nodiscard]] rmath::Vector2 getMousePosition() const { return _mousePosition; }
     [[nodiscard]] float getMouseWheelMove() const { return _mouseWheelMove; }

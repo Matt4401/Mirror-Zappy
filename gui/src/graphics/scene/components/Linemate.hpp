@@ -6,20 +6,23 @@
 */
 
 #pragma once
+#include <string>
+
 #include "AObject.hpp"
+#include "rmath/Vector3.hpp"
 
 namespace zappy::gui::graphics::scene {
-    class Linemate : public AObject {
-    public:
-        Linemate();
-        ~Linemate();
-        Linemate(const Linemate& other) = delete;
-        Linemate& operator=(const Linemate& other) = delete;
-        Linemate(Linemate&& other) noexcept = default;
-        Linemate& operator=(Linemate&& other) noexcept = default;
+class Linemate : public AObject {
+  public:
+    Linemate(raylib::rmath::Vector3 position) : AObject(position) { setName("Linemate"); }
+    ~Linemate() override = default;
+    Linemate(const Linemate& other) = delete;
+    Linemate& operator=(const Linemate& other) = delete;
+    Linemate(Linemate&& other) noexcept = default;
+    Linemate& operator=(Linemate&& other) noexcept = default;
 
-    protected:
-    private:
-        double _density{0.3};
-    };
-} // namespace zappy::gui::graphics::scene
+  protected:
+  private:
+    double _density{0.3};
+};
+}  // namespace zappy::gui::graphics::scene

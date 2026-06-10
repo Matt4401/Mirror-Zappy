@@ -7,14 +7,15 @@
 
 #pragma once
 
-#include <string>
 #include <memory>
-#include "SkyBackground.hpp"
-#include "rcore/Camera.hpp"
-#include "rcore/Window.hpp"
-#include "rcore/Event.hpp"
-#include "context/EventContext.hpp"
+#include <string>
+
 #include "Map.hpp"
+#include "SkyBackground.hpp"
+#include "context/EventContext.hpp"
+#include "rcore/Camera.hpp"
+#include "rcore/Event.hpp"
+#include "rcore/Window.hpp"
 #include "rmath/Vector3.hpp"
 
 namespace zappy::gui::graphics {
@@ -43,6 +44,6 @@ class Render {
     EventContext _eventContext{_camera};
     scene::SkyBackground _skyBackground;
     raylib::rcore::Event _event;
-    scene::Map _map{200, 200};
+    scene::Map _map{10, 10};  // TEMPORARY MAP SIZE, JUST FOR TESTING
 };
 }  // namespace zappy::gui::graphics

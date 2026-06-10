@@ -41,4 +41,4 @@ raylib::Color SkyBackground::currentTint() const {
     return raylib::Color::lerp(SUNSET, NIGHT, (_dayProgress - 0.88F) / 0.12F);
 }
 
-}  // namespace zappy::gui::graphics
+}  // namespace zappy::gui::graphics::scene

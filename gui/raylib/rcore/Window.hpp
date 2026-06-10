@@ -28,7 +28,10 @@ class Window {
 
     [[nodiscard]] bool shouldClose() const { return _ownsWindow && WindowShouldClose(); }
 
-    void beginDrawing() { BeginDrawing(); clearBackground(); }
+    void beginDrawing() {
+        BeginDrawing();
+        clearBackground();
+    }
     static void endDrawing() { EndDrawing(); }
     static float frameTime() { return GetFrameTime(); }
     void clearBackground() { ClearBackground(_backgroundColor.color()); }

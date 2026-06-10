@@ -40,4 +40,4 @@ class SkyBackground {
     raylib::rtextures::Texture2D _texture{TEXTURE_PATH};
     float _dayProgress = 0.25F;
 };
-}  // namespace zappy::gui::graphics
+}  // namespace zappy::gui::graphics::scene
