@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "parsing/strategy/ServerStrategy.hpp"
 #include "util/DataStructures.hpp"
 
 namespace zappy::server::game {
@@ -14,7 +15,7 @@ namespace zappy::server::game {
 // TODO: implement world logic and storage once the player, team and world classes are defined
 class World {
   public:
-    explicit World(const util::ServerConfig& config);
+    explicit World(const zappy::shared::parsing::ServerConfig& config);
     ~World() = default;
 
     World(const World& other) = delete;

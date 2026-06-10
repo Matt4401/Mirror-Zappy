@@ -11,11 +11,11 @@
 #include <utility>
 
 #include "network/SessionManager.hpp"
-#include "util/DataStructures.hpp"
 
 namespace zappy::server {
 
-Core::Core(util::ServerConfig config) : _config(std::move(config)), _sessionManager(_config.port), _world(_config) {}
+Core::Core(shared::parsing::ServerConfig config)
+    : _config(std::move(config)), _sessionManager(_config.port), _world(_config) {}
 
 void Core::run() {
     network::SessionManager::NetworkEvent message{};

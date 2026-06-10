@@ -12,7 +12,7 @@
 
 namespace zappy::gui::util {
 
-struct Config {
+struct GuiConfig {
     std::uint16_t port = 0;
     std::string machine = "127.0.0.1";
 };

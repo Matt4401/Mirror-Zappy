@@ -8,14 +8,14 @@
 #pragma once
 
 #include "network/ClientSocket.hpp"
-#include "util/DataStructures.hpp"
+#include "parsing/strategy/GUIStrategy.hpp"
 
 namespace zappy::gui::network {
 class Client {
   public:
     static constexpr auto DefaultTeamName = "GRAPHIC";
 
-    explicit Client(const util::Config& config);
+    explicit Client(const shared::parsing::GuiConfig & config);
     ~Client() = default;
     Client(const Client& other) = delete;
     Client& operator=(const Client& other) = delete;

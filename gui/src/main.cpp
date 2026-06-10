@@ -11,14 +11,13 @@
 #include "Core.hpp"
 #include "parsing/Parser.hpp"
 #include "parsing/strategy/GUIStrategy.hpp"
-#include "util/DataStructures.hpp"
 
 // NOLINTNEXTLINE
 int main(int ac, char** av) {
     try {
         auto guiStrategy = std::make_unique<zappy::shared::parsing::GUIStrategy>();
-        zappy::shared::parsing::Parser<zappy::gui::util::Config> parser(std::move(guiStrategy));
-        const zappy::gui::util::Config config = parser.parse(ac, av);
+        zappy::shared::parsing::Parser<zappy::shared::parsing::GuiConfig> parser(std::move(guiStrategy));
+        const zappy::shared::parsing::GuiConfig config = parser.parse(ac, av);
         zappy::gui::Core core(config);
 
         core.run();

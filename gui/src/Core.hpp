@@ -12,12 +12,12 @@
 
 #include "Render.hpp"
 #include "network/Client.hpp"
-#include "util/DataStructures.hpp"
+#include "parsing/strategy/GUIStrategy.hpp"
 
 namespace zappy::gui {
 class Core {
   public:
-    explicit Core(util::Config config) : _config(std::move(config)) {};
+    explicit Core(shared::parsing::GuiConfig config) : _config(std::move(config)) {};
     ~Core() = default;
     Core(const Core& other) = delete;
     Core& operator=(const Core& other) = delete;
@@ -27,7 +27,7 @@ class Core {
     void run();
 
   private:
-    util::Config _config;
+    shared::parsing::GuiConfig _config;
     std::unique_ptr<graphics::Render> _render;
     std::unique_ptr<network::Client> _client;
 };

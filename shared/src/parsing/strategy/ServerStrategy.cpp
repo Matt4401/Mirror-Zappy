@@ -15,10 +15,9 @@
 #include "encapsulation/GetoptWrapper.hpp"
 #include "exception/ParsingError.hpp"
 #include "parsing/Parser.hpp"
-#include "server/src/util/DataStructures.hpp"
 
 namespace zappy::shared::parsing {
-void ServerStrategy::parse(const int argc, char** argv, server::util::ServerConfig& config) {
+void ServerStrategy::parse(const int argc, char** argv, ServerConfig& config) {
     if (handleUsage(argv, argc)) {
         throw exception::ParsingError(kUsageThrowMessage);
     }
@@ -39,7 +38,7 @@ int ServerStrategy::parseNumericArg(const std::string& arg, const std::string& f
     }
 }
 
-void ServerStrategy::processOptions(const int argc, char** argv, server::util::ServerConfig& config) {
+void ServerStrategy::processOptions(const int argc, char** argv, ServerConfig& config) {
     const encapsulation::GetOptWrapper optionParser(argc, argv, kServerConfigFlags);
     const std::unordered_map<char, std::function<void(const std::string&)>> argumentHandlers = {
         {'p', [&config](const std::string& arg) { config.port = parseNumericArg(arg, "-p"); }},
@@ -64,7 +63,7 @@ void ServerStrategy::processOptions(const int argc, char** argv, server::util::S
     }
 }
 
-void ServerStrategy::validate(const server::util::ServerConfig& config) {
+void ServerStrategy::validate(const ServerConfig& config) {
     if (config.port <= 0) {
         throw exception::ParsingError("Missing or invalid port (-p)");
     }

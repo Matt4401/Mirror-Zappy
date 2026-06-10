@@ -7,11 +7,11 @@
 
 #include "World.hpp"
 
-#include "util/DataStructures.hpp"
+#include "parsing/strategy/ServerStrategy.hpp"
 
 namespace zappy::server::game {
 
 // TODO: implement world logic and storage once the player, team and world classes are defined
-World::World(const util::ServerConfig& /*config*/) {}
+World::World(const zappy::shared::parsing::ServerConfig& /*config*/) {}
 
 }  // namespace zappy::server::game
