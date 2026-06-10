@@ -1,11 +1,24 @@
+/*
+** EPITECH PROJECT, 2026
+** zappy
+** File description:
+** main
+*/
+/*
+** EPITECH PROJECT, 2026
+** zappy
+** File description:
+** main
+*/
+
 #include <sys/wait.h>
 #include <unistd.h>
 
+#include <cstdlib>
 #include <filesystem>
-#include <iostream>
 #include <string>
+#include <system_error>
 #include <vector>
-
 
 int main(const int argc, char* argv[]) {
     std::error_code ec;
@@ -19,6 +32,7 @@ int main(const int argc, char* argv[]) {
         args.emplace_back(argv[i]);  // NOLINT
     }
     std::vector<char*> c_args;
+    c_args.reserve(args.size());
     for (auto& arg : args) {
         c_args.push_back(arg.data());
     }
