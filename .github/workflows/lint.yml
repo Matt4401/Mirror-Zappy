@@ -1,0 +1,96 @@
+name: Lint
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  RAYLIB_VERSION: "6.0"
+
+jobs:
+  cpp-linter:
+    name: Check linter cpp
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends build-essential cmake git clang-format-20 clang-tidy-20 libconfig++-dev libmbedtls-dev libssh2-1-dev libasound2-dev libx11-dev libxrandr-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev libxcursor-dev libxinerama-dev libwayland-dev libxkbcommon-dev
+
+      - name: Install raylib
+        run: |
+          git clone --depth 1 --branch "${RAYLIB_VERSION}" https://github.com/raysan5/raylib.git /tmp/raylib
+          cmake -S /tmp/raylib -B /tmp/raylib/build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DBUILD_EXAMPLES=OFF
+          cmake --build /tmp/raylib/build --config Release --parallel
+          sudo cmake --install /tmp/raylib/build --config Release
+          sudo ldconfig
+
+      - name: Configure CMake for Linter
+        run: cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+      - name: Register clang-tidy annotations
+        run: |
+          cat > "$RUNNER_TEMP/clang-tidy-matcher.json" <<'JSON'
+          {
+            "problemMatcher": [
+              {
+                "owner": "clang-tidy",
+                "pattern": [
+                  {
+                    "regexp": "^([^:\\n]+):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                  }
+                ]
+              }
+            ]
+          }
+          JSON
+          echo "::add-matcher::$RUNNER_TEMP/clang-tidy-matcher.json"
+
+      - name: Run cpp-linter
+        uses: cpp-linter/cpp-linter-action@v2
+        id: linter
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          version: "22"
+          style: "file"
+          tidy-checks: ""
+          database: "build"
+          ignore: ".github|libs"
+          file-annotations: "true"
+          step-summary: "true"
+
+      - name: Fail fast if checks failed
+        if: steps.linter.outputs.checks-failed > 0
+        run: exit 1
+
+  python-linter:
+    name: Check linter python
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Ruff
+        run: pip install ruff
+      - name: Run Ruff Linter
+        run: ruff check .
+      - name: Run Ruff Formatter Check
+        run: ruff format --check .

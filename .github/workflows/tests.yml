@@ -1,0 +1,105 @@
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+env:
+  BUILD_TYPE: Release
+  RAYLIB_VERSION: "6.0"
+  CCACHE_DIR: ${{ github.workspace }}/.ccache
+  EXECUTABLES: "zappy_server,zappy_gui,zappy_ai"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check_program_compilation:
+    name: Build and check binaries
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends build-essential cmake git libmbedtls-dev libssh2-1-dev libconfig++-dev ccache libasound2-dev libx11-dev libxrandr-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev libxcursor-dev libxinerama-dev libwayland-dev libxkbcommon-dev
+
+      - name: Install raylib
+        run: |
+          git clone --depth 1 --branch "${RAYLIB_VERSION}" https://github.com/raysan5/raylib.git /tmp/raylib
+          cmake -S /tmp/raylib -B /tmp/raylib/build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DBUILD_EXAMPLES=OFF
+          cmake --build /tmp/raylib/build --config Release --parallel
+          sudo cmake --install /tmp/raylib/build --config Release
+          sudo ldconfig
+
+      - name: Cache ccache
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: ccache-${{ github.ref }}-${{ github.sha }}
+          restore-keys: |
+            ccache-${{ github.ref }}-
+            ccache-
+
+      - name: Configure CMake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+
+      - name: Build Zappy Binaries
+        timeout-minutes: 10
+        run: cmake --build build --config ${{env.BUILD_TYPE}}
+
+      - name: Check Zappy Executables Exist
+        shell: bash
+        run: |
+          IFS=','
+          read -ra prog <<< "${{env.EXECUTABLES}}"
+          for val in "${prog[@]}"; do
+            if [ ! -x "$val" ]; then
+              echo "::error title=\"Missing Binary\"::Binary $val does not exist or is not executable."
+              exit 1
+            fi
+          done
+
+  run_tests:
+    name: Run CTest
+    needs: check_program_compilation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends build-essential cmake git libmbedtls-dev libssh2-1-dev libconfig++-dev libasound2-dev libx11-dev libxrandr-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev libxcursor-dev libxinerama-dev libwayland-dev libxkbcommon-dev
+
+      - name: Install raylib
+        run: |
+          git clone --depth 1 --branch "${RAYLIB_VERSION}" https://github.com/raysan5/raylib.git /tmp/raylib
+          cmake -S /tmp/raylib -B /tmp/raylib/build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DBUILD_EXAMPLES=OFF
+          cmake --build /tmp/raylib/build --config Release --parallel
+          sudo cmake --install /tmp/raylib/build --config Release
+          sudo ldconfig
+
+      - name: Cache ccache
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: ccache-${{ github.ref }}-${{ github.sha }}
+          restore-keys: |
+            ccache-${{ github.ref }}-
+            ccache-
+
+      - name: Configure CMake
+        run: cmake -S . -B build_tests
+
+      - name: Build
+        run: cmake --build build_tests
+
+      - name: Run CTest
+        run: ctest --test-dir build_tests --output-on-failure
