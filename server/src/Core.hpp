@@ -7,9 +7,11 @@
 
 #pragma once
 
-#include "SessionManager.hpp"
+#include <memory>
+
 #include "command/CommandFactory.hpp"
 #include "game/World.hpp"
+#include "network/ISessionManager.hpp"
 #include "util/DataStructures.hpp"
 
 namespace zappy::server {
@@ -29,7 +31,7 @@ class Core {
 
   private:
     util::Config _config;
-    network::SessionManager _sessionManager;
+    std::unique_ptr<shared::network::ISessionManager> _sessionManager;
     game::World _world;
     command::CommandFactory _commandFactory;
     bool _isRunning{true};

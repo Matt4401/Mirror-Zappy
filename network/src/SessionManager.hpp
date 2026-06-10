@@ -23,7 +23,7 @@
 
 namespace network {
 
-class SessionManager : public shared::network::ISessionManager {
+class SessionManager : public zappy::shared::network::ISessionManager {
   public:
     explicit SessionManager(std::uint16_t port);
 

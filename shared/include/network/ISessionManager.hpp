@@ -10,7 +10,7 @@
 #include <cstdint>
 #include <string>
 #include <string_view>
-namespace shared::network {
+namespace zappy::shared::network {
 
 class ISessionManager {
   public:
@@ -36,4 +36,4 @@ class ISessionManager {
     virtual void disconnectClient(int clientId) = 0;
 };
 
-}  // namespace shared::network
+}  // namespace zappy::shared::network

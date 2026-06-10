@@ -18,7 +18,7 @@
 
 namespace network::socket {
 
-class ClientSocket : public BaseSocket, public shared::network::IClientSocket {
+class ClientSocket : public BaseSocket, public zappy::shared::network::IClientSocket {
   public:
     ClientSocket() = delete;
     ClientSocket(std::string_view host, std::uint16_t port);
