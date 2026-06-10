@@ -20,6 +20,7 @@ if(ENABLE_COVERAGE)
 endif()
 
 add_subdirectory(shared)
+add_subdirectory(parser)
 add_subdirectory(server)
 add_subdirectory(ai)
 add_subdirectory(gui)
