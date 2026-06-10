@@ -6,11 +6,16 @@
 */
 
 #pragma once
-#include <string>
 
-#include "Tile3D.hpp"
+#include <string>
+#include <memory>
+#include "SkyBackground.hpp"
 #include "rcore/Camera.hpp"
 #include "rcore/Window.hpp"
+#include "rcore/Event.hpp"
+#include "context/EventContext.hpp"
+#include "Map.hpp"
+#include "rmath/Vector3.hpp"
 
 namespace zappy::gui::graphics {
 class Render {
@@ -28,9 +33,16 @@ class Render {
 
   protected:
   private:
+    void update();
+    void render2D();
     void render3D();
+    void handleEvents();
     raylib::rcore::Window _window{WINDOW_NAME.c_str()};
-    raylib::rcore::Camera _camera{{10.0F, 10.0F, 10.0F}};
-    Tile3D _tile;
+    std::shared_ptr<raylib::rcore::Camera> _camera{
+        std::make_shared<raylib::rcore::Camera>(raylib::rmath::Vector3{10.0F, 10.0F, 10.0F})};
+    EventContext _eventContext{_camera};
+    scene::SkyBackground _skyBackground;
+    raylib::rcore::Event _event;
+    scene::Map _map{200, 200};
 };
 }  // namespace zappy::gui::graphics
