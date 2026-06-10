@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-namespace zappy::shared::encapsulation {
+namespace zappy::parser::encapsulation {
 class GetOptWrapper {
   public:
     GetOptWrapper(int argc, char** argv, std::string optString);

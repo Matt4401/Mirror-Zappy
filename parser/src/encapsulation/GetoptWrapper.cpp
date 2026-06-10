@@ -14,7 +14,7 @@
 #include <utility>
 #include <vector>
 
-namespace zappy::shared::encapsulation {
+namespace zappy::parser::encapsulation {
 GetOptWrapper::GetOptWrapper(const int argc, char** argv, std::string optString)
     : _argc(argc), _argv(argv), _optString(std::move(optString)) {
     optind = 1;

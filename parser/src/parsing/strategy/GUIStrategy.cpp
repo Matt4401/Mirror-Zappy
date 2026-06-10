@@ -14,10 +14,10 @@
 #include "exception/ParsingError.hpp"
 #include "parsing/Parser.hpp"
 
-namespace zappy::shared::parsing {
+namespace zappy::parser::parsing {
 void GUIStrategy::parse(const int argc, char** argv, GuiConfig& config) {
     if (handleUsage(argv, argc)) {
-        throw exception::ParsingError(kUsageThrowMessage);
+        throw shared::exception::ParsingError(kUsageThrowMessage);
     }
     processOptions(argc, argv, config);
     validate(config);
@@ -36,7 +36,7 @@ void GUIStrategy::processOptions(const int argc, char** argv, GuiConfig& config)
                 config.machine = encapsulation::GetOptWrapper::getOptionArg();
                 break;
             default:
-                throw exception::ParsingError("Invalid GUI option.");
+                throw shared::exception::ParsingError("Invalid GUI option.");
         }
     }
 }
@@ -46,17 +46,17 @@ void GUIStrategy::parsePort(const std::string& arg, GuiConfig& config) {
         const int val = std::stoi(arg);
 
         if (val <= 0) {
-            throw exception::ParsingError("Port must be a positive non-zero integer.");
+            throw shared::exception::ParsingError("Port must be a positive non-zero integer.");
         }
         config.port = val;
     } catch (const std::exception&) {
-        throw exception::ParsingError("Invalid port formatting: '" + arg + "' is not a valid number.");
+        throw shared::exception::ParsingError("Invalid port formatting: '" + arg + "' is not a valid number.");
     }
 }
 
 void GUIStrategy::validate(const GuiConfig& config) {
     if (config.port <= 0) {
-        throw exception::ParsingError("Missing or invalid port (-p)");
+        throw shared::exception::ParsingError("Missing or invalid port (-p)");
     }
 }
 

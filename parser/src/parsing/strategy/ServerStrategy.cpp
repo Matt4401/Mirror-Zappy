@@ -16,10 +16,10 @@
 #include "exception/ParsingError.hpp"
 #include "parsing/Parser.hpp"
 
-namespace zappy::shared::parsing {
+namespace zappy::parser::parsing {
 void ServerStrategy::parse(const int argc, char** argv, ServerConfig& config) {
     if (handleUsage(argv, argc)) {
-        throw exception::ParsingError(kUsageThrowMessage);
+        throw shared::exception::ParsingError(kUsageThrowMessage);
     }
     processOptions(argc, argv, config);
     validate(config);
@@ -30,11 +30,12 @@ int ServerStrategy::parseNumericArg(const std::string& arg, const std::string& f
         const int val = std::stoi(arg);
 
         if (val <= 0) {
-            throw exception::ParsingError("Invalid value for " + flagName + ": must be greater than 0.");
+            throw shared::exception::ParsingError("Invalid value for " + flagName + ": must be greater than 0.");
         }
         return val;
     } catch (const std::exception&) {
-        throw exception::ParsingError("Invalid formatting for " + flagName + ": '" + arg + "' is not a valid number.");
+        throw shared::exception::ParsingError("Invalid formatting for " + flagName + ": '" + arg +
+                                              "' is not a valid number.");
     }
 }
 
@@ -57,31 +58,32 @@ void ServerStrategy::processOptions(const int argc, char** argv, ServerConfig& c
         if (auto it = argumentHandlers.find(static_cast<char>(opt)); it != argumentHandlers.end()) {
             it->second(encapsulation::GetOptWrapper::getOptionArg());
         } else {
-            throw exception::ParsingError("Unknown option or missing argument near '-" +
-                                          std::string(1, encapsulation::GetOptWrapper::getUnknownOption()) + "'");
+            throw shared::exception::ParsingError("Unknown option or missing argument near '-" +
+                                                  std::string(1, encapsulation::GetOptWrapper::getUnknownOption()) +
+                                                  "'");
         }
     }
 }
 
 void ServerStrategy::validate(const ServerConfig& config) {
     if (config.port <= 0) {
-        throw exception::ParsingError("Missing or invalid port (-p)");
+        throw shared::exception::ParsingError("Missing or invalid port (-p)");
     }
     if (config.width <= 0) {
-        throw exception::ParsingError("Missing or invalid width (-x)");
+        throw shared::exception::ParsingError("Missing or invalid width (-x)");
     }
     if (config.height <= 0) {
-        throw exception::ParsingError("Missing or invalid height (-y)");
+        throw shared::exception::ParsingError("Missing or invalid height (-y)");
     }
     if (config.clientLimit <= 0) {
-        throw exception::ParsingError("Missing or invalid clientsNb (-c)");
+        throw shared::exception::ParsingError("Missing or invalid clientsNb (-c)");
     }
     if (config.teamNames.empty()) {
-        throw exception::ParsingError("Server requires at least one team (-n)");
+        throw shared::exception::ParsingError("Server requires at least one team (-n)");
     }
     for (const auto& name : config.teamNames) {
         if (name == kReservedGraphicName) {
-            throw exception::ParsingError("Team name 'GRAPHIC' is reserved for the GUI.");
+            throw shared::exception::ParsingError("Team name 'GRAPHIC' is reserved for the GUI.");
         }
     }
 }
@@ -96,4 +98,4 @@ bool ServerStrategy::handleUsage(char** argv, const int argc) {
     }
     return false;
 }
-}  // namespace zappy::shared::parsing
+}  // namespace zappy::parser::parsing

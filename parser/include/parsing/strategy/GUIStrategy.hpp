@@ -12,7 +12,7 @@
 
 #include "parsing/IParseStrategy.hpp"
 
-namespace zappy::shared::parsing {
+namespace zappy::parser::parsing {
 struct GuiConfig {
     std::uint16_t port = 0;
     std::string machine = "127.0.0.1";

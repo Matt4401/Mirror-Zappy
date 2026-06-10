@@ -12,7 +12,7 @@
 #include "exception/ParsingError.hpp"
 #include "parsing/IParseStrategy.hpp"
 
-namespace zappy::shared::parsing {
+namespace zappy::parser::parsing {
 static constexpr std::size_t kExitSuccess = 0;
 static constexpr std::size_t kExitFailure = 84;
 static constexpr std::string kUsageThrowMessage = "Help displayed";
@@ -30,7 +30,7 @@ class Parser {
 
     ConfigType parse(int argc, char** argv) {
         if (!_strategy) {
-            throw exception::ParsingError("No parsing strategy provided");
+            throw shared::exception::ParsingError("No parsing strategy provided");
         }
 
         ConfigType config;

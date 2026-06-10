@@ -13,7 +13,7 @@
 
 #include "parsing/IParseStrategy.hpp"
 
-namespace zappy::shared::parsing {
+namespace zappy::parser::parsing {
 struct ServerConfig {
     std::uint16_t port{};
     std::uint32_t width{};
