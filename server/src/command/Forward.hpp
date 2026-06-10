@@ -22,6 +22,9 @@ class Forward : public ACommand {
     Forward& operator=(Forward&& other) = delete;
 
     void execute(game::World& world, game::Player& player) override;
+
+  private:
+    static constexpr int kTimeLimit = 7;
 };
 
 }  // namespace zappy::server::command

@@ -15,10 +15,13 @@
 
 namespace zappy::server::command {
 
-Forward::Forward() : ACommand{7} {}
+Forward::Forward() : ACommand{kTimeLimit} {}
 
-void Forward::execute(game::World& /*world*/, game::Player& /*player*/) {
-    std::cout << "Executing Forward. Need to be implemented." << std::endl;
+void Forward::execute(game::World& world, game::Player& player) {
+    const auto limitMap = world.getLimitMap();
+
+    player.moveUp(limitMap);
+    player.addResponse("ok\n");
 };
 
 }  // namespace zappy::server::command
