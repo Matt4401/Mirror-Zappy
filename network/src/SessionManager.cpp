@@ -126,7 +126,7 @@ void SessionManager::acceptNewConnection() {
     const int clientId = newClient.fd();
 
     _clients.emplace(clientId, std::move(newClient));
-    _pollFds.push_back({.fd = clientId, .events = POLLIN | POLLOUT, .revents = 0});
+    _pollFds.push_back({.fd = clientId, .events = POLLIN, .revents = 0});
     _eventQueue.push({.type = EventType::CLIENT_CONNECTED, .clientId = clientId, .message = ""});
 }
 
