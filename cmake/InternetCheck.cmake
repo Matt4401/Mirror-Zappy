@@ -1,8 +1,8 @@
 macro(check_internet_connection)
     set(INTERNET_AVAILABLE FALSE)
 
-    file(DOWNLOAD "https://api.github.com/zen"
-            "${CMAKE_CURRENT_BINARY_DIR}/.github.ping.txt"
+    file(DOWNLOAD "https://www.google.com"
+            "${CMAKE_CURRENT_BINARY_DIR}/.internet_ping.txt"
             TIMEOUT 5
             STATUS ping_status
     )
