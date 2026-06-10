@@ -7,8 +7,7 @@
 
 #include "encapsulation/GetoptWrapper.hpp"
 
-// NOLINTNEXTLINE
-#include <unistd.h>
+#include <getopt.h>
 
 #include <iterator>
 #include <string>

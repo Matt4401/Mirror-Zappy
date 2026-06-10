@@ -7,10 +7,13 @@
 
 #include "parsing/strategy/ServerStrategy.hpp"
 
+#include <exception>
 #include <functional>
 #include <iostream>
 #include <ostream>
+#include <string>
 #include <unordered_map>
+#include <utility>
 
 #include "encapsulation/GetoptWrapper.hpp"
 #include "exception/ParsingError.hpp"

@@ -8,7 +8,9 @@
 #include "parsing/strategy/GUIStrategy.hpp"
 
 #include <iostream>
+#include <iterator>
 #include <ostream>
+#include <string>
 
 #include "encapsulation/GetoptWrapper.hpp"
 #include "exception/ParsingError.hpp"

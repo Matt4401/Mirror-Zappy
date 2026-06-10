@@ -5,16 +5,16 @@
 ** main
 */
 
+#include <exception>
 #include <iostream>
 #include <memory>
-#include <exception>
-#include <utility>
 #include <string>
+#include <utility>
 
 #include "Core.hpp"
+#include "exception/Exception.hpp"
 #include "parsing/Parser.hpp"
 #include "parsing/strategy/GUIStrategy.hpp"
-#include "exception/Exception.hpp"
 
 // NOLINTNEXTLINE
 int main(int ac, char** av) {
