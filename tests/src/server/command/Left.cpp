@@ -13,6 +13,7 @@
 #include <string>
 
 #include "command/Forward.hpp"
+#include "command/ICommand.hpp"
 #include "game/Player.hpp"
 #include "game/World.hpp"
 #include "util/DataStructures.hpp"

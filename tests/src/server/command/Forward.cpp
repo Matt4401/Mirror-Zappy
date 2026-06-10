@@ -14,6 +14,7 @@
 
 #include "command/ICommand.hpp"
 #include "game/Player.hpp"
+#include "util/DataStructures.hpp"
 
 namespace zappy::server::command {
 

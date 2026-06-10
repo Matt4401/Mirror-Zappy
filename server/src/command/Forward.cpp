@@ -15,7 +15,7 @@ namespace zappy::server::command {
 
 Forward::Forward() : ACommand{kTimeLimit} {}
 
-void Forward::execute(game::World& world, game::Player& player) {
+void Forward::execute(game::World& /*world*/, game::Player& player) {
     const auto limitMap = game::World::getLimitMap();
 
     player.moveUp(limitMap);
