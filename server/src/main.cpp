@@ -22,9 +22,15 @@ int main(int ac, char** av) {
         zappy::server::Core core(config);
 
         core.run();
-    } catch (const std::exception& e) {
+    } catch (const zappy::shared::exception::Exception& e) {
+        if (std::string(e.what()) == "Help displayed") {
+        return zappy::shared::parsing::kExitSuccess;
+        }
         std::cerr << "Error: " << e.what() << std::endl;
-        return 84;
+        return zappy::shared::parsing::kExitFailure;
+    } catch (const std::exception& e) {
+        std::cerr << "Unknow error: " << e.what() << std::endl;
+        return zappy::shared::parsing::kExitFailure;
     }
-    return 0;
+    return zappy::shared::parsing::kExitSuccess;
 }
