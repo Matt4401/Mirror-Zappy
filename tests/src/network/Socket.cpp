@@ -11,12 +11,26 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include <chrono>
 #include <cstdint>
 #include <optional>
 #include <string>
+#include <thread>
 
 #include "socket/ClientSocket.hpp"
 #include "socket/ServerSocket.hpp"
+
+namespace {
+
+std::uint16_t getServerPort(const network::socket::ServerSocket& server) {
+    sockaddr_in serverAddress{};
+    socklen_t length = sizeof(serverAddress);
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+    ::getsockname(server.fd(), reinterpret_cast<sockaddr*>(&serverAddress), &length);
+    return ::ntohs(serverAddress.sin_port);
+}
+
+}  // namespace
 
 namespace network::socket {
 
@@ -74,4 +88,26 @@ TEST(NetworkSocketTest, ClientAndServerExchangeData) {
     const std::string receivedMessage = client.receive();
     EXPECT_EQ(receivedMessage, expectedMessage);
 }
+
+TEST(ClientSocketBufferTest, TryPopMessageExtractsCompleteMessage) {
+    const ServerSocket server{0};
+    ClientSocket client{"127.0.0.1", getServerPort(server)};
+
+    std::optional<ClientSocket> serverSideOpt = server.acceptClient();
+    ASSERT_TRUE(serverSideOpt.has_value());
+
+    client.setNonBlocking();
+
+    if (serverSideOpt.value().send("Forward\n") != 8) {
+        FAIL() << "Failed to send complete message to client";
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+    std::optional<std::string> msg = client.tryPopMessage();
+    ASSERT_TRUE(msg.has_value());
+    EXPECT_EQ(msg.value(), "Forward");
+
+    EXPECT_FALSE(client.tryPopMessage().has_value());
+}
+
 }  // namespace network::socket

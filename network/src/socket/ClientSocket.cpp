@@ -16,6 +16,7 @@
 #include <cerrno>
 #include <cstddef>
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -96,6 +97,21 @@ std::string ClientSocket::receive() const {
     }
 
     return std::string{buffer.data(), static_cast<std::size_t>(bytesRead)};
+}
+
+std::optional<std::string> ClientSocket::tryPopMessage() {
+    const std::string newData = receive();
+    if (newData.size() + _buffer.size() <= 8192) {
+        _buffer += newData;
+    }
+    const std::size_t newlinePos = _buffer.find('\n');
+
+    if (newlinePos == std::string::npos) {
+        return std::nullopt;
+    }
+    std::string message = _buffer.substr(0, newlinePos);
+    _buffer.erase(0, newlinePos + 1);
+    return message;
 }
 
 }  // namespace network::socket

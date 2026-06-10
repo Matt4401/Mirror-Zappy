@@ -9,6 +9,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -25,8 +26,12 @@ class ClientSocket : public BaseSocket {
     [[nodiscard]] std::size_t send(std::string_view message) const;
     [[nodiscard]] std::string receive() const;
 
+    [[nodiscard]] std::optional<std::string> tryPopMessage();
+
   private:
     void connectToServer(std::string_view host, std::uint16_t port);
+
+    std::string _buffer;
 };
 
 }  // namespace network::socket
