@@ -89,6 +89,7 @@ TEST(NetworkSocketTest, ClientAndServerExchangeData) {
     EXPECT_EQ(receivedMessage, expectedMessage);
 }
 
+// NOLINTBEGIN
 TEST(ClientSocketBufferTest, TryPopMessageExtractsCompleteMessage) {
     const ServerSocket server{0};
     ClientSocket client{"127.0.0.1", getServerPort(server)};
@@ -168,5 +169,6 @@ TEST(ClientSocketBufferTest, TryPopMessageHandlesMultipleMessages) {
 
     EXPECT_FALSE(client.tryPopMessage().has_value());
 }
+// NOLINTEND
 
 }  // namespace network::socket
