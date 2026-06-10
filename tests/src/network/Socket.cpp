@@ -105,7 +105,66 @@ TEST(ClientSocketBufferTest, TryPopMessageExtractsCompleteMessage) {
 
     std::optional<std::string> msg = client.tryPopMessage();
     ASSERT_TRUE(msg.has_value());
-    EXPECT_EQ(msg.value(), "Forward");
+    if (msg.has_value()) {
+        EXPECT_EQ(msg.value(), "Forward");
+    }
+    EXPECT_FALSE(client.tryPopMessage().has_value());
+}
+
+TEST(ClientSocketBufferTest, TryPopMessageExtractsMessage2times) {
+    const ServerSocket server{0};
+    ClientSocket client{"127.0.0.1", getServerPort(server)};
+
+    std::optional<ClientSocket> serverSideOpt = server.acceptClient();
+    ASSERT_TRUE(serverSideOpt.has_value());
+
+    client.setNonBlocking();
+
+    if (serverSideOpt.value().send("Forwar") != 6) {
+        FAIL() << "Failed to send complete message to client";
+    }
+    ASSERT_FALSE(client.tryPopMessage().has_value());
+
+    if (serverSideOpt.value().send("d\n") != 2) {
+        FAIL() << "Failed to send complete message to client";
+    }
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+    std::optional<std::string> msg = client.tryPopMessage();
+    ASSERT_TRUE(msg.has_value());
+    if (msg.has_value()) {
+        EXPECT_EQ(msg.value(), "Forward");
+    }
+    EXPECT_FALSE(client.tryPopMessage().has_value());
+}
+
+TEST(ClientSocketBufferTest, TryPopMessageHandlesMultipleMessages) {
+    const ServerSocket server{0};
+    ClientSocket client{"127.0.0.1", getServerPort(server)};
+
+    std::optional<ClientSocket> serverSideOpt = server.acceptClient();
+    ASSERT_TRUE(serverSideOpt.has_value());
+
+    client.setNonBlocking();
+
+    if (serverSideOpt.value().send("Forward\nRight\n") != 14) {
+        FAIL() << "Failed to send complete message to client";
+    }
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+    std::optional<std::string> msg = client.tryPopMessage();
+
+    ASSERT_TRUE(msg.has_value());
+    if (msg.has_value()) {
+        EXPECT_EQ(msg.value(), "Forward");
+    }
+
+    ASSERT_TRUE(client.tryPopMessage().has_value());
+    if (client.tryPopMessage().has_value()) {
+        EXPECT_EQ(client.tryPopMessage().value(), "Right");
+    }
 
     EXPECT_FALSE(client.tryPopMessage().has_value());
 }
