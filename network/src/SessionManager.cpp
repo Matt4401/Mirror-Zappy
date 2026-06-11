@@ -29,8 +29,8 @@ SessionManager::SessionManager(std::uint16_t port) : _serverSocket{port} {
     _pollFds.push_back({.fd = _serverSocket.fd(), .events = POLLIN});
 }
 
-void SessionManager::pollNetwork() {
-    const int readyFds = ::poll(_pollFds.data(), _pollFds.size(), 0);
+void SessionManager::pollNetwork(int timeout) {
+    const int readyFds = ::poll(_pollFds.data(), _pollFds.size(), timeout);
 
     if (readyFds < 0) {
         if (errno == EINTR) {
@@ -75,6 +75,12 @@ void SessionManager::sendMessage(int clientId, std::string_view message) {
         throw exception::SocketError{"write buffer overflow, disconnecting client"};
     }
     buffer += message;
+    for (auto& pfd : _pollFds) {
+        if (pfd.fd == clientId) {
+            pfd.events |= POLLOUT;
+            break;
+        }
+    }
 }
 
 void SessionManager::disconnectClient(const int clientId) {
@@ -126,7 +132,7 @@ void SessionManager::acceptNewConnection() {
     const int clientId = newClient.fd();
 
     _clients.emplace(clientId, std::move(newClient));
-    _pollFds.push_back({.fd = clientId, .events = POLLIN | POLLOUT, .revents = 0});
+    _pollFds.push_back({.fd = clientId, .events = POLLIN, .revents = 0});
     _eventQueue.push({.type = EventType::CLIENT_CONNECTED, .clientId = clientId, .message = ""});
 }
 
@@ -162,6 +168,14 @@ void SessionManager::handleClientWrite(const int clientId) {
 
         if (bytesSent > 0) {
             buffer.erase(0, bytesSent);
+        }
+        if (buffer.empty()) {
+            for (auto& pfd : _pollFds) {
+                if (pfd.fd == clientId) {
+                    pfd.events &= ~POLLOUT;
+                    break;
+                }
+            }
         }
     } catch (const std::exception&) {
         disconnectClient(clientId);

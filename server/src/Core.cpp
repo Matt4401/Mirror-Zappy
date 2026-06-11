@@ -21,14 +21,15 @@ namespace zappy::server {
 Core::Core(util::Config config)
     : _config{std::move(config)},
       _sessionManager{std::make_unique<network::SessionManager>(_config.port)},
-      _world{_config} {}
+      _world{_config},
+      _timeUnit{static_cast<int>(1.0F / static_cast<float>(_config.freq) * 1000)} {}
 
 void Core::run() {
     shared::network::ISessionManager::NetworkEvent message{};
 
     while (_isRunning) {
         try {
-            _sessionManager->pollNetwork();
+            _sessionManager->pollNetwork(_timeUnit);
             while (_sessionManager->tryPopMessage(message)) {
                 // TODO: should be removed, is of course temporary for testing purposes
                 std::cout << "Received message from client " << message.clientId
