@@ -14,13 +14,12 @@
 namespace zappy::gui::raylib::rcore {
 class Camera {
   public:
-    Camera(rmath::Vector3 position) : _camera{} {
-        _camera.position = position.vector();
-        _camera.target = rmath::Vector3(0, 0.0, 0);
-        _camera.up = rmath::Vector3(0, 1.0, 0);
-        _camera.fovy = 60.0;
-        _camera.projection = CAMERA_PERSPECTIVE;
-    }
+    static constexpr float MAX_RENDER_DISTANCE = 80.0F;
+    static constexpr float VIEW_PADDING_DEGREES = 35.0F;
+    static constexpr float MIN_DISTANCE = 2.0F;
+    static constexpr float VISIBILITY_ORIGIN_BACKSTEP = 4.0F;
+
+    Camera(rmath::Vector3 position);
     ~Camera() = default;
     Camera(const Camera& other) = delete;
     Camera& operator=(const Camera& other) = delete;
@@ -28,6 +27,14 @@ class Camera {
     Camera& operator=(Camera&& other) = delete;
 
     [[nodiscard]] Camera3D camera() const { return _camera; }
+    [[nodiscard]] rmath::Vector3 position() const { return _camera.position; }
+    [[nodiscard]] rmath::Vector3 target() const { return _camera.target; }
+    [[nodiscard]] rmath::Vector3 up() const { return _camera.up; }
+    [[nodiscard]] float fovy() const { return _camera.fovy; }
+    [[nodiscard]] rmath::Vector3 direction() const { return (target() - position()).normalized(); }
+    [[nodiscard]] float halfFovyRadians(float paddingDegrees = 0.0F) const {
+        return ((_camera.fovy * 0.5F) + paddingDegrees) * DEG2RAD;
+    }
 
     void beginMode3D() const { BeginMode3D(_camera); }
     static void endMode3D() { EndMode3D(); }
@@ -41,9 +48,9 @@ class Camera {
     void updateCamera(int mode) { UpdateCamera(&_camera, mode); }
 
     void cameraYaw(float angle, bool rotateAroundTarget) { CameraYaw(&_camera, angle, rotateAroundTarget); }
-    void cameraPitch(float angle, bool lockView, bool rotateAroundTarget, bool rotateUp) {
-        CameraPitch(&_camera, angle, lockView, rotateAroundTarget, rotateUp);
-    }
+    void cameraPitch(float angle, bool lockView, bool rotateAroundTarget, bool rotateUp);
+
+    [[nodiscard]] bool isVisibleFromCamera(raylib::rmath::Vector3 position) const;
 
   protected:
   private:

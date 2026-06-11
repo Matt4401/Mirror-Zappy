@@ -8,43 +8,39 @@
 #pragma once
 #include <raylib.h>
 
-#include <algorithm>
+#include <functional>
+#include <map>
 #include <vector>
 
+#include "context/EventContext.hpp"
 #include "rmath/Vector2.hpp"
 
 namespace zappy::gui::raylib::rcore {
 class Event {
   public:
-    Event() = default;
+    using EventFunc = std::function<void(EventContext&)>;
+
+    Event();
     ~Event() = default;
     Event(const Event& other) = delete;
     Event& operator=(const Event& other) = delete;
     Event(Event&& other) = delete;
     Event& operator=(Event&& other) = delete;
 
-    void update() {
-        _pressedKeys.clear();
+    void update();
 
-        int key = GetKeyPressed();
-        while (key != 0) {
-            _pressedKeys.push_back(key);
-            key = GetKeyPressed();
-        }
+    void handleEvent(EventContext& context);
 
-        _mousePosition = GetMousePosition();
-        _mouseWheelMove = GetMouseWheelMove();
-    }
-
-    [[nodiscard]] bool isKeyPressed(int key) const {
-        return std::ranges::find(_pressedKeys, key) != _pressedKeys.end();
-    }
+    [[nodiscard]] static bool isKeyPressed(int key) { return IsKeyPressed(key); }
+    [[nodiscard]] static bool isKeyDown(int key) { return IsKeyDown(key); }
+    [[nodiscard]] static bool isKeyReleased(int key) { return IsKeyReleased(key); }
 
     [[nodiscard]] rmath::Vector2 getMousePosition() const { return _mousePosition; }
     [[nodiscard]] float getMouseWheelMove() const { return _mouseWheelMove; }
 
   protected:
   private:
+    std::map<int, EventFunc> _keyEvents;
     std::vector<int> _pressedKeys;
     rmath::Vector2 _mousePosition;
     float _mouseWheelMove = 0.0F;
