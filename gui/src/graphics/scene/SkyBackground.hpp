@@ -21,6 +21,10 @@ class SkyBackground {
     static constexpr raylib::Color SUNRISE{255, 184, 112, 255};
     static constexpr raylib::Color DAY{255, 255, 255, 255};
     static constexpr raylib::Color SUNSET{255, 151, 99, 255};
+    static constexpr float MORNING_START = 0.20F;
+    static constexpr float AFTERNOON_START = 0.45F;
+    static constexpr float EVENING_START = 0.72F;
+    static constexpr float NIGHT_START = 0.88F;
 
     SkyBackground() = default;
     ~SkyBackground() = default;

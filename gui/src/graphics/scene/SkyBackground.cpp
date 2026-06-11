@@ -26,19 +26,19 @@ void SkyBackground::draw(raylib::rcore::Window& window) const {
 }
 
 raylib::Color SkyBackground::currentTint() const {
-    if (_dayProgress < 0.20F) {
-        return raylib::Color::lerp(NIGHT, SUNRISE, _dayProgress / 0.20F);
+    if (_dayProgress < MORNING_START) {
+        return raylib::Color::lerp(NIGHT, SUNRISE, _dayProgress / MORNING_START);
     }
-    if (_dayProgress < 0.45F) {
-        return raylib::Color::lerp(SUNRISE, DAY, (_dayProgress - 0.20F) / 0.25F);
+    if (_dayProgress < AFTERNOON_START) {
+        return raylib::Color::lerp(SUNRISE, DAY, (_dayProgress - MORNING_START) / (AFTERNOON_START - MORNING_START));
     }
-    if (_dayProgress < 0.72F) {
+    if (_dayProgress < EVENING_START) {
         return DAY;
     }
-    if (_dayProgress < 0.88F) {
-        return raylib::Color::lerp(DAY, SUNSET, (_dayProgress - 0.72F) / 0.16F);
+    if (_dayProgress < NIGHT_START) {
+        return raylib::Color::lerp(DAY, SUNSET, (_dayProgress - EVENING_START) / (NIGHT_START - EVENING_START));
     }
-    return raylib::Color::lerp(SUNSET, NIGHT, (_dayProgress - 0.88F) / 0.12F);
+    return raylib::Color::lerp(SUNSET, NIGHT, (_dayProgress - NIGHT_START) / (FULL_DAY - NIGHT_START));
 }
 
 }  // namespace zappy::gui::graphics::scene
