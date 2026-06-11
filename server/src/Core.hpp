@@ -36,6 +36,7 @@ class Core {
 
     std::span<char*> _args;
     parser::parsing::ServerConfig _config;
+    int _timeUnit;
     std::unique_ptr<shared::network::ISessionManager> _sessionManager;
     std::unique_ptr<game::World> _world;
     command::CommandFactory _commandFactory;

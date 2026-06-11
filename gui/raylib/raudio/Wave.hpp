@@ -36,10 +36,7 @@ class Wave {
         return *this;
     }
 
-    [[nodiscard]] static Wave fromMemory(std::string_view fileType, std::span<const unsigned char> data) {
-        const std::string extension{fileType};
-        return Wave{LoadWaveFromMemory(extension.c_str(), data.data(), static_cast<int>(data.size()))};
-    }
+    [[nodiscard]] static Wave fromMemory(std::string_view fileType, std::span<const unsigned char> data);
 
     [[nodiscard]] bool valid() const { return IsWaveValid(_wave); }
     [[nodiscard]] bool exportTo(const std::string& path) const { return ExportWave(_wave, path.c_str()); }
@@ -50,12 +47,7 @@ class Wave {
 
   protected:
   private:
-    void reset() {
-        if (valid()) {
-            UnloadWave(_wave);
-        }
-        _wave = {};
-    }
+    void reset();
 
     ::Wave _wave{};
 };

@@ -27,7 +27,7 @@ class SessionManager : public zappy::shared::network::ISessionManager {
   public:
     explicit SessionManager(std::uint16_t port);
 
-    void pollNetwork() override;
+    void pollNetwork(int timeout) override;
     [[nodiscard]] bool tryPopMessage(NetworkEvent& message) override;
     void sendMessage(int clientId, std::string_view message) override;
 

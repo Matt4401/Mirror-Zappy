@@ -22,12 +22,21 @@ if(ENABLE_COVERAGE)
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
 endif()
 
+add_custom_command(
+        OUTPUT ${CMAKE_SOURCE_DIR}/zappy_ai
+        COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_SOURCE_DIR}/zappy_ai.py ${CMAKE_SOURCE_DIR}/zappy_ai
+        COMMAND chmod +x ${CMAKE_SOURCE_DIR}/zappy_ai
+        DEPENDS ${CMAKE_SOURCE_DIR}/zappy_ai.py
+)
+
+add_custom_target(prepare_script ALL DEPENDS ${CMAKE_SOURCE_DIR}/zappy_ai)
+
 add_subdirectory(shared)
 add_subdirectory(parser)
 add_subdirectory(server)
-add_subdirectory(ai)
 add_subdirectory(gui)
 add_subdirectory(network)
+
 
 include(SetupGoogleTest)
 setup_googletest()

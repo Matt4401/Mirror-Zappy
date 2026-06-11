@@ -10,28 +10,37 @@
 #include <raylib.h>
 
 #include "rcore/Camera.hpp"
+#include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
 
 namespace zappy::gui::graphics {
 void Render::start() {
     while (!_window.shouldClose()) {
-        _camera.updateCamera(CAMERA_FIRST_PERSON);
-        raylib::rcore::Window::beginDrawing();
-        _window.clearBackground();
+        update();
+        _event.handleEvent(_eventContext);
+        _window.beginDrawing();
+        render2D();
         render3D();
         raylib::rcore::Window::endDrawing();
     }
 }
 
-void Render::render3D() {
-    _camera.beginMode3D();
-
-    // Temporary rendering of a grid of tiles for testing purposes
-    for (int x = -6; x <= 6; x += 2) {
-        for (int z = -6; z <= 6; z += 2) {
-            _tile.draw({static_cast<float>(x), 0.0F, static_cast<float>(z)});
-        }
+void Render::update() {
+    _skyBackground.update(raylib::rcore::Window::frameTime());
+    _camera->updateCamera(CAMERA_FREE);
+    if (_camera->position().y() < 2.5F) {
+        _camera->setPosition({_camera->position().x(), 2.5F, _camera->position().z()});
+        _camera->setTarget({_camera->target().x(), _camera->target().y() + (raylib::rcore::Window::frameTime() * 2.0F),
+                            _camera->target().z()});
     }
+    _event.update();
+}
+
+void Render::render2D() { _skyBackground.draw(_window); }
+
+void Render::render3D() {
+    _camera->beginMode3D();
+    _map.draw(*_camera);
     raylib::rcore::Camera::endMode3D();
 }
 }  // namespace zappy::gui::graphics
