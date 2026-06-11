@@ -45,7 +45,7 @@ void World::setSpawnEggs(const std::size_t clientLimit, const std::string_view t
     }
     std::random_device rd;
     std::mt19937 e{rd()};
-    std::uniform_int_distribution<std::size_t> dist{0, _heightMap * _widthMap - 1};
+    std::uniform_int_distribution<std::size_t> dist{0, (_heightMap * _widthMap) - 1};
 
     for (std::size_t i = 0; i < clientLimit; i++) {
         const auto pos = dist(e);
