@@ -31,6 +31,8 @@ class Core {
 
   private:
     util::Config _config;
+    int _timeUnit;
+
     std::unique_ptr<shared::network::ISessionManager> _sessionManager;
     game::World _world;
     command::CommandFactory _commandFactory;
