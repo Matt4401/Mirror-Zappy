@@ -28,7 +28,7 @@ TEST(LeftTest, CheckRequiredTicks) {
 TEST(LeftTest, CheckTurnMovement) {
     const std::unique_ptr<ICommand> left = std::make_unique<Left>();
     const std::unique_ptr<ICommand> forward = std::make_unique<Forward>();
-    game::Player player{0, 5, 5};
+    game::Player player{0, 5, 5, game::cardinalPoint::NORTH};
     const util::Config config{};
     game::World world{config};
 
@@ -44,10 +44,10 @@ TEST(LeftTest, CheckTurnMovement) {
 TEST(LeftTest, CheckTurnMovementBordure) {
     const std::unique_ptr<ICommand> left = std::make_unique<Left>();
     const std::unique_ptr<ICommand> forward = std::make_unique<Forward>();
-    auto [maxX, maxY] = game::World::limitMap();
-    game::Player player{0, maxX, maxY};
-    const util::Config config{};
+    const util::Config config{80, 16, 16, {}, 1, 100};
     game::World world{config};
+    auto [maxX, maxY] = world.limitMap();
+    game::Player player{0, maxX, maxY, game::cardinalPoint::NORTH};
 
     left->execute(world, player);
     ASSERT_EQ(player.orientation(), game::cardinalPoint::WEST);

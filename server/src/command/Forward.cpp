@@ -15,10 +15,13 @@ namespace zappy::server::command {
 
 Forward::Forward() : ACommand{kTimeLimit} {}
 
-void Forward::execute(game::World& /*world*/, game::Player& player) {
-    const auto limitMap = game::World::limitMap();
+void Forward::execute(game::World& world, game::Player& player) {
+    const auto [limitX, limitY] = world.limitMap();
 
-    player.moveUp(limitMap);
+    const auto [oldX, oldY] = player.position();
+    player.moveUp({.x = limitX, .y = limitY});
+    const auto [newX, newY] = player.position();
+    world.updatePosOnMap(player.id(), {.x = oldX, .y = oldY}, {.x = newX, .y = newY});
     player.addResponse("ok\n");
 };
 

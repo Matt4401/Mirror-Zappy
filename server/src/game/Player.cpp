@@ -19,8 +19,8 @@
 #include "game/World.hpp"
 
 namespace zappy::server::game {
-Player::Player(const int id, std::size_t x, std::size_t y)
-    : _orientation(cardinalPoint::NORTH), _pos({.x = x, .y = y}), _id(id) {
+Player::Player(const std::size_t id, const std::size_t x, const std::size_t y, const cardinalPoint orient)
+    : _orientation(orient), _pos({.x = x, .y = y}), _id(id) {
     _inventory.fill(0);
     setItem(ItemType::Food, kNbStartFood);
 }
@@ -64,12 +64,13 @@ void Player::update(World& world) {
         _currentCommand = std::move(_commands.front());
         _commands.pop();
         _currentCommand->start(world, *this);
+        _cmdTick = _currentCommand->requiredTicks();
         return;
     }
     _cmdTick--;
 }
 
-void Player::moveUp(const pos& limit) {
+void Player::moveUp(const Pos& limit) {
     auto [fst, snd] = playerMove.at(static_cast<uint8_t>(_orientation));
     const std::size_t width = limit.x + 1;
     const std::size_t height = limit.y + 1;
@@ -86,10 +87,19 @@ std::vector<std::string> Player::responses() {
     return tmpResponses;
 }
 
-pos Player::position() const { return _pos; }
+Pos Player::position() const { return _pos; }
 
 void Player::setOrientation(const cardinalPoint orient) { _orientation = orient; }
 
 cardinalPoint Player::orientation() const { return _orientation; }
+
+std::size_t Player::id() const { return _id; }
+
+std::size_t Player::nbLifeTick() const { return _lifeTick; }
+
+void Player::kill() {
+    _isDead = true;
+    _buffersResponses = {"dead\n"};
+}
 
 }  // namespace zappy::server::game

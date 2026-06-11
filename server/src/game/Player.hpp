@@ -20,11 +20,7 @@
 
 namespace zappy::server::game {
 
-enum class cardinalPoint : uint8_t { NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3, COUNT = 4 };
-
 constexpr std::array<std::pair<int, int>, 4> playerMove = {{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}};
-
-enum class ItemType : uint8_t { Food, Linemate, Deraumere, Sibur, Mendiane, Phiras, Thystame, COUNT };
 
 static constexpr std::uint8_t kNbLifeTickFood = 126;
 static constexpr std::uint8_t kNbStartFood = 10;
@@ -37,7 +33,7 @@ class Player {
     Player(Player&& other) = delete;
     Player& operator=(Player&& other) = delete;
 
-    explicit Player(int id, std::size_t x, std::size_t y);
+    explicit Player(std::size_t id, std::size_t x, std::size_t y, cardinalPoint orient);
     ~Player() = default;
 
     void addItem(ItemType item, std::size_t quantity = 1);
@@ -47,14 +43,18 @@ class Player {
 
     void pushCommand(std::unique_ptr<command::ICommand> command);
     void update(World& world);
-    void moveUp(const pos& limit);
+    void moveUp(const Pos& limit);
 
     void addResponse(const std::string&);
     std::vector<std::string> responses();
-    [[nodiscard]] pos position() const;
+    [[nodiscard]] Pos position() const;
 
     void setOrientation(cardinalPoint orient);
     [[nodiscard]] cardinalPoint orientation() const;
+
+    std::size_t id() const;
+    std::size_t nbLifeTick() const;
+    void kill();
 
   private:
     std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> _inventory{};
@@ -63,8 +63,9 @@ class Player {
     std::unique_ptr<command::ICommand> _currentCommand{nullptr};
     std::size_t _cmdTick{0};
     std::size_t _lifeTick{0};
-    pos _pos{.x = 0, .y = 0};
+    Pos _pos{.x = 0, .y = 0};
     std::vector<std::string> _buffersResponses;
-    int _id;
+    bool _isDead{false};
+    std::size_t _id;
 };
 }  // namespace zappy::server::game
