@@ -28,13 +28,13 @@ namespace zappy::server::game {
 struct Egg {
     std::size_t id;
     Pos pos;
-    std::string_view teamName;
+    std::string teamName;
 };
 
 struct Tile {
     std::vector<std::size_t> players;
     std::vector<std::size_t> eggs;
-    std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> ressources;
+    std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> resources;
 };
 
 class World {
@@ -62,10 +62,10 @@ class World {
     void updatePosOnMap(std::size_t id, const Pos& oldPos, const Pos& newPos);
 
     std::optional<std::size_t> removePlayer(std::size_t id);
-    std::vector<std::size_t> getDeadsId() const;
+    std::vector<std::size_t> collectAndKillDeadPlayers() const;
 
   private:
-    std::unordered_map<std::string_view, std::unique_ptr<Team>> _teamList;
+    std::unordered_map<std::string, std::unique_ptr<Team>> _teamList;
     std::vector<std::unique_ptr<Player>> _playerList;
     std::size_t _heightMap;
     std::size_t _widthMap;
@@ -77,5 +77,6 @@ class World {
     std::size_t getTileIndex(const Pos& pos) const;
     void erasePlayerFromTile(std::size_t pos1dVec, std::size_t id);
     void eraseEggFromTile(std::size_t pos1dVec, std::size_t id);
+    std::optional<Egg> getTeamEgg(const std::string_view& teamName);
 };
 }  // namespace zappy::server::game

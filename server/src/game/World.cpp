@@ -28,22 +28,28 @@
 namespace zappy::server::game {
 
 std::pair<std::size_t, std::size_t> World::getRandomPlace(const std::size_t heightMap, const std::size_t widthMap) {
+    if (heightMap == 0 || widthMap == 0) {
+        return {0, 0};
+    }
     std::random_device rd;
     std::mt19937 e{rd()};
-    std::uniform_int_distribution<std::size_t> distHeight{0, heightMap};
-    std::uniform_int_distribution<std::size_t> distWidth{0, widthMap};
+    std::uniform_int_distribution<std::size_t> distHeight{0, heightMap - 1};
+    std::uniform_int_distribution<std::size_t> distWidth{0, widthMap - 1};
 
     return {distHeight(e), distWidth(e)};
 }
 
 void World::setSpawnEggs(const std::size_t clientLimit, const std::string_view teamName) {
+    if (_heightMap == 0 || _widthMap == 0) {
+        return;
+    }
     std::random_device rd;
     std::mt19937 e{rd()};
-    std::uniform_int_distribution<std::size_t> dist{0, _heightMap * _widthMap};
+    std::uniform_int_distribution<std::size_t> dist{0, _heightMap * _widthMap - 1};
 
     for (std::size_t i = 0; i < clientLimit; i++) {
         const auto pos = dist(e);
-        _vecEggs.push_back(Egg{.id = _newId, .pos = getTilePos(pos), .teamName = teamName});
+        _vecEggs.push_back(Egg{.id = _newId, .pos = getTilePos(pos), .teamName = std::string(teamName)});
         _tiles.at(pos).eggs.push_back(_newId);
         _newId++;
     }
@@ -52,7 +58,7 @@ void World::setSpawnEggs(const std::size_t clientLimit, const std::string_view t
 cardinalPoint World::randomCardinalPoint() {
     std::random_device rd;
     std::mt19937 e{rd()};
-    std::uniform_int_distribution<std::uint8_t> dist{0, static_cast<std::size_t>(cardinalPoint::COUNT)};
+    std::uniform_int_distribution<std::uint8_t> dist{0, static_cast<std::uint8_t>(cardinalPoint::COUNT) - 1};
 
     return static_cast<cardinalPoint>(dist(e));
 }
@@ -60,7 +66,7 @@ cardinalPoint World::randomCardinalPoint() {
 World::World(const util::Config& config) : _heightMap(config.height), _widthMap(config.width) {
     const auto nbTile = _heightMap * _widthMap;
     for (std::size_t i = 0; i < nbTile; i++) {
-        _tiles.push_back(Tile{.ressources = {}});
+        _tiles.push_back(Tile{.resources = {}});
     }
     for (const auto& teamName : config.teamNames) {
         _teamList[teamName] = std::make_unique<Team>(config.clientLimit);
@@ -83,23 +89,38 @@ void World::eraseEggFromTile(const std::size_t pos1dVec, const std::size_t id) {
     }
 }
 
+std::optional<Egg> World::getTeamEgg(const std::string_view& teamName) {
+    Egg egg{};
+    auto it = _vecEggs.begin();
+    while (it != _vecEggs.end()) {
+        if (it->teamName == teamName) {
+            egg = *it;
+            _vecEggs.erase(it);
+            return egg;
+        }
+    }
+    return egg;
+}
+
 std::optional<size_t> World::spawnPlayer(const std::string_view teamName) {
-    const auto team = _teamList.find(teamName);
-    if (team == _teamList.end()) {
+    const auto team = _teamList.find(std::string(teamName));
+    if (team == _teamList.end() || _vecEggs.empty()) {
         return std::nullopt;
     }
-    const auto egg = _vecEggs.back();
-    team->second->addInTeam(egg.id);
-    _vecEggs.pop_back();
-    eraseEggFromTile(getTileIndex(egg.pos), egg.id);
-    _playerList.push_back(std::make_unique<Player>(egg.id, egg.pos.x, egg.pos.y, randomCardinalPoint()));
+    const auto& egg = getTeamEgg(teamName);
+    if (!egg.has_value()) {
+        return std::nullopt;
+    }
+    eraseEggFromTile(getTileIndex(egg.value().pos), egg.value().id);
+    _playerList.push_back(
+        std::make_unique<Player>(egg.value().id, egg.value().pos.x, egg.value().pos.y, randomCardinalPoint()));
     const auto& newPlayer = _playerList.back();
     _tiles.at(getTileIndex(newPlayer->position().x, newPlayer->position().y)).players.push_back(newPlayer->id());
     return newPlayer->id();
 }
 
 [[nodiscard]] Pos World::getTilePos(const std::size_t pos) const {
-    return Pos{.x = pos / _widthMap, .y = pos % _widthMap};
+    return Pos{.x = pos % _widthMap, .y = pos / _widthMap};
 }
 
 [[nodiscard]] std::size_t World::getTileIndex(const std::size_t x, const std::size_t y) const {
@@ -183,7 +204,7 @@ std::optional<std::size_t> World::removePlayer(const std::size_t id) {
     return std::nullopt;
 }
 
-std::vector<std::size_t> World::getDeadsId() const {
+std::vector<std::size_t> World::collectAndKillDeadPlayers() const {
     std::vector<std::size_t> deadIds;
 
     for (const auto& player : _playerList) {
