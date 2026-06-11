@@ -3,7 +3,7 @@ import argparse
 from ai.src.AITeamClass import AITeam
 from ai.src.TrantorianClass import Trantorian
 
-def mainIA():
+def mainAI():
     parser = argparse.ArgumentParser(
         usage="./zappy_ai -p port -n name -h machine", add_help=False
     )

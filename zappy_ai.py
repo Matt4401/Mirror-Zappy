@@ -2,9 +2,9 @@
 import sys
 import os
 
-from ai.src.mainIA import mainIA
+from ai.src.mainAI import mainAI
 def main():
-    mainIA()
+    return mainAI()
 
 if __name__ == "__main__":
     main()

@@ -3,11 +3,11 @@ import os
 import pytest
 from unittest.mock import patch
 
-sys.path.append(
-    os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../ai/src"))
-)
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 
 from zappy_ai import main
+
+from mainAI import mainAI
 
 
 def test_main():
