@@ -29,7 +29,7 @@ TEST(RightTest, CheckTurnMovement) {
     const std::unique_ptr<ICommand> right = std::make_unique<Right>();
     const std::unique_ptr<ICommand> forward = std::make_unique<Forward>();
     game::Player player{0, 5, 5, game::cardinalPoint::NORTH};
-    const util::Config config{};
+    const util::Config config{80, 16, 16, {"test"}, 1, 100};
     game::World world{config};
 
     right->execute(world, player);
@@ -44,9 +44,9 @@ TEST(RightTest, CheckTurnMovement) {
 TEST(RightTest, CheckTurnMovementBordure) {
     const std::unique_ptr<ICommand> right = std::make_unique<Right>();
     const std::unique_ptr<ICommand> forward = std::make_unique<Forward>();
-    const util::Config config{80, 16, 16, {}, 1, 100};
+    const util::Config config{80, 16, 16, {"test"}, 1, 100};
     game::World world{config};
-    auto [maxX, maxY] = game::World::limitMap();
+    auto [maxX, maxY] = world.limitMap();
     game::Player player{0, maxX, maxY, game::cardinalPoint::NORTH};
 
     right->execute(world, player);
@@ -54,6 +54,6 @@ TEST(RightTest, CheckTurnMovementBordure) {
     forward->execute(world, player);
     auto [fst, snd] = player.position();
     ASSERT_EQ(fst, 0);
-    ASSERT_EQ(snd, 16);
+    ASSERT_EQ(snd, maxY);
 }
 }  // namespace zappy::server::command

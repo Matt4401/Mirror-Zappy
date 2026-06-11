@@ -20,31 +20,27 @@
 
 #include "Team.hpp"
 #include "command/ICommand.hpp"
+#include "game/Player.hpp"
 #include "util/DataStructures.hpp"
 
 namespace zappy::server::game {
 
-class Player;
-
-enum class ItemType : uint8_t { Food, Linemate, Deraumere, Sibur, Mendiane, Phiras, Thystame, COUNT };
-
-enum class cardinalPoint : uint8_t { NORTH, EAST, SOUTH, WEST, COUNT };
-
-struct Pos {
-    std::size_t x;
-    std::size_t y;
+struct Egg {
+    std::size_t id;
+    Pos pos;
+    std::string teamName;
 };
 
 struct Tile {
-    bool isEgg;
     std::vector<std::size_t> players;
+    std::vector<std::size_t> eggs;
     std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> ressources;
 };
 
 class World {
   public:
     static std::pair<std::size_t, std::size_t> getRandomPlace(std::size_t heightMap, std::size_t widthMap);
-    void setSpawnEggs();
+    void setSpawnEggs(size_t clientLimit, std::string_view teamName);
     static cardinalPoint randomCardinalPoint();
     explicit World(const util::Config& config);
     ~World() = default;
@@ -54,16 +50,19 @@ class World {
     World(World&& other) = delete;
     World& operator=(World&& other) = delete;
 
-    std::pair<std::size_t, std::size_t> limitMap();
+    std::pair<std::size_t, std::size_t> limitMap() const;
     [[nodiscard]] std::optional<size_t> spawnPlayer(std::string_view teamName);
+    Pos getTilePos(std::size_t pos) const;
 
     void update();
     void removeFromMap(std::size_t id);
-    std::optional<std::size_t> Kill(std::size_t id);
-    std::vector<std::size_t> removeDead();
+    std::unordered_map<std::size_t, std::vector<std::string>> getAllResponsesBuffer() const;
     void pushCommandToPlayer(std::size_t playerId, std::unique_ptr<command::ICommand> command) const;
     void removePlayerFromTeam(std::size_t id) const;
     void updatePosOnMap(std::size_t id, const Pos& oldPos, const Pos& newPos);
+
+    std::optional<std::size_t> removePlayer(std::size_t id);
+    std::vector<std::size_t> getDeadsId() const;
 
   private:
     std::unordered_map<std::string_view, std::unique_ptr<Team>> _teamList;
@@ -72,11 +71,11 @@ class World {
     std::size_t _widthMap;
     std::size_t _newId{0};
     std::vector<Tile> _tiles;
-    std::vector<std::size_t> _vecEggs;
-    std::size_t _clientLimit;
+    std::vector<Egg> _vecEggs;
 
     [[nodiscard]] std::size_t getTileIndex(int x, int y) const;
     std::size_t getTileIndex(const Pos& pos) const;
-    void erasePlayerFromTiles(std::size_t pos1dVec, std::size_t id);
+    void erasePlayerFromTile(std::size_t pos1dVec, std::size_t id);
+    void eraseEggFromTile(std::size_t pos1dVec, std::size_t id);
 };
 }  // namespace zappy::server::game

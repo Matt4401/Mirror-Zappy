@@ -14,6 +14,7 @@
 
 #include "command/ICommand.hpp"
 #include "game/Player.hpp"
+#include "game/World.hpp"
 #include "util/DataStructures.hpp"
 
 namespace zappy::server::command {
@@ -25,11 +26,10 @@ TEST(ForwardTest, CheckRequiredTicks) {
 }
 
 TEST(ForwardTest, CheckMovement) {
-    std::unique_ptr<ICommand> forward = std::make_unique<Forward>();
+    const std::unique_ptr<ICommand> forward = std::make_unique<Forward>();
     game::Player player{0, 5, 5, game::cardinalPoint::NORTH};
-    const util::Config config{};
+    const util::Config config{80, 16, 16, {"test"}, 1, 100};
     game::World world{config};
-
     forward->execute(world, player);
     auto [fst, snd] = player.position();
     ASSERT_EQ(fst, 5);
@@ -46,7 +46,7 @@ TEST(ForwardTest, CheckMovementBordure) {
 
     forward->execute(world, player);
     auto [fst, snd] = player.position();
-    ASSERT_EQ(fst, 16);
+    ASSERT_EQ(fst, maxX);
     ASSERT_EQ(snd, 0);
 }
 }  // namespace zappy::server::command

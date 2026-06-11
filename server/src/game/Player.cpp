@@ -5,7 +5,7 @@
 ** Player
 */
 
-#include "Player.hpp"
+#include "game/Player.hpp"
 
 #include <cstddef>
 #include <cstdint>

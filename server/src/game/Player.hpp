@@ -16,9 +16,19 @@
 #include <vector>
 
 #include "command/ICommand.hpp"
-#include "game/World.hpp"
 
 namespace zappy::server::game {
+
+class World;
+
+struct Pos {
+    std::size_t x;
+    std::size_t y;
+};
+
+enum class ItemType : uint8_t { Food, Linemate, Deraumere, Sibur, Mendiane, Phiras, Thystame, COUNT };
+
+enum class cardinalPoint : uint8_t { NORTH, EAST, SOUTH, WEST, COUNT };
 
 constexpr std::array<std::pair<int, int>, 4> playerMove = {{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}};
 
