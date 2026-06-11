@@ -21,8 +21,9 @@ Camera::Camera(rmath::Vector3 position) : _camera{} {
 }
 
 [[nodiscard]] bool Camera::isVisibleFromCamera(raylib::rmath::Vector3 position) const {
-    const raylib::rmath::Vector3 toTile = position - static_cast<raylib::rmath::Vector3>(_camera.position);
-    const float distanceSquared = toTile.lengthSquared();
+    const raylib::rmath::Vector3 cameraPosition = static_cast<raylib::rmath::Vector3>(_camera.position);
+    const raylib::rmath::Vector3 toTileFromCamera = position - cameraPosition;
+    const float distanceSquared = toTileFromCamera.lengthSquared();
 
     if (distanceSquared > MAX_RENDER_DISTANCE * MAX_RENDER_DISTANCE) {
         return false;
@@ -30,6 +31,9 @@ Camera::Camera(rmath::Vector3 position) : _camera{} {
     if (distanceSquared < MIN_DISTANCE * MIN_DISTANCE) {
         return true;
     }
+
+    const raylib::rmath::Vector3 visibilityOrigin = cameraPosition - (direction() * VISIBILITY_ORIGIN_BACKSTEP);
+    const raylib::rmath::Vector3 toTile = position - visibilityOrigin;
 
     return direction().angle(toTile) <= halfFovyRadians(VIEW_PADDING_DEGREES);
 }

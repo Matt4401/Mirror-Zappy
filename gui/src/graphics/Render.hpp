@@ -39,7 +39,7 @@ class Render {
     void render2D();
     void render3D();
     void handleEvents();
-    raylib::rcore::Window _window{WINDOW_NAME.c_str(), FLAG_FULLSCREEN_MODE};
+    raylib::rcore::Window _window{WINDOW_NAME.c_str()};
     std::shared_ptr<raylib::rcore::Camera> _camera{
         std::make_shared<raylib::rcore::Camera>(raylib::rmath::Vector3{10.0F, 10.0F, 10.0F})};
     EventContext _eventContext{_camera};

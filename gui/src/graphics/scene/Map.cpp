@@ -19,10 +19,10 @@ namespace zappy::gui::graphics::scene {
 Map::Map(int width, int height) {
     raylib::rmath::Vector3 position{0.0F, 0.0F, 0.0F};
 
-    for (int x = ((width / 2) * -1); x < width / 2; x += 2) {
-        for (int z = ((height / 2) * -1); z < height / 2; z += 2) {
-            position.setX(static_cast<float>(x));
-            position.setZ(static_cast<float>(z));
+    for (int x = ((width / 2) * -1); x < width / 2; x += 1) {
+        for (int z = ((height / 2) * -1); z < height / 2; z += 1) {
+            position.setX(static_cast<float>((x * TILE_SIZE)));
+            position.setZ(static_cast<float>((z * TILE_SIZE)));
             _tiles.emplace_back(position);
 
             // TEMPORARY : Add a Deraumere item to the tile for testing

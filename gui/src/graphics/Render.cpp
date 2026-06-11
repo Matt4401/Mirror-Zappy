@@ -28,8 +28,8 @@ void Render::start() {
 void Render::update() {
     _skyBackground.update(raylib::rcore::Window::frameTime());
     _camera->updateCamera(CAMERA_FREE);
-    if (_camera->position().y() < 4.0F) {
-        _camera->setPosition({_camera->position().x(), 4.0F, _camera->position().z()});
+    if (_camera->position().y() < 2.5F) {
+        _camera->setPosition({_camera->position().x(), 2.5F, _camera->position().z()});
         _camera->setTarget({_camera->target().x(), _camera->target().y() + (raylib::rcore::Window::frameTime() * 2.0F),
                             _camera->target().z()});
     }

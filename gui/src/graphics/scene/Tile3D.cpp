@@ -26,6 +26,12 @@ void Tile3D::draw(const raylib::rmodels::Model& model) const {
 bool Tile3D::hasItems() const { return !_itemObjects.empty(); }
 
 void Tile3D::addItem(std::unique_ptr<IObject> object, std::size_t quantity) {
+    for (auto& item : _itemObjects) {
+        if (item.object->name() == object->name()) {
+            item.quantity += static_cast<int>(quantity);
+            return;
+        }
+    }
     _itemObjects.emplace_back(Item(std::move(object), static_cast<int>(quantity)));
 }
 
