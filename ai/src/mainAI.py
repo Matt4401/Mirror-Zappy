@@ -3,6 +3,7 @@ import argparse
 from ai.src.AITeamClass import AITeam
 from ai.src.TrantorianClass import Trantorian
 
+
 def mainAI():
     parser = argparse.ArgumentParser(
         usage="./zappy_ai -p port -n name -h machine", add_help=False
@@ -24,6 +25,3 @@ def mainAI():
     trantorian = Trantorian("matt4401")
     main_class = AITeam(trantorian, machine)  # noqa: F841
     # main_class.run()
-
-
-
