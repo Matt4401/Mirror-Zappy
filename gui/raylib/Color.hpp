@@ -48,6 +48,10 @@ class Color {
     static constexpr Color Magenta() { return MAGENTA; }
     static constexpr Color RayWhite() { return RAYWHITE; }
 
+    [[nodiscard]] static Color lerp(Color from, Color to, float amount) {
+        return ColorLerp(from.color(), to.color(), amount);
+    }
+
     [[nodiscard]] constexpr const ::Color& color() const { return _color; }
 
     [[nodiscard]] constexpr std::uint8_t r() const { return _color.r; }

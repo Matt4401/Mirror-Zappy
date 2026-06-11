@@ -1,6 +1,7 @@
 add_subdirectory(cli)
 add_subdirectory(graphics)
 add_subdirectory(network)
+add_subdirectory(context)
 
 add_library(zappy_gui_core
         Core.cpp
@@ -18,5 +19,7 @@ target_link_libraries(zappy_gui_core PUBLIC
         zappy_gui_raylib
         zappy_gui_cli
         zappy_gui_graphics
+        network
         zappy_gui_network
+        zappy_gui_context
 )

@@ -1,4 +1,5 @@
 include(GoogleTest)
+find_package(Python3 REQUIRED)
 
 set(FIXTURES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/fixtures")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
@@ -29,6 +30,14 @@ target_link_libraries(unit_tests PRIVATE
 target_compile_definitions(unit_tests
         PRIVATE
         FIXTURES_PATH="${FIXTURES_DIR}"
+)
+
+add_test(NAME python_tests
+    COMMAND ${Python3_EXECUTABLE} -m pytest ${CMAKE_SOURCE_DIR}/tests/src/ai/test_main.py
+)
+
+set_tests_properties(python_tests PROPERTIES 
+    ENVIRONMENT "PYTHONPATH=${CMAKE_SOURCE_DIR}/ai/src"
 )
 
 gtest_discover_tests(unit_tests)
