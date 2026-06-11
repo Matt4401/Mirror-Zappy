@@ -11,6 +11,7 @@
 #include <string>
 #include <utility>
 
+#include "Color.hpp"
 #include "rmath/Vector3.hpp"
 #include "rmodels/Mesh.hpp"
 
@@ -41,18 +42,18 @@ class Model {
     [[nodiscard]] ::Model& model() { return _model; }
 
     void drawModel(rmath::Vector3 position, float scale, Color tint) const {
-        DrawModel(_model, position.vector(), scale, tint);
+        DrawModel(_model, position.vector(), scale, tint.color());
     }
     void drawModelEx(rmath::Vector3 position, rmath::Vector3 rotationAxis, float rotationAngle, rmath::Vector3 scale,
                      Color tint) const {
-        DrawModelEx(_model, position.vector(), rotationAxis.vector(), rotationAngle, scale.vector(), tint);
+        DrawModelEx(_model, position.vector(), rotationAxis.vector(), rotationAngle, scale.vector(), tint.color());
     }
     void drawModelWires(rmath::Vector3 position, float scale, Color tint) const {
-        DrawModelWires(_model, position.vector(), scale, tint);
+        DrawModelWires(_model, position.vector(), scale, tint.color());
     }
     void drawModelWiresEx(rmath::Vector3 position, rmath::Vector3 rotationAxis, float rotationAngle,
                           rmath::Vector3 scale, Color tint) const {
-        DrawModelWiresEx(_model, position.vector(), rotationAxis.vector(), rotationAngle, scale.vector(), tint);
+        DrawModelWiresEx(_model, position.vector(), rotationAxis.vector(), rotationAngle, scale.vector(), tint.color());
     }
 
   protected:

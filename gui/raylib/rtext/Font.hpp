@@ -37,11 +37,7 @@ class Font {
     }
 
     [[nodiscard]] static Font fromMemory(std::string_view fileType, std::span<const unsigned char> data, int fontSize,
-                                         std::span<const int> codepoints = {}) {
-        const std::string extension{fileType};
-        return Font{LoadFontFromMemory(extension.c_str(), data.data(), static_cast<int>(data.size()), fontSize,
-                                       codepoints.data(), static_cast<int>(codepoints.size()))};
-    }
+                                         std::span<const int> codepoints = {});
 
     [[nodiscard]] bool valid() const { return IsFontValid(_font); }
     [[nodiscard]] int baseSize() const { return _font.baseSize; }
@@ -50,13 +46,7 @@ class Font {
 
   protected:
   private:
-    void reset() {
-        if (_owned && valid()) {
-            UnloadFont(_font);
-        }
-        _font = {};
-        _owned = false;
-    }
+    void reset();
 
     ::Font _font{};
     bool _owned = false;
