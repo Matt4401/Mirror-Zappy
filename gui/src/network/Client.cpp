@@ -10,8 +10,8 @@
 #include <memory>
 
 #include "exception/SocketError.hpp"
-#include "strategy/GUIStrategy.hpp"
 #include "socket/ClientSocket.hpp"
+#include "strategy/GUIStrategy.hpp"
 
 namespace zappy::gui::network {
 Client::Client(const parser::GuiConfig& config)

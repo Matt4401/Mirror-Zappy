@@ -16,6 +16,8 @@
 
 #include "Parser.hpp"
 #include "SessionManager.hpp"
+#include "exception/Exception.hpp"
+#include "game/World.hpp"
 #include "network/ISessionManager.hpp"
 #include "strategy/ServerStrategy.hpp"
 

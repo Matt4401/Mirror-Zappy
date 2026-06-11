@@ -13,8 +13,6 @@
 #include <string>
 #include <vector>
 
-#include "strategy/ServerStrategy.hpp"
-
 namespace {
 
 std::vector<char*> buildArgv(std::vector<std::string>& args) {
@@ -32,8 +30,7 @@ std::vector<char*> buildArgv(std::vector<std::string>& args) {
 namespace zappy::server::tests {
 
 TEST(CoreTest, ConstructionSucceeds) {
-    std::vector<std::string> args{"./zappy_server", "-p", "4243", "-x", "10", "-y", "10", "-n", "TeamA",
-                                  "-c",             "1"};
+    std::vector<std::string> args{"./zappy_server", "-p", "4243", "-x", "10", "-y", "10", "-n", "TeamA", "-c", "1"};
     auto argv = buildArgv(args);
     const std::span<char*> argvSpan{argv.data(), argv.size()};
 
