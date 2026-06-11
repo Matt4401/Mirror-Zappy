@@ -11,9 +11,11 @@
 #include <cstdint>
 #include <ctime>
 #include <memory>
+#include <optional>
 #include <random>
 #include <ranges>
 #include <string_view>
+#include <unordered_map>
 #include <utility>
 
 #include "Player.hpp"
@@ -39,7 +41,7 @@ void World::setSpawnEggs(const std::size_t clientLimit, std::string_view teamNam
 
     for (std::size_t i = 0; i < clientLimit; i++) {
         const auto pos = dist(e);
-        _vecEggs.push_back(Egg{_newId, getTilePos(pos), teamName.data()});
+        _vecEggs.push_back(Egg{.id = _newId, .pos = getTilePos(pos), .teamName = teamName.data()});
         _tiles.at(pos).eggs.push_back(_newId);
         _newId++;
     }
@@ -94,9 +96,13 @@ std::optional<size_t> World::spawnPlayer(const std::string_view teamName) {
     return newPlayer->id();
 }
 
-[[nodiscard]] Pos World::getTilePos(const std::size_t pos) const { return {pos / _widthMap, pos % _widthMap}; }
+[[nodiscard]] Pos World::getTilePos(const std::size_t pos) const {
+    return Pos{.x = pos / _widthMap, .y = pos % _widthMap};
+}
 
-[[nodiscard]] std::size_t World::getTileIndex(const int x, const int y) const { return (y * _widthMap) + x; }
+[[nodiscard]] std::size_t World::getTileIndex(const std::size_t x, const std::size_t y) const {
+    return (y * _widthMap) + x;
+}
 
 [[nodiscard]] std::size_t World::getTileIndex(const Pos& pos) const { return (pos.y * _widthMap) + pos.x; }
 

@@ -62,8 +62,8 @@ class Player {
     void setOrientation(cardinalPoint orient);
     [[nodiscard]] cardinalPoint orientation() const;
 
-    std::size_t id() const;
-    std::size_t nbLifeTick() const;
+    [[nodiscard]] std::size_t id() const;
+    [[nodiscard]] std::size_t nbLifeTick() const;
     void kill();
 
   private:
