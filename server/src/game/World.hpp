@@ -28,7 +28,7 @@ namespace zappy::server::game {
 struct Egg {
     std::size_t id;
     Pos pos;
-    std::string teamName;
+    std::string_view teamName;
 };
 
 struct Tile {

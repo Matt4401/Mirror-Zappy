@@ -36,14 +36,14 @@ std::pair<std::size_t, std::size_t> World::getRandomPlace(const std::size_t heig
     return {distHeight(e), distWidth(e)};
 }
 
-void World::setSpawnEggs(const std::size_t clientLimit, std::string_view teamName) {
+void World::setSpawnEggs(const std::size_t clientLimit, const std::string_view teamName) {
     std::random_device rd;
     std::mt19937 e{rd()};
     std::uniform_int_distribution<std::size_t> dist{0, _heightMap * _widthMap};
 
     for (std::size_t i = 0; i < clientLimit; i++) {
         const auto pos = dist(e);
-        _vecEggs.push_back(Egg{.id = _newId, .pos = getTilePos(pos), .teamName = teamName.data()});
+        _vecEggs.push_back(Egg{.id = _newId, .pos = getTilePos(pos), .teamName = teamName});
         _tiles.at(pos).eggs.push_back(_newId);
         _newId++;
     }
