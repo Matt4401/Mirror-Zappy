@@ -73,7 +73,7 @@ class World {
     std::vector<Tile> _tiles;
     std::vector<Egg> _vecEggs;
 
-    [[nodiscard]] std::size_t getTileIndex(int x, int y) const;
+    [[nodiscard]] std::size_t getTileIndex(std::size_t x, std::size_t y) const;
     std::size_t getTileIndex(const Pos& pos) const;
     void erasePlayerFromTile(std::size_t pos1dVec, std::size_t id);
     void eraseEggFromTile(std::size_t pos1dVec, std::size_t id);

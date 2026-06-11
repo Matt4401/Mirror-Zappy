@@ -14,9 +14,11 @@
 #include <optional>
 #include <random>
 #include <ranges>
+#include <string>
 #include <string_view>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 #include "Player.hpp"
 #include "Team.hpp"
