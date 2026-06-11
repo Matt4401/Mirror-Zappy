@@ -1,11 +1,9 @@
-#!/usr/bin/env python3
 import sys
 import argparse
-from AITeamClass import AITeam
-from TrantorianClass import Trantorian
+from ai.src.AITeamClass import AITeam
+from ai.src.TrantorianClass import Trantorian
 
-
-def main():
+def mainIA():
     parser = argparse.ArgumentParser(
         usage="./zappy_ai -p port -n name -h machine", add_help=False
     )
@@ -28,5 +26,4 @@ def main():
     # main_class.run()
 
 
-if __name__ == "__main__":
-    main()
+

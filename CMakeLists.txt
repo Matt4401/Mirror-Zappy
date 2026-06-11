@@ -22,7 +22,6 @@ endif()
 add_subdirectory(shared)
 add_subdirectory(server)
 add_subdirectory(gui)
-add_subdirectory(ai)
 
 include(SetupGoogleTest)
 setup_googletest()
