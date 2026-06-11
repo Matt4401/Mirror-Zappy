@@ -11,7 +11,6 @@
 #include <gtest/gtest.h>
 
 #include <cstddef>
-#include <utility>
 
 #include "command/ICommand.hpp"
 #include "game/World.hpp"
@@ -58,31 +57,31 @@ TEST(PlayerTest, ResponsesHandling) {
     player.addResponse("message 1\n");
     player.addResponse("message 2\n");
 
-    const auto responses = player.getResponses();
+    const auto responses = player.responses();
     ASSERT_EQ(responses.size(), 2);
     EXPECT_EQ(responses.at(0), "message 1\n");
     EXPECT_EQ(responses.at(1), "message 2\n");
 
-    const auto emptyResponses = player.getResponses();
+    const auto emptyResponses = player.responses();
     EXPECT_TRUE(emptyResponses.empty());
 }
 
 TEST(PlayerTest, MoveUpNorth) {
     Player player{1, 5, 5};
-    const std::pair<std::size_t, std::size_t> limit = {9, 9};
+    constexpr pos limit = {.x = 9, .y = 9};
 
     player.moveUp(limit);
 }
 
 TEST(PlayerTest, MoveUpNegativeWraparound) {
     Player player{1, 0, 0};
-    const std::pair<std::size_t, std::size_t> limit = {9, 9};
+    constexpr pos limit = {.x = 9, .y = 9};
 
     player.moveUp(limit);
 
-    const std::pair<std::size_t, std::size_t> position = player.getPosition();
-    EXPECT_EQ(position.first, 0);
-    EXPECT_EQ(position.second, 1);
+    const auto [x, y] = player.position();
+    EXPECT_EQ(x, 0);
+    EXPECT_EQ(y, 1);
 }
 
 }  // namespace
