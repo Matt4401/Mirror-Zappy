@@ -6,7 +6,6 @@
 */
 
 #include <cstddef>
-#include <iostream>
 #include <span>
 
 #include "Core.hpp"

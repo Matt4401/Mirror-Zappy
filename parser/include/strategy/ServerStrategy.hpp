@@ -11,9 +11,9 @@
 #include <string>
 #include <vector>
 
-#include "parsing/IParseStrategy.hpp"
+#include "IParseStrategy.hpp"
 
-namespace zappy::parser::parsing {
+namespace zappy::parser {
 struct ServerConfig {
     std::uint16_t port{};
     std::uint32_t width{};
@@ -36,4 +36,4 @@ class ServerStrategy : public IParseStrategy<ServerConfig> {
     static void validate(const ServerConfig& config);
     static bool handleUsage(char** argv, int argc);
 };
-}  // namespace zappy::parser::parsing
+}  // namespace zappy::parser

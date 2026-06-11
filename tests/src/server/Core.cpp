@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#include "parsing/strategy/ServerStrategy.hpp"
+#include "strategy/ServerStrategy.hpp"
 
 namespace {
 

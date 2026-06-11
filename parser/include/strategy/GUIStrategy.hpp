@@ -10,9 +10,9 @@
 #include <cstdint>
 #include <string>
 
-#include "parsing/IParseStrategy.hpp"
+#include "IParseStrategy.hpp"
 
-namespace zappy::parser::parsing {
+namespace zappy::parser {
 struct GuiConfig {
     std::uint16_t port = 0;
     std::string machine = "127.0.0.1";
@@ -30,4 +30,4 @@ class GUIStrategy : public IParseStrategy<GuiConfig> {
     static void parsePort(const std::string& arg, GuiConfig& config);
     static void processOptions(int argc, char** argv, GuiConfig& config);
 };
-}  // namespace zappy::parser::parsing
+}  // namespace zappy::parser

@@ -12,7 +12,7 @@
 
 #include "Render.hpp"
 #include "network/Client.hpp"
-#include "parsing/strategy/GUIStrategy.hpp"
+#include "strategy/GUIStrategy.hpp"
 
 namespace zappy::gui {
 class Core {
@@ -31,7 +31,7 @@ class Core {
     void loop() const;
 
     std::span<char*> _args;
-    parser::parsing::GuiConfig _config;
+    parser::GuiConfig _config;
     std::unique_ptr<graphics::Render> _render;
     std::unique_ptr<network::Client> _client;
 };

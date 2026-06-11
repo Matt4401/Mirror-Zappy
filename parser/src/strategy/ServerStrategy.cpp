@@ -5,7 +5,7 @@
 ** ServerStrategy
 */
 
-#include "parsing/strategy/ServerStrategy.hpp"
+#include "strategy/ServerStrategy.hpp"
 
 #include <exception>
 #include <functional>
@@ -15,11 +15,11 @@
 #include <string>
 #include <unordered_map>
 
+#include "Parser.hpp"
 #include "encapsulation/GetoptWrapper.hpp"
 #include "exception/ParsingError.hpp"
-#include "parsing/Parser.hpp"
 
-namespace zappy::parser::parsing {
+namespace zappy::parser {
 void ServerStrategy::parse(const int argc, char** argv, ServerConfig& config) {
     if (handleUsage(argv, argc)) {
         throw shared::exception::ParsingError(kUsageThrowMessage);
@@ -30,7 +30,7 @@ void ServerStrategy::parse(const int argc, char** argv, ServerConfig& config) {
 
 int ServerStrategy::parseNumericArg(const std::string& arg, const std::string& flagName) {
     try {
-        const int val = std::stoi(arg);
+        const int val = static_cast<int>(std::stol(arg));
 
         if (val <= 0) {
             throw shared::exception::ParsingError("Invalid value for " + flagName + ": must be greater than 0.");
@@ -101,4 +101,4 @@ bool ServerStrategy::handleUsage(char** argv, const int argc) {
     }
     return false;
 }
-}  // namespace zappy::parser::parsing
+}  // namespace zappy::parser

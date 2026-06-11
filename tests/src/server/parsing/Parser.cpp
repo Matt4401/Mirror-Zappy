@@ -5,7 +5,7 @@
 ** Parser
 */
 
-#include "parsing/Parser.hpp"
+#include "Parser.hpp"
 
 #include <gtest/gtest.h>
 
@@ -14,7 +14,7 @@
 #include <vector>
 
 #include "exception/ParsingError.hpp"
-#include "parsing/strategy/ServerStrategy.hpp"
+#include "strategy/ServerStrategy.hpp"
 
 namespace {
 
@@ -37,8 +37,8 @@ TEST(ServerParsingTest, ParserReturnsExpectedConfigWhenArgumentsAreValid) {
                                   "TeamA",          "TeamB", "-c",   "6",  "-f", "100"};
     auto argv = buildArgv(args);
 
-    parser::parsing::Parser<zappy::parser::parsing::ServerConfig> parser(
-        std::make_unique<parser::parsing::ServerStrategy>());
+    parser::Parser<zappy::parser::ServerConfig> parser(
+        std::make_unique<parser::ServerStrategy>());
 
     const auto [port, width, height, teamNames, clientLimit, freq] =
         parser.parse(static_cast<int>(argv.size()), argv.data());
@@ -57,8 +57,8 @@ TEST(ServerParsingTest, ParserRejectsMissingTeamName) {
     std::vector<std::string> args{"./zappy_server", "-p", "4242", "-x", "10", "-y", "20", "-c", "6", "-f", "100"};
     auto argv = buildArgv(args);
 
-    parser::parsing::Parser<zappy::parser::parsing::ServerConfig> parser(
-        std::make_unique<parser::parsing::ServerStrategy>());
+    parser::Parser<zappy::parser::ServerConfig> parser(
+        std::make_unique<parser::ServerStrategy>());
 
     EXPECT_THROW(
         { [[maybe_unused]] const auto config = parser.parse(static_cast<int>(argv.size()), argv.data()); },
@@ -70,8 +70,8 @@ TEST(ServerParsingTest, ParserRejectsReservedGraphicTeamName) {
                                   "GRAPHIC",        "-c", "6",    "-f", "100"};
     auto argv = buildArgv(args);
 
-    parser::parsing::Parser<zappy::parser::parsing::ServerConfig> parser(
-        std::make_unique<parser::parsing::ServerStrategy>());
+    parser::Parser<zappy::parser::ServerConfig> parser(
+        std::make_unique<parser::ServerStrategy>());
 
     EXPECT_THROW(
         { [[maybe_unused]] const auto config = parser.parse(static_cast<int>(argv.size()), argv.data()); },
@@ -82,8 +82,8 @@ TEST(ServerParsingHelp, ParserDisplaysHelpAndThrows) {
     std::vector<std::string> args{"./zappy_server", "-h"};
     auto argv = buildArgv(args);
 
-    parser::parsing::Parser<zappy::parser::parsing::ServerConfig> parser(
-        std::make_unique<parser::parsing::ServerStrategy>());
+    parser::Parser<zappy::parser::ServerConfig> parser(
+        std::make_unique<parser::ServerStrategy>());
 
     EXPECT_THROW(
         { [[maybe_unused]] const auto config = parser.parse(static_cast<int>(argv.size()), argv.data()); },
@@ -94,10 +94,10 @@ TEST(ServerParsingTest, ParserAppliesDefaultFrequencyWhenFlagIsMissing) {
     std::vector<std::string> args{"./zappy_server", "-p", "4242", "-x", "10", "-y", "20", "-n", "TeamA", "-c", "6"};
     auto argv = buildArgv(args);
 
-    parser::parsing::Parser<zappy::parser::parsing::ServerConfig> parser(
-        std::make_unique<parser::parsing::ServerStrategy>());
+    parser::Parser<zappy::parser::ServerConfig> parser(
+        std::make_unique<parser::ServerStrategy>());
 
-    const zappy::parser::parsing::ServerConfig config = parser.parse(static_cast<int>(argv.size()), argv.data());
+    const zappy::parser::ServerConfig config = parser.parse(static_cast<int>(argv.size()), argv.data());
 
     EXPECT_EQ(config.freq, 100U);
 }
@@ -106,8 +106,8 @@ TEST(ServerParsingTest, ParserRejectsInvalidOrZeroDimensions) {
     std::vector<std::string> args{"./zappy_server", "-p", "4242", "-x", "0", "-y", "20", "-n", "TeamA", "-c", "6"};
     auto argv = buildArgv(args);
 
-    parser::parsing::Parser<zappy::parser::parsing::ServerConfig> parser(
-        std::make_unique<parser::parsing::ServerStrategy>());
+    parser::Parser<zappy::parser::ServerConfig> parser(
+        std::make_unique<parser::ServerStrategy>());
 
     EXPECT_THROW(
         { [[maybe_unused]] const auto config = parser.parse(static_cast<int>(argv.size()), argv.data()); },
@@ -118,8 +118,8 @@ TEST(ServerParsingTest, ParserRejectsNegativePort) {
     std::vector<std::string> args{"./zappy_server", "-p", "-80", "-x", "10", "-y", "20", "-n", "TeamA", "-c", "6"};
     auto argv = buildArgv(args);
 
-    parser::parsing::Parser<zappy::parser::parsing::ServerConfig> parser(
-        std::make_unique<parser::parsing::ServerStrategy>());
+    parser::Parser<zappy::parser::ServerConfig> parser(
+        std::make_unique<parser::ServerStrategy>());
 
     EXPECT_THROW(
         { [[maybe_unused]] const auto config = parser.parse(static_cast<int>(argv.size()), argv.data()); },
@@ -131,10 +131,10 @@ TEST(ServerParsingTest, ParserCorrectlySeparatesTeamsFromFollowingFlags) {
                                   "TeamA",          "TeamB", "-c",   "6"};
     auto argv = buildArgv(args);
 
-    parser::parsing::Parser<zappy::parser::parsing::ServerConfig> parser(
-        std::make_unique<parser::parsing::ServerStrategy>());
+    parser::Parser<zappy::parser::ServerConfig> parser(
+        std::make_unique<parser::ServerStrategy>());
 
-    const zappy::parser::parsing::ServerConfig config = parser.parse(static_cast<int>(argv.size()), argv.data());
+    const zappy::parser::ServerConfig config = parser.parse(static_cast<int>(argv.size()), argv.data());
 
     ASSERT_EQ(config.teamNames.size(), 2U);
     EXPECT_EQ(config.teamNames.at(0), "TeamA");
@@ -146,8 +146,8 @@ TEST(ServerParsingTest, ParserRejectsNonNumericArguments) {
     std::vector<std::string> args{"./zappy_server", "-p", "poulet", "-x", "10", "-y", "20", "-n", "TeamA", "-c", "6"};
     auto argv = buildArgv(args);
 
-    parser::parsing::Parser<zappy::parser::parsing::ServerConfig> parser(
-        std::make_unique<parser::parsing::ServerStrategy>());
+    parser::Parser<zappy::parser::ServerConfig> parser(
+        std::make_unique<parser::ServerStrategy>());
 
     EXPECT_THROW(
         { [[maybe_unused]] const auto config = parser.parse(static_cast<int>(argv.size()), argv.data()); },
@@ -159,8 +159,8 @@ TEST(ServerParsingTest, ParserRejectsUnknownFlags) {
                                   "TeamA",          "-c", "6"};
     auto argv = buildArgv(args);
 
-    parser::parsing::Parser<zappy::parser::parsing::ServerConfig> parser(
-        std::make_unique<parser::parsing::ServerStrategy>());
+    parser::Parser<zappy::parser::ServerConfig> parser(
+        std::make_unique<parser::ServerStrategy>());
 
     EXPECT_THROW(
         { [[maybe_unused]] const auto config = parser.parse(static_cast<int>(argv.size()), argv.data()); },

@@ -7,7 +7,7 @@
 
 #pragma once
 
-namespace zappy::parser::parsing {
+namespace zappy::parser {
 
 template <typename ConfigType>
 class IParseStrategy {
@@ -22,4 +22,4 @@ class IParseStrategy {
 
     virtual void parse(int ac, char** av, ConfigType& config) = 0;
 };
-}  // namespace zappy::parser::parsing
+}  // namespace zappy::parser

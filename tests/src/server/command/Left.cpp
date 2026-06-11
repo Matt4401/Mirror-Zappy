@@ -16,7 +16,7 @@
 #include "command/ICommand.hpp"
 #include "game/Player.hpp"
 #include "game/World.hpp"
-#include "parsing/strategy/ServerStrategy.hpp"
+#include "strategy/ServerStrategy.hpp"
 
 namespace zappy::server::command {
 TEST(LeftTest, CheckRequiredTicks) {
@@ -29,7 +29,7 @@ TEST(LeftTest, CheckTurnMovement) {
     const std::unique_ptr<ICommand> left = std::make_unique<Left>();
     const std::unique_ptr<ICommand> forward = std::make_unique<Forward>();
     game::Player player{0, 5, 5};
-    const zappy::parser::parsing::ServerConfig config{};
+    const zappy::parser::ServerConfig config{};
     game::World world{config};
 
     left->execute(world, player);
@@ -46,7 +46,7 @@ TEST(LeftTest, CheckTurnMovementBordure) {
     const std::unique_ptr<ICommand> forward = std::make_unique<Forward>();
     auto [maxX, maxY] = game::World::limitMap();
     game::Player player{0, maxX, maxY};
-    const zappy::parser::parsing::ServerConfig config{};
+    const zappy::parser::ServerConfig config{};
     game::World world{config};
 
     left->execute(world, player);

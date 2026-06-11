@@ -13,7 +13,7 @@
 #include "command/CommandFactory.hpp"
 #include "game/World.hpp"
 #include "network/ISessionManager.hpp"
-#include "parsing/strategy/ServerStrategy.hpp"
+#include "strategy/ServerStrategy.hpp"
 
 namespace zappy::server {
 
@@ -35,8 +35,8 @@ class Core {
     void loop() const;
 
     std::span<char*> _args;
-    parser::parsing::ServerConfig _config;
-    int _timeUnit;
+    parser::ServerConfig _config;
+    int _timeUnit{0};
     std::unique_ptr<shared::network::ISessionManager> _sessionManager;
     std::unique_ptr<game::World> _world;
     command::CommandFactory _commandFactory;

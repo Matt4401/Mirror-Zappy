@@ -10,11 +10,11 @@
 #include <memory>
 
 #include "exception/SocketError.hpp"
-#include "parsing/strategy/GUIStrategy.hpp"
+#include "strategy/GUIStrategy.hpp"
 #include "socket/ClientSocket.hpp"
 
 namespace zappy::gui::network {
-Client::Client(const parser::parsing::GuiConfig& config)
+Client::Client(const parser::GuiConfig& config)
     : _socket{std::make_unique<::network::socket::ClientSocket>(config.machine, config.port)} {
     if (_socket->send(DefaultTeamName) == 0) {
         throw ::network::exception::SocketError("failed to send team name");

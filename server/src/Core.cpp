@@ -10,12 +10,14 @@
 #include <exception>
 #include <iostream>
 #include <memory>
+#include <span>
+#include <string>
 #include <utility>
 
+#include "Parser.hpp"
 #include "SessionManager.hpp"
 #include "network/ISessionManager.hpp"
-#include "parsing/Parser.hpp"
-#include "parsing/strategy/ServerStrategy.hpp"
+#include "strategy/ServerStrategy.hpp"
 
 namespace zappy::server {
 
@@ -26,21 +28,21 @@ int Core::run() {
         setup();
         loop();
     } catch (const zappy::shared::exception::Exception& e) {
-        if (std::string(e.what()) == zappy::parser::parsing::kUsageThrowMessage) {
-            return zappy::parser::parsing::kExitSuccess;
+        if (std::string(e.what()) == zappy::parser::kUsageThrowMessage) {
+            return zappy::parser::kExitSuccess;
         }
         std::cerr << "Error: " << e.what() << std::endl;
-        return zappy::parser::parsing::kExitFailure;
+        return zappy::parser::kExitFailure;
     } catch (const std::exception& e) {
         std::cerr << "Unknown error: " << e.what() << std::endl;
-        return zappy::parser::parsing::kExitFailure;
+        return zappy::parser::kExitFailure;
     }
-    return zappy::parser::parsing::kExitSuccess;
+    return zappy::parser::kExitSuccess;
 }
 
 void Core::setup() {
-    auto serverStrategy = std::make_unique<zappy::parser::parsing::ServerStrategy>();
-    zappy::parser::parsing::Parser<zappy::parser::parsing::ServerConfig> parser(std::move(serverStrategy));
+    auto serverStrategy = std::make_unique<zappy::parser::ServerStrategy>();
+    zappy::parser::Parser<zappy::parser::ServerConfig> parser(std::move(serverStrategy));
 
     _config = parser.parse(static_cast<int>(_args.size()), _args.data());
     _sessionManager = std::make_unique<network::SessionManager>(_config.port);

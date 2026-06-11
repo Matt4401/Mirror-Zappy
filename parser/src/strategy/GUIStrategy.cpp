@@ -5,7 +5,7 @@
 ** GUIStrategy
 */
 
-#include "parsing/strategy/GUIStrategy.hpp"
+#include "strategy/GUIStrategy.hpp"
 
 #include <exception>
 #include <iostream>
@@ -13,11 +13,11 @@
 #include <ostream>
 #include <string>
 
+#include "Parser.hpp"
 #include "encapsulation/GetoptWrapper.hpp"
 #include "exception/ParsingError.hpp"
-#include "parsing/Parser.hpp"
 
-namespace zappy::parser::parsing {
+namespace zappy::parser {
 void GUIStrategy::parse(const int argc, char** argv, GuiConfig& config) {
     if (handleUsage(argv, argc)) {
         throw shared::exception::ParsingError(kUsageThrowMessage);
@@ -46,7 +46,7 @@ void GUIStrategy::processOptions(const int argc, char** argv, GuiConfig& config)
 
 void GUIStrategy::parsePort(const std::string& arg, GuiConfig& config) {
     try {
-        const int val = std::stoi(arg);
+        const int val = static_cast<int>(std::stol(arg));
 
         if (val <= 0) {
             throw shared::exception::ParsingError("Port must be a positive non-zero integer.");
@@ -72,4 +72,4 @@ bool GUIStrategy::handleUsage(char** argv, const int argc) {
     }
     return false;
 }
-}  // namespace zappy::parser::parsing
+}  // namespace zappy::parser

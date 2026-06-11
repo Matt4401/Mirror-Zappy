@@ -12,10 +12,10 @@
 #include <string>
 #include <utility>
 
+#include "IParseStrategy.hpp"
 #include "exception/ParsingError.hpp"
-#include "parsing/IParseStrategy.hpp"
 
-namespace zappy::parser::parsing {
+namespace zappy::parser {
 static constexpr std::size_t kExitSuccess = 0;
 static constexpr std::size_t kExitFailure = 84;
 static constexpr std::string kUsageThrowMessage = "Help displayed";
@@ -44,4 +44,4 @@ class Parser {
   private:
     std::unique_ptr<IParseStrategy<ConfigType>> _strategy;
 };
-}  // namespace zappy::parser::parsing
+}  // namespace zappy::parser
