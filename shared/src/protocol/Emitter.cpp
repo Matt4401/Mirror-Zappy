@@ -15,12 +15,14 @@
 namespace zappy::shared::protocol {
 
 namespace {
+// NOLINTBEGIN
 template <class... Ts>
 struct overloaded : Ts... {  // NOLINT(cppcoreguidelines-multiple-inheritance)
     using Ts::operator()...;
 };
 template <class... Ts>
 overloaded(Ts...) -> overloaded<Ts...>;
+// NOLINTEND
 }  // namespace
 
 std::string Emitter::build(const ServerCommand& cmd) {
