@@ -20,7 +20,7 @@
 #include "Team.hpp"
 #include "command/ICommand.hpp"
 #include "game/Player.hpp"
-#include "util/DataStructures.hpp"
+#include "strategy/ServerStrategy.hpp"
 
 namespace zappy::server::game {
 
@@ -38,10 +38,10 @@ struct Tile {
 
 class World {
   public:
+    explicit World(const parser::ServerConfig& config);
     static Position getRandomPlace(std::size_t heightMap, std::size_t widthMap);
     void setSpawnEggs(size_t clientLimit, std::string_view teamName);
     static cardinalPoint randomCardinalPoint();
-    explicit World(const util::Config& config);
     ~World() = default;
 
     World(const World& other) = delete;
@@ -54,7 +54,7 @@ class World {
     Position getTilePosition(std::size_t position1D) const;
 
     void update();
-    std::unordered_map<std::size_t, std::vector<std::string>> getAllResponsesBuffer() const;
+    [[nodiscard]] std::unordered_map<std::size_t, std::vector<std::string>> getAllResponsesBuffer() const;
     void pushCommandToPlayer(std::size_t playerId, std::unique_ptr<command::ICommand> command) const;
     void removePlayerFromTeam(std::size_t id) const;
     void updatePositionOnMap(std::size_t id, const Position& oldPosition, const Position& newPosition);
@@ -72,7 +72,7 @@ class World {
     std::vector<Egg> _vecEggs;
 
     [[nodiscard]] std::size_t getTileIndex(std::size_t x, std::size_t y) const;
-    std::size_t getTileIndex(const Position& position) const;
+    [[nodiscard]] std::size_t getTileIndex(const Position& position) const;
     void erasePlayerFromTile(std::size_t position1dVec, std::size_t id);
     void eraseEggFromTile(std::size_t position1dVec, std::size_t id);
     std::optional<Egg> getTeamEgg(const std::string_view& teamName);

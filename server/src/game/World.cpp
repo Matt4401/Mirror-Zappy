@@ -23,7 +23,7 @@
 #include "Player.hpp"
 #include "Team.hpp"
 #include "command/ICommand.hpp"
-#include "util/DataStructures.hpp"
+#include "strategy/ServerStrategy.hpp"
 
 namespace zappy::server::game {
 
@@ -63,7 +63,7 @@ cardinalPoint World::randomCardinalPoint() {
     return static_cast<cardinalPoint>(dist(e));
 }
 
-World::World(const util::Config& config) : _heightMap(config.height), _widthMap(config.width) {
+World::World(const parser::ServerConfig& config) : _heightMap(config.height), _widthMap(config.width) {
     const auto nbTile = _heightMap * _widthMap;
     for (std::size_t i = 0; i < nbTile; i++) {
         _tiles.push_back(Tile{.resources = {}});

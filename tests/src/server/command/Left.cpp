@@ -17,7 +17,7 @@
 #include "command/ICommand.hpp"
 #include "game/Player.hpp"
 #include "game/World.hpp"
-#include "util/DataStructures.hpp"
+#include "strategy/ServerStrategy.hpp"
 
 namespace zappy::server::command {
 TEST(LeftTest, CheckRequiredTicks) {
@@ -30,8 +30,8 @@ TEST(LeftTest, CheckTurnMovement) {
     const std::unique_ptr<ICommand> left = std::make_unique<Left>();
     const std::unique_ptr<ICommand> forward = std::make_unique<Forward>();
     game::Player player{0, 5, 5, game::cardinalPoint::NORTH};
-    const auto config =
-        util::Config{.port = 80, .width = 16, .height = 16, .teamNames = {"test"}, .clientLimit = 1, .freq = 100};
+    const auto config = parser::ServerConfig{
+        .port = 80, .width = 16, .height = 16, .teamNames = {"test"}, .clientLimit = 1, .freq = 100};
     game::World world{config};
 
     left->execute(world, player);
@@ -46,8 +46,8 @@ TEST(LeftTest, CheckTurnMovement) {
 TEST(LeftTest, CheckTurnMovementBordure) {
     const std::unique_ptr<ICommand> left = std::make_unique<Left>();
     const std::unique_ptr<ICommand> forward = std::make_unique<Forward>();
-    const auto config =
-        util::Config{.port = 80, .width = 16, .height = 16, .teamNames = {"test"}, .clientLimit = 1, .freq = 100};
+    const auto config = parser::ServerConfig{
+        .port = 80, .width = 16, .height = 16, .teamNames = {"test"}, .clientLimit = 1, .freq = 100};
     game::World world{config};
     auto [maxX, maxY] = world.sizeMap();
     game::Player player{0, maxX, maxY, game::cardinalPoint::NORTH};
