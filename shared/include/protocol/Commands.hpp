@@ -19,102 +19,102 @@ struct UnknownCommand {};
 // --- Server to Client (GUI) Commands ---
 namespace server {
 struct Msz {
-    int width;
-    int height;
+    int width = 0;
+    int height = 0;
 };
 struct Bct {
-    int x;
-    int y;
-    int food;
-    int linemate;
-    int deraumere;
-    int sibur;
-    int mendiane;
-    int phiras;
-    int thystame;
+    int x = 0;
+    int y = 0;
+    int food = 0;
+    int linemate = 0;
+    int deraumere = 0;
+    int sibur = 0;
+    int mendiane = 0;
+    int phiras = 0;
+    int thystame = 0;
 };
 struct Tna {
     std::string teamName;
 };
 struct Pnw {
-    int playerId;
-    int x;
-    int y;
-    int orientation;
-    int level;
+    int playerId = 0;
+    int x = 0;
+    int y = 0;
+    int orientation = 0;
+    int level = 0;
     std::string teamName;
 };
 struct Ppo {
-    int playerId;
-    int x;
-    int y;
-    int orientation;
+    int playerId = 0;
+    int x = 0;
+    int y = 0;
+    int orientation = 0;
 };
 struct Plv {
-    int playerId;
-    int level;
+    int playerId = 0;
+    int level = 0;
 };
 struct Pin {
-    int playerId;
-    int x;
-    int y;
-    int food;
-    int linemate;
-    int deraumere;
-    int sibur;
-    int mendiane;
-    int phiras;
-    int thystame;
+    int playerId = 0;
+    int x = 0;
+    int y = 0;
+    int food = 0;
+    int linemate = 0;
+    int deraumere = 0;
+    int sibur = 0;
+    int mendiane = 0;
+    int phiras = 0;
+    int thystame = 0;
 };
 struct Pex {
-    int playerId;
+    int playerId = 0;
 };
 struct Pbc {
-    int playerId;
+    int playerId = 0;
     std::string message;
 };
 struct Pic {
-    int x;
-    int y;
-    int level;
+    int x = 0;
+    int y = 0;
+    int level = 0;
     std::vector<int> playerIds;
 };
 struct Pie {
-    int x;
-    int y;
-    int incantationResult;
+    int x = 0;
+    int y = 0;
+    int incantationResult = 0;
 };
 struct Pfk {
-    int playerId;
+    int playerId = 0;
 };
 struct Pdr {
-    int playerId;
-    int resourceId;
+    int playerId = 0;
+    int resourceId = 0;
 };
 struct Pgt {
-    int playerId;
-    int resourceId;
+    int playerId = 0;
+    int resourceId = 0;
 };
 struct Pdi {
-    int playerId;
+    int playerId = 0;
 };
 struct Enw {
-    int eggId;
-    int playerId;
-    int x;
-    int y;
+    int eggId = 0;
+    int playerId = 0;
+    int x = 0;
+    int y = 0;
 };
 struct Ebo {
-    int eggId;
+    int eggId = 0;
 };
 struct Edi {
-    int eggId;
+    int eggId = 0;
 };
 struct Sgt {
-    int timeUnit;
+    int timeUnit = 0;
 };
 struct Sst {
-    int timeUnit;
+    int timeUnit = 0;
 };
 struct Seg {
     std::string teamName;
@@ -130,23 +130,23 @@ struct Sbp {};
 namespace client {
 struct Msz {};
 struct Bct {
-    int x;
-    int y;
+    int x = 0;
+    int y = 0;
 };
 struct Mct {};
 struct Tna {};
 struct Ppo {
-    int playerId;
+    int playerId = 0;
 };
 struct Plv {
-    int playerId;
+    int playerId = 0;
 };
 struct Pin {
-    int playerId;
+    int playerId = 0;
 };
 struct Sgt {};
 struct Sst {
-    int timeUnit;
+    int timeUnit = 0;
 };
 }  // namespace client
 
