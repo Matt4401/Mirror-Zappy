@@ -8,8 +8,10 @@
 #include "Core.hpp"
 
 #include <exception>
+#include <format>
 #include <iostream>
 #include <memory>
+#include <string>
 #include <string_view>
 #include <utility>
 
@@ -50,12 +52,32 @@ void Core::run() {
 
 void Core::stop() { _isRunning = false; }
 
-void Core::handleNewClient(int clientId) { _sessionManager->sendMessage(clientId, "WELCOME\n"); }
+void Core::handleNewClient(int clientId) {
+    _sessionManager->sendMessage(clientId, "WELCOME\n");
+    _clientStates.emplace(clientId, ClientState::WAITING_TEAM_SELECTION);
+}
 
-void Core::handleClientMessage(int clientId, std::string_view message) {}
+void Core::handleClientMessage(int clientId, std::string_view message) {
+    auto it = _clientStates.find(clientId);
+    if (it == _clientStates.end()) {
+        return;
+    }
+
+    if (it->second == ClientState::WAITING_TEAM_SELECTION) {
+        const auto teamName = std::string{message};
+        const auto playerIdOpt = _world.spawnPlayer(teamName);
+
+        if (!playerIdOpt.has_value()) {
+            _clientToPlayer[clientId] = playerIdOpt.value();
+        }
+        _sessionManager->sendMessage(clientId, std::format("{}\n{} {}\n", _world.getAvailableSlotsInTeam(teamName),
+        it->second = ClientState::IN_GAME;
+    }
+}
 
 void Core::handleClientDisconnection(int clientId) {
     _clientStates.erase(clientId);
+    _clientToPlayer.erase(clientId);
     _world.removePlayer(clientId);
 }
 

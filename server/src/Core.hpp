@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string_view>
@@ -33,7 +34,7 @@ class Core {
     void stop();
 
   private:
-    enum class ClientState : std::uint8_t { CONNECTED, WAITING_TEAM_SELECTION, IN_GAME };
+    enum class ClientState : std::uint8_t { WAITING_TEAM_SELECTION, IN_GAME };
 
     void handleNewClient(int clientId);
     void handleClientMessage(int clientId, std::string_view message);
@@ -46,7 +47,9 @@ class Core {
     game::World _world;
     command::CommandFactory _commandFactory;
     bool _isRunning{true};
+
     std::unordered_map<int, ClientState> _clientStates;
+    std::unordered_map<int, std::size_t> _clientToPlayer;
 };
 
 }  // namespace zappy::server
