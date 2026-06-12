@@ -6,17 +6,18 @@
 */
 
 #pragma once
+
 #include <memory>
 #include <span>
 
 #include "Render.hpp"
-#include "cli/Parser.hpp"
 #include "network/Client.hpp"
+#include "strategy/GUIStrategy.hpp"
 
 namespace zappy::gui {
 class Core {
   public:
-    Core(std::span<char*> args) : _cliParser(cli::Parser(args)) {}
+    explicit Core(std::span<char*> args);
     ~Core() = default;
     Core(const Core& other) = delete;
     Core& operator=(const Core& other) = delete;
@@ -25,9 +26,12 @@ class Core {
 
     int run();
 
-  protected:
   private:
-    cli::Parser _cliParser;
+    void setup();
+    void loop() const;
+
+    std::span<char*> _args;
+    parser::GuiConfig _config;
     std::unique_ptr<graphics::Render> _render;
     std::unique_ptr<network::Client> _client;
 };

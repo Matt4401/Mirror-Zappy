@@ -1,4 +1,3 @@
-add_subdirectory(cli)
 add_subdirectory(graphics)
 add_subdirectory(network)
 add_subdirectory(context)
@@ -17,7 +16,6 @@ target_include_directories(zappy_gui_core PUBLIC
 target_link_libraries(zappy_gui_core PUBLIC
         zappy_shared
         zappy_gui_raylib
-        zappy_gui_cli
         zappy_gui_graphics
         network
         zappy_gui_network
