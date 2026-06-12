@@ -16,7 +16,7 @@ namespace zappy::shared::protocol {
 
 namespace {
 template <class... Ts>
-// NOLINTNEXTLINE
+// NOLINTNEXTLINE (misc-multiple-inheritance)
 struct overloaded : Ts... {
     using Ts::operator()...;
 };
