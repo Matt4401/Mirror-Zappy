@@ -10,8 +10,9 @@
 
 #include "Core.hpp"
 
+// NOLINTNEXTLINE
 int main(int ac, char** av) {
-    auto args = std::span{av, static_cast<std::size_t>(ac)};
+    const auto args = std::span{av, static_cast<std::size_t>(ac)};
 
     return zappy::gui::Core(args).run();
 }

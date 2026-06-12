@@ -5,7 +5,6 @@ add_library(zappy_server_objects OBJECT
         src/game/World.hpp
         src/Core.cpp
         src/Core.hpp
-        src/util/DataStructures.hpp
         src/command/ICommand.hpp
         src/command/ACommand.hpp
         src/command/CommandFactory.cpp
@@ -28,6 +27,7 @@ target_include_directories(zappy_server_objects PUBLIC
 )
 target_link_libraries(zappy_server_objects PUBLIC
         zappy_shared
+        zappy_parser
         network
 )
 
@@ -36,4 +36,5 @@ add_executable(zappy_server
 )
 target_link_libraries(zappy_server PRIVATE
         zappy_server_objects
+        zappy_parser
 )

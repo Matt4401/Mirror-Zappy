@@ -10,19 +10,20 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <span>
 #include <string_view>
 #include <unordered_map>
 
 #include "command/CommandFactory.hpp"
 #include "game/World.hpp"
 #include "network/ISessionManager.hpp"
-#include "util/DataStructures.hpp"
+#include "strategy/ServerStrategy.hpp"
 
 namespace zappy::server {
 
 class Core {
   public:
-    explicit Core(util::Config config);
+    explicit Core(std::span<char*> args);
     ~Core() = default;
 
     Core(const Core& other) = delete;
@@ -30,7 +31,7 @@ class Core {
     Core(Core&& other) = delete;
     Core& operator=(Core&& other) = delete;
 
-    void run();
+    int run();
     void stop();
 
   private:
@@ -40,14 +41,18 @@ class Core {
     void handleClientMessage(int clientId, std::string_view message);
     void handleClientDisconnection(int clientId);
 
-    util::Config _config;
-    int _timeUnit;
+    void setup();
+    void loop();
 
+    parser::ServerConfig _config;
     std::unique_ptr<shared::network::ISessionManager> _sessionManager;
-    game::World _world;
+    std::unique_ptr<game::World> _world;
     command::CommandFactory _commandFactory;
+
+    int _timeUnit{0};
     bool _isRunning{true};
 
+    std::span<char*> _args;
     std::unordered_map<int, ClientState> _clientStates;
     std::unordered_map<int, std::size_t> _clientToPlayer;
 };
