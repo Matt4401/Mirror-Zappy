@@ -88,7 +88,7 @@ ServerCommand parseServerPbc(std::istringstream& iss) {
     if (iss >> cmd.playerId) {
         std::string msg;
         std::getline(iss, msg);
-        if (!msg.empty() && msg[0] == ' ') {
+        if (!msg.empty() && msg.front() == ' ') {
             msg.erase(0, 1);
         }
         cmd.message = msg;
@@ -201,7 +201,7 @@ ServerCommand parseServerSmg(std::istringstream& iss) {
     server::Smg cmd{};
     std::string msg;
     std::getline(iss, msg);
-    if (!msg.empty() && msg[0] == ' ') {
+    if (!msg.empty() && msg.front() == ' ') {
         msg.erase(0, 1);
     }
     cmd.message = msg;
