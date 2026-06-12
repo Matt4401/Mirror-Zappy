@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 
-from zappy_ai import main
+from ai.zappy_ai import main
 
 from mainAI import mainAI
 

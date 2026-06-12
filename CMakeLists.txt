@@ -24,9 +24,9 @@ endif()
 
 add_custom_command(
         OUTPUT ${CMAKE_SOURCE_DIR}/zappy_ai
-        COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_SOURCE_DIR}/zappy_ai.py ${CMAKE_SOURCE_DIR}/zappy_ai
+        COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_SOURCE_DIR}/ai/zappy_ai.py ${CMAKE_SOURCE_DIR}/zappy_ai
         COMMAND chmod +x ${CMAKE_SOURCE_DIR}/zappy_ai
-        DEPENDS ${CMAKE_SOURCE_DIR}/zappy_ai.py
+        DEPENDS ${CMAKE_SOURCE_DIR}/ai/zappy_ai.py
 )
 
 add_custom_target(prepare_script ALL DEPENDS ${CMAKE_SOURCE_DIR}/zappy_ai)
