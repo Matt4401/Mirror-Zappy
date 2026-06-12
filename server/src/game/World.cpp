@@ -75,7 +75,7 @@ World::World(const parser::ServerConfig& config) : _heightMap(config.height), _w
 }
 
 Position World::sizeMap() const {
-    return Position{.x = _widthMap == 0 ? 0 : _widthMap - 1, .y = _heightMap == 0 ? 0 : _heightMap - 1};
+    return Position{.x = _widthMap == 0 ? 0 : _widthMap, .y = _heightMap == 0 ? 0 : _heightMap};
 }
 
 void World::eraseEggFromTile(const std::size_t position1dVec, const std::size_t id) {
@@ -216,6 +216,14 @@ std::vector<std::size_t> World::collectAndKillDeadPlayers() const {
         }
     }
     return deadIds;
+}
+
+std::size_t World::getAvailableSlotInTeam(std::string_view teamName) const {
+    const auto team = _teamList.find(std::string(teamName));
+    if (team == _teamList.end()) {
+        return 0;
+    }
+    return team->second->availableSlot();
 }
 
 }  // namespace zappy::server::game

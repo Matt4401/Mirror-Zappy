@@ -61,6 +61,7 @@ class World {
 
     std::optional<std::size_t> removePlayer(std::size_t id);
     std::vector<std::size_t> collectAndKillDeadPlayers() const;
+    std::size_t getAvailableSlotInTeam(std::string_view teamName) const;
 
   private:
     std::unordered_map<std::string, std::unique_ptr<Team>> _teamList;
