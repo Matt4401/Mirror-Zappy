@@ -1,7 +1,7 @@
 import sys
 import argparse
-from ai.src.AITeamClass import AITeam
-from ai.src.TrantorianClass import Trantorian
+from src.AITeamClass import *
+from src.TrantorianClass import *
 
 
 def mainAI():

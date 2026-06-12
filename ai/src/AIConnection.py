@@ -32,8 +32,10 @@ class AIConnection:
         self.socket.send((self.team_name + "\n").encode())
         client_num = self.socket.recv(1024).decode().strip()
         dims = self.socket.recv(1024).decode().strip()
-
-        if int(client_num) < 1:
+        try:
+            if isidgit(client_num) and int(client_num) > 0:
+                pass
+        except:
             print("Handshake failed, no space for a new client or team name incorrect")
             sys.exit(84)
         if dims == "":

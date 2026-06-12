@@ -2,7 +2,7 @@
 import sys
 import os
 
-from ai.src.mainAI import mainAI
+from src.mainAI import mainAI
 def main():
     return mainAI()
 

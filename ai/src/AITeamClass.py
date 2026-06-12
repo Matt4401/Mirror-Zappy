@@ -1,11 +1,10 @@
-import AIConnection
+from src.AIConnection import *
 
 
 class AITeam:
-    def __init__(self, trantorian, socket):
+    def __init__(self, trantorian, port, host, team_name):
         self.trantorian = trantorian
-        self.socket = socket
-        self.AIConnection = AIConnection.AIConnection()
+        self.AIConnection = AIConnection.AIConnection(host, port, team_name)
 
     def run(self):
         pass
