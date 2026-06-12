@@ -20,7 +20,7 @@
 
 namespace zappy::server::game {
 Player::Player(const std::size_t id, const std::size_t x, const std::size_t y, const cardinalPoint orient)
-    : _orientation(orient), _pos({.x = x, .y = y}), _id(id) {
+    : _orientation(orient), _lifeTick(kNbStartFood * kNbLifeTickFood), _pos({.x = x, .y = y}), _id(id) {
     _inventory.fill(0);
     setItem(ItemType::Food, kNbStartFood);
 }

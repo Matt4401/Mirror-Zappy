@@ -27,18 +27,6 @@
 
 namespace zappy::server::game {
 
-Position World::getRandomPlace(const std::size_t heightMap, const std::size_t widthMap) {
-    if (heightMap == 0 || widthMap == 0) {
-        return Position{.x = 0, .y = 0};
-    }
-    std::random_device rd;
-    std::mt19937 e{rd()};
-    std::uniform_int_distribution<std::size_t> distHeight{0, heightMap - 1};
-    std::uniform_int_distribution<std::size_t> distWidth{0, widthMap - 1};
-
-    return Position{.x = distHeight(e), .y = distWidth(e)};
-}
-
 void World::setSpawnEggs(const std::size_t clientLimit, const std::string_view teamName) {
     if (_heightMap == 0 || _widthMap == 0) {
         return;
