@@ -29,14 +29,14 @@ namespace zappy::server::game {
 
 Position World::getRandomPlace(const std::size_t heightMap, const std::size_t widthMap) {
     if (heightMap == 0 || widthMap == 0) {
-        return {0, 0};
+        return Position{.x = 0, .y = 0};
     }
     std::random_device rd;
     std::mt19937 e{rd()};
     std::uniform_int_distribution<std::size_t> distHeight{0, heightMap - 1};
     std::uniform_int_distribution<std::size_t> distWidth{0, widthMap - 1};
 
-    return {distHeight(e), distWidth(e)};
+    return Position{.x = distHeight(e), .y = distWidth(e)};
 }
 
 void World::setSpawnEggs(const std::size_t clientLimit, const std::string_view teamName) {
@@ -90,16 +90,16 @@ void World::eraseEggFromTile(const std::size_t position1dVec, const std::size_t 
 }
 
 std::optional<Egg> World::getTeamEgg(const std::string_view& teamName) {
-    Egg egg{};
-    const auto it = _vecEggs.begin();
+    auto it = _vecEggs.begin();
     while (it != _vecEggs.end()) {
         if (it->teamName == teamName) {
-            egg = *it;
+            Egg egg = *it;
             _vecEggs.erase(it);
             return egg;
         }
+        ++it;
     }
-    return egg;
+    return std::nullopt;
 }
 
 std::optional<size_t> World::spawnPlayer(const std::string_view teamName) {
@@ -112,13 +112,13 @@ std::optional<size_t> World::spawnPlayer(const std::string_view teamName) {
         return std::nullopt;
     }
     eraseEggFromTile(getTileIndex(egg.value().position), egg.value().id);
+    team->second->addInTeam(egg.value().id);
     _playerList.push_back(std::make_unique<Player>(egg.value().id, egg.value().position.x, egg.value().position.y,
                                                    randomCardinalPoint()));
     const auto& newPlayer = _playerList.back();
     _tiles.at(getTileIndex(newPlayer->position().x, newPlayer->position().y)).players.push_back(newPlayer->id());
     return newPlayer->id();
 }
-
 [[nodiscard]] Position World::getTilePosition(const std::size_t position1D) const {
     return Position{.x = position1D % _widthMap, .y = position1D / _widthMap};
 }

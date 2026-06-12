@@ -15,7 +15,6 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
-#include <utility>
 #include <vector>
 
 #include "Team.hpp"
@@ -55,7 +54,6 @@ class World {
     Position getTilePosition(std::size_t position1D) const;
 
     void update();
-    void removeFromMap(std::size_t id);
     std::unordered_map<std::size_t, std::vector<std::string>> getAllResponsesBuffer() const;
     void pushCommandToPlayer(std::size_t playerId, std::unique_ptr<command::ICommand> command) const;
     void removePlayerFromTeam(std::size_t id) const;
@@ -78,5 +76,6 @@ class World {
     void erasePlayerFromTile(std::size_t position1dVec, std::size_t id);
     void eraseEggFromTile(std::size_t position1dVec, std::size_t id);
     std::optional<Egg> getTeamEgg(const std::string_view& teamName);
+    void removeFromMap(std::size_t id);
 };
 }  // namespace zappy::server::game
