@@ -11,6 +11,7 @@
 #include <format>
 #include <iostream>
 #include <memory>
+#include <optional>
 #include <span>
 #include <string>
 #include <string_view>
@@ -61,6 +62,7 @@ void Core::loop() {
         try {
             _sessionManager->pollNetwork(_timeUnit);
             while (_sessionManager->tryPopMessage(message)) {
+                // Remove trailing \n from message
                 if (message.type == shared::network::ISessionManager::EventType::CLIENT_CONNECTED) {
                     handleNewClient(message.clientId);
                 }
@@ -68,6 +70,7 @@ void Core::loop() {
                     handleClientDisconnection(message.clientId);
                 }
                 if (message.type == shared::network::ISessionManager::EventType::MESSAGE_RECEIVED) {
+                    formatReceivedString(message.message);
                     handleClientMessage(message.clientId, message.message);
                 }
             }
@@ -78,6 +81,15 @@ void Core::loop() {
 }
 
 void Core::stop() { _isRunning = false; }
+
+void Core::formatReceivedString(std::string& str) {
+    if (!str.empty() && str.back() == '\n') {
+        str.pop_back();
+    }
+    if (!str.empty() && str.back() == '\r') {
+        str.pop_back();
+    }
+}
 
 void Core::handleNewClient(int clientId) {
     _sessionManager->sendMessage(clientId, "WELCOME\n");
@@ -94,12 +106,25 @@ void Core::handleClientMessage(int clientId, std::string_view message) {
         const auto teamName = std::string{message};
         const auto playerIdOpt = _world->spawnPlayer(teamName);
 
-        if (!playerIdOpt.has_value()) {
+        if (playerIdOpt.has_value()) {
             _clientToPlayer[clientId] = playerIdOpt.value();
+            it->second = ClientState::IN_GAME;
         }
-        _sessionManager->sendMessage(clientId, std::format("{}\n{} {}\n", _world.getAvailableSlotsInTeam(teamName),
+        _sessionManager->sendMessage(clientId, std::format("{}\n{} {}\n", _world->getAvailableSlotInTeam(teamName),
                                                            _world->sizeMap().x, _world->sizeMap().y));
-        it->second = ClientState::IN_GAME;
+    } else if (it->second == ClientState::IN_GAME) {
+        const auto playerIdIt = _clientToPlayer.find(clientId);
+        if (playerIdIt == _clientToPlayer.end()) {
+            return;
+        }
+        const auto playerId = playerIdIt->second;
+        auto command = _commandFactory.createCommand(message);
+
+        if (command != nullptr) {
+            _world->pushCommandToPlayer(playerId, std::move(command));
+        } else {
+            _sessionManager->sendMessage(clientId, "ko\n");
+        }
     }
 }
 

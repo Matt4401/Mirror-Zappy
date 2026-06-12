@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <memory>
 #include <span>
+#include <string>
 #include <string_view>
 #include <unordered_map>
 
@@ -36,6 +37,8 @@ class Core {
 
   private:
     enum class ClientState : std::uint8_t { WAITING_TEAM_SELECTION, IN_GAME };
+
+    static void formatReceivedString(std::string& str);
 
     void handleNewClient(int clientId);
     void handleClientMessage(int clientId, std::string_view message);
