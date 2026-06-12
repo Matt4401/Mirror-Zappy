@@ -33,7 +33,8 @@ void Player::addItem(ItemType item, const std::size_t quantity) {
 }
 
 void Player::subItem(ItemType item, const std::size_t quantity) {
-    if (const auto nbInventory = _inventory.at(static_cast<uint8_t>(item)); nbInventory == 0) {
+    const auto nbInventory = _inventory.at(static_cast<uint8_t>(item));
+    if (nbInventory < quantity) {
         return;
     }
     _inventory.at(static_cast<uint8_t>(item)) -= quantity;
