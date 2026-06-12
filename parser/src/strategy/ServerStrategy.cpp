@@ -69,18 +69,10 @@ void ServerStrategy::processOptions(const int argc, char** argv, ServerConfig& c
 }
 
 void ServerStrategy::validate(const ServerConfig& config) {
-    if (config.port <= 0) {
-        throw shared::exception::ParsingError("Missing or invalid port (-p)");
-    }
-    if (config.width <= 0) {
-        throw shared::exception::ParsingError("Missing or invalid width (-x)");
-    }
-    if (config.height <= 0) {
-        throw shared::exception::ParsingError("Missing or invalid height (-y)");
-    }
-    if (config.clientLimit <= 0) {
-        throw shared::exception::ParsingError("Missing or invalid clientsNb (-c)");
-    }
+    isValidate(config.port, "Missing or invalid port (-p)");
+    isValidate(config.width, "Missing or invalid width (-x)");
+    isValidate(config.height, "Missing or invalid height (-y)");
+    isValidate(config.clientLimit, "Missing or invalid clientsNb (-c)");
     if (config.teamNames.empty()) {
         throw shared::exception::ParsingError("Server requires at least one team (-n)");
     }

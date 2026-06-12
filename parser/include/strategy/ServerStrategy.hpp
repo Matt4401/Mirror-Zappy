@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "IParseStrategy.hpp"
+#include "exception/ParsingError.hpp"
 
 namespace zappy::parser {
 struct ServerConfig {
@@ -35,5 +36,12 @@ class ServerStrategy : public IParseStrategy<ServerConfig> {
     static void processOptions(int argc, char** argv, ServerConfig& config);
     static void validate(const ServerConfig& config);
     static bool handleUsage(char** argv, int argc);
+
+    template <typename T>
+    static void isValidate(T value, const std::string& error) {
+        if (value <= 0) {
+            throw shared::exception::ParsingError(error);
+        }
+    }
 };
 }  // namespace zappy::parser
