@@ -7,7 +7,10 @@
 
 #pragma once
 
+#include <cstdint>
 #include <memory>
+#include <string_view>
+#include <unordered_map>
 
 #include "command/CommandFactory.hpp"
 #include "game/World.hpp"
@@ -30,6 +33,12 @@ class Core {
     void stop();
 
   private:
+    enum class ClientState : std::uint8_t { CONNECTED, WAITING_TEAM_SELECTION, IN_GAME };
+
+    void handleNewClient(int clientId);
+    void handleClientMessage(int clientId, std::string_view message);
+    void handleClientDisconnection(int clientId);
+
     util::Config _config;
     int _timeUnit;
 
@@ -37,6 +46,7 @@ class Core {
     game::World _world;
     command::CommandFactory _commandFactory;
     bool _isRunning{true};
+    std::unordered_map<int, ClientState> _clientStates;
 };
 
 }  // namespace zappy::server

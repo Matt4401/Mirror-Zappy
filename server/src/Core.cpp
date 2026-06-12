@@ -10,6 +10,7 @@
 #include <exception>
 #include <iostream>
 #include <memory>
+#include <string_view>
 #include <utility>
 
 #include "SessionManager.hpp"
@@ -31,10 +32,15 @@ void Core::run() {
         try {
             _sessionManager->pollNetwork(_timeUnit);
             while (_sessionManager->tryPopMessage(message)) {
-                // TODO: should be removed, is of course temporary for testing purposes
-                std::cout << "Received message from client " << message.clientId
-                          << " of type: " << static_cast<int>(message.type) << ". Message: " << message.message
-                          << std::endl;
+                if (message.type == shared::network::ISessionManager::EventType::CLIENT_CONNECTED) {
+                    handleNewClient(message.clientId);
+                }
+                if (message.type == shared::network::ISessionManager::EventType::CLIENT_DISCONNECTED) {
+                    handleClientDisconnection(message.clientId);
+                }
+                if (message.type == shared::network::ISessionManager::EventType::MESSAGE_RECEIVED) {
+                    handleClientMessage(message.clientId, message.message);
+                }
             }
         } catch (const std::exception& e) {
             std::cerr << "Error in main loop: " << e.what() << std::endl;
@@ -43,5 +49,14 @@ void Core::run() {
 }
 
 void Core::stop() { _isRunning = false; }
+
+void Core::handleNewClient(int clientId) { _sessionManager->sendMessage(clientId, "WELCOME\n"); }
+
+void Core::handleClientMessage(int clientId, std::string_view message) {}
+
+void Core::handleClientDisconnection(int clientId) {
+    _clientStates.erase(clientId);
+    _world.removePlayer(clientId);
+}
 
 }  // namespace zappy::server
