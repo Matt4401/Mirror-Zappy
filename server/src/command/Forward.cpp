@@ -16,12 +16,12 @@ namespace zappy::server::command {
 Forward::Forward() : ACommand{kTimeLimit} {}
 
 void Forward::execute(game::World& world, game::Player& player) {
-    const auto [limitX, limitY] = world.limitMap();
+    const auto [limitX, limitY] = world.sizeMap();
 
     const auto [oldX, oldY] = player.position();
-    player.moveUp({.x = limitX, .y = limitY});
+    player.moveForward({.x = limitX, .y = limitY});
     const auto [newX, newY] = player.position();
-    world.updatePosOnMap(player.id(), {.x = oldX, .y = oldY}, {.x = newX, .y = newY});
+    world.updatePositionOnMap(player.id(), {.x = oldX, .y = oldY}, {.x = newX, .y = newY});
     player.addResponse("ok\n");
 };
 

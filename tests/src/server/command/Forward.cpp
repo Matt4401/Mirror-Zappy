@@ -43,7 +43,7 @@ TEST(ForwardTest, CheckMovementBordure) {
         util::Config{.port = 80, .width = 16, .height = 16, .teamNames = {"test"}, .clientLimit = 1, .freq = 100};
     game::World world{config};
 
-    auto [maxX, maxY] = world.limitMap();
+    auto [maxX, maxY] = world.sizeMap();
     game::Player player{0, maxX, maxY, game::cardinalPoint::NORTH};
 
     forward->execute(world, player);

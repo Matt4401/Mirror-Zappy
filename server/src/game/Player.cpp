@@ -70,7 +70,7 @@ void Player::update(World& world) {
     _cmdTick--;
 }
 
-void Player::moveUp(const Pos& limit) {
+void Player::moveForward(const Position& limit) {
     auto [fst, snd] = playerMove.at(static_cast<uint8_t>(_orientation));
     const std::size_t width = limit.x + 1;
     const std::size_t height = limit.y + 1;
@@ -87,7 +87,7 @@ std::vector<std::string> Player::responses() {
     return tmpResponses;
 }
 
-Pos Player::position() const { return _pos; }
+Position Player::position() const { return _pos; }
 
 void Player::setOrientation(const cardinalPoint orient) { _orientation = orient; }
 

@@ -27,7 +27,7 @@ namespace zappy::server::game {
 
 struct Egg {
     std::size_t id;
-    Pos pos;
+    Position position;
     std::string teamName;
 };
 
@@ -39,7 +39,7 @@ struct Tile {
 
 class World {
   public:
-    static std::pair<std::size_t, std::size_t> getRandomPlace(std::size_t heightMap, std::size_t widthMap);
+    static Position getRandomPlace(std::size_t heightMap, std::size_t widthMap);
     void setSpawnEggs(size_t clientLimit, std::string_view teamName);
     static cardinalPoint randomCardinalPoint();
     explicit World(const util::Config& config);
@@ -50,16 +50,16 @@ class World {
     World(World&& other) = delete;
     World& operator=(World&& other) = delete;
 
-    std::pair<std::size_t, std::size_t> limitMap() const;
+    Position sizeMap() const;
     [[nodiscard]] std::optional<size_t> spawnPlayer(std::string_view teamName);
-    Pos getTilePos(std::size_t pos) const;
+    Position getTilePosition(std::size_t position1D) const;
 
     void update();
     void removeFromMap(std::size_t id);
     std::unordered_map<std::size_t, std::vector<std::string>> getAllResponsesBuffer() const;
     void pushCommandToPlayer(std::size_t playerId, std::unique_ptr<command::ICommand> command) const;
     void removePlayerFromTeam(std::size_t id) const;
-    void updatePosOnMap(std::size_t id, const Pos& oldPos, const Pos& newPos);
+    void updatePositionOnMap(std::size_t id, const Position& oldPosition, const Position& newPosition);
 
     std::optional<std::size_t> removePlayer(std::size_t id);
     std::vector<std::size_t> collectAndKillDeadPlayers() const;
@@ -74,9 +74,9 @@ class World {
     std::vector<Egg> _vecEggs;
 
     [[nodiscard]] std::size_t getTileIndex(std::size_t x, std::size_t y) const;
-    std::size_t getTileIndex(const Pos& pos) const;
-    void erasePlayerFromTile(std::size_t pos1dVec, std::size_t id);
-    void eraseEggFromTile(std::size_t pos1dVec, std::size_t id);
+    std::size_t getTileIndex(const Position& position) const;
+    void erasePlayerFromTile(std::size_t position1dVec, std::size_t id);
+    void eraseEggFromTile(std::size_t position1dVec, std::size_t id);
     std::optional<Egg> getTeamEgg(const std::string_view& teamName);
 };
 }  // namespace zappy::server::game

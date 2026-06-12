@@ -21,7 +21,7 @@ namespace zappy::server::game {
 
 class World;
 
-struct Pos {
+struct Position {
     std::size_t x;
     std::size_t y;
 };
@@ -53,11 +53,11 @@ class Player {
 
     void pushCommand(std::unique_ptr<command::ICommand> command);
     void update(World& world);
-    void moveUp(const Pos& limit);
+    void moveForward(const Position& limit);
 
     void addResponse(const std::string&);
     std::vector<std::string> responses();
-    [[nodiscard]] Pos position() const;
+    [[nodiscard]] Position position() const;
 
     void setOrientation(cardinalPoint orient);
     [[nodiscard]] cardinalPoint orientation() const;
@@ -73,7 +73,7 @@ class Player {
     std::unique_ptr<command::ICommand> _currentCommand{nullptr};
     std::size_t _cmdTick{0};
     std::size_t _lifeTick{0};
-    Pos _pos{.x = 0, .y = 0};
+    Position _pos{.x = 0, .y = 0};
     std::vector<std::string> _buffersResponses;
     bool _isDead{false};
     std::size_t _id;

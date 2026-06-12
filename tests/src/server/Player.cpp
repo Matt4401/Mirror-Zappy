@@ -68,16 +68,16 @@ TEST(PlayerTest, ResponsesHandling) {
 
 TEST(PlayerTest, MoveUpNorth) {
     Player player{1, 5, 5, cardinalPoint::NORTH};
-    constexpr Pos limit = {.x = 9, .y = 9};
+    constexpr Position limit = {.x = 9, .y = 9};
 
-    player.moveUp(limit);
+    player.moveForward(limit);
 }
 
 TEST(PlayerTest, MoveUpNegativeWraparound) {
     Player player{1, 0, 0, cardinalPoint::NORTH};
-    constexpr Pos limit = {.x = 9, .y = 9};
+    constexpr Position limit = {.x = 9, .y = 9};
 
-    player.moveUp(limit);
+    player.moveForward(limit);
 
     const auto [x, y] = player.position();
     EXPECT_EQ(x, 0);
