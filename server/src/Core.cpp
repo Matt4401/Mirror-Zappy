@@ -37,8 +37,7 @@ void Core::run() {
             _sessionManager->pollNetwork(_timeUnit);
             while (_sessionManager->tryPopMessage(message)) {
                 // TODO: Example of parsing the command (to be moved to a proper CommandHandler)
-                shared::protocol::Parser const parser;
-                auto clientCmd = parser.parseClientCommand(message.message);
+                auto clientCmd = shared::protocol::Parser::parseClientCommand(message.message);
 
                 if (std::holds_alternative<shared::protocol::client::Msz>(
                         clientCmd)) {  // TODO: instead of using holds_alternative, we should use std::visit with

@@ -28,8 +28,7 @@ Client::Client(const cli::Parser::Config& config)
 void Client::update() {
     auto msg = _socket->tryPopMessage();
     if (msg) {
-        shared::protocol::Parser const parser;
-        auto serverCmd = parser.parseServerCommand(*msg);
+        auto serverCmd = shared::protocol::Parser::parseServerCommand(*msg);
 
         if (std::holds_alternative<shared::protocol::server::Msz>(
                 serverCmd)) {  // TODO : instead of using holds_alternative + get, we should use std::visit with an

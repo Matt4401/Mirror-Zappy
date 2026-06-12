@@ -10,12 +10,16 @@
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 
 #include "protocol/Commands.hpp"
 
 namespace zappy::shared::protocol {
 
 namespace {
+
+using ServerParseFunc = ServerCommand (*)(std::istringstream&);
+using ClientParseFunc = ClientCommand (*)(std::istringstream&);
 
 ServerCommand parseServerMsz(std::istringstream& iss) {
     server::Msz cmd{};
@@ -260,12 +264,15 @@ ClientCommand parseClientSst(std::istringstream& iss) {
 
 }  // namespace
 
-Parser::Parser() {
-    initServerDispatch();
-    initClientDispatch();
-}
+ServerCommand Parser::parseServerCommand(std::string_view input) {
+    static const std::unordered_map<std::string, ServerParseFunc> serverDispatch = {
+        {"msz", parseServerMsz}, {"bct", parseServerBct}, {"tna", parseServerTna}, {"pnw", parseServerPnw},
+        {"ppo", parseServerPpo}, {"plv", parseServerPlv}, {"pin", parseServerPin}, {"pex", parseServerPex},
+        {"pbc", parseServerPbc}, {"pic", parseServerPic}, {"pie", parseServerPie}, {"pfk", parseServerPfk},
+        {"pdr", parseServerPdr}, {"pgt", parseServerPgt}, {"pdi", parseServerPdi}, {"enw", parseServerEnw},
+        {"ebo", parseServerEbo}, {"edi", parseServerEdi}, {"sgt", parseServerSgt}, {"sst", parseServerSst},
+        {"seg", parseServerSeg}, {"smg", parseServerSmg}, {"suc", parseServerSuc}, {"sbp", parseServerSbp}};
 
-ServerCommand Parser::parseServerCommand(std::string_view input) const {
     std::string const inputStr(input);
     std::istringstream iss(inputStr);
     std::string command;
@@ -274,14 +281,19 @@ ServerCommand Parser::parseServerCommand(std::string_view input) const {
         return UnknownCommand{};
     }
 
-    auto it = _serverDispatch.find(command);
-    if (it != _serverDispatch.end()) {
+    auto const it = serverDispatch.find(command);
+    if (it != serverDispatch.end()) {
         return it->second(iss);
     }
     return UnknownCommand{};
 }
 
-ClientCommand Parser::parseClientCommand(std::string_view input) const {
+ClientCommand Parser::parseClientCommand(std::string_view input) {
+    static const std::unordered_map<std::string, ClientParseFunc> clientDispatch = {
+        {"msz", parseClientMsz}, {"bct", parseClientBct}, {"mct", parseClientMct},
+        {"tna", parseClientTna}, {"ppo", parseClientPpo}, {"plv", parseClientPlv},
+        {"pin", parseClientPin}, {"sgt", parseClientSgt}, {"sst", parseClientSst}};
+
     std::string const inputStr(input);
     std::istringstream iss(inputStr);
     std::string command;
@@ -290,50 +302,11 @@ ClientCommand Parser::parseClientCommand(std::string_view input) const {
         return UnknownCommand{};
     }
 
-    auto it = _clientDispatch.find(command);
-    if (it != _clientDispatch.end()) {
+    auto const it = clientDispatch.find(command);
+    if (it != clientDispatch.end()) {
         return it->second(iss);
     }
     return UnknownCommand{};
-}
-
-void Parser::initServerDispatch() {
-    _serverDispatch["msz"] = parseServerMsz;
-    _serverDispatch["bct"] = parseServerBct;
-    _serverDispatch["tna"] = parseServerTna;
-    _serverDispatch["pnw"] = parseServerPnw;
-    _serverDispatch["ppo"] = parseServerPpo;
-    _serverDispatch["plv"] = parseServerPlv;
-    _serverDispatch["pin"] = parseServerPin;
-    _serverDispatch["pex"] = parseServerPex;
-    _serverDispatch["pbc"] = parseServerPbc;
-    _serverDispatch["pic"] = parseServerPic;
-    _serverDispatch["pie"] = parseServerPie;
-    _serverDispatch["pfk"] = parseServerPfk;
-    _serverDispatch["pdr"] = parseServerPdr;
-    _serverDispatch["pgt"] = parseServerPgt;
-    _serverDispatch["pdi"] = parseServerPdi;
-    _serverDispatch["enw"] = parseServerEnw;
-    _serverDispatch["ebo"] = parseServerEbo;
-    _serverDispatch["edi"] = parseServerEdi;
-    _serverDispatch["sgt"] = parseServerSgt;
-    _serverDispatch["sst"] = parseServerSst;
-    _serverDispatch["seg"] = parseServerSeg;
-    _serverDispatch["smg"] = parseServerSmg;
-    _serverDispatch["suc"] = parseServerSuc;
-    _serverDispatch["sbp"] = parseServerSbp;
-}
-
-void Parser::initClientDispatch() {
-    _clientDispatch["msz"] = parseClientMsz;
-    _clientDispatch["bct"] = parseClientBct;
-    _clientDispatch["mct"] = parseClientMct;
-    _clientDispatch["tna"] = parseClientTna;
-    _clientDispatch["ppo"] = parseClientPpo;
-    _clientDispatch["plv"] = parseClientPlv;
-    _clientDispatch["pin"] = parseClientPin;
-    _clientDispatch["sgt"] = parseClientSgt;
-    _clientDispatch["sst"] = parseClientSst;
 }
 
 }  // namespace zappy::shared::protocol

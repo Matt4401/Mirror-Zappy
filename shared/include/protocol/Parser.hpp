@@ -7,11 +7,7 @@
 
 #pragma once
 
-#include <functional>
-#include <sstream>
-#include <string>
 #include <string_view>
-#include <unordered_map>
 
 #include "protocol/Commands.hpp"
 
@@ -19,7 +15,7 @@ namespace zappy::shared::protocol {
 
 class Parser {
   public:
-    Parser();
+    Parser() = default;
     ~Parser() = default;
 
     Parser(const Parser& other) = delete;
@@ -30,22 +26,12 @@ class Parser {
     /**
      * @brief Parse a raw protocol string sent by the Server to the GUI.
      */
-    [[nodiscard]] ServerCommand parseServerCommand(std::string_view input) const;
+    [[nodiscard]] static ServerCommand parseServerCommand(std::string_view input);
 
     /**
      * @brief Parse a raw protocol string sent by the GUI to the Server.
      */
-    [[nodiscard]] ClientCommand parseClientCommand(std::string_view input) const;
-
-  private:
-    using ServerParseFunc = std::function<ServerCommand(std::istringstream&)>;
-    using ClientParseFunc = std::function<ClientCommand(std::istringstream&)>;
-
-    std::unordered_map<std::string, ServerParseFunc> _serverDispatch;
-    std::unordered_map<std::string, ClientParseFunc> _clientDispatch;
-
-    void initServerDispatch();
-    void initClientDispatch();
+    [[nodiscard]] static ClientCommand parseClientCommand(std::string_view input);
 };
 
 }  // namespace zappy::shared::protocol
