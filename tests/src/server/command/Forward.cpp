@@ -10,10 +10,10 @@
 #include <gtest/gtest.h>
 
 #include <memory>
-#include <string>
 
 #include "command/ICommand.hpp"
 #include "game/Player.hpp"
+#include "game/World.hpp"
 #include "strategy/ServerStrategy.hpp"
 
 namespace zappy::server::command {
@@ -25,9 +25,10 @@ TEST(ForwardTest, CheckRequiredTicks) {
 }
 
 TEST(ForwardTest, CheckMovement) {
-    std::unique_ptr<ICommand> forward = std::make_unique<Forward>();
-    game::Player player{0, 5, 5};
-    const zappy::parser::ServerConfig config{};
+    const std::unique_ptr<ICommand> forward = std::make_unique<Forward>();
+    game::Player player{0, 5, 5, game::cardinalPoint::NORTH};
+    const auto config = parser::ServerConfig{
+        .port = 80, .width = 16, .height = 16, .teamNames = {"test"}, .clientLimit = 1, .freq = 100};
     game::World world{config};
 
     forward->execute(world, player);
@@ -38,14 +39,16 @@ TEST(ForwardTest, CheckMovement) {
 
 TEST(ForwardTest, CheckMovementBordure) {
     const std::unique_ptr<ICommand> forward = std::make_unique<Forward>();
-    auto [maxX, maxY] = game::World::limitMap();
-    game::Player player{0, maxX, maxY};
-    const zappy::parser::ServerConfig config{};
+    const auto config = parser::ServerConfig{
+        .port = 80, .width = 16, .height = 16, .teamNames = {"test"}, .clientLimit = 1, .freq = 100};
     game::World world{config};
+
+    auto [maxX, maxY] = world.sizeMap();
+    game::Player player{0, maxX, maxY, game::cardinalPoint::NORTH};
 
     forward->execute(world, player);
     auto [fst, snd] = player.position();
-    ASSERT_EQ(fst, 16);
+    ASSERT_EQ(fst, maxX);
     ASSERT_EQ(snd, 0);
 }
 }  // namespace zappy::server::command

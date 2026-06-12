@@ -28,8 +28,9 @@ TEST(RightTest, CheckRequiredTicks) {
 TEST(RightTest, CheckTurnMovement) {
     const std::unique_ptr<ICommand> right = std::make_unique<Right>();
     const std::unique_ptr<ICommand> forward = std::make_unique<Forward>();
-    game::Player player{0, 5, 5};
-    const zappy::parser::ServerConfig config{};
+    game::Player player{0, 5, 5, game::cardinalPoint::NORTH};
+    const auto config = parser::ServerConfig{
+        .port = 80, .width = 16, .height = 16, .teamNames = {"test"}, .clientLimit = 1, .freq = 100};
     game::World world{config};
 
     right->execute(world, player);
@@ -44,16 +45,17 @@ TEST(RightTest, CheckTurnMovement) {
 TEST(RightTest, CheckTurnMovementBordure) {
     const std::unique_ptr<ICommand> right = std::make_unique<Right>();
     const std::unique_ptr<ICommand> forward = std::make_unique<Forward>();
-    auto [maxX, maxY] = game::World::limitMap();
-    game::Player player{0, maxX, maxY};
-    const zappy::parser::ServerConfig config{};
+    const auto config = parser::ServerConfig{
+        .port = 80, .width = 16, .height = 16, .teamNames = {"test"}, .clientLimit = 1, .freq = 100};
     game::World world{config};
+    auto [maxX, maxY] = world.sizeMap();
+    game::Player player{0, maxX, maxY, game::cardinalPoint::NORTH};
 
     right->execute(world, player);
     ASSERT_EQ(player.orientation(), game::cardinalPoint::EAST);
     forward->execute(world, player);
     auto [fst, snd] = player.position();
     ASSERT_EQ(fst, 0);
-    ASSERT_EQ(snd, 16);
+    ASSERT_EQ(snd, maxY);
 }
 }  // namespace zappy::server::command
