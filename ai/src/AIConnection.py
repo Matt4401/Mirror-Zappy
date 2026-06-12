@@ -33,7 +33,7 @@ class AIConnection:
         client_num = self.socket.recv(1024).decode().strip()
         dims = self.socket.recv(1024).decode().strip()
         if client_num.isdigit() and int(client_num) > 0:
-                pass
+            pass
         else:
             print("Handshake failed, no space for a new client or team name incorrect")
             sys.exit(84)

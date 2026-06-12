@@ -8,8 +8,7 @@ ai_dir = os.path.dirname(os.path.abspath(__file__))
 
 if ai_dir not in sys.path:
     sys.path.insert(0, ai_dir)
-from src.mainAI import mainAI   # noqa: E402
-
+from src.mainAI import mainAI  # noqa: E402
 
 
 def main():
