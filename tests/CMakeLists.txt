@@ -14,6 +14,7 @@ add_executable(unit_tests
         src/server/Player.cpp
         src/server/command/Right.cpp
         src/server/command/Left.cpp
+        src/protocol/ProtocolTest.cpp
 )
 target_include_directories(unit_tests PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -36,7 +37,7 @@ add_test(NAME python_tests
     COMMAND ${Python3_EXECUTABLE} -m pytest ${CMAKE_SOURCE_DIR}/tests/src/ai/test_main.py
 )
 
-set_tests_properties(python_tests PROPERTIES 
+set_tests_properties(python_tests PROPERTIES
     ENVIRONMENT "PYTHONPATH=${CMAKE_SOURCE_DIR}/ai/src"
 )
 
