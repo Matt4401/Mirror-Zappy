@@ -1,5 +1,4 @@
-from src.AIConnection import *
-
+from src.AIConnection import AIConnection
 
 class AITeam:
     def __init__(self, trantorian, port, host, team_name):

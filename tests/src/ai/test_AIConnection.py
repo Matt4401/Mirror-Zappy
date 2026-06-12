@@ -1,6 +1,5 @@
 import sys
 import os
-import pytest
 import unittest
 from unittest.mock import patch, MagicMock
 import socket
@@ -8,24 +7,20 @@ import threading
 import time
 
 # On remonte à la racine du projet (mir_zappy)
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
 
 # Import absolu depuis la racine du projet
 from ai.src.AIConnection import AIConnection
 
-class TestAIConnectionUnit(unittest.TestCase):
 
+class TestAIConnectionUnit(unittest.TestCase):
     # Le patch doit pointer sur le chemin exact utilisé par Python (ai.src.AIConnection)
-    @patch('ai.src.AIConnection.socket.socket')
+    @patch("ai.src.AIConnection.socket.socket")
     def test_successful_handshake(self, mock_socket_class):
         mock_socket = MagicMock()
         mock_socket_class.return_value = mock_socket
 
-        mock_socket.recv.side_effect = [
-            b"WELCOME\n",
-            b"2\n",
-            b"10 10\n"
-        ]
+        mock_socket.recv.side_effect = [b"WELCOME\n", b"2\n", b"10 10\n"]
 
         ai = AIConnection("127.0.0.1", 4242, "TeamA")
 
@@ -33,7 +28,7 @@ class TestAIConnectionUnit(unittest.TestCase):
         mock_socket.send.assert_called_with(b"TeamA\n")
         self.assertEqual(ai.team_name, "TeamA")
 
-    @patch('ai.src.AIConnection.socket.socket')
+    @patch("ai.src.AIConnection.socket.socket")
     def test_handshake_bad_welcome(self, mock_socket_class):
         mock_socket = MagicMock()
         mock_socket_class.return_value = mock_socket
@@ -47,7 +42,6 @@ class TestAIConnectionUnit(unittest.TestCase):
 
 
 class TestAIConnectionFunctional(unittest.TestCase):
-
     def setUp(self):
         self.host = "127.0.0.1"
         self.port = 8888
@@ -64,7 +58,7 @@ class TestAIConnectionFunctional(unittest.TestCase):
         try:
             server.bind((self.host, self.port))
             server.listen(1)
-        except Exception as e:
+        except Exception:
             self.server_ready.set()
             return
         self.server_ready.set()
@@ -91,5 +85,6 @@ class TestAIConnectionFunctional(unittest.TestCase):
         self.assertEqual(response, "ok")
         ai.disconnect()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
