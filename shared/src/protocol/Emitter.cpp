@@ -16,7 +16,8 @@ namespace zappy::shared::protocol {
 
 namespace {
 template <class... Ts>
-struct overloaded : Ts... {  // NOLINT(cppcoreguidelines-multiple-inheritance)
+// NOLINTNEXTLINE(cppcoreguidelines-multiple-inheritance)
+struct overloaded : Ts... {
     using Ts::operator()...;
 };
 template <class... Ts>
