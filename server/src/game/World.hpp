@@ -39,7 +39,6 @@ struct Tile {
 class World {
   public:
     explicit World(const parser::ServerConfig& config);
-    static Position getRandomPlace(std::size_t heightMap, std::size_t widthMap);
     void setSpawnEggs(size_t clientLimit, std::string_view teamName);
     static cardinalPoint randomCardinalPoint();
     ~World() = default;
@@ -59,17 +58,18 @@ class World {
     void removePlayerFromTeam(std::size_t id) const;
     void updatePositionOnMap(std::size_t id, const Position& oldPosition, const Position& newPosition);
 
-    std::optional<std::size_t> removePlayer(std::size_t id);
+    std::size_t removePlayer(std::size_t id);
     std::vector<std::size_t> collectAndKillDeadPlayers() const;
+    void eject(std::size_t id);
 
   private:
     std::unordered_map<std::string, std::unique_ptr<Team>> _teamList;
-    std::vector<std::unique_ptr<Player>> _playerList;
+    std::unordered_map<std::size_t, std::unique_ptr<Player>> _playerList;
     std::size_t _heightMap;
     std::size_t _widthMap;
     std::size_t _newId{0};
     std::vector<Tile> _tiles;
-    std::vector<Egg> _vecEggs;
+    std::unordered_map<std::size_t, Egg> _vecEggs;
 
     [[nodiscard]] std::size_t getTileIndex(std::size_t x, std::size_t y) const;
     [[nodiscard]] std::size_t getTileIndex(const Position& position) const;

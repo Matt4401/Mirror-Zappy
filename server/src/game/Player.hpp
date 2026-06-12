@@ -54,6 +54,7 @@ class Player {
     void pushCommand(std::unique_ptr<command::ICommand> command);
     void update(World& world);
     void moveForward(const Position& limit);
+    void moveWithOrientation(const Position& limit, cardinalPoint orientation);
 
     void addResponse(const std::string&);
     std::vector<std::string> responses();
