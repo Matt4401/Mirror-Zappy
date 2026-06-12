@@ -32,6 +32,7 @@ add_custom_command(
 add_custom_target(prepare_script ALL DEPENDS ${CMAKE_SOURCE_DIR}/zappy_ai)
 
 add_subdirectory(shared)
+add_subdirectory(parser)
 add_subdirectory(server)
 add_subdirectory(gui)
 add_subdirectory(network)

@@ -9,7 +9,7 @@
 
 #include <cstddef>
 
-#include "util/DataStructures.hpp"
+#include "strategy/ServerStrategy.hpp"
 
 namespace zappy::server::game {
 
@@ -21,7 +21,7 @@ struct pos {
 // TODO: implement world logic and storage once the player, team and world classes are defined
 class World {
   public:
-    explicit World(const util::Config& config);
+    explicit World(const zappy::parser::ServerConfig& config);
     ~World() = default;
 
     World(const World& other) = delete;
