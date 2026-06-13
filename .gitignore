@@ -12,3 +12,5 @@ compile_flags.txt
 test_binaries/
 *issues.md
 /lib
+.markdownlint.json
+*__pycache__*
