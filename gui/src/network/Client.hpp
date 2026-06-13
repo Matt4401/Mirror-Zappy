@@ -16,7 +16,7 @@
 namespace zappy::gui::network {
 class Client {
   public:
-    static constexpr auto DefaultTeamName = "GRAPHIC";
+    static constexpr auto DefaultTeamName = "GRAPHIC\n";
 
     explicit Client(const parser::GuiConfig& config, std::shared_ptr<events::EventDispatcher> dispatcher);
     ~Client() = default;
