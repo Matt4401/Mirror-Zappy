@@ -10,9 +10,11 @@
 #include <any>
 #include <cstdint>
 #include <functional>
+#include <type_traits>
 #include <typeindex>
 #include <unordered_map>
 #include <utility>
+#include <variant>
 #include <vector>
 
 #include "protocol/Commands.hpp"
@@ -31,9 +33,6 @@ class EventDispatcher {
     EventDispatcher(EventDispatcher&& other) = delete;
     EventDispatcher& operator=(EventDispatcher&& other) = delete;
 
-    /**
-     * @brief Subscribe to a specific command type and get a unique token.
-     */
     template <typename CommandType>
     [[nodiscard]] EventToken subscribe(std::function<void(const CommandType&)> callback) {
         auto type = std::type_index(typeid(CommandType));
@@ -43,9 +42,6 @@ class EventDispatcher {
         return token;
     }
 
-    /**
-     * @brief Unsubscribe using the type and token.
-     */
     template <typename CommandType>
     void unsubscribe(EventToken token) {
         auto type = std::type_index(typeid(CommandType));
@@ -54,10 +50,21 @@ class EventDispatcher {
         }
     }
 
-    /**
-     * @brief Dispatch a parsed server command to all registered listeners.
-     */
-    void dispatch(const shared::protocol::ServerCommand& command);
+    void dispatch(const shared::protocol::ServerCommand& command) {
+        std::visit(
+            [this](const auto& cmd) {
+                using RealCmdType = std::decay_t<decltype(cmd)>;
+                auto type = std::type_index(typeid(RealCmdType));
+
+                if (auto it = _listeners.find(type); it != _listeners.end()) {
+                    for (const auto& [token, anyCallback] : it->second) {
+                        auto callback = std::any_cast<std::function<void(const RealCmdType&)>>(anyCallback);
+                        callback(cmd);
+                    }
+                }
+            },
+            command);
+    }
 
   private:
     std::unordered_map<std::type_index, std::vector<std::pair<EventToken, std::any>>> _listeners;
