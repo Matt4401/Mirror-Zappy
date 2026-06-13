@@ -14,6 +14,7 @@
 #include <string>
 #include <utility>
 
+#include "EventDispatcher.hpp"
 #include "Parser.hpp"
 #include "exception/Exception.hpp"
 #include "graphics/Render.hpp"
@@ -45,7 +46,8 @@ void Core::setup() {
     zappy::parser::Parser<zappy::parser::GuiConfig> parser(std::move(guiStrategy));
 
     _config = parser.parse(static_cast<int>(_args.size()), _args.data());
-    _client = std::make_unique<network::Client>(_config);
+    _dispatcher = std::make_shared<events::EventDispatcher>();
+    _client = std::make_unique<network::Client>(_config, _dispatcher);
     _render = std::make_unique<graphics::Render>();
 }
 
