@@ -9,11 +9,29 @@
 
 #include <raylib.h>
 
+#include <memory>
+#include <utility>
+
+#include "events/EventDispatcher.hpp"
+#include "protocol/Commands.hpp"
 #include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
 
 namespace zappy::gui::graphics {
+Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher) : _dispatcher(std::move(dispatcher)) {
+    if (_dispatcher) {
+        _mszToken = _dispatcher->subscribe<shared::protocol::server::Msz>(
+            [this](const shared::protocol::server::Msz& cmd) { _map.resize(cmd.width, cmd.height); });
+    }
+}
+
+Render::~Render() {
+    if (_dispatcher && _mszToken != 0) {
+        _dispatcher->unsubscribe<shared::protocol::server::Msz>(_mszToken);
+    }
+}
+
 void Render::start() {
     while (!_window.shouldClose()) {
         update();

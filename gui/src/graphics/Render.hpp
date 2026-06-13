@@ -13,6 +13,7 @@
 #include "Map.hpp"
 #include "SkyBackground.hpp"
 #include "context/EventContext.hpp"
+#include "events/EventDispatcher.hpp"
 #include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
@@ -24,8 +25,8 @@ class Render {
     static constexpr const std::string WINDOW_NAME = "Zappy GUI";
     static constexpr int FLAG_FULLSCREEN_MODE = 2;
 
-    Render() = default;
-    ~Render() = default;
+    explicit Render(std::shared_ptr<events::EventDispatcher> dispatcher = nullptr);
+    ~Render();
     Render(const Render& other) = delete;
     Render& operator=(const Render& other) = delete;
     Render(Render&& other) = delete;
@@ -46,5 +47,7 @@ class Render {
     scene::SkyBackground _skyBackground;
     raylib::rcore::Event _event;
     scene::Map _map{10, 10};  // TEMPORARY MAP SIZE, JUST FOR TESTING
+    std::shared_ptr<events::EventDispatcher> _dispatcher;
+    events::EventDispatcher::EventToken _mszToken{0};
 };
 }  // namespace zappy::gui::graphics
