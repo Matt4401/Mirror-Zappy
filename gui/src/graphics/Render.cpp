@@ -32,15 +32,15 @@ Render::~Render() {
     }
 }
 
-void Render::start() {
-    while (!_window.shouldClose()) {
-        update();
-        _event.handleEvent(_eventContext);
-        _window.beginDrawing();
-        render2D();
-        render3D();
-        raylib::rcore::Window::endDrawing();
-    }
+bool Render::isRunning() const { return !_window.shouldClose(); }
+
+void Render::renderFrame() {
+    update();
+    _event.handleEvent(_eventContext);
+    _window.beginDrawing();
+    render2D();
+    render3D();
+    raylib::rcore::Window::endDrawing();
 }
 
 void Render::update() {

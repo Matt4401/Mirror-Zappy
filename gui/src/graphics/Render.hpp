@@ -32,7 +32,8 @@ class Render {
     Render(Render&& other) = delete;
     Render& operator=(Render&& other) = delete;
 
-    void start();
+    [[nodiscard]] bool isRunning() const;
+    void renderFrame();
 
   protected:
   private:
