@@ -42,6 +42,11 @@ class Text {
         return MeasureTextEx(font.font(), _text.c_str(), fontSize, spacing);
     }
 
+    [[nodiscard]] static rmath::Vector2 measureText(const Font& font, const std::string& text, float fontSize,
+                                                    float spacing) {
+        return MeasureTextEx(font.font(), text.c_str(), fontSize, spacing);
+    }
+
     [[nodiscard]] int codepointCount() const { return GetCodepointCount(_text.c_str()); }
 
     [[nodiscard]] std::string upper() { return TextToUpper(_text.c_str()); }

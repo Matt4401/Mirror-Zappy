@@ -26,6 +26,7 @@ add_subdirectory(rmath)
 add_subdirectory(rmodels)
 add_subdirectory(rtext)
 add_subdirectory(rtextures)
+add_subdirectory(rshapes)
 
 add_library(zappy_gui_raylib INTERFACE)
 target_sources(zappy_gui_raylib INTERFACE
@@ -43,4 +44,5 @@ target_link_libraries(zappy_gui_raylib INTERFACE
         zappy_gui_raylib_rmodels
         zappy_gui_raylib_rtext
         zappy_gui_raylib_rtextures
+        zappy_gui_raylib_rshapes
 )
