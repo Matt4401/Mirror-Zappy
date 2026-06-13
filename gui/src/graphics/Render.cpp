@@ -24,6 +24,7 @@ Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher) : _dispatche
         _mszToken = _dispatcher->subscribe<shared::protocol::server::Msz>(
             [this](const shared::protocol::server::Msz& cmd) { _map.resize(cmd.width, cmd.height); });
     }
+    _window.setTargetFPS(60);
 }
 
 Render::~Render() {
