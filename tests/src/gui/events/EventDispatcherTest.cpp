@@ -23,7 +23,9 @@ TEST(EventDispatcherTest, SubscribeAndDispatch) {
         receivedHeight = cmd.height;
     });
 
-    ServerCommand const cmd = server::Msz{10, 20};
+    (void)token;
+
+    ServerCommand const cmd = server::Msz{.width = 10, .height = 20};
     dispatcher.dispatch(cmd);
 
     EXPECT_EQ(receivedWidth, 10);
@@ -38,7 +40,7 @@ TEST(EventDispatcherTest, Unsubscribe) {
 
     dispatcher.unsubscribe<server::Msz>(token);
 
-    ServerCommand const cmd = server::Msz{10, 20};
+    ServerCommand const cmd = server::Msz{.width = 10, .height = 20};
     dispatcher.dispatch(cmd);
 
     EXPECT_FALSE(called);
@@ -53,10 +55,15 @@ TEST(EventDispatcherTest, MultipleListenersAndDifferentCommands) {
     auto token2 = dispatcher.subscribe<server::Msz>([&](const server::Msz&) { mszCount++; });
     auto token3 = dispatcher.subscribe<server::Pnw>([&](const server::Pnw&) { pnwCount++; });
 
-    ServerCommand cmdMsz = server::Msz{.width = 10, .height = 20};
+    (void)token1;
+    (void)token2;
+    (void)token3;
+
+    ServerCommand const cmdMsz = server::Msz{.width = 10, .height = 20};
     dispatcher.dispatch(cmdMsz);
 
-    ServerCommand cmdPnw = server::Pnw{.playerId = 1, .x = 5, .y = 5, .orientation = 1, .level = 1, .teamName = "team"};
+    ServerCommand const cmdPnw =
+        server::Pnw{.playerId = 1, .x = 5, .y = 5, .orientation = 1, .level = 1, .teamName = "team"};
     dispatcher.dispatch(cmdPnw);
 
     EXPECT_EQ(mszCount, 2);
