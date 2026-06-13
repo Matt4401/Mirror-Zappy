@@ -12,11 +12,13 @@
 #include <memory>
 #include <utility>
 
+#include "AssetManager.hpp"
 #include "events/EventDispatcher.hpp"
 #include "protocol/Commands.hpp"
 #include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
+#include "ui/menus/PauseMenu.hpp"
 
 namespace zappy::gui::graphics {
 Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher) : _dispatcher(std::move(dispatcher)) {
@@ -25,34 +27,62 @@ Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher) : _dispatche
             [this](const shared::protocol::server::Msz& cmd) { _map.resize(cmd.width, cmd.height); });
     }
     _window.setTargetFPS(60);
+    raylib::rcore::Window::setExitKey(0);
+
+    AssetManager::getInstance().loadFont("Minecraft", "assets/fonts/Minecraft.ttf");
+
+    _pauseMenu = std::make_shared<ui::menus::PauseMenu>(_dispatcher, AssetManager::getInstance().getFont("Minecraft"));
+    _pauseMenu->setOnExit([this]() { _isExiting = true; });
+    _uiManager.addComponent(_pauseMenu);
 }
 
 Render::~Render() {
     if (_dispatcher && _mszToken != 0) {
         _dispatcher->unsubscribe<shared::protocol::server::Msz>(_mszToken);
     }
+    _pauseMenu.reset();
+    _uiManager.clear();
+    AssetManager::getInstance().clear();
 }
 
-bool Render::isRunning() const { return !_window.shouldClose(); }
+bool Render::isRunning() const { return !_window.shouldClose() && !_isExiting; }
 
 void Render::renderFrame() {
     update();
-    _event.handleEvent(_eventContext);
+    if (!_pauseMenu->isVisible()) {
+        _event.handleEvent(_eventContext);
+    }
     _window.beginDrawing();
     render2D();
     render3D();
+    _uiManager.draw();
     raylib::rcore::Window::endDrawing();
 }
 
 void Render::update() {
-    _skyBackground.update(raylib::rcore::Window::frameTime());
-    _camera->updateCamera(CAMERA_FREE);
-    if (_camera->position().y() < 2.5F) {
-        _camera->setPosition({_camera->position().x(), 2.5F, _camera->position().z()});
-        _camera->setTarget({_camera->target().x(), _camera->target().y() + (raylib::rcore::Window::frameTime() * 2.0F),
-                            _camera->target().z()});
+    if (raylib::rcore::Event::isKeyPressed(256)) {  // 256 = KEY_ESCAPE
+        _pauseMenu->setVisible(!_pauseMenu->isVisible());
+        if (_pauseMenu->isVisible()) {
+            raylib::rcore::Window::enableCursor();
+        } else {
+            raylib::rcore::Window::disableCursor();
+        }
     }
-    _event.update();
+
+    _uiManager.update();
+    _uiManager.handleEvent(_event);
+
+    if (!_pauseMenu->isVisible()) {
+        _skyBackground.update(raylib::rcore::Window::frameTime());
+        _camera->updateCamera(CAMERA_FREE);
+        if (_camera->position().y() < 2.5F) {
+            _camera->setPosition({_camera->position().x(), 2.5F, _camera->position().z()});
+            _camera->setTarget({_camera->target().x(),
+                                _camera->target().y() + (raylib::rcore::Window::frameTime() * 2.0F),
+                                _camera->target().z()});
+        }
+        _event.update();
+    }
 }
 
 void Render::render2D() { _skyBackground.draw(_window); }

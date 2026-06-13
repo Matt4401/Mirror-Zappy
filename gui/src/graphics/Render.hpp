@@ -10,6 +10,8 @@
 #include <memory>
 #include <string>
 
+#include "../ui/UIManager.hpp"
+#include "../ui/menus/PauseMenu.hpp"
 #include "Map.hpp"
 #include "SkyBackground.hpp"
 #include "context/EventContext.hpp"
@@ -50,5 +52,8 @@ class Render {
     scene::Map _map{10, 10};  // TEMPORARY MAP SIZE, JUST FOR TESTING
     std::shared_ptr<events::EventDispatcher> _dispatcher;
     events::EventDispatcher::EventToken _mszToken{0};
+    ui::UIManager _uiManager;
+    std::shared_ptr<ui::menus::PauseMenu> _pauseMenu;
+    bool _isExiting{false};
 };
 }  // namespace zappy::gui::graphics
