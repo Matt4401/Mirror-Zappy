@@ -6,15 +6,12 @@ import socket
 import threading
 import time
 
-# On remonte à la racine du projet (mir_zappy)
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
 
-# Import absolu depuis la racine du projet
 from ai.src.AIConnection import AIConnection
 
 
 class TestAIConnectionUnit(unittest.TestCase):
-    # Le patch doit pointer sur le chemin exact utilisé par Python (ai.src.AIConnection)
     @patch("ai.src.AIConnection.socket.socket")
     def test_successful_handshake(self, mock_socket_class):
         mock_socket = MagicMock()
