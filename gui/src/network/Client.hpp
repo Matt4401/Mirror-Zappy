@@ -33,7 +33,6 @@ class Client {
      */
     void update();
 
-  protected:
   private:
     std::unique_ptr<shared::network::IClientSocket> _socket;
     std::shared_ptr<events::EventDispatcher> _dispatcher;

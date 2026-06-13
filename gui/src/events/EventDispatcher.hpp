@@ -10,11 +10,9 @@
 #include <any>
 #include <cstdint>
 #include <functional>
-#include <type_traits>
 #include <typeindex>
 #include <unordered_map>
 #include <utility>
-#include <variant>
 #include <vector>
 
 #include "protocol/Commands.hpp"
@@ -33,15 +31,21 @@ class EventDispatcher {
     EventDispatcher(EventDispatcher&& other) = delete;
     EventDispatcher& operator=(EventDispatcher&& other) = delete;
 
+    /**
+     * @brief Subscribe to a specific command type with a callback function.
+     */
     template <typename CommandType>
     [[nodiscard]] EventToken subscribe(std::function<void(const CommandType&)> callback) {
         auto type = std::type_index(typeid(CommandType));
         EventToken token = ++_nextToken;
 
-        _listeners[type].push_back({token, std::make_any<std::function<void(const CommandType&)>>(callback)});
+        _listeners[type].emplace_back(token, std::make_any<std::function<void(const CommandType&)>>(callback));
         return token;
     }
 
+    /**
+     * @brief Unsubscribe from a specific command type.
+     */
     template <typename CommandType>
     void unsubscribe(EventToken token) {
         auto type = std::type_index(typeid(CommandType));
@@ -50,21 +54,10 @@ class EventDispatcher {
         }
     }
 
-    void dispatch(const shared::protocol::ServerCommand& command) {
-        std::visit(
-            [this](const auto& cmd) {
-                using RealCmdType = std::decay_t<decltype(cmd)>;
-                auto type = std::type_index(typeid(RealCmdType));
-
-                if (auto it = _listeners.find(type); it != _listeners.end()) {
-                    for (const auto& [token, anyCallback] : it->second) {
-                        auto callback = std::any_cast<std::function<void(const RealCmdType&)>>(anyCallback);
-                        callback(cmd);
-                    }
-                }
-            },
-            command);
-    }
+    /**
+     * @brief Dispatch a command to all subscribed listeners.
+     */
+    void dispatch(const shared::protocol::ServerCommand& command);
 
   private:
     std::unordered_map<std::type_index, std::vector<std::pair<EventToken, std::any>>> _listeners;
