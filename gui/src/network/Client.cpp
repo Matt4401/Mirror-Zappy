@@ -28,7 +28,9 @@ Client::Client(const parser::GuiConfig& config, std::shared_ptr<events::EventDis
 void Client::update() {
     while (auto msg = _socket->tryPopMessage()) {
         auto serverCmd = shared::protocol::Parser::parseServerCommand(*msg);
-        _dispatcher->dispatch(serverCmd);
+        if (_dispatcher) {
+            _dispatcher->dispatch(serverCmd);
+        }
     }
 }
 
