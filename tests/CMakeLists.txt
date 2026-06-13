@@ -7,6 +7,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 add_executable(unit_tests
     src/server/parsing/Parser.cpp
     src/gui/parsing/Parser.cpp
+    src/gui/events/EventDispatcherTest.cpp
     src/network/Socket.cpp
     src/network/SessionManager.cpp
     src/server/Core.cpp
@@ -24,6 +25,7 @@ target_link_libraries(unit_tests PRIVATE
         zappy_shared
         zappy_parser
         zappy_server_objects
+        zappy_gui_events
         GTest::gtest
         GTest::gmock
         GTest::gmock_main
