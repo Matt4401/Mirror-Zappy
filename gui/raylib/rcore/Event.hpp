@@ -38,6 +38,13 @@ class Event {
     [[nodiscard]] rmath::Vector2 getMousePosition() const { return _mousePosition; }
     [[nodiscard]] float getMouseWheelMove() const { return _mouseWheelMove; }
 
+    [[nodiscard]] static bool isMouseButtonDown(int button) { return IsMouseButtonDown(button); }
+    [[nodiscard]] static bool isMouseButtonPressed(int button) { return IsMouseButtonPressed(button); }
+    [[nodiscard]] static bool isMouseButtonReleased(int button) { return IsMouseButtonReleased(button); }
+    [[nodiscard]] static rmath::Vector2 getMousePositionStatic() {
+        return {GetMousePosition().x, GetMousePosition().y};
+    }
+
   protected:
   private:
     std::map<int, EventFunc> _keyEvents;
