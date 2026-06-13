@@ -34,6 +34,8 @@ class Map {
     Map(Map&& other) noexcept = default;
     Map& operator=(Map&& other) noexcept = default;
 
+    void resize(int width, int height);
+
     void draw(const raylib::rcore::Camera& camera) const;
 
   protected:
