@@ -23,7 +23,6 @@
 #include "protocol/Commands.hpp"
 #include "protocol/Emitter.hpp"
 #include "protocol/Parser.hpp"
-#include "util/DataStructures.hpp"
 #include "strategy/ServerStrategy.hpp"
 
 namespace zappy::server {
