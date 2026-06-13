@@ -9,6 +9,7 @@
 
 #include <memory>
 
+#include "events/EventDispatcher.hpp"
 #include "network/IClientSocket.hpp"
 #include "strategy/GUIStrategy.hpp"
 
@@ -17,7 +18,7 @@ class Client {
   public:
     static constexpr auto DefaultTeamName = "GRAPHIC";
 
-    explicit Client(const parser::GuiConfig& config);
+    explicit Client(const parser::GuiConfig& config, std::shared_ptr<events::EventDispatcher> dispatcher);
     ~Client() = default;
     Client(const Client& other) = delete;
     Client& operator=(const Client& other) = delete;
@@ -35,5 +36,6 @@ class Client {
   protected:
   private:
     std::unique_ptr<shared::network::IClientSocket> _socket;
+    std::shared_ptr<events::EventDispatcher> _dispatcher;
 };
 }  // namespace zappy::gui::network
