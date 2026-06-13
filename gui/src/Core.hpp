@@ -10,8 +10,8 @@
 #include <memory>
 #include <span>
 
+#include "EventDispatcher.hpp"
 #include "Render.hpp"
-#include "events/EventDispatcher.hpp"
 #include "network/Client.hpp"
 #include "strategy/GUIStrategy.hpp"
 

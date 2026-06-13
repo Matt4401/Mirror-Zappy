@@ -9,7 +9,7 @@
 
 #include <memory>
 
-#include "events/EventDispatcher.hpp"
+#include "EventDispatcher.hpp"
 #include "network/IClientSocket.hpp"
 #include "strategy/GUIStrategy.hpp"
 
