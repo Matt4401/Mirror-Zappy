@@ -26,6 +26,13 @@ class Client {
 
     [[nodiscard]] shared::network::IClientSocket& socket() const { return *_socket; }
 
+    /**
+     * @brief Poll the socket and parse incoming server messages.
+     * Temporary example to be moved to a dedicated system.
+     */
+    void update();
+
+  protected:
   private:
     std::unique_ptr<shared::network::IClientSocket> _socket;
 };
