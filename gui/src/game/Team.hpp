@@ -14,6 +14,7 @@
 #include "Egg.hpp"
 #include "GameModel.hpp"
 #include "Player.hpp"
+#include "server/src/game/Player.hpp"
 
 namespace zappy::gui::game {
 class Team {
