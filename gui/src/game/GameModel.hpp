@@ -16,7 +16,7 @@
 namespace zappy::gui::game {
 class GameModel {
   public:
-    static constexpr auto PLAYER_MODEL_RESOURCE = "assets/steve-test/scene.gltf";
+    static constexpr auto PLAYER_MODEL_RESOURCE = "assets/jeffrey/scene.gltf";
     static constexpr auto EGG_MODEL_RESOURCE = "assets/minecraft_dragon_egg/scene.gltf";
 
     GameModel(std::shared_ptr<raylib::rcore::Camera>& camera) : _camera(camera) {}
