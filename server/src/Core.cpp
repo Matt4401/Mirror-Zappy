@@ -17,16 +17,12 @@
 #include <string>
 #include <string_view>
 #include <utility>
-#include <variant>
 
 #include "Parser.hpp"
 #include "SessionManager.hpp"
 #include "exception/Exception.hpp"
 #include "game/World.hpp"
 #include "network/ISessionManager.hpp"
-#include "protocol/Commands.hpp"
-#include "protocol/Emitter.hpp"
-#include "protocol/Parser.hpp"
 #include "strategy/ServerStrategy.hpp"
 
 namespace zappy::server {
@@ -168,7 +164,15 @@ void Core::handleInGameMessage(int clientId, std::string_view message) {
 }
 
 void Core::handleGuiMessage(int clientId, std::string_view message) {
-    auto command = _commandFactory.createCommand(message);
+    auto command = _commandFactory.createGuiCommand(message);
+
+    if (command != nullptr) {
+        const std::string response = command->execute(*_world);
+
+        if (!response.empty()) {
+            _sessionManager->sendMessage(clientId, response);
+        }
+    }
 }
 
 void Core::handleClientDisconnection(int clientId) {
