@@ -13,7 +13,7 @@
 #include "rmath/Vector3.hpp"
 #include "rmodels/Model.hpp"
 
-namespace zappy::gui::graphics::scene {
+namespace zappy::gui::game {
 class Deraumere : public AObject {
   public:
     Deraumere(raylib::rmath::Vector3 position) : AObject(position) {
@@ -27,10 +27,10 @@ class Deraumere : public AObject {
     Deraumere& operator=(Deraumere&& other) noexcept = default;
 
     void draw(const raylib::rmodels::Model& model) const override {
-        model.drawModel(position(), 0.05F, raylib::Color::White());
+        model.drawModel(position(), 0.5F, raylib::Color::White());
     }
 
   protected:
   private:
 };
-}  // namespace zappy::gui::graphics::scene
+}  // namespace zappy::gui::game

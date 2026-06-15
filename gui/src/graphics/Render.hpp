@@ -9,15 +9,18 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "Map.hpp"
 #include "SkyBackground.hpp"
+#include "Team.hpp"
 #include "context/EventContext.hpp"
 #include "events/EventDispatcher.hpp"
 #include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
 #include "rmath/Vector3.hpp"
+#include "game/GameModel.hpp"
 
 namespace zappy::gui::graphics {
 class Render {
@@ -50,5 +53,7 @@ class Render {
     scene::Map _map{10, 10};  // TEMPORARY MAP SIZE, JUST FOR TESTING
     std::shared_ptr<events::EventDispatcher> _dispatcher;
     events::EventDispatcher::EventToken _mszToken{0};
+    game::GameModel _gameModel{_camera};
+    std::vector<game::Team> _teams;
 };
 }  // namespace zappy::gui::graphics

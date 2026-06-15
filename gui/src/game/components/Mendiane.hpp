@@ -11,7 +11,7 @@
 #include "AObject.hpp"
 #include "rmath/Vector3.hpp"
 
-namespace zappy::gui::graphics::scene {
+namespace zappy::gui::game {
 class Mendiane : public AObject {
   public:
     Mendiane(raylib::rmath::Vector3 position) : AObject(position) {
@@ -27,4 +27,4 @@ class Mendiane : public AObject {
   protected:
   private:
 };
-}  // namespace zappy::gui::graphics::scene
+}  // namespace zappy::gui::game

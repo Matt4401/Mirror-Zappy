@@ -10,15 +10,16 @@
 #include <memory>
 
 #include "Tile3D.hpp"
-#include "components/Deraumere.hpp"
-#include "components/IObject.hpp"
+#include "game/components/Linemate.hpp"
+#include "game/components/IObject.hpp"
 #include "rcore/Camera.hpp"
 #include "rmath/Vector3.hpp"
 
 namespace zappy::gui::graphics::scene {
 Map::Map(int width, int height) {
     resize(width, height);
-    _itemDrawFunctions["Deraumere"] = [this](const IObject& object) { drawDeraumere(object); };
+    _itemDrawFunctions["Deraumere"] = [this](const game::IObject& object) { object.draw(_deraumereModel); };
+    _itemDrawFunctions["Linemate"] = [this](const game::IObject& object) { object.draw(_linemateModel); };
 }
 
 void Map::resize(int width, int height) {
@@ -27,15 +28,12 @@ void Map::resize(int width, int height) {
 
     for (int x = ((width / 2) * -1); x < width / 2; x += 1) {
         for (int z = ((height / 2) * -1); z < height / 2; z += 1) {
-            position.setX(static_cast<float>((x * TILE_SIZE)));
-            position.setZ(static_cast<float>((z * TILE_SIZE)));
+            position.setX(static_cast<float>(static_cast<float>(x) * Tile3D::TILE_SIZE));
+            position.setZ(static_cast<float>(static_cast<float>(z) * Tile3D::TILE_SIZE));
             _tiles.emplace_back(position);
-
-            // TEMPORARY : Add a Deraumere item to the tile for testing
-            raylib::rmath::Vector3 itemPosition = position;
-            itemPosition.setY(position.y() + TILE_SIZE);
-            _tiles.back().addItem(std::make_unique<Deraumere>(itemPosition));
         }
+        // TEMPORARY : Add a Deraumere item to the tile for testing
+        _tiles.back().itemBag().addItem(std::make_unique<game::Linemate>(position));
     }
 }
 
@@ -43,7 +41,7 @@ void Map::draw(const raylib::rcore::Camera& camera) const {
     for (const auto& tile : _tiles) {
         if (camera.isVisibleFromCamera(tile.position())) {
             tile.draw(_tileModel);
-            if (tile.hasItems()) {
+            if (tile.itemBag().hasItems()) {
                 drawItems(tile);
             }
         }
@@ -51,19 +49,11 @@ void Map::draw(const raylib::rcore::Camera& camera) const {
 }
 
 void Map::drawItems(const Tile3D& tile) const {
-    for (const auto& item : tile.items()) {
+    for (const auto& item : tile.itemBag().items()) {
         auto it = _itemDrawFunctions.find(item.object->name());
         if (it != _itemDrawFunctions.end()) {
             it->second(*item.object);
         }
     }
-}
-
-void Map::drawDeraumere(const IObject& object) const {
-    const auto* deraumereObject = dynamic_cast<const Deraumere*>(&object);
-    if (deraumereObject == nullptr) {
-        return;
-    }
-    deraumereObject->draw(_deraumereModel);
 }
 }  // namespace zappy::gui::graphics::scene

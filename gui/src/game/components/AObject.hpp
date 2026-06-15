@@ -13,7 +13,7 @@
 #include "rmath/Vector3.hpp"
 #include "rmodels/Model.hpp"
 
-namespace zappy::gui::graphics::scene {
+namespace zappy::gui::game {
 class AObject : public IObject {
   public:
     AObject(raylib::rmath::Vector3 position) : _position(position) {}
@@ -29,6 +29,9 @@ class AObject : public IObject {
 
     [[nodiscard]] raylib::rmath::Vector3 position() const { return _position; }
     void setPosition(const raylib::rmath::Vector3& position) { _position = position; }
+    void setPositionX(float x) { _position.setX(x); }
+    void setPositionY(float y) { _position.setY(y); }
+    void setPositionZ(float z) { _position.setZ(z); }
     [[nodiscard]] double density() const { return _density; }
     void setDensity(double density) { _density = density; }
     [[nodiscard]] std::string name() const override { return _name; }
@@ -40,4 +43,4 @@ class AObject : public IObject {
     double _density{0.0};
     std::string _name{"Object"};
 };
-}  // namespace zappy::gui::graphics::scene
+}  // namespace zappy::gui::game

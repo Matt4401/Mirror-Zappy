@@ -10,7 +10,7 @@
 
 #include "rmodels/Model.hpp"
 
-namespace zappy::gui::graphics::scene {
+namespace zappy::gui::game {
 class IObject {
   public:
     IObject() = default;
@@ -26,4 +26,4 @@ class IObject {
   protected:
   private:
 };
-}  // namespace zappy::gui::graphics::scene
+}  // namespace zappy::gui::game
