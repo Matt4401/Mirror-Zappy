@@ -37,7 +37,7 @@ class Core {
     void stop();
 
   private:
-    enum class ClientState : std::uint8_t { WAITING_TEAM_SELECTION, IN_GAME };
+    enum class ClientState : std::uint8_t { WAITING_TEAM_SELECTION, IN_GAME, GUI };
 
     static void formatReceivedString(std::string& str);
 

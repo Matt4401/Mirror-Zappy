@@ -73,8 +73,8 @@ void Player::update(World& world) {
 
 void Player::moveForward(const Position& limit) {
     auto [fst, snd] = playerMove.at(static_cast<uint8_t>(_orientation));
-    const std::size_t width = limit.x + 1;
-    const std::size_t height = limit.y + 1;
+    const std::size_t width = limit.x;
+    const std::size_t height = limit.y;
 
     _pos.x = (_pos.x + fst + width) % width;
     _pos.y = (_pos.y + snd + height) % height;
@@ -105,8 +105,8 @@ void Player::kill() {
 
 void Player::moveWithOrientation(const Position& limit, cardinalPoint orientation) {
     auto [fst, snd] = playerMove.at(static_cast<uint8_t>(orientation));
-    const std::size_t width = limit.x + 1;
-    const std::size_t height = limit.y + 1;
+    const std::size_t width = limit.x;
+    const std::size_t height = limit.y;
 
     _pos.x = (_pos.x + fst + width) % width;
     _pos.y = (_pos.y + snd + height) % height;

@@ -44,11 +44,11 @@ TEST(ForwardTest, CheckMovementBordure) {
     game::World world{config};
 
     auto [maxX, maxY] = world.sizeMap();
-    game::Player player{0, maxX, maxY, game::cardinalPoint::NORTH};
+    game::Player player{0, maxX - 1, maxY - 1, game::cardinalPoint::NORTH};
 
     forward->execute(world, player);
     auto [fst, snd] = player.position();
-    ASSERT_EQ(fst, maxX);
+    ASSERT_EQ(fst, maxX - 1);
     ASSERT_EQ(snd, 0);
 }
 }  // namespace zappy::server::command
