@@ -1,9 +1,10 @@
+from src.AIConnection import AIConnection
+
+
 class AITeam:
-    def __init__(self, trantorian, socket):
+    def __init__(self, trantorian, port, host, team_name):
         self.trantorian = trantorian
-        self.socket = socket
+        self.AIConnection = AIConnection(host, port, team_name)
 
     def run(self):
-        alive = True  # noqa: F841
-        while True:
-            pass
+        pass

@@ -1,7 +1,7 @@
 import sys
 import argparse
-from ai.src.AITeamClass import AITeam
-from ai.src.TrantorianClass import Trantorian
+from src.AITeamClass import AITeam
+from src.TrantorianClass import Trantorian
 
 
 def mainAI():
@@ -23,5 +23,5 @@ def mainAI():
     machine = args.h
 
     trantorian = Trantorian("matt4401")
-    main_class = AITeam(trantorian, machine)  # noqa: F841
-    # main_class.run()
+    main_class = AITeam(trantorian, port, machine, name)  # noqa: F841
+    main_class.run()
