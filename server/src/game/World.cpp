@@ -168,8 +168,8 @@ void World::removeFromMap(const std::size_t id) {
 std::unordered_map<std::size_t, std::vector<std::string>> World::getAllResponsesBuffer() const {
     std::unordered_map<std::size_t, std::vector<std::string>> responses;
     for (const auto& player : _playerList | std::views::values) {
-        if (!player->responses().empty()) {
-            responses[player->id()] = player->responses();
+        if (auto vecResponses = player->responses(); !vecResponses.empty()) {
+            responses[player->id()] = std::move(vecResponses);
         }
     }
     return responses;
