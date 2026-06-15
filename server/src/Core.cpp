@@ -130,6 +130,7 @@ void Core::handleClientMessage(int clientId, std::string_view message) {
     } else if (it->second == ClientState::IN_GAME) {
         handleInGameMessage(clientId, message);
     } else if (it->second == ClientState::GUI) {
+        handleGuiMessage(clientId, message);
     }
 }
 
