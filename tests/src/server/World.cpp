@@ -4,6 +4,7 @@
 ** File description:
 ** World tests
 */
+// NOLINTBEGIN
 
 #include "game/World.hpp"
 
@@ -382,3 +383,4 @@ TEST_F(WorldTest, UpdateWithNoCommandsDoesNotGenerateResponses) {
 }
 
 }  // namespace zappy::server::game
+// NOLINTEND
