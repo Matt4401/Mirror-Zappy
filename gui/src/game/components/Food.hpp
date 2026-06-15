@@ -9,10 +9,10 @@
 #include <string>
 
 #include "AObject.hpp"
-#include "rmath/Vector3.hpp"
-#include "rmodels/Model.hpp"
 #include "Color.hpp"
 #include "graphics/scene/Tile3D.hpp"
+#include "rmath/Vector3.hpp"
+#include "rmodels/Model.hpp"
 
 namespace zappy::gui::game {
 class Food : public AObject {
@@ -32,6 +32,7 @@ class Food : public AObject {
     void draw(const raylib::rmodels::Model& model) const override {
         model.drawModel(position(), 0.9F, raylib::Color::Yellow());
     }
+
   protected:
   private:
 };

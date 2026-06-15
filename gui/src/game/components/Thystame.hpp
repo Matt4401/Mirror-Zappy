@@ -7,11 +7,12 @@
 
 #pragma once
 #include <string>
-#include "Tile3D.hpp"
+
 #include "AObject.hpp"
+#include "Color.hpp"
+#include "Tile3D.hpp"
 #include "rmath/Vector3.hpp"
 #include "rmodels/Model.hpp"
-#include "Color.hpp"
 
 namespace zappy::gui::game {
 class Thystame : public AObject {

@@ -16,11 +16,11 @@
 #include "Team.hpp"
 #include "context/EventContext.hpp"
 #include "events/EventDispatcher.hpp"
+#include "game/GameModel.hpp"
 #include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
 #include "rmath/Vector3.hpp"
-#include "game/GameModel.hpp"
 
 namespace zappy::gui::graphics {
 class Render {

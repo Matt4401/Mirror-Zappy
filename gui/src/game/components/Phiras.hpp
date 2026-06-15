@@ -9,10 +9,10 @@
 #include <string>
 
 #include "AObject.hpp"
-#include "rmath/Vector3.hpp"
-#include "rmodels/Model.hpp"
 #include "Color.hpp"
 #include "graphics/scene/Tile3D.hpp"
+#include "rmath/Vector3.hpp"
+#include "rmodels/Model.hpp"
 
 namespace zappy::gui::game {
 class Phiras : public AObject {

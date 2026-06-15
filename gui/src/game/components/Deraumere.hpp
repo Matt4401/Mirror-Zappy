@@ -10,9 +10,9 @@
 
 #include "AObject.hpp"
 #include "Color.hpp"
+#include "graphics/scene/Tile3D.hpp"
 #include "rmath/Vector3.hpp"
 #include "rmodels/Model.hpp"
-#include "graphics/scene/Tile3D.hpp"
 
 namespace zappy::gui::game {
 class Deraumere : public AObject {

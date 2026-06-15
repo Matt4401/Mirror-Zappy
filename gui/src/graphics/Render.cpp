@@ -13,11 +13,11 @@
 #include <utility>
 
 #include "events/EventDispatcher.hpp"
+#include "game/Team.hpp"
 #include "protocol/Commands.hpp"
 #include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
-#include "game/Team.hpp"
 #include "scene/Tile3D.hpp"
 
 namespace zappy::gui::graphics {

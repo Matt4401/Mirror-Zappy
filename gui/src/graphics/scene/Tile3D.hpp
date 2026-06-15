@@ -7,9 +7,9 @@
 
 #pragma once
 
+#include "game/ItemBag.hpp"
 #include "rmath/Vector3.hpp"
 #include "rmodels/Model.hpp"
-#include "game/ItemBag.hpp"
 
 namespace zappy::gui::graphics::scene {
 class Tile3D {
@@ -28,6 +28,7 @@ class Tile3D {
     [[nodiscard]] raylib::rmath::Vector3 position() const { return _position; }
     [[nodiscard]] const game::ItemBag& itemBag() const { return _itemBag; }
     [[nodiscard]] game::ItemBag& itemBag() { return _itemBag; }
+
   protected:
   private:
     raylib::rmath::Vector3 _position;
