@@ -38,7 +38,7 @@ void World::setSpawnEggs(const std::size_t clientLimit, const std::string_view t
     for (std::size_t i = 0; i < clientLimit; i++) {
         const auto position = dist(e);
         _vecEggs[_newId] = Egg{.id = _newId, .position = getTilePosition(position), .teamName = std::string{teamName}};
-        _tiles.at(position).eggs.push_back(_newId);
+        _tiles.at(position).eggs.emplace_back(_newId);
         _newId++;
     }
 }
@@ -54,7 +54,7 @@ cardinalPoint World::randomCardinalPoint() {
 World::World(const parser::ServerConfig& config) : _heightMap(config.height), _widthMap(config.width) {
     const auto nbTile = _heightMap * _widthMap;
     for (std::size_t i = 0; i < nbTile; i++) {
-        _tiles.push_back(Tile{.resources = {}});
+        _tiles.emplace_back(Tile{.resources = {}});
     }
     for (const auto& teamName : config.teamNames) {
         _teamList[teamName] = std::make_unique<Team>(config.clientLimit);
@@ -104,7 +104,7 @@ std::optional<size_t> World::spawnPlayer(const std::string_view teamName) {
     _playerList[egg.value().id] =
         std::make_unique<Player>(egg.value().id, egg.value().position.x, egg.value().position.y, randomCardinalPoint());
     const auto& newPlayer = _playerList.at(egg.value().id);
-    _tiles.at(getTileIndex(newPlayer->position().x, newPlayer->position().y)).players.push_back(newPlayer->id());
+    _tiles.at(getTileIndex(newPlayer->position().x, newPlayer->position().y)).players.emplace_back(newPlayer->id());
     return newPlayer->id();
 }
 [[nodiscard]] Position World::getTilePosition(const std::size_t position1D) const {
@@ -150,7 +150,7 @@ void World::updatePositionOnMap(const std::size_t id, const Position& oldPositio
     const auto newTileIndex = getTileIndex(newPosition);
 
     erasePlayerFromTile(oldTileIndex, id);
-    _tiles.at(newTileIndex).players.push_back(id);
+    _tiles.at(newTileIndex).players.emplace_back(id);
 }
 
 void World::update() {
@@ -189,7 +189,7 @@ std::vector<std::size_t> World::collectAndKillDeadPlayers() const {
     for (const auto& val : _playerList | std::views::values) {
         if (val->nbLifeTick() == 0) {
             val->kill();
-            deadIds.push_back(val->id());
+            deadIds.emplace_back(val->id());
         }
     }
     return deadIds;

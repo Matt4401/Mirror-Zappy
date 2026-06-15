@@ -25,7 +25,7 @@ void Team::removeFromTeam(const std::size_t id) {
     }
 }
 
-void Team::addInTeam(const std::size_t id) { _listPlayerId.push_back(id); }
+void Team::addInTeam(const std::size_t id) { _listPlayerId.emplace_back(id); }
 
 void Team::addNewTeamSlot() {
     _nbTeamSlots++;

@@ -251,10 +251,8 @@ TEST_F(WorldTest, UpdateExecutesCommandAfterRequiredTicks) {
     const auto playerId = world.spawnPlayer("team1");
     ASSERT_TRUE(playerId.has_value());
 
-    // Forward command requires 7 ticks, executes on the 8th update
     world.pushCommandToPlayer(playerId.value(), std::make_unique<command::Forward>());
 
-    // Update 8 times - command executes on the 8th
     for (int i = 0; i < 8; ++i) {
         world.update();
     }
@@ -273,7 +271,6 @@ TEST_F(WorldTest, UpdateDoesNotExecuteCommandBeforeRequiredTicks) {
 
     world.pushCommandToPlayer(playerId.value(), std::make_unique<command::Forward>());
 
-    // Update only 7 times - command should not have executed yet
     for (int i = 0; i < 7; ++i) {
         world.update();
     }
@@ -289,12 +286,10 @@ TEST_F(WorldTest, UpdateExecutesMultipleCommandsInSequence) {
     const auto playerId = world.spawnPlayer("team1");
     ASSERT_TRUE(playerId.has_value());
 
-    // Push 3 Forward commands
     world.pushCommandToPlayer(playerId.value(), std::make_unique<command::Forward>());
     world.pushCommandToPlayer(playerId.value(), std::make_unique<command::Forward>());
     world.pushCommandToPlayer(playerId.value(), std::make_unique<command::Forward>());
 
-    // 1st command: executes at tick 8
     for (int i = 0; i < 8; ++i) {
         world.update();
     }
@@ -302,7 +297,6 @@ TEST_F(WorldTest, UpdateExecutesMultipleCommandsInSequence) {
     auto responses = world.getAllResponsesBuffer();
     ASSERT_EQ(responses.at(playerId.value()).size(), 1);
 
-    // 2nd command: tick 9 loads it, executes at tick 17 (9 ticks total)
     for (int i = 0; i < 9; ++i) {
         world.update();
     }
@@ -310,7 +304,6 @@ TEST_F(WorldTest, UpdateExecutesMultipleCommandsInSequence) {
     responses = world.getAllResponsesBuffer();
     ASSERT_EQ(responses.at(playerId.value()).size(), 1);
 
-    // 3rd command: tick 18 loads it, executes at tick 26 (9 more ticks)
     for (int i = 0; i < 9; ++i) {
         world.update();
     }
@@ -330,7 +323,6 @@ TEST_F(WorldTest, MultiplePlayersUpdateIndependently) {
     world.pushCommandToPlayer(player1.value(), std::make_unique<command::Forward>());
     world.pushCommandToPlayer(player2.value(), std::make_unique<command::Forward>());
 
-    // Both commands execute on the 8th update
     for (int i = 0; i < 8; ++i) {
         world.update();
     }
@@ -353,11 +345,9 @@ TEST_F(WorldTest, CommandExecutionClearsResponseBuffer) {
         world.update();
     }
 
-    // First call should return the response
     const auto responses1 = world.getAllResponsesBuffer();
     ASSERT_EQ(responses1.at(playerId.value()).size(), 1);
 
-    // Second call should return empty (buffer is cleared after first call)
     const auto responses2 = world.getAllResponsesBuffer();
     ASSERT_TRUE(responses2.empty() || responses2.find(playerId.value()) == responses2.end() ||
                 responses2.at(playerId.value()).empty());
@@ -369,7 +359,6 @@ TEST_F(WorldTest, UpdateWithNoCommandsDoesNotGenerateResponses) {
     const auto playerId = world.spawnPlayer("team1");
     ASSERT_TRUE(playerId.has_value());
 
-    // Update without pushing any commands
     for (int i = 0; i < 10; ++i) {
         world.update();
     }
