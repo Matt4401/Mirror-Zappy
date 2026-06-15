@@ -17,6 +17,12 @@
 
 namespace zappy::gui::graphics::scene {
 Map::Map(int width, int height) {
+    resize(width, height);
+    _itemDrawFunctions["Deraumere"] = [this](const IObject& object) { drawDeraumere(object); };
+}
+
+void Map::resize(int width, int height) {
+    _tiles.clear();
     raylib::rmath::Vector3 position{0.0F, 0.0F, 0.0F};
 
     for (int x = ((width / 2) * -1); x < width / 2; x += 1) {
@@ -31,8 +37,6 @@ Map::Map(int width, int height) {
             _tiles.back().addItem(std::make_unique<Deraumere>(itemPosition));
         }
     }
-
-    _itemDrawFunctions["Deraumere"] = [this](const IObject& object) { drawDeraumere(object); };
 }
 
 void Map::draw(const raylib::rcore::Camera& camera) const {
