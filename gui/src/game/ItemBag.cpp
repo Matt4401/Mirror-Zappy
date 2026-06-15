@@ -16,19 +16,22 @@
 
 namespace zappy::gui::game {
 void ItemBag::addItem(std::unique_ptr<zappy::gui::game::IObject> object, std::size_t quantity) {
+    if (!object) {
+        return;
+    }
     for (auto& item : _items) {
         if (item.object->name() == object->name()) {
-            item.quantity += static_cast<int>(quantity);
+            item.quantity += quantity;
             return;
         }
     }
-    _items.emplace_back(Item(std::move(object), static_cast<int>(quantity)));
+    _items.emplace_back(Item(std::move(object), quantity));
 }
 
 void ItemBag::removeItem(std::size_t index) {
     if (index >= _items.size()) {
         return;
     }
-    _items.erase(_items.begin() + static_cast<int>(index));
+    _items.erase(_items.begin() + static_cast<std::vector<Item>::difference_type>(index));
 }
 }  // namespace zappy::gui::game

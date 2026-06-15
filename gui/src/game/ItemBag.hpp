@@ -24,7 +24,7 @@ class ItemBag {
 
     struct Item {
         std::unique_ptr<IObject> object;
-        int quantity{0};
+        std::size_t quantity{0};
     };
 
     [[nodiscard]] bool hasItems() const { return !_items.empty(); }
