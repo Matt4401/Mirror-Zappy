@@ -49,6 +49,7 @@ class Core {
     void handleClientDisconnection(int clientId);
     void handleHandshake(int clientId, std::string_view teamName);
     void handleInGameMessage(int clientId, std::string_view message);
+    void handleGuiMessage(int clientId, std::string_view message);
 
     void setup();
     void loop();

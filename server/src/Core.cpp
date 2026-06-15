@@ -129,12 +129,17 @@ void Core::handleClientMessage(int clientId, std::string_view message) {
         handleHandshake(clientId, message);
     } else if (it->second == ClientState::IN_GAME) {
         handleInGameMessage(clientId, message);
+    } else if (it->second == ClientState::GUI) {
     }
 }
 
 void Core::handleHandshake(int clientId, std::string_view teamName) {
     const auto playerIdOpt = _world->spawnPlayer(teamName);
 
+    if (teamName == "GRAPHIC") {
+        _clientStates[clientId] = ClientState::GUI;
+        return;
+    }
     if (playerIdOpt.has_value()) {
         _clientToPlayer[clientId] = playerIdOpt.value();
         _clientStates[clientId] = ClientState::IN_GAME;
@@ -156,6 +161,10 @@ void Core::handleInGameMessage(int clientId, std::string_view message) {
     } else {
         _sessionManager->sendMessage(clientId, "ko\n");
     }
+}
+
+void Core::handleGuiMessage(int clientId, std::string_view message) {
+    auto command = _commandFactory.createCommand(message);
 }
 
 void Core::handleClientDisconnection(int clientId) {
