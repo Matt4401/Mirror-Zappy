@@ -9,20 +9,39 @@
 
 #include <raylib.h>
 
+#include <memory>
+#include <utility>
+
+#include "events/EventDispatcher.hpp"
+#include "protocol/Commands.hpp"
 #include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
 
 namespace zappy::gui::graphics {
-void Render::start() {
-    while (!_window.shouldClose()) {
-        update();
-        _event.handleEvent(_eventContext);
-        _window.beginDrawing();
-        render2D();
-        render3D();
-        raylib::rcore::Window::endDrawing();
+Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher) : _dispatcher(std::move(dispatcher)) {
+    if (_dispatcher) {
+        _mszToken = _dispatcher->subscribe<shared::protocol::server::Msz>(
+            [this](const shared::protocol::server::Msz& cmd) { _map.resize(cmd.width, cmd.height); });
     }
+    _window.setTargetFPS(60);
+}
+
+Render::~Render() {
+    if (_dispatcher && _mszToken != 0) {
+        _dispatcher->unsubscribe<shared::protocol::server::Msz>(_mszToken);
+    }
+}
+
+bool Render::isRunning() const { return !_window.shouldClose(); }
+
+void Render::renderFrame() {
+    update();
+    _event.handleEvent(_eventContext);
+    _window.beginDrawing();
+    render2D();
+    render3D();
+    raylib::rcore::Window::endDrawing();
 }
 
 void Render::update() {
