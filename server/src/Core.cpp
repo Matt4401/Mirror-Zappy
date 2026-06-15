@@ -7,6 +7,7 @@
 
 #include "Core.hpp"
 
+#include <chrono>
 #include <exception>
 #include <format>
 #include <iostream>
@@ -56,32 +57,53 @@ void Core::setup() {
 }
 
 void Core::loop() {
-    shared::network::ISessionManager::NetworkEvent message{};
+    auto nextTickTarget = std::chrono::steady_clock::now() + std::chrono::milliseconds(_timeUnit);
 
     while (_isRunning) {
         try {
-            _sessionManager->pollNetwork(_timeUnit);
-            while (_sessionManager->tryPopMessage(message)) {
-                if (message.type == shared::network::ISessionManager::EventType::CLIENT_CONNECTED) {
-                    handleNewClient(message.clientId);
-                }
-                if (message.type == shared::network::ISessionManager::EventType::CLIENT_DISCONNECTED) {
-                    handleClientDisconnection(message.clientId);
-                }
-                if (message.type == shared::network::ISessionManager::EventType::MESSAGE_RECEIVED) {
-                    formatReceivedString(message.message);
-                    handleClientMessage(message.clientId, message.message);
-                }
+            const auto now = std::chrono::steady_clock::now();
+            int pollTimeout = 0;
+
+            if (now < nextTickTarget) {
+                pollTimeout = static_cast<int>(
+                    std::chrono::duration_cast<std::chrono::milliseconds>(nextTickTarget - now).count());
             }
-            _world->update();
-            flushPlayerResponses();
+            processNetworkEvents(pollTimeout);
+            processGameTick(nextTickTarget);
         } catch (const std::exception& e) {
             std::cerr << "Error in main loop: " << e.what() << std::endl;
         }
     }
 }
 
-void Core::stop() { _isRunning = false; }
+void Core::processNetworkEvents(int timeout) {
+    _sessionManager->pollNetwork(timeout);
+    shared::network::ISessionManager::NetworkEvent message{};
+
+    while (_sessionManager->tryPopMessage(message)) {
+        if (message.type == shared::network::ISessionManager::EventType::CLIENT_CONNECTED) {
+            handleNewClient(message.clientId);
+        }
+        if (message.type == shared::network::ISessionManager::EventType::CLIENT_DISCONNECTED) {
+            handleClientDisconnection(message.clientId);
+        }
+        if (message.type == shared::network::ISessionManager::EventType::MESSAGE_RECEIVED) {
+            formatReceivedString(message.message);
+            handleClientMessage(message.clientId, message.message);
+        }
+    }
+}
+
+void Core::processGameTick(std::chrono::steady_clock::time_point& nextTickTarget) {
+    const auto now = std::chrono::steady_clock::now();
+
+    if (now >= nextTickTarget) {
+        _world->update();
+        flushPlayerResponses();
+
+        nextTickTarget += std::chrono::milliseconds(_timeUnit);
+    }
+}
 
 void Core::formatReceivedString(std::string& str) {
     if (!str.empty() && str.back() == '\n') {

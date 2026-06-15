@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -39,6 +40,9 @@ class Core {
     enum class ClientState : std::uint8_t { WAITING_TEAM_SELECTION, IN_GAME };
 
     static void formatReceivedString(std::string& str);
+
+    void processNetworkEvents(int timeout);
+    void processGameTick(std::chrono::steady_clock::time_point& nextTickTarget);
 
     void handleNewClient(int clientId);
     void handleClientMessage(int clientId, std::string_view message);
