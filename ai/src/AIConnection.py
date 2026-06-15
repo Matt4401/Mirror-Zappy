@@ -43,10 +43,18 @@ class AIConnection:
 
     def send_command(self, cmd):
         self.socket.send((cmd + "\n").encode())
-        return self._read_line()
+        return self.read_line()
 
-    def _read_line(self):
-        return self.socket.recv(1024).decode().strip()
+    def read_line(self):
+        buffer = ""
+        while True:
+            char = self.socket.recv(1).decode()
+            if not char:
+                break
+            buffer += char
+            if char == "\n":
+                break
+        return buffer.strip()
 
     def disconnect(self):
         if self.socket:
