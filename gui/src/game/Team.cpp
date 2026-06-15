@@ -7,8 +7,6 @@
 
 #include "Team.hpp"
 
-#include <rmath/Vector3.hpp>
-
 #include "Egg.hpp"
 #include "GameModel.hpp"
 #include "Player.hpp"
