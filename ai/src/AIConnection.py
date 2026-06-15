@@ -3,13 +3,15 @@ import sys
 
 
 class AIConnection:
-    def __init__(self, host, port, team_name):
+    def __init__(self, host, port, team_name, data_lock, list):
         self.host = host
         self.port = port
         self.team_name = team_name
         self.socket = None
         self.connect(host, port)
         self.do_handshake()
+        self.runnig = true
+        self.sub_charac = "\n"
 
     def connect(self, host, port):
         try:
@@ -29,7 +31,7 @@ class AIConnection:
         if welcome_msg != "WELCOME\n":
             print("Handshake failed at welcome message")
             sys.exit(84)
-        self.socket.send((self.team_name + "\n").encode())
+        self.socket.send((self.team_name + self.sub_charac).encode())
         client_num = self.socket.recv(1024).decode().strip()
         dims = self.socket.recv(1024).decode().strip()
         if client_num.isdigit() and int(client_num) > 0:
@@ -42,20 +44,44 @@ class AIConnection:
             sys.exit(84)
 
     def send_command(self, cmd):
-        self.socket.send((cmd + "\n").encode())
+        self.socket.send((cmd + self.sub_charac).encode())
         return self.read_line()
+
+    def add_in_list(self, buffer, nbr_backslash_n):
+        answer = ""
+        for i in nbr_backslash_n:
+            answer = buffer.split(self.sub_charac)[i]
+            with data_lock:
+                self.answer_list.append(answer)
+        buffer = buffer.remove_prefix(answer)
+        return buffer
+
 
     def read_line(self):
         buffer = ""
         while True:
-            char = self.socket.recv(1).decode()
-            if not char:
-                break
-            buffer += char
-            if char == "\n":
-                break
-        return buffer.strip()
+            buffer = self.socket.recv(1024).decode()
+            nbr_backslash_n = buffer.count(self.sub_charac)
+            if nbr_backslash_n > 0:
+                buffer = add_in_list(buffer, nbr_backslash_n)
 
     def disconnect(self):
         if self.socket:
             self.socket.close()
+
+def run_reader(self):
+    buffer = ""
+    while self.running:
+        try:
+            data = self.socket.recv(1024).decode()
+            if not data: break
+            buffer += data
+
+            while self.sub_charac in buffer:
+                line, buffer = buffer.split(self.sub_charac, 1)
+                with self.data_lock:
+                    if line.strip():
+                        self.answer_list.append(line.strip())
+        except Exception as e:
+            print(f"Error while reading the socket content: {e}")
+            break
