@@ -10,6 +10,7 @@
 #include <memory>
 #include <span>
 
+#include "EventDispatcher.hpp"
 #include "Render.hpp"
 #include "network/Client.hpp"
 #include "strategy/GUIStrategy.hpp"
@@ -32,6 +33,7 @@ class Core {
 
     std::span<char*> _args;
     parser::GuiConfig _config;
+    std::shared_ptr<events::EventDispatcher> _dispatcher;
     std::unique_ptr<graphics::Render> _render;
     std::unique_ptr<network::Client> _client;
 };
