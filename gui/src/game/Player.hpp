@@ -21,7 +21,6 @@ namespace zappy::gui::game {
 
         Player(raylib::rmath::Vector3 position, std::string name, cardinalPoint orientation)
             : _position(position), _name(std::move(name)), _orientation(orientation) {}
-        Player() = default; // TEMPORARY CONSTRUCTOR, JUST FOR TESTING
         ~Player() = default;
         Player(const Player& other) = delete;
         Player& operator=(const Player& other) = delete;

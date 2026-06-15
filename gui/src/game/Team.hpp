@@ -27,7 +27,7 @@ namespace zappy::gui::game {
             void draw(const GameModel& gameModel) const;
             void playerHatched(raylib::rmath::Vector3 position, server::game::cardinalPoint orientation);
 
-            void addPlayer(raylib::rmath::Vector3 position = {0.0F, 0.0F, 0.0F}) {
+            void addPlayer(raylib::rmath::Vector3 position = {10.0F, 12.0F, 0.0F}) {
                 _players.emplace_back(position, _name + std::to_string(_players.size()), Player::cardinalPoint::NORTH);
             } // TEMPORARY FUNCTION, JUST FOR TESTING
 
