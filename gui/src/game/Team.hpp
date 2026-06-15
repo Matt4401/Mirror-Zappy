@@ -6,10 +6,10 @@
 */
 
 #pragma once
+#include <cstddef>
 #include <rmath/Vector3.hpp>
 #include <string>
 #include <vector>
-#include <cstddef>
 
 #include "Egg.hpp"
 #include "GameModel.hpp"
