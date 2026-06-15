@@ -17,12 +17,16 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <variant>
 
 #include "Parser.hpp"
 #include "SessionManager.hpp"
 #include "exception/Exception.hpp"
 #include "game/World.hpp"
 #include "network/ISessionManager.hpp"
+#include "protocol/Commands.hpp"
+#include "protocol/Emitter.hpp"
+#include "protocol/Parser.hpp"
 #include "strategy/ServerStrategy.hpp"
 
 namespace zappy::server {

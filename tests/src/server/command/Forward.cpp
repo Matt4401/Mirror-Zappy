@@ -28,7 +28,13 @@ TEST(ForwardTest, CheckMovement) {
     const std::unique_ptr<ICommand> forward = std::make_unique<Forward>();
     game::Player player{0, 5, 5, game::cardinalPoint::NORTH};
     const auto config = parser::ServerConfig{
-        .port = 80, .width = 16, .height = 16, .teamNames = {"test"}, .clientLimit = 1, .freq = 100};
+        .port = 80,
+        .width = 16,
+        .height = 16,
+        .teamNames = {"test"},
+        .clientLimit = 1,
+        .freq = 100,
+    };
     game::World world{config};
 
     forward->execute(world, player);
@@ -40,7 +46,13 @@ TEST(ForwardTest, CheckMovement) {
 TEST(ForwardTest, CheckMovementBordure) {
     const std::unique_ptr<ICommand> forward = std::make_unique<Forward>();
     const auto config = parser::ServerConfig{
-        .port = 80, .width = 16, .height = 16, .teamNames = {"test"}, .clientLimit = 1, .freq = 100};
+        .port = 80,
+        .width = 16,
+        .height = 16,
+        .teamNames = {"test"},
+        .clientLimit = 1,
+        .freq = 100,
+    };
     game::World world{config};
 
     auto [maxX, maxY] = world.sizeMap();

@@ -3,20 +3,22 @@ import os
 import pytest
 from unittest.mock import patch
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
 
-from zappy_ai import main
-
-from mainAI import mainAI
+from ai.zappy_ai import main
 
 
-def test_main():
+@patch("src.AITeamClass.AIConnection")
+def test_main(mock_connect):
+    mock_connect.return_value = None
     test_args = ["zappy_ai", "-p", "4242", "-n", "EquipeTest", "-h", "localhost"]
     with patch("sys.argv", test_args):
         main()
 
 
-def test_invalide_main_zero_args():
+@patch("src.AITeamClass.AIConnection")
+def test_invalide_main_zero_args(mock_connect):
+    mock_connect.return_value = None
     test_wrong_args = ["zappy_ai"]
 
     with patch("sys.argv", test_wrong_args):
@@ -25,7 +27,9 @@ def test_invalide_main_zero_args():
         assert excinfo.value.code == 84
 
 
-def test_invalide_main_zero_args():
+@patch("src.AITeamClass.AIConnection")
+def test_invalide_main_zero_adrgs(mock_connect):
+    mock_connect.return_value = None
     test_wrong_args = ["zappy_ai", "-p", "4242", "-n", "EquipeTest", "-h"]
 
     with patch("sys.argv", test_wrong_args):
