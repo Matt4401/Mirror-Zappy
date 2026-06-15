@@ -22,7 +22,7 @@ class Linemate : public AObject {
         setDensity(0.3);
         setPositionY(position.y() + graphics::scene::Tile3D::TILE_SIZE);
         setPositionX(position.x() - 0.86F);
-        setPositionZ(position.z() - 0.5F);
+        setPositionZ(position.z() + 0.5F);
     }
     ~Linemate() override = default;
     Linemate(const Linemate& other) = delete;

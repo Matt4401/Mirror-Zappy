@@ -10,6 +10,9 @@
 
 #include "AObject.hpp"
 #include "rmath/Vector3.hpp"
+#include "rmodels/Model.hpp"
+#include "Color.hpp"
+#include "graphics/scene/Tile3D.hpp"
 
 namespace zappy::gui::game {
 class Food : public AObject {
@@ -17,6 +20,8 @@ class Food : public AObject {
     Food(raylib::rmath::Vector3 position) : AObject(position) {
         setName("Food");
         setDensity(0.5);
+        setPositionY(position.y() + (graphics::scene::Tile3D::TILE_SIZE * 1.03F));
+        setPositionZ(position.z() - 2.2F);
     }
     ~Food() override = default;
     Food(const Food& other) = delete;
@@ -24,6 +29,9 @@ class Food : public AObject {
     Food(Food&& other) noexcept = default;
     Food& operator=(Food&& other) noexcept = default;
 
+    void draw(const raylib::rmodels::Model& model) const override {
+        model.drawModel(position(), 0.9F, raylib::Color::Yellow());
+    }
   protected:
   private:
 };

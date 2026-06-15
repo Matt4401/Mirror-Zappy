@@ -10,7 +10,7 @@ target_sources(zappy_gui_game_components INTERFACE
         components/Mendiane.hpp
         components/Phiras.hpp
         components/Sibur.hpp
-        components/Thystasme.hpp
+        components/Thystame.hpp
 )
 target_include_directories(zappy_gui_game_components INTERFACE
         ${CMAKE_CURRENT_SOURCE_DIR}/..
