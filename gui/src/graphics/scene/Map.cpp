@@ -10,7 +10,6 @@
 #include <memory>
 
 #include "Tile3D.hpp"
-#include "game/components/Linemate.hpp"
 #include "game/components/IObject.hpp"
 #include "rcore/Camera.hpp"
 #include "rmath/Vector3.hpp"
@@ -20,6 +19,11 @@ Map::Map(int width, int height) {
     resize(width, height);
     _itemDrawFunctions["Deraumere"] = [this](const game::IObject& object) { object.draw(_deraumereModel); };
     _itemDrawFunctions["Linemate"] = [this](const game::IObject& object) { object.draw(_linemateModel); };
+    _itemDrawFunctions["Sibur"] = [this](const game::IObject& object) { object.draw(_siburModel); };
+    _itemDrawFunctions["Phiras"] = [this](const game::IObject& object) { object.draw(_phirasModel); };
+    _itemDrawFunctions["Thystame"] = [this](const game::IObject& object) { object.draw(_thystameModel); };
+    _itemDrawFunctions["Mendiane"] = [this](const game::IObject& object) { object.draw(_mendianeModel); };
+    _itemDrawFunctions["Food"] = [this](const game::IObject& object) { object.draw(_foodModel); };
 }
 
 void Map::resize(int width, int height) {
@@ -33,7 +37,13 @@ void Map::resize(int width, int height) {
             _tiles.emplace_back(position);
         }
         // TEMPORARY : Add a Deraumere item to the tile for testing
-        _tiles.back().itemBag().addItem(std::make_unique<game::Linemate>(position));
+        //  _tiles.back().itemBag().addItem(std::make_unique<game::Deraumere>(position));
+        // _tiles.back().itemBag().addItem(std::make_unique<game::Linemate>(position));
+        // _tiles.back().itemBag().addItem(std::make_unique<game::Sibur>(position));
+        // _tiles.back().itemBag().addItem(std::make_unique<game::Phiras>(position));
+        // _tiles.back().itemBag().addItem(std::make_unique<game::Thystame>(position));
+        // _tiles.back().itemBag().addItem(std::make_unique<game::Mendiane>(position));
+        // _tiles.back().itemBag().addItem(std::make_unique<game::Food>(position));
     }
 }
 
