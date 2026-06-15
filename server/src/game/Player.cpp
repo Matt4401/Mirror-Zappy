@@ -59,12 +59,20 @@ void Player::pushCommand(std::unique_ptr<command::ICommand> command) {
 void Player::update(World& world) {
     _lifeTick--;
     if (_cmdTick == 0) {
+        if (_currentCommand != nullptr) {
+            _currentCommand->execute(world, *this);
+        }
         if (_commands.empty()) {
             return;
         }
         _currentCommand = std::move(_commands.front());
         _commands.pop();
-        _currentCommand->start(world, *this);
+        if (!_currentCommand->start(world, *this)) {
+            _buffersResponses.emplace_back("ko\n");
+            _currentCommand = nullptr;
+            return;
+        }
+
         _cmdTick = _currentCommand->requiredTicks();
         return;
     }
