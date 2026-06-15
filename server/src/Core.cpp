@@ -62,7 +62,6 @@ void Core::loop() {
         try {
             _sessionManager->pollNetwork(_timeUnit);
             while (_sessionManager->tryPopMessage(message)) {
-                // Remove trailing \n from message
                 if (message.type == shared::network::ISessionManager::EventType::CLIENT_CONNECTED) {
                     handleNewClient(message.clientId);
                 }
@@ -74,6 +73,8 @@ void Core::loop() {
                     handleClientMessage(message.clientId, message.message);
                 }
             }
+            _world->update();
+            flushPlayerResponses();
         } catch (const std::exception& e) {
             std::cerr << "Error in main loop: " << e.what() << std::endl;
         }
@@ -130,8 +131,26 @@ void Core::handleClientMessage(int clientId, std::string_view message) {
 
 void Core::handleClientDisconnection(int clientId) {
     _clientStates.erase(clientId);
+    if (!_clientToPlayer.contains(clientId)) {
+        return;
+    }
+    _world->removePlayer(_clientToPlayer.at(clientId));
     _clientToPlayer.erase(clientId);
-    _world->removePlayer(clientId);
+}
+
+void Core::flushPlayerResponses() {
+    const auto responses = _world->getAllResponsesBuffer();
+
+    for (const auto& [clientId, playerId] : _clientToPlayer) {
+        const auto it = responses.find(playerId);
+
+        if (it == responses.end()) {
+            continue;
+        }
+        for (const auto& message : it->second) {
+            _sessionManager->sendMessage(clientId, message);
+        }
+    }
 }
 
 }  // namespace zappy::server

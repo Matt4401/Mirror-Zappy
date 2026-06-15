@@ -47,6 +47,8 @@ class Core {
     void setup();
     void loop();
 
+    void flushPlayerResponses();
+
     parser::ServerConfig _config;
     std::unique_ptr<shared::network::ISessionManager> _sessionManager;
     std::unique_ptr<game::World> _world;
