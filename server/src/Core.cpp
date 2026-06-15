@@ -126,28 +126,35 @@ void Core::handleClientMessage(int clientId, std::string_view message) {
     }
 
     if (it->second == ClientState::WAITING_TEAM_SELECTION) {
-        const auto teamName = std::string{message};
-        const auto playerIdOpt = _world->spawnPlayer(teamName);
-
-        if (playerIdOpt.has_value()) {
-            _clientToPlayer[clientId] = playerIdOpt.value();
-            it->second = ClientState::IN_GAME;
-        }
-        _sessionManager->sendMessage(clientId, std::format("{}\n{} {}\n", _world->getAvailableSlotInTeam(teamName),
-                                                           _world->sizeMap().x, _world->sizeMap().y));
+        handleHandshake(clientId, message);
     } else if (it->second == ClientState::IN_GAME) {
-        const auto playerIdIt = _clientToPlayer.find(clientId);
-        if (playerIdIt == _clientToPlayer.end()) {
-            return;
-        }
-        const auto playerId = playerIdIt->second;
-        auto command = _commandFactory.createCommand(message);
+        handleInGameMessage(clientId, message);
+    }
+}
 
-        if (command != nullptr) {
-            _world->pushCommandToPlayer(playerId, std::move(command));
-        } else {
-            _sessionManager->sendMessage(clientId, "ko\n");
-        }
+void Core::handleHandshake(int clientId, std::string_view teamName) {
+    const auto playerIdOpt = _world->spawnPlayer(teamName);
+
+    if (playerIdOpt.has_value()) {
+        _clientToPlayer[clientId] = playerIdOpt.value();
+        _clientStates[clientId] = ClientState::IN_GAME;
+    }
+    _sessionManager->sendMessage(clientId, std::format("{}\n{} {}\n", _world->getAvailableSlotInTeam(teamName),
+                                                       _world->sizeMap().x, _world->sizeMap().y));
+}
+
+void Core::handleInGameMessage(int clientId, std::string_view message) {
+    const auto playerIdIt = _clientToPlayer.find(clientId);
+    if (playerIdIt == _clientToPlayer.end()) {
+        return;
+    }
+    const auto playerId = playerIdIt->second;
+    auto command = _commandFactory.createCommand(message);
+
+    if (command != nullptr) {
+        _world->pushCommandToPlayer(playerId, std::move(command));
+    } else {
+        _sessionManager->sendMessage(clientId, "ko\n");
     }
 }
 
