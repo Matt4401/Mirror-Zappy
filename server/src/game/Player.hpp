@@ -32,8 +32,8 @@ enum class cardinalPoint : uint8_t { NORTH, EAST, SOUTH, WEST, COUNT };
 
 constexpr std::array<std::pair<int, int>, 4> playerMove = {{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}};
 
-static constexpr std::uint8_t kNbLifeTickFood = 126;
-static constexpr std::uint8_t kNbStartFood = 10;
+static constexpr std::size_t kNbLifeTickFood = 126;
+static constexpr std::size_t kNbStartFood = 10;
 static constexpr std::uint8_t kMaxNbCmd = 10;
 
 class Player {
@@ -54,6 +54,7 @@ class Player {
     void pushCommand(std::unique_ptr<command::ICommand> command);
     void update(World& world);
     void moveForward(const Position& limit);
+    void moveWithOrientation(const Position& limit, cardinalPoint orientation);
 
     void addResponse(const std::string&);
     std::vector<std::string> responses();
@@ -72,7 +73,7 @@ class Player {
     std::queue<std::unique_ptr<command::ICommand>> _commands;
     std::unique_ptr<command::ICommand> _currentCommand{nullptr};
     std::size_t _cmdTick{0};
-    std::size_t _lifeTick{0};
+    std::size_t _lifeTick;
     Position _pos{.x = 0, .y = 0};
     std::vector<std::string> _buffersResponses;
     bool _isDead{false};

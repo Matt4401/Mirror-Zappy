@@ -27,18 +27,6 @@
 
 namespace zappy::server::game {
 
-Position World::getRandomPlace(const std::size_t heightMap, const std::size_t widthMap) {
-    if (heightMap == 0 || widthMap == 0) {
-        return Position{.x = 0, .y = 0};
-    }
-    std::random_device rd;
-    std::mt19937 e{rd()};
-    std::uniform_int_distribution<std::size_t> distHeight{0, heightMap - 1};
-    std::uniform_int_distribution<std::size_t> distWidth{0, widthMap - 1};
-
-    return Position{.x = distHeight(e), .y = distWidth(e)};
-}
-
 void World::setSpawnEggs(const std::size_t clientLimit, const std::string_view teamName) {
     if (_heightMap == 0 || _widthMap == 0) {
         return;
@@ -49,7 +37,7 @@ void World::setSpawnEggs(const std::size_t clientLimit, const std::string_view t
 
     for (std::size_t i = 0; i < clientLimit; i++) {
         const auto position = dist(e);
-        _vecEggs.push_back(Egg{.id = _newId, .position = getTilePosition(position), .teamName = std::string{teamName}});
+        _vecEggs[_newId] = Egg{.id = _newId, .position = getTilePosition(position), .teamName = std::string{teamName}};
         _tiles.at(position).eggs.push_back(_newId);
         _newId++;
     }
@@ -92,8 +80,8 @@ void World::eraseEggFromTile(const std::size_t position1dVec, const std::size_t 
 std::optional<Egg> World::getTeamEgg(const std::string_view& teamName) {
     auto it = _vecEggs.begin();
     while (it != _vecEggs.end()) {
-        if (it->teamName == teamName) {
-            Egg egg = *it;
+        if (it->second.teamName == teamName) {
+            Egg egg = it->second;
             _vecEggs.erase(it);
             return egg;
         }
@@ -113,9 +101,9 @@ std::optional<size_t> World::spawnPlayer(const std::string_view teamName) {
     }
     eraseEggFromTile(getTileIndex(egg.value().position), egg.value().id);
     team->second->addInTeam(egg.value().id);
-    _playerList.push_back(std::make_unique<Player>(egg.value().id, egg.value().position.x, egg.value().position.y,
-                                                   randomCardinalPoint()));
-    const auto& newPlayer = _playerList.back();
+    _playerList[egg.value().id] =
+        std::make_unique<Player>(egg.value().id, egg.value().position.x, egg.value().position.y, randomCardinalPoint());
+    const auto& newPlayer = _playerList.at(egg.value().id);
     _tiles.at(getTileIndex(newPlayer->position().x, newPlayer->position().y)).players.push_back(newPlayer->id());
     return newPlayer->id();
 }
@@ -132,12 +120,9 @@ std::optional<size_t> World::spawnPlayer(const std::string_view teamName) {
 }
 
 void World::pushCommandToPlayer(const std::size_t playerId, std::unique_ptr<command::ICommand> command) const {
-    for (const auto& player : _playerList) {
-        if (player->id() == playerId) {
-            player->pushCommand(std::move(command));
-            return;
-        }
-    }
+    const auto& player = _playerList.at(playerId);
+
+    player->pushCommand(std::move(command));
 }
 
 void World::removePlayerFromTeam(const std::size_t id) const {
@@ -169,24 +154,20 @@ void World::updatePositionOnMap(const std::size_t id, const Position& oldPositio
 }
 
 void World::update() {
-    for (const auto& player : _playerList) {
+    for (const auto& player : _playerList | std::views::values) {
         player->update(*this);
     }
 }
 
 void World::removeFromMap(const std::size_t id) {
-    for (const auto& player : _playerList) {
-        if (player->id() == id) {
-            const auto tileIndex = getTileIndex(player->position());
-            erasePlayerFromTile(tileIndex, id);
-            return;
-        }
-    }
+    const auto& player = _playerList.at(id);
+    const auto tileIndex = getTileIndex(player->position());
+    erasePlayerFromTile(tileIndex, id);
 }
 
 std::unordered_map<std::size_t, std::vector<std::string>> World::getAllResponsesBuffer() const {
     std::unordered_map<std::size_t, std::vector<std::string>> responses;
-    for (const auto& player : _playerList) {
+    for (const auto& player : _playerList | std::views::values) {
         if (!player->responses().empty()) {
             responses[player->id()] = player->responses();
         }
@@ -194,25 +175,21 @@ std::unordered_map<std::size_t, std::vector<std::string>> World::getAllResponses
     return responses;
 }
 
-std::optional<std::size_t> World::removePlayer(const std::size_t id) {
-    for (const auto& player : _playerList) {
-        if (player->id() == id) {
-            player->kill();
-            removePlayerFromTeam(id);
-            erasePlayerFromTile(getTileIndex(player->position()), id);
-            return player->id();
-        }
-    }
-    return std::nullopt;
+std::size_t World::removePlayer(const std::size_t id) {
+    const auto& player = _playerList.at(id);
+    player->kill();
+    removePlayerFromTeam(id);
+    erasePlayerFromTile(getTileIndex(player->position()), id);
+    return player->id();
 }
 
 std::vector<std::size_t> World::collectAndKillDeadPlayers() const {
     std::vector<std::size_t> deadIds;
 
-    for (const auto& player : _playerList) {
-        if (player->nbLifeTick() == 0) {
-            player->kill();
-            deadIds.push_back(player->id());
+    for (const auto& val : _playerList | std::views::values) {
+        if (val->nbLifeTick() == 0) {
+            val->kill();
+            deadIds.push_back(val->id());
         }
     }
     return deadIds;
@@ -220,10 +197,33 @@ std::vector<std::size_t> World::collectAndKillDeadPlayers() const {
 
 std::size_t World::getAvailableSlotInTeam(std::string_view teamName) const {
     const auto team = _teamList.find(std::string(teamName));
+
     if (team == _teamList.end()) {
         return 0;
     }
     return team->second->availableSlot();
+}
+
+void World::eject(const std::size_t id) {
+    const auto& pushingPlayer = _playerList.at(id);
+    const auto orientation = pushingPlayer->orientation();
+    const auto position = getTileIndex(pushingPlayer->position());
+    const auto vecPlayerPush = _tiles.at(position).players;
+    const auto vecEggPush = _tiles.at(position).eggs;
+
+    for (const auto& idPushed : vecPlayerPush) {
+        const auto& pushedPlayer = _playerList.at(idPushed);
+        const auto [limitX, limitY] = sizeMap();
+
+        const auto [oldX, oldY] = pushedPlayer->position();
+        pushedPlayer->moveWithOrientation(Position{.x = limitX, .y = limitY}, orientation);
+        const auto [newX, newY] = pushedPlayer->position();
+        updatePositionOnMap(pushedPlayer->id(), {.x = oldX, .y = oldY}, {.x = newX, .y = newY});
+    }
+    for (const auto idEgg : vecEggPush) {
+        _vecEggs.erase(idEgg);
+        eraseEggFromTile(position, idEgg);
+    }
 }
 
 }  // namespace zappy::server::game
