@@ -61,6 +61,8 @@ void Player::update(World& world) {
     if (_cmdTick == 0) {
         if (_currentCommand != nullptr) {
             _currentCommand->execute(world, *this);
+            _currentCommand = nullptr;
+            return;
         }
         if (_commands.empty()) {
             return;

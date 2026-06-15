@@ -251,22 +251,36 @@ TEST_F(WorldTest, UpdateExecutesCommandAfterRequiredTicks) {
     const auto playerId = world.spawnPlayer("team1");
     ASSERT_TRUE(playerId.has_value());
 
+    // Forward command requires 7 ticks, executes on the 8th update
     world.pushCommandToPlayer(playerId.value(), std::make_unique<command::Forward>());
 
+    // Update 8 times - command executes on the 8th
+    for (int i = 0; i < 8; ++i) {
+        world.update();
+    }
+
+    const auto responses = world.getAllResponsesBuffer();
+    ASSERT_FALSE(responses.empty());
+    ASSERT_EQ(responses.at(playerId.value()).size(), 1);
+    ASSERT_EQ(responses.at(playerId.value()).at(0), "ok\n");
+}
+
+TEST_F(WorldTest, UpdateDoesNotExecuteCommandBeforeRequiredTicks) {
+    World world{config};
+
+    const auto playerId = world.spawnPlayer("team1");
+    ASSERT_TRUE(playerId.has_value());
+
+    world.pushCommandToPlayer(playerId.value(), std::make_unique<command::Forward>());
+
+    // Update only 7 times - command should not have executed yet
     for (int i = 0; i < 7; ++i) {
         world.update();
     }
 
-    auto responses = world.getAllResponsesBuffer();
-    ASSERT_TRUE(responses.empty() || !responses.contains(playerId.value()) || responses.at(playerId.value()).empty());
-
-    // 8th update - command should execute now
-    world.update();
-
-    responses = world.getAllResponsesBuffer();
-    ASSERT_FALSE(responses.empty());
-    ASSERT_EQ(responses.at(playerId.value()).size(), 1);
-    ASSERT_EQ(responses.at(playerId.value()).at(0), "ok\n");
+    const auto responses = world.getAllResponsesBuffer();
+    ASSERT_TRUE(responses.empty() || responses.find(playerId.value()) == responses.end() ||
+                responses.at(playerId.value()).empty());
 }
 
 TEST_F(WorldTest, UpdateExecutesMultipleCommandsInSequence) {
@@ -280,7 +294,7 @@ TEST_F(WorldTest, UpdateExecutesMultipleCommandsInSequence) {
     world.pushCommandToPlayer(playerId.value(), std::make_unique<command::Forward>());
     world.pushCommandToPlayer(playerId.value(), std::make_unique<command::Forward>());
 
-    // 1st command executes on the 8th update
+    // 1st command: executes at tick 8
     for (int i = 0; i < 8; ++i) {
         world.update();
     }
@@ -288,39 +302,21 @@ TEST_F(WorldTest, UpdateExecutesMultipleCommandsInSequence) {
     auto responses = world.getAllResponsesBuffer();
     ASSERT_EQ(responses.at(playerId.value()).size(), 1);
 
-    // 2nd command executes on the 8th update after the first
-    for (int i = 0; i < 8; ++i) {
+    // 2nd command: tick 9 loads it, executes at tick 17 (9 ticks total)
+    for (int i = 0; i < 9; ++i) {
         world.update();
     }
 
     responses = world.getAllResponsesBuffer();
     ASSERT_EQ(responses.at(playerId.value()).size(), 1);
 
-    // 3rd command executes on the 8th update after the second
-    for (int i = 0; i < 8; ++i) {
+    // 3rd command: tick 18 loads it, executes at tick 26 (9 more ticks)
+    for (int i = 0; i < 9; ++i) {
         world.update();
     }
 
     responses = world.getAllResponsesBuffer();
     ASSERT_EQ(responses.at(playerId.value()).size(), 1);
-}
-
-TEST_F(WorldTest, UpdateDoesNotExecuteCommandBeforeRequiredTicks) {
-    World world{config};
-
-    const auto playerId = world.spawnPlayer("team1");
-    ASSERT_TRUE(playerId.has_value());
-
-    world.pushCommandToPlayer(playerId.value(), std::make_unique<command::Forward>());
-
-    // Update only 3 times - way below the 8 required
-    for (int i = 0; i < 3; ++i) {
-        world.update();
-    }
-
-    const auto responses = world.getAllResponsesBuffer();
-    ASSERT_TRUE(responses.empty() || responses.find(playerId.value()) == responses.end() ||
-                responses.at(playerId.value()).empty());
 }
 
 TEST_F(WorldTest, MultiplePlayersUpdateIndependently) {
@@ -358,11 +354,11 @@ TEST_F(WorldTest, CommandExecutionClearsResponseBuffer) {
     }
 
     // First call should return the response
-    auto responses1 = world.getAllResponsesBuffer();
+    const auto responses1 = world.getAllResponsesBuffer();
     ASSERT_EQ(responses1.at(playerId.value()).size(), 1);
 
     // Second call should return empty (buffer is cleared after first call)
-    auto responses2 = world.getAllResponsesBuffer();
+    const auto responses2 = world.getAllResponsesBuffer();
     ASSERT_TRUE(responses2.empty() || responses2.find(playerId.value()) == responses2.end() ||
                 responses2.at(playerId.value()).empty());
 }
