@@ -19,6 +19,7 @@
 #include "game/World.hpp"
 
 namespace zappy::server::game {
+
 Player::Player(const std::size_t id, const std::size_t x, const std::size_t y, const cardinalPoint orient)
     : _orientation(orient), _lifeTick(kNbStartFood * kNbLifeTickFood), _pos({.x = x, .y = y}), _id(id) {
     _inventory.fill(0);
@@ -47,11 +48,6 @@ void Player::setItem(ItemType item, const size_t amount) { _inventory.at(static_
 void Player::pushCommand(std::unique_ptr<command::ICommand> command) {
     if (_commands.size() >= kMaxNbCmd) {
         throw exception::TooMuchCmd{"Player " + std::to_string(_id) + " has too much commands queued"};
-    }
-    if (_currentCommand == nullptr) {
-        _currentCommand = std::move(command);
-        _cmdTick = _currentCommand->requiredTicks();
-        return;
     }
     _commands.push(std::move(command));
 }
@@ -87,11 +83,13 @@ void Player::update(game::World& world) {
 
 void Player::moveForward(const Position& limit) {
     auto [fst, snd] = playerMove.at(static_cast<uint8_t>(_orientation));
-    const std::size_t width = limit.x;
-    const std::size_t height = limit.y;
+    const int width = static_cast<int>(limit.x);
+    const int height = static_cast<int>(limit.y);
+    const int newX = (static_cast<int>(_pos.x) + fst + width) % width;
+    const int newY = (static_cast<int>(_pos.y) + snd + height) % height;
 
-    _pos.x = (_pos.x + fst + width) % width;
-    _pos.y = (_pos.y + snd + height) % height;
+    _pos.x = static_cast<std::size_t>(newX);
+    _pos.y = static_cast<std::size_t>(newY);
 }
 
 void Player::addResponse(const std::string& str) { _buffersResponses.push_back(str); }

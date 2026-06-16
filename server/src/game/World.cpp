@@ -240,6 +240,8 @@ int World::getNextExecutionTick() const {
 
         if (player->cmdTick() > 0 && player->cmdTick() < playerNextEvent) {
             playerNextEvent = player->cmdTick();
+        } else if (player->cmdTick() == 0 && player->hasCommands()) {
+            playerNextEvent = 1;
         }
 
         if (nextTick == -1 || playerNextEvent < nextTick) {
