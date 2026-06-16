@@ -58,27 +58,35 @@ void Core::setup() {
 }
 
 void Core::loop() {
-    auto nextTickTarget = std::chrono::steady_clock::now() + std::chrono::milliseconds(_timeUnit);
+    auto nextTickTarget = std::chrono::steady_clock::now() + std::chrono::milliseconds{_timeUnit};
 
     while (_isRunning) {
         try {
-            const auto now = std::chrono::steady_clock::now();
-            int pollTimeout = 0;
+            auto now = std::chrono::steady_clock::now();
+            int pollTimeout = -1;
+            const int nextExecutionTick = _world->getNextExecutionTick();
 
-            if (now < nextTickTarget) {
-                pollTimeout = static_cast<int>(
-                    std::chrono::duration_cast<std::chrono::milliseconds>(nextTickTarget - now).count());
+            if (nextExecutionTick != -1) {
+                auto targetTime = nextTickTarget + std::chrono::milliseconds{_timeUnit * (nextExecutionTick)};
+                if (now < targetTime) {
+                    pollTimeout = static_cast<int>(
+                        std::chrono::duration_cast<std::chrono::milliseconds>(targetTime - now).count());
+                } else {
+                    pollTimeout = 0;
+                }
+            } else {
+                nextTickTarget = now + std::chrono::milliseconds(_timeUnit);
             }
-            processNetworkEvents(pollTimeout);
+            _sessionManager->pollNetwork(pollTimeout);
             processGameTick(nextTickTarget);
+            processNetworkEvents();
         } catch (const std::exception& e) {
             std::cerr << "Error in main loop: " << e.what() << std::endl;
         }
     }
 }
 
-void Core::processNetworkEvents(int timeout) {
-    _sessionManager->pollNetwork(timeout);
+void Core::processNetworkEvents() {
     shared::network::ISessionManager::NetworkEvent message{};
 
     while (_sessionManager->tryPopMessage(message)) {
@@ -102,7 +110,6 @@ void Core::processGameTick(std::chrono::steady_clock::time_point& nextTickTarget
         _world->update();
         flushPlayerResponses();
         flushGuiResponses();
-
         nextTickTarget += std::chrono::milliseconds(_timeUnit);
     }
 }

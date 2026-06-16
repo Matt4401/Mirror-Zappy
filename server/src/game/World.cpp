@@ -232,4 +232,20 @@ std::vector<std::string> World::getAndClearGuiEvents() {
     return events;
 }
 
+int World::getNextExecutionTick() const {
+    int nextTick = -1;
+
+    for (const auto& player : _playerList | std::ranges::views::values) {
+        int playerNextEvent = static_cast<int>(player->nbLifeTick());
+
+        if (player->cmdTick() > 0 && player->cmdTick() < playerNextEvent) {
+            playerNextEvent = player->cmdTick();
+        }
+        if (nextTick == -1 || playerNextEvent < nextTick) {
+            nextTick = playerNextEvent;
+        }
+    }
+    return nextTick;
+}
+
 }  // namespace zappy::server::game

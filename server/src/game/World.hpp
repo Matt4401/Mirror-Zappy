@@ -64,6 +64,8 @@ class World {
     std::size_t getAvailableSlotInTeam(std::string_view teamName) const;
     void eject(std::size_t id);
 
+    [[nodiscard]] int getNextExecutionTick() const;
+
   private:
     std::unordered_map<std::string, std::unique_ptr<Team>> _teamList;
     std::unordered_map<std::size_t, std::unique_ptr<Player>> _playerList;
