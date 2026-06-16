@@ -15,7 +15,7 @@ namespace zappy::gui::graphics::scene {
 Tile3D::Tile3D(raylib::rmath::Vector3 position) : _position{position} {}
 
 void Tile3D::draw(const raylib::rmodels::Model& model) const {
-    model.drawModel(_position, 2.0F, raylib::Color::White());
+    model.drawModel(_position, TILE_SCALE, raylib::Color::White());
 }
 
 }  // namespace zappy::gui::graphics::scene

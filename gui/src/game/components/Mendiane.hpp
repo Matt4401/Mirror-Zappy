@@ -16,12 +16,16 @@
 namespace zappy::gui::game {
 class Mendiane : public AObject {
   public:
+    static constexpr auto MENDIANE_DENSITY = 0.1F;
+    static constexpr auto MENDIANE_X_OFFSET = 1.3F;
+    static constexpr auto MENDIANE_Z_OFFSET = 1.2F;
+
     Mendiane(raylib::rmath::Vector3 position) : AObject(position) {
         setName("Mendiane");
-        setDensity(0.1);
+        setDensity(MENDIANE_DENSITY);
         setPositionY(position.y() + graphics::scene::Tile3D::TILE_SIZE);
-        setPositionX(position.x() - 1.3F);
-        setPositionZ(position.z() - 1.2F);
+        setPositionX(position.x() - MENDIANE_X_OFFSET);
+        setPositionZ(position.z() - MENDIANE_Z_OFFSET);
     }
     ~Mendiane() override = default;
     Mendiane(const Mendiane& other) = delete;

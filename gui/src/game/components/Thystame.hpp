@@ -16,12 +16,16 @@
 namespace zappy::gui::game {
 class Thystame : public AObject {
   public:
+    static constexpr auto THYSTAME_DENSITY = 0.05F;
+    static constexpr auto THYSTAME_X_OFFSET = 7.0F;
+    static constexpr auto THYSTAME_Z_OFFSET = 0.5F;
+
     Thystame(raylib::rmath::Vector3 position) : AObject(position) {
         setName("Thystame");
-        setDensity(0.05);
+        setDensity(THYSTAME_DENSITY);
         setPositionY(position.y() + graphics::scene::Tile3D::TILE_SIZE);
-        setPositionX(position.x() - 7.0F);
-        setPositionZ(position.z() - 0.5F);
+        setPositionX(position.x() - THYSTAME_X_OFFSET);
+        setPositionZ(position.z() - THYSTAME_Z_OFFSET);
     }
     ~Thystame() override = default;
     Thystame(const Thystame& other) = delete;

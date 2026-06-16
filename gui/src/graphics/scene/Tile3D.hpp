@@ -15,6 +15,7 @@ namespace zappy::gui::graphics::scene {
 class Tile3D {
   public:
     static constexpr float TILE_SIZE = 4.0F;
+    static constexpr float TILE_SCALE = 2.0F;
 
     explicit Tile3D(raylib::rmath::Vector3 position = {0.0F, 0.0F, 0.0F});
     ~Tile3D() = default;

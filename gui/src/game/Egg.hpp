@@ -22,6 +22,6 @@ class Egg {
 
   protected:
   private:
-    raylib::rmath::Vector3 _position{0.0F, 4.0F, 0.0F};
+    raylib::rmath::Vector3 _position{0.0F, 4.0F, 0.0F};  // TEMP POSITION
 };
 }  // namespace zappy::gui::game

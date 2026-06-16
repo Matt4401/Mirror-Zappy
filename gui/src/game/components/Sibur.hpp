@@ -16,12 +16,16 @@
 namespace zappy::gui::game {
 class Sibur : public AObject {
   public:
+    static constexpr auto SIBUR_DENSITY = 0.1F;
+    static constexpr auto SIBUR_X_OFFSET = 1.2F;
+    static constexpr auto SIBUR_Z_OFFSET = 2.0F;
+
     Sibur(raylib::rmath::Vector3 position) : AObject(position) {
         setName("Sibur");
-        setDensity(0.1);
+        setDensity(SIBUR_DENSITY);
         setPositionY(position.y() + graphics::scene::Tile3D::TILE_SIZE);
-        setPositionX(position.x() - 1.2F);
-        setPositionZ(position.z() - 2.0F);
+        setPositionX(position.x() - SIBUR_X_OFFSET);
+        setPositionZ(position.z() - SIBUR_Z_OFFSET);
     }
     ~Sibur() override = default;
     Sibur(const Sibur& other) = delete;

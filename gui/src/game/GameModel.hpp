@@ -8,7 +8,6 @@
 #pragma once
 #include <memory>
 
-#include "Color.hpp"
 #include "rcore/Camera.hpp"
 #include "rmath/Vector3.hpp"
 #include "rmodels/Model.hpp"
@@ -16,8 +15,10 @@
 namespace zappy::gui::game {
 class GameModel {
   public:
+    static constexpr auto PLAYER_SCALE = 0.1F;
     static constexpr auto PLAYER_MODEL_RESOURCE = "assets/jeffrey/scene.gltf";
     static constexpr auto EGG_MODEL_RESOURCE = "assets/minecraft_dragon_egg/scene.gltf";
+    static constexpr auto EGG_SCALE = 0.6F;
 
     GameModel(std::shared_ptr<raylib::rcore::Camera>& camera) : _camera(camera) {}
     ~GameModel() = default;
@@ -26,16 +27,8 @@ class GameModel {
     GameModel(GameModel&& other) noexcept = default;
     GameModel& operator=(GameModel&& other) noexcept = default;
 
-    void drawPlayer(raylib::rmath::Vector3 position) const {
-        if (_camera->isVisibleFromCamera(position)) {
-            _playerModel.drawModel(position, 0.1, raylib::Color::White());
-        }
-    }
-    void drawEgg(raylib::rmath::Vector3 position) const {
-        if (_camera->isVisibleFromCamera(position)) {
-            _eggModel.drawModel(position, 0.6, raylib::Color::White());
-        }
-    }
+    void drawPlayer(raylib::rmath::Vector3 position) const;
+    void drawEgg(raylib::rmath::Vector3 position) const;
 
   protected:
   private:

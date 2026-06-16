@@ -16,12 +16,16 @@
 namespace zappy::gui::game {
 class Phiras : public AObject {
   public:
+    static constexpr auto PHIRAS_DENSITY = 0.08F;
+    static constexpr auto PHIRAS_X_OFFSET = 6.4F;
+    static constexpr auto PHIRAS_Z_OFFSET = 0.4F;
+
     Phiras(raylib::rmath::Vector3 position) : AObject(position) {
         setName("Phiras");
-        setDensity(0.08);
+        setDensity(PHIRAS_DENSITY);
         setPositionY(position.y() + graphics::scene::Tile3D::TILE_SIZE);
-        setPositionX(position.x() - 6.4F);
-        setPositionZ(position.z() + 0.4F);
+        setPositionX(position.x() - PHIRAS_X_OFFSET);
+        setPositionZ(position.z() + PHIRAS_Z_OFFSET);
     }
     ~Phiras() override = default;
     Phiras(const Phiras& other) = delete;

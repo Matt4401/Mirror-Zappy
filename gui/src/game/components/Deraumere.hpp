@@ -16,12 +16,16 @@
 namespace zappy::gui::game {
 class Deraumere : public AObject {
   public:
+    static constexpr auto DERAUMERE_X_OFFSET = 0.4F;
+    static constexpr auto DERAUMERE_Z_OFFSET = 0.5F;
+    static constexpr auto DERAUMERE_DENSITY = 0.15F;
+
     Deraumere(raylib::rmath::Vector3 position) : AObject(position) {
         setName("Deraumere");
-        setDensity(0.15);
+        setDensity(DERAUMERE_DENSITY);
         setPositionY(position.y() + graphics::scene::Tile3D::TILE_SIZE);
-        setPositionX(position.x() - 0.4F);
-        setPositionZ(position.z() - 0.5F);
+        setPositionX(position.x() - DERAUMERE_X_OFFSET);
+        setPositionZ(position.z() - DERAUMERE_Z_OFFSET);
     }
     ~Deraumere() override = default;
     Deraumere(const Deraumere& other) = delete;
