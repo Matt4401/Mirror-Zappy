@@ -55,6 +55,7 @@ class Core {
     void loop();
 
     void flushPlayerResponses();
+    void flushGuiResponses();
 
     parser::ServerConfig _config;
     std::unique_ptr<shared::network::ISessionManager> _sessionManager;

@@ -7,7 +7,6 @@
 
 #include "World.hpp"
 
-#include <cmath>
 #include <cstdint>
 #include <ctime>
 #include <memory>
@@ -224,6 +223,13 @@ void World::eject(const std::size_t id) {
         _vecEggs.erase(idEgg);
         eraseEggFromTile(position, idEgg);
     }
+}
+
+std::vector<std::string> World::getAndClearGuiEvents() {
+    std::vector<std::string> events = std::move(_guiEvents);
+
+    _guiEvents.clear();
+    return events;
 }
 
 }  // namespace zappy::server::game

@@ -54,6 +54,7 @@ class World {
 
     void update();
     [[nodiscard]] std::unordered_map<std::size_t, std::vector<std::string>> getAllResponsesBuffer() const;
+    [[nodiscard]] std::vector<std::string> getAndClearGuiEvents();
     void pushCommandToPlayer(std::size_t playerId, std::unique_ptr<command::ICommand> command) const;
     void removePlayerFromTeam(std::size_t id) const;
     void updatePositionOnMap(std::size_t id, const Position& oldPosition, const Position& newPosition);
@@ -71,6 +72,8 @@ class World {
     std::size_t _newId{0};
     std::vector<Tile> _tiles;
     std::unordered_map<std::size_t, Egg> _vecEggs;
+
+    std::vector<std::string> _guiEvents;
 
     [[nodiscard]] std::size_t getTileIndex(std::size_t x, std::size_t y) const;
     [[nodiscard]] std::size_t getTileIndex(const Position& position) const;

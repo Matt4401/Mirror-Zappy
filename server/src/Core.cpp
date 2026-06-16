@@ -17,6 +17,7 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #include "Parser.hpp"
 #include "SessionManager.hpp"
@@ -196,6 +197,21 @@ void Core::flushPlayerResponses() {
         }
         for (const auto& message : it->second) {
             _sessionManager->sendMessage(clientId, message);
+        }
+    }
+}
+
+void Core::flushGuiResponses() {
+    auto events = _world->getAndClearGuiEvents();
+    if (events.empty()) {
+        return;
+    }
+
+    for (const auto& [clientId, state] : _clientStates) {
+        if (state == ClientState::GUI) {
+            for (const auto& eventMsg : events) {
+                _sessionManager->sendMessage(clientId, eventMsg);
+            }
         }
     }
 }
