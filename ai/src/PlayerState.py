@@ -5,7 +5,7 @@ class PlayerState:
         self.position =  {10 , 10} # TODO randomise here
         self.direction = {1} # # TODO randomise here
         self.vision = None # TODO we have to create a norm for the vision in an other issu
-        self.inventory = [] # TODO we have to create a struct or eaven a class for inventory in an other issue
+        self.inventory = []  # TODO we have to create a struct or eaven a class for inventory in an other issue
         self.food_remaining = 10
 
 
