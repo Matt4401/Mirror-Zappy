@@ -7,8 +7,14 @@
 
 #pragma once
 
+#include <chrono>
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <span>
+#include <string>
+#include <string_view>
+#include <unordered_map>
 
 #include "command/CommandFactory.hpp"
 #include "game/World.hpp"
@@ -31,16 +37,37 @@ class Core {
     void stop();
 
   private:
-    void setup();
-    void loop() const;
+    enum class ClientState : std::uint8_t { WAITING_TEAM_SELECTION, IN_GAME, GUI };
 
-    std::span<char*> _args;
+    static void formatReceivedString(std::string& str);
+
+    void processNetworkEvents(int timeout);
+    void processGameTick(std::chrono::steady_clock::time_point& nextTickTarget);
+
+    void handleNewClient(int clientId);
+    void handleClientMessage(int clientId, std::string_view message);
+    void handleClientDisconnection(int clientId);
+    void handleHandshake(int clientId, std::string_view teamName);
+    void handleInGameMessage(int clientId, std::string_view message);
+    void handleGuiMessage(int clientId, std::string_view message);
+
+    void setup();
+    void loop();
+
+    void flushPlayerResponses();
+    void flushGuiResponses();
+
     parser::ServerConfig _config;
-    int _timeUnit{0};
     std::unique_ptr<shared::network::ISessionManager> _sessionManager;
     std::unique_ptr<game::World> _world;
     command::CommandFactory _commandFactory;
+
+    int _timeUnit{0};
     bool _isRunning{true};
+
+    std::span<char*> _args;
+    std::unordered_map<int, ClientState> _clientStates;
+    std::unordered_map<int, std::size_t> _clientToPlayer;
 };
 
 }  // namespace zappy::server

@@ -34,6 +34,8 @@ void Team::addNewTeamSlot() {
 
 std::vector<std::size_t> Team::listPlayerId() const { return _listPlayerId; }
 
+std::size_t Team::availableSlot() const { return _nbTeamSlots - _listPlayerId.size(); }
+
 void Team::removeTeamSlot() { _nbTeamSlots--; }
 
 }  // namespace zappy::server::game

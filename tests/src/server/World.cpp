@@ -35,8 +35,8 @@ TEST_F(WorldTest, ConstructorCreatesCorrectMapSize) {
     const World world{config};
     const auto [maxX, maxY] = world.sizeMap();
 
-    ASSERT_EQ(maxX, 9);
-    ASSERT_EQ(maxY, 9);
+    ASSERT_EQ(maxX, 10);
+    ASSERT_EQ(maxY, 10);
 }
 
 TEST_F(WorldTest, ConstructorInitializesTeams) {
@@ -186,8 +186,8 @@ TEST_F(WorldTest, SizeMapReturnsDimensions) {
     const World world{customConfig};
     const auto [maxX, maxY] = world.sizeMap();
 
-    ASSERT_EQ(maxX, 19);
-    ASSERT_EQ(maxY, 14);
+    ASSERT_EQ(maxX, 20);
+    ASSERT_EQ(maxY, 15);
 }
 
 TEST_F(WorldTest, RandomCardinalPointReturnsValidOrientation) {

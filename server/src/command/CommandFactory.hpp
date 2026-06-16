@@ -14,6 +14,7 @@
 #include <unordered_map>
 
 #include "ICommand.hpp"
+#include "guiCommand/IGuiCommand.hpp"
 
 namespace zappy::server::command {
 
@@ -27,10 +28,14 @@ class CommandFactory {
     ~CommandFactory() = default;
 
     [[nodiscard]] std::unique_ptr<ICommand> createCommand(std::string_view rawCommand) const;
+    [[nodiscard]] std::unique_ptr<guiCommand::IGuiCommand> createGuiCommand(std::string_view rawCommand) const;
 
   private:
     using CommandCreator = std::move_only_function<std::unique_ptr<ICommand>(std::string_view) const>;
+    using GuiCommandCreator = std::move_only_function<std::unique_ptr<guiCommand::IGuiCommand>(std::string_view) const>;
+
     std::unordered_map<std::string, CommandCreator> _creators;
+    std::unordered_map<std::string, GuiCommandCreator> _guiCreators;
 
     [[nodiscard]] static std::string extractFirstWord(std::string_view rawCommand);
 };
