@@ -8,9 +8,11 @@ class AITeam:
         self.thread = threading.Lock()
         self.answer_list = []
         self.data_lock = threading.Lock()
+        self.team_name = team_name
         self.connection = AIConnection(
             host, port, team_name, self.data_lock, self.answer_list
         )
+        self.player_state(team_name, )
         self.reader_thread = threading.Thread(
             target=self.connection.run_reader, daemon=True
         )
