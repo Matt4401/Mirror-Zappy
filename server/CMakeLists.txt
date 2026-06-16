@@ -6,6 +6,8 @@ add_library(zappy_server_objects OBJECT
         src/Core.cpp
         src/Core.hpp
         src/guiCommand/IGuiCommand.hpp
+        src/guiCommand/Mct.cpp
+        src/guiCommand/Mct.hpp
         src/guiCommand/Msz.cpp
         src/guiCommand/Msz.hpp
         src/guiCommand/Sgt.cpp

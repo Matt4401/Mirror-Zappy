@@ -7,6 +7,7 @@
 
 #include "Core.hpp"
 #include "guiCommand/Bct.hpp"
+#include "guiCommand/Mct.hpp"
 #include "guiCommand/Msz.hpp"
 #include "guiCommand/Sgt.hpp"
 
@@ -72,4 +73,21 @@ TEST(BctCommandTest, ExecuteFailsSafelyOnOutOfBounds) {
     const std::string response = command.execute(core);
 
     EXPECT_TRUE(response == "sbp\n" || response.empty());
+}
+
+TEST(MctCommandTest, ExecuteReturnsAllTileContents) {
+    auto args = createDummyArgs();
+    zappy::server::Core core{std::span<char*>(args)};
+    core.setup();
+
+    zappy::server::guiCommand::Mct command{};
+    const std::string response = command.execute(core);
+
+    std::string expectedResponse;
+    for (int x = 0; x < 10; ++x) {
+        for (int y = 0; y < 20; ++y) {
+            expectedResponse += "bct " + std::to_string(x) + " " + std::to_string(y) + " 0 0 0 0 0 0 0\n";
+        }
+    }
+    EXPECT_EQ(response, expectedResponse);
 }

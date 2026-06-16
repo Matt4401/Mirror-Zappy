@@ -19,6 +19,7 @@
 #include "command/Right.hpp"
 #include "guiCommand/Bct.hpp"
 #include "guiCommand/IGuiCommand.hpp"
+#include "guiCommand/Mct.hpp"
 #include "guiCommand/Msz.hpp"
 #include "guiCommand/Sgt.hpp"
 #include "protocol/Commands.hpp"
@@ -41,6 +42,7 @@ CommandFactory::CommandFactory() {
         }
         return nullptr;
     });
+    _guiCreators.emplace("mct", [](std::string_view) { return std::make_unique<guiCommand::Mct>(); });
 }
 
 std::unique_ptr<ICommand> CommandFactory::createCommand(std::string_view rawCommand) const {
