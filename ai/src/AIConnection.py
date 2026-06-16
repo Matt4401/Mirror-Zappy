@@ -12,7 +12,7 @@ class AIConnection:
         self.team_name = team_name
         self.socket = None
         self.running = True
-        self.sub_charac = "\n"
+        self.sub_character = "\n"
         self.response_queue = Queue()
         self.socket_lock = threading.Lock()
         self.reader_thread = None
@@ -40,7 +40,7 @@ class AIConnection:
                 sys.exit(84)
 
             with self.socket_lock:
-                self.socket.send((self.team_name + self.sub_charac).encode())
+                self.socket.send((self.team_name + self.sub_character).encode())
             client_num = self.socket.recv(1024).decode().strip()
             if not client_num.isdigit() or int(client_num) <= 0:
                 print(f"Handshake failed: invalid client number '{client_num}'")
@@ -78,8 +78,8 @@ class AIConnection:
                         self.running = False
                         break
                     buffer += data
-                    while self.sub_charac in buffer:
-                        line, buffer = buffer.split(self.sub_charac, 1)
+                    while self.sub_character in buffer:
+                        line, buffer = buffer.split(self.sub_character, 1)
                         line = line.strip()
                         if line:
                             self.response_queue.put(line)
@@ -101,7 +101,7 @@ class AIConnection:
             return False
         try:
             with self.socket_lock:
-                self.socket.send((cmd + self.sub_charac).encode())
+                self.socket.send((cmd + self.sub_character).encode())
             return True
         except Exception as e:
             print(f"Error sending command '{cmd}': {e}")
