@@ -177,6 +177,8 @@ void Core::handleGuiMessage(int clientId, std::string_view message) {
         if (!response.empty()) {
             _sessionManager->sendMessage(clientId, response);
         }
+    } else {
+        _sessionManager->sendMessage(clientId, "suc\n");
     }
 }
 
