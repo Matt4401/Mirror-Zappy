@@ -6,7 +6,7 @@ from queue import Queue
 
 
 class AIConnection:
-    def __init__(self, host, port, team_name, debug=False):
+    def __init__(self, host, port, team_name):
         self.host = host
         self.port = port
         self.team_name = team_name
@@ -124,4 +124,4 @@ class AIConnection:
         try:
             self.disconnect()
         except socket.error as e:
-            print(f"Error while disconnecting happendd '{e}'")
+            print(f"Error while disconnecting '{e}'")
