@@ -10,8 +10,8 @@ class AITeam:
         self.connection = AIConnection(host, port, team_name, self.data_lock, self.answer_list)
         self.reader_thread = threading.Thread(target=self.connection.run_reader, daemon=True)
 
-    def threat_start(self):
+    def thread_start(self):
         self.reader_thread.start()
 
     def run(self):
-        thread_start()
+        self.thread_start()

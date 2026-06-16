@@ -1,7 +1,7 @@
 import sys
 import os
 import pytest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
 
@@ -9,15 +9,16 @@ from ai.zappy_ai import main
 
 
 @patch("src.AITeamClass.AIConnection")
-def test_main(mock_connect):
-    mock_connect.return_value = None
+def test_main(mock_connect_class):
+    mock_instance = MagicMock()
+    mock_connect_class.return_value = mock_instance
+
     test_args = ["zappy_ai", "-p", "4242", "-n", "EquipeTest", "-h", "localhost"]
     with patch("sys.argv", test_args):
         main()
 
-
 @patch("src.AITeamClass.AIConnection")
-def test_invalide_main_zero_args(mock_connect):
+def test_invalid_main_zero_args(mock_connect):
     mock_connect.return_value = None
     test_wrong_args = ["zappy_ai"]
 
@@ -28,7 +29,7 @@ def test_invalide_main_zero_args(mock_connect):
 
 
 @patch("src.AITeamClass.AIConnection")
-def test_invalide_main_zero_adrgs(mock_connect):
+def test_invalid_main_zero_args(mock_connect):
     mock_connect.return_value = None
     test_wrong_args = ["zappy_ai", "-p", "4242", "-n", "EquipeTest", "-h"]
 

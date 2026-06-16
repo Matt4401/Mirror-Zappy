@@ -11,6 +11,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.
 from ai.src.AIConnection import AIConnection
 
 
+
 class TestAIConnectionUnit(unittest.TestCase):
     @patch("ai.src.AIConnection.socket.socket")
     def test_successful_handshake(self, mock_socket_class):
@@ -19,7 +20,9 @@ class TestAIConnectionUnit(unittest.TestCase):
 
         mock_socket.recv.side_effect = [b"WELCOME\n", b"2\n", b"10 10\n"]
 
-        ai = AIConnection("127.0.0.1", 4242, "TeamA")
+        data_lock = threading.Lock()
+        answer_list = []
+        ai = AIConnection("127.0.0.1", 4242, "TeamA", data_lock, answer_list)
 
         mock_socket.connect.assert_called_with(("127.0.0.1", 4242))
         mock_socket.send.assert_called_with(b"TeamA\n")
@@ -27,13 +30,16 @@ class TestAIConnectionUnit(unittest.TestCase):
 
     @patch("ai.src.AIConnection.socket.socket")
     def test_handshake_bad_welcome(self, mock_socket_class):
+        data_lock = threading.Lock()
+        answer_list = []
         mock_socket = MagicMock()
         mock_socket_class.return_value = mock_socket
 
         mock_socket.recv.return_value = b"BAD MESSAGE aaaaaaaaaa\n"
 
+
         with self.assertRaises(SystemExit) as cm:
-            AIConnection("127.0.0.1", 4242, "TeamA")
+            ai = AIConnection("127.0.0.1", 4242, "TeamA", data_lock, answer_list)
 
         self.assertEqual(cm.exception.code, 84)
 
@@ -43,6 +49,7 @@ class TestAIConnectionFunctional(unittest.TestCase):
         self.host = "127.0.0.1"
         self.port = 8888
         self.server_ready = threading.Event()
+
 
         self.server_thread = threading.Thread(target=self._run_dummy_server)
         self.server_thread.daemon = True
@@ -77,7 +84,11 @@ class TestAIConnectionFunctional(unittest.TestCase):
             server.close()
 
     def test_full_connection_and_command(self):
-        ai = AIConnection(self.host, self.port, "MyTeam")
+        data_lock = threading.Lock()
+        answer_list = []
+        ai = AIConnection(self.host, self.port, "MyTeam", data_lock, answer_list)
+        reader_thread = threading.Thread(target=ai.run_reader, daemon=True)
+        reader_thread.start()
         response = ai.send_command("Forward")
         self.assertEqual(response, "ok")
         ai.disconnect()
