@@ -182,7 +182,7 @@ void Core::handleGuiMessage(int clientId, std::string_view message) {
     auto command = _commandFactory.createGuiCommand(message);
 
     if (command != nullptr) {
-        const std::string response = command->execute(*_world);
+        const std::string response = command->execute(*this);
 
         if (!response.empty()) {
             _sessionManager->sendMessage(clientId, response);

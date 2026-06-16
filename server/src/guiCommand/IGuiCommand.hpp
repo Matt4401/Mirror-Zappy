@@ -8,9 +8,10 @@
 #pragma once
 
 #include <string>
-namespace zappy::server::game {
-class World;
-}  // namespace zappy::server::game
+
+namespace zappy::server {
+class Core;
+}  // namespace zappy::server
 
 namespace zappy::server::guiCommand {
 
@@ -23,7 +24,7 @@ class IGuiCommand {
     IGuiCommand& operator=(IGuiCommand&& other) = delete;
     virtual ~IGuiCommand() = default;
 
-    virtual std::string execute(const game::World& world) = 0;
+    virtual std::string execute(Core& core) = 0;
 };
 
 }  // namespace zappy::server::guiCommand
