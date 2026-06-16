@@ -56,29 +56,33 @@ void Player::pushCommand(std::unique_ptr<command::ICommand> command) {
     _commands.push(std::move(command));
 }
 
-void Player::update(World& world) {
+void Player::update(game::World& world) {
     _lifeTick--;
-    if (_cmdTick == 0) {
+
+    if (_cmdTick > 0) {
+        _cmdTick--;
+    }
+    while (_cmdTick == 0) {
         if (_currentCommand != nullptr) {
             _currentCommand->execute(world, *this);
             _currentCommand = nullptr;
-            return;
         }
         if (_commands.empty()) {
-            return;
+            break;
         }
         _currentCommand = std::move(_commands.front());
         _commands.pop();
+
         if (!_currentCommand->start(world, *this)) {
             _buffersResponses.emplace_back("ko\n");
             _currentCommand = nullptr;
-            return;
+            continue;
         }
-
         _cmdTick = _currentCommand->requiredTicks();
-        return;
+        if (_cmdTick > 0) {
+            break;
+        }
     }
-    _cmdTick--;
 }
 
 void Player::moveForward(const Position& limit) {
@@ -123,5 +127,7 @@ void Player::moveWithOrientation(const Position& limit, cardinalPoint orientatio
 }
 
 int Player::cmdTick() const { return static_cast<int>(_cmdTick); }
+
+bool Player::hasCommands() const { return _currentCommand != nullptr || !_commands.empty(); }
 
 }  // namespace zappy::server::game

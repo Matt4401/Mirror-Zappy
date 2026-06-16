@@ -67,7 +67,7 @@ void Core::loop() {
             const int nextExecutionTick = _world->getNextExecutionTick();
 
             if (nextExecutionTick != -1) {
-                auto targetTime = nextTickTarget + std::chrono::milliseconds{_timeUnit * (nextExecutionTick)};
+                auto targetTime = nextTickTarget + std::chrono::milliseconds{_timeUnit * nextExecutionTick};
                 if (now < targetTime) {
                     pollTimeout = static_cast<int>(
                         std::chrono::duration_cast<std::chrono::milliseconds>(targetTime - now).count());

@@ -241,6 +241,7 @@ int World::getNextExecutionTick() const {
         if (player->cmdTick() > 0 && player->cmdTick() < playerNextEvent) {
             playerNextEvent = player->cmdTick();
         }
+
         if (nextTick == -1 || playerNextEvent < nextTick) {
             nextTick = playerNextEvent;
         }
