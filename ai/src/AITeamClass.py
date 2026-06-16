@@ -12,9 +12,7 @@ class AITeam:
         self.connection = AIConnection(
             host, port, team_name, self.data_lock, self.answer_list
         )
-        self.player_state(
-            team_name,
-        )
+        self.player_state = PlayerState(team_name)
 
     def run(self):
         pass
