@@ -2,7 +2,7 @@ import socket
 import sys
 import threading
 import time
-from queue import Queue, Empty
+from queue import Queue
 
 
 class AIConnection:
@@ -118,10 +118,10 @@ class AIConnection:
         if self.reader_thread and self.reader_thread.is_alive():
             self.reader_thread.join(timeout=2.0)
             if self.reader_thread.is_alive():
-                print(f"Warning: reader thread did not terminate gracefully")
+                print("Warning: reader thread did not terminate gracefully")
 
     def __del__(self):
         try:
             self.disconnect()
-        except:
-            print(f"Error while disconnecting happendd")
+        except socket.error as e:
+            print(f"Error while disconnecting happendd '{e}'")
