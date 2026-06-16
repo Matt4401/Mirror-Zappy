@@ -24,6 +24,8 @@
 #include "exception/Exception.hpp"
 #include "game/World.hpp"
 #include "network/ISessionManager.hpp"
+#include "protocol/Commands.hpp"
+#include "protocol/Emitter.hpp"
 #include "strategy/ServerStrategy.hpp"
 
 namespace zappy::server {
@@ -151,6 +153,7 @@ void Core::handleHandshake(int clientId, std::string_view teamName) {
 
     if (teamName == "GRAPHIC") {
         _clientStates[clientId] = ClientState::GUI;
+        sendGuiInitialState(clientId);
         return;
     }
     if (!playerIdOpt.has_value()) {
@@ -229,6 +232,15 @@ void Core::flushGuiResponses() {
             }
         }
     }
+}
+
+void Core::sendGuiInitialState(int clientId) {
+    _sessionManager->sendMessage(clientId, shared::protocol::Emitter::build(shared::protocol::server::Msz{
+                                               .width = static_cast<int>(_world->sizeMap().x),
+                                               .height = static_cast<int>(_world->sizeMap().y)}));
+    _sessionManager->sendMessage(
+        clientId,
+        shared::protocol::Emitter::build(shared::protocol::server::Sgt{.timeUnit = static_cast<int>(_config.freq)}));
 }
 
 }  // namespace zappy::server
