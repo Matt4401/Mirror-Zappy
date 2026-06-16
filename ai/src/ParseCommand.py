@@ -18,3 +18,12 @@ class ParseCommand:
         self.inventory.update_inventory(
             linemate, deraumere, sibur, mendiane, phiras, thystame, food
         )
+
+    def parse_broadcast(self, data):
+        pass
+
+    def parse_look(self, data):
+        pass
+
+    def parse_eject(self, data):
+        pass

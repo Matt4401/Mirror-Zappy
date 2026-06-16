@@ -6,7 +6,7 @@ class PlayerState:
     def __init__(self, team_name):
         self.level = 0
         self.team_name = team_name
-        self.direction = random.randint(1, 4)
+        self.direction = random.randint(1, 8)
         self.vision = (
             None  # TODO we have to create a norm for the vision in an other issu
         )
