@@ -13,6 +13,5 @@ class AITeam:
             host, port, team_name, self.data_lock, self.answer_list
         )
 
-
     def run(self):
         pass
