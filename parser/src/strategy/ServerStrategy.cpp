@@ -33,12 +33,11 @@ int ServerStrategy::parseNumericArg(const std::string& arg, const std::string& f
         const int val = static_cast<int>(std::stol(arg));
 
         if (val <= 0) {
-            throw shared::exception::ParsingError("Invalid value for " + flagName + ": must be greater than 0.");
+            throw shared::exception::ParsingError("Invalid value for {}: must be greater than 0.", flagName);
         }
         return val;
     } catch (const std::exception&) {
-        throw shared::exception::ParsingError("Invalid formatting for " + flagName + ": '" + arg +
-                                              "' is not a valid number.");
+        throw shared::exception::ParsingError("Invalid formatting for {}: '{}' is not a valid number.", flagName, arg);
     }
 }
 
@@ -61,9 +60,8 @@ void ServerStrategy::processOptions(const int argc, char** argv, ServerConfig& c
         if (auto it = argumentHandlers.find(static_cast<char>(opt)); it != argumentHandlers.end()) {
             it->second(encapsulation::GetOptWrapper::getOptionArg());
         } else {
-            throw shared::exception::ParsingError("Unknown option or missing argument near '-" +
-                                                  std::string(1, encapsulation::GetOptWrapper::getUnknownOption()) +
-                                                  "'");
+            throw shared::exception::ParsingError("Unknown option or missing argument near '-{}'",
+                                                  std::string(1, encapsulation::GetOptWrapper::getUnknownOption()));
         }
     }
 }

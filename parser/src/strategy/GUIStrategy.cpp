@@ -53,7 +53,7 @@ void GUIStrategy::parsePort(const std::string& arg, GuiConfig& config) {
         }
         config.port = val;
     } catch (const std::exception&) {
-        throw shared::exception::ParsingError("Invalid port formatting: '" + arg + "' is not a valid number.");
+        throw shared::exception::ParsingError("Invalid port formatting: '{}' is not a valid number.", arg);
     }
 }
 
