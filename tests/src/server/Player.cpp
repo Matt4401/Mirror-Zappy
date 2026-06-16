@@ -27,7 +27,7 @@ class [[maybe_unused]] MockCommand : public command::ICommand {
 };
 
 TEST(PlayerTest, InitialState) {
-    const Player player{1, 5, 5};
+    const Player player{1, 5, 5, cardinalPoint::NORTH};
 
     EXPECT_EQ(player.getItem(ItemType::Food), 10);
     EXPECT_EQ(player.getItem(ItemType::Linemate), 0);
@@ -35,7 +35,7 @@ TEST(PlayerTest, InitialState) {
 }
 
 TEST(PlayerTest, AddAndSubItems) {
-    Player player{1, 5, 5};
+    Player player{1, 5, 5, cardinalPoint::NORTH};
 
     player.addItem(ItemType::Linemate, 5);
     EXPECT_EQ(player.getItem(ItemType::Linemate), 5);
@@ -45,14 +45,14 @@ TEST(PlayerTest, AddAndSubItems) {
 }
 
 TEST(PlayerTest, SetItemDirectly) {
-    Player player{1, 5, 5};
+    Player player{1, 5, 5, cardinalPoint::NORTH};
 
     player.setItem(ItemType::Deraumere, 42);
     EXPECT_EQ(player.getItem(ItemType::Deraumere), 42);
 }
 
 TEST(PlayerTest, ResponsesHandling) {
-    Player player{1, 5, 5};
+    Player player{1, 5, 5, cardinalPoint::NORTH};
 
     player.addResponse("message 1\n");
     player.addResponse("message 2\n");
@@ -67,17 +67,17 @@ TEST(PlayerTest, ResponsesHandling) {
 }
 
 TEST(PlayerTest, MoveUpNorth) {
-    Player player{1, 5, 5};
-    constexpr pos limit = {.x = 9, .y = 9};
+    Player player{1, 5, 5, cardinalPoint::NORTH};
+    constexpr Position limit = {.x = 9, .y = 9};
 
-    player.moveUp(limit);
+    player.moveForward(limit);
 }
 
 TEST(PlayerTest, MoveUpNegativeWraparound) {
-    Player player{1, 0, 0};
-    constexpr pos limit = {.x = 9, .y = 9};
+    Player player{1, 0, 0, cardinalPoint::NORTH};
+    constexpr Position limit = {.x = 9, .y = 9};
 
-    player.moveUp(limit);
+    player.moveForward(limit);
 
     const auto [x, y] = player.position();
     EXPECT_EQ(x, 0);
