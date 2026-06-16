@@ -21,10 +21,14 @@ Bct::Bct(int x, int y) : _x(x), _y(y) {}
 
 std::string Bct::execute(Core& core) {
     const auto mapSize = core.world().sizeMap();
+
+    if (_x < 0 || _x >= mapSize.x || _y < 0 || _y >= mapSize.y) {
+        return "sbp\n";
+    }
     auto resources = core.world().getResourcesAt(_x, _y);
     auto payload = shared::protocol::Emitter::build(shared::protocol::server::Bct{
-        .x = _x,
-        .y = _y,
+        .x = static_cast<int>(_x),
+        .y = static_cast<int>(_y),
         .food = static_cast<int>(resources.at(static_cast<std::uint8_t>(game::ItemType::Food))),
         .linemate = static_cast<int>(resources.at(static_cast<std::uint8_t>(game::ItemType::Linemate))),
         .deraumere = static_cast<int>(resources.at(static_cast<std::uint8_t>(game::ItemType::Deraumere))),

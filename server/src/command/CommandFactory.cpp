@@ -11,13 +11,18 @@
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <variant>
 
 #include "command/Forward.hpp"
 #include "command/ICommand.hpp"
 #include "command/Left.hpp"
 #include "command/Right.hpp"
+#include "guiCommand/Bct.hpp"
 #include "guiCommand/IGuiCommand.hpp"
 #include "guiCommand/Msz.hpp"
+#include "guiCommand/Sgt.hpp"
+#include "protocol/Commands.hpp"
+#include "protocol/Parser.hpp"
 
 namespace zappy::server::command {
 
@@ -27,6 +32,15 @@ CommandFactory::CommandFactory() {
     _creators.emplace("Right", [](std::string_view) { return std::make_unique<Right>(); });
 
     _guiCreators.emplace("msz", [](std::string_view) { return std::make_unique<guiCommand::Msz>(); });
+    _guiCreators.emplace("sgt", [](std::string_view) { return std::make_unique<guiCommand::Sgt>(); });
+    _guiCreators.emplace("bct", [](std::string_view rawCommand) -> std::unique_ptr<guiCommand::IGuiCommand> {
+        auto parsedCmd = shared::protocol::Parser::parseClientCommand(rawCommand);
+
+        if (const auto* bctParams = std::get_if<shared::protocol::client::Bct>(&parsedCmd)) {
+            return std::make_unique<guiCommand::Bct>(bctParams->x, bctParams->y);
+        }
+        return nullptr;
+    });
 }
 
 std::unique_ptr<ICommand> CommandFactory::createCommand(std::string_view rawCommand) const {

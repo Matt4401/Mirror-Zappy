@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <string>
 
 #include "guiCommand/IGuiCommand.hpp"
@@ -26,7 +27,7 @@ class Bct : public IGuiCommand {
     std::string execute(Core& core) override;
 
   private:
-    int _x;
-    int _y;
+    std::uint32_t _x;
+    std::uint32_t _y;
 };
 }  // namespace zappy::server::guiCommand
