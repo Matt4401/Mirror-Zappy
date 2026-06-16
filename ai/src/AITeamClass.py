@@ -16,6 +16,5 @@ class AITeam:
             team_name,
         )
 
-
     def run(self):
         pass
