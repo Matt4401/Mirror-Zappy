@@ -18,4 +18,5 @@ target_link_libraries(zappy_gui_graphics PUBLIC
         zappy_gui_raylib
         zappy_gui_context
         zappy_gui_graphics_scene
+        zappy_gui_events
 )
