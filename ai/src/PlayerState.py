@@ -40,12 +40,6 @@ class PlayerState:
     def update_inventory(self, new_inventory):
         self.inventory = new_inventory
 
-    def update_vision(self, vision):
-        self.vision = vision
-
-    def vision(self):
-        return self.vision
-
     def upgrade_level(self):
         self.level += 1
 
