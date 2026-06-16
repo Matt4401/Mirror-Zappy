@@ -26,7 +26,6 @@ class AIConnection:
         except socket.error as e:
             print(f"Failed to create socket: {e}")
             sys.exit(84)
-
         try:
             self.socket.connect((host, port))
         except socket.error as e:
@@ -40,22 +39,17 @@ class AIConnection:
                 print(f"Handshake failed: expected 'WELCOME\\n', got '{welcome_msg}'")
                 sys.exit(84)
 
-
             with self.socket_lock:
                 self.socket.send((self.team_name + self.sub_charac).encode())
-
             client_num = self.socket.recv(1024).decode().strip()
             if not client_num.isdigit() or int(client_num) <= 0:
                 print(f"Handshake failed: invalid client number '{client_num}'")
                 sys.exit(84)
-
             self.client_num = int(client_num)
-
             dims = self.socket.recv(1024).decode().strip()
             if not dims:
                 print("Handshake failed: no dimensions received")
                 sys.exit(84)
-
             try:
                 x, y = map(int, dims.split())
                 self.width = x
@@ -63,7 +57,6 @@ class AIConnection:
             except ValueError:
                 print(f"Handshake failed: invalid dimensions '{dims}'")
                 sys.exit(84)
-
         except Exception as e:
             print(f"Handshake error: {e}")
             sys.exit(84)
@@ -93,12 +86,14 @@ class AIConnection:
                         line = line.strip()
                         if line:
                             self.response_queue.put(line)
+                except BlockingIOError:
+                    time.sleep(0.01)
+                    continue
                 except Exception as e:
                     if self.running:
                         print(f"Error reading from socket: {e}")
                     self.running = False
                     break
-
         except Exception as e:
             print(f"Fatal reader socket error: {e}")
             self.running = False
@@ -112,28 +107,11 @@ class AIConnection:
             with self.socket_lock:
                 self.socket.send((cmd + self.sub_charac).encode())
             return True
-
         except Exception as e:
             print(f"Error sending command '{cmd}': {e}")
             self.running = False
             return False
 
-    def get_response(self, timeout=None):
-
-        try:
-            response = self.response_queue.get(block=(timeout is not None), timeout=timeout)
-            return response
-        except Empty:
-            return None
-
-    def wait_for_response(self, timeout=5.0):
-        response = self.get_response(timeout=timeout)
-        if response is None:
-            raise TimeoutError(f"No response from server within {timeout}s")
-        return response
-
-    def has_response(self):
-        return not self.response_queue.empty()
 
     def disconnect(self):
         self.running = False
@@ -145,10 +123,11 @@ class AIConnection:
         if self.reader_thread and self.reader_thread.is_alive():
             self.reader_thread.join(timeout=2.0)
             if self.reader_thread.is_alive():
-                print("Warning: reader thread did not terminate gracefully")
+                print(f"Warning: reader thread did not terminate gracefully")
+
 
     def __del__(self):
         try:
             self.disconnect()
         except:
-            pass
+            print(f"Error while disconnecting happendd")
