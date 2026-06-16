@@ -16,12 +16,6 @@ class PlayerState:
     def update_food(self, new_food):
         self.food_remaining += new_food
 
-    def position(self):
-        return self.position
-
-    def update_position(self, new_position):
-        self.position = new_position
-
     def direction(self):
         return self.direction
 
