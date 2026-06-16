@@ -15,12 +15,7 @@ class AITeam:
         self.player_state(
             team_name,
         )
-        self.reader_thread = threading.Thread(
-            target=self.connection.run_reader, daemon=True
-        )
 
-    def thread_start(self):
-        self.reader_thread.start()
 
     def run(self):
-        self.thread_start()
+        pass
