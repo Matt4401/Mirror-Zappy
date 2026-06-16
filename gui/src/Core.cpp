@@ -31,7 +31,7 @@ int Core::run() {
         if (std::string(e.what()) == zappy::parser::kUsageThrowMessage) {
             return zappy::parser::kExitSuccess;
         }
-        std::cerr << "Error: " << e.what() << std::endl;
+        std::cerr << e.what() << std::endl;
         return zappy::parser::kExitFailure;
     } catch (const std::exception& e) {
         std::cerr << "Unknown error: " << e.what() << std::endl;
