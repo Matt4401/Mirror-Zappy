@@ -62,21 +62,25 @@ void Core::loop() {
 
     while (_isRunning) {
         try {
-            auto now = std::chrono::steady_clock::now();
-            int pollTimeout = -1;
+            const auto now = std::chrono::steady_clock::now();
             const int nextExecutionTick = _world->getNextExecutionTick();
 
-            if (nextExecutionTick != -1) {
-                auto targetTime = nextTickTarget + std::chrono::milliseconds{_timeUnit * (nextExecutionTick - 1)};
-                if (now < targetTime) {
-                    pollTimeout = static_cast<int>(
-                        std::chrono::duration_cast<std::chrono::milliseconds>(targetTime - now).count());
-                } else {
-                    pollTimeout = 0;
-                }
-            } else {
-                nextTickTarget = now + std::chrono::milliseconds(_timeUnit);
+            if (nextExecutionTick == -1) {
+                _sessionManager->pollNetwork(-1);
+                processNetworkEvents();
+                nextTickTarget = std::chrono::steady_clock::now() + std::chrono::milliseconds{_timeUnit};
+                continue;
             }
+            int pollTimeout = -1;
+            auto targetTime = nextTickTarget + std::chrono::milliseconds{_timeUnit * (nextExecutionTick - 1)};
+
+            if (now < targetTime) {
+                pollTimeout =
+                    static_cast<int>(std::chrono::duration_cast<std::chrono::milliseconds>(targetTime - now).count());
+            } else {
+                pollTimeout = 0;
+            }
+
             _sessionManager->pollNetwork(pollTimeout);
             processGameTick(nextTickTarget);
             processNetworkEvents();
@@ -85,7 +89,6 @@ void Core::loop() {
         }
     }
 }
-
 void Core::processNetworkEvents() {
     shared::network::ISessionManager::NetworkEvent message{};
 
