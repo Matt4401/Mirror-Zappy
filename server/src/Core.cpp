@@ -101,6 +101,7 @@ void Core::processGameTick(std::chrono::steady_clock::time_point& nextTickTarget
     if (now >= nextTickTarget) {
         _world->update();
         flushPlayerResponses();
+        flushGuiResponses();
 
         nextTickTarget += std::chrono::milliseconds(_timeUnit);
     }
@@ -142,10 +143,12 @@ void Core::handleHandshake(int clientId, std::string_view teamName) {
         _clientStates[clientId] = ClientState::GUI;
         return;
     }
-    if (playerIdOpt.has_value()) {
-        _clientToPlayer[clientId] = playerIdOpt.value();
-        _clientStates[clientId] = ClientState::IN_GAME;
+    if (!playerIdOpt.has_value()) {
+        _sessionManager->sendMessage(clientId, "ko\n");
+        return;
     }
+    _clientToPlayer[clientId] = playerIdOpt.value();
+    _clientStates[clientId] = ClientState::IN_GAME;
     _sessionManager->sendMessage(clientId, std::format("{}\n{} {}\n", _world->getAvailableSlotInTeam(teamName),
                                                        _world->sizeMap().x, _world->sizeMap().y));
 }
