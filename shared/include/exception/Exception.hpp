@@ -26,8 +26,8 @@ public:
     Exception &operator=(const Exception &) = default;
     Exception &operator=(Exception &&) = default;
 
-    const char *what() const noexcept override;
-    const source &location() const noexcept;
+    [[nodiscard]] const char *what() const noexcept override;
+    [[nodiscard]] const source &location() const noexcept;
 
 protected:
     std::string _message;
