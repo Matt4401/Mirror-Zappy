@@ -6,10 +6,10 @@ import socket
 import threading
 import time
 
-# Adjust this path to your project structure
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from AIConnection import AIConnection
+
 
 class TestAIConnectionUnit(unittest.TestCase):
     @patch("AIConnection.socket.socket")
@@ -17,7 +17,6 @@ class TestAIConnectionUnit(unittest.TestCase):
         mock_socket = MagicMock()
         mock_socket_class.return_value = mock_socket
 
-        # Simulate the handshake sequence
         mock_socket.recv.side_effect = [b"WELCOME\n", b"2\n", b"10 10\n"]
 
         ai = AIConnection("127.0.0.1", 4242, "TeamA")
@@ -37,12 +36,15 @@ class TestAIConnectionUnit(unittest.TestCase):
             AIConnection("127.0.0.1", 4242, "TeamA")
         self.assertEqual(cm.exception.code, 84)
 
+
 class TestAIConnectionFunctional(unittest.TestCase):
     def setUp(self):
         self.host = "127.0.0.1"
-        self.port = 8889 # Use a different port to avoid conflicts
+        self.port = 8889
         self.server_ready = threading.Event()
-        self.server_thread = threading.Thread(target=self._run_dummy_server, daemon=True)
+        self.server_thread = threading.Thread(
+            target=self._run_dummy_server, daemon=True
+        )
         self.server_thread.start()
         self.server_ready.wait(timeout=2.0)
 
@@ -54,11 +56,10 @@ class TestAIConnectionFunctional(unittest.TestCase):
         self.server_ready.set()
         conn, addr = server.accept()
         conn.sendall(b"WELCOME\n")
-        conn.recv(1024) # Consume team name
+        conn.recv(1024)
         conn.sendall(b"1\n")
         conn.sendall(b"10 10\n")
 
-        # Keep connection open for commands
         data = conn.recv(1024)
         if data == b"Forward\n":
             conn.sendall(b"ok\n")
@@ -70,11 +71,11 @@ class TestAIConnectionFunctional(unittest.TestCase):
         success = ai.send_command("Forward")
         self.assertTrue(success)
 
-        # Verify response in queue (needs small delay for thread)
         time.sleep(0.1)
         response = ai.response_queue.get(timeout=1.0)
         self.assertEqual(response, "ok")
         ai.disconnect()
+
 
 if __name__ == "__main__":
     unittest.main()

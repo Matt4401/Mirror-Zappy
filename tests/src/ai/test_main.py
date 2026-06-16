@@ -17,6 +17,7 @@ def test_main(mock_connect_class):
     with patch("sys.argv", test_args):
         main()
 
+
 @patch("src.AITeamClass.AIConnection")
 def test_invalid_main_zero_args(mock_connect):
     mock_connect.return_value = None

@@ -63,12 +63,9 @@ class AIConnection:
 
     def _start_reader(self):
         self.reader_thread = threading.Thread(
-            target=self._run_reader,
-            daemon=False,
-            name="AIConnection-Reader"
+            target=self._run_reader, daemon=False, name="AIConnection-Reader"
         )
         self.reader_thread.start()
-
 
     def _run_reader(self):
         buffer = ""
@@ -98,7 +95,6 @@ class AIConnection:
             print(f"Fatal reader socket error: {e}")
             self.running = False
 
-
     def send_command(self, cmd):
         if not self.running or not self.socket:
             print("Cannot send: connection not active")
@@ -112,7 +108,6 @@ class AIConnection:
             self.running = False
             return False
 
-
     def disconnect(self):
         self.running = False
         try:
@@ -124,7 +119,6 @@ class AIConnection:
             self.reader_thread.join(timeout=2.0)
             if self.reader_thread.is_alive():
                 print(f"Warning: reader thread did not terminate gracefully")
-
 
     def __del__(self):
         try:
