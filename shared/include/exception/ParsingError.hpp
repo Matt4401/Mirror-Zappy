@@ -20,7 +20,7 @@ class ParsingError : public Exception {
     static constexpr std::string_view PREFIX = "[Parsing error]: ";
 
     template <typename... Args>
-    explicit ParsingError(const std::string_view fmt, Args &&...args)
+    explicit ParsingError(const std::string_view fmt, Args... args)
         : Exception(std::string(PREFIX) + std::vformat(fmt, std::make_format_args(std::forward<Args>(args)...)),
                     source::current()) {}
 
