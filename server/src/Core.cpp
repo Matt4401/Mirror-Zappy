@@ -98,7 +98,7 @@ void Core::processNetworkEvents(int timeout) {
 void Core::processGameTick(std::chrono::steady_clock::time_point& nextTickTarget) {
     const auto now = std::chrono::steady_clock::now();
 
-    if (now >= nextTickTarget) {
+    while (now >= nextTickTarget) {
         _world->update();
         flushPlayerResponses();
         flushGuiResponses();
