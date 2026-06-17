@@ -174,6 +174,9 @@ void UIButton::setVisible(bool visible) { _isVisible = visible; }
 void UIButton::setOnClick(std::function<void()> callback) { _onClick = std::move(callback); }
 
 void UIButton::setFontSize(float size) {
+    if (size <= 0.0F) {
+        return;
+    }
     _fontSize = size;
     updateTextPosition();
 }
