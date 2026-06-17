@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <ranges>
 
 #include "Color.hpp"
 #include "rcore/Event.hpp"
@@ -28,7 +29,7 @@ void UIPanel::draw() {
         return;
     }
 
-    Rectangle const rec = {_position.x(), _position.y(), _size.x(), _size.y()};
+    Rectangle const rec{.x = _position.x(), .y = _position.y(), .width = _size.x(), .height = _size.y()};
     if (_isRounded) {
         raylib::rshapes::Shapes::drawRectangleRounded(rec, RoundednessFactor, RoundedSegments, _color);
     } else {
@@ -57,9 +58,9 @@ void UIPanel::handleEvent(const raylib::rcore::Event& event) {
     if (!_isVisible) {
         return;
     }
-    for (auto it = _children.rbegin(); it != _children.rend(); ++it) {
-        if ((*it)->isVisible()) {
-            (*it)->handleEvent(event);
+    for (auto& child : std::views::reverse(_children)) {
+        if (child->isVisible()) {
+            child->handleEvent(event);
         }
     }
 }
