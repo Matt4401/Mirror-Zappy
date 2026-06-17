@@ -7,6 +7,7 @@
 
 #include "game/Player.hpp"
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -123,5 +124,7 @@ void Player::moveWithOrientation(const Position& limit, cardinalPoint orientatio
 }
 
 void Player::setPosition(const Position pos) { _pos = pos; }
+
+std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> Player::inventory() const { return _inventory; }
 
 }  // namespace zappy::server::game

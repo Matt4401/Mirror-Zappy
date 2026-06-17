@@ -74,6 +74,8 @@ class World {
     bool isEggOnTile(const Position& position) const;
 
     const std::unordered_map<std::size_t, std::unique_ptr<Player>>& playerList() const;
+    void addItemOnGround(ItemType item, Position pos);
+    void removeItemOnGround(ItemType item, Position pos);
 
   private:
     std::unordered_map<std::string, std::unique_ptr<Team>> _teamList;

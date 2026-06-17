@@ -59,6 +59,7 @@ class Player {
     void addResponse(const std::string&);
     std::vector<std::string> responses();
     [[nodiscard]] Position position() const;
+    [[nodiscard]] std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> inventory() const;
 
     void setOrientation(cardinalPoint orient);
     [[nodiscard]] cardinalPoint orientation() const;

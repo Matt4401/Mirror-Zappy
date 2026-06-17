@@ -233,4 +233,12 @@ bool World::isEggOnTile(const Position& position) const {
 
 const std::unordered_map<std::size_t, std::unique_ptr<Player>>& World::playerList() const { return _playerList; }
 
+void World::addItemOnGround(ItemType item, const Position pos) {
+    _tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(item))++;
+}
+
+void World::removeItemOnGround(ItemType item, const Position pos) {
+    _tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(item))--;
+}
+
 }  // namespace zappy::server::game
