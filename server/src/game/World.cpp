@@ -199,8 +199,10 @@ void World::eject(const std::size_t id) {
     const auto& pushingPlayer = _playerList.at(id);
     const auto orientation = pushingPlayer->orientation();
     const auto position = getTileIndex(pushingPlayer->position());
-    const auto vecPlayerPush = _tiles.at(position).players;
-    const auto vecEggPush = _tiles.at(position).eggs;
+    const auto& tile = _tiles.at(position);
+    auto vecPlayerPush = tile.players;
+    std::erase(vecPlayerPush, id);
+    const auto vecEggPush = tile.eggs;
 
     for (const auto& idPushed : vecPlayerPush) {
         const auto& pushedPlayer = _playerList.at(idPushed);
@@ -210,11 +212,25 @@ void World::eject(const std::size_t id) {
         pushedPlayer->moveWithOrientation(Position{.x = limitX, .y = limitY}, orientation);
         const auto [newX, newY] = pushedPlayer->position();
         updatePositionOnMap(pushedPlayer->id(), {.x = oldX, .y = oldY}, {.x = newX, .y = newY});
+        pushedPlayer->addResponse("eject: " + kCardinalPointToStr.at(orientation) + "\n");
     }
     for (const auto idEgg : vecEggPush) {
         _vecEggs.erase(idEgg);
         eraseEggFromTile(position, idEgg);
     }
+    pushingPlayer->addResponse("ok\n");
 }
+
+bool World::isPeopleOrEggOnTile(const Position& position) const {
+    const auto tile = _tiles.at(getTileIndex(position));
+    return !tile.players.empty() || !tile.eggs.empty();
+}
+
+bool World::isEggOnTile(const Position& position) const {
+    const auto tile = _tiles.at(getTileIndex(position));
+    return !tile.eggs.empty();
+}
+
+const std::unordered_map<std::size_t, std::unique_ptr<Player>>& World::playerList() const { return _playerList; }
 
 }  // namespace zappy::server::game

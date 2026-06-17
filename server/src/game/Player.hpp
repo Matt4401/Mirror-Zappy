@@ -66,6 +66,7 @@ class Player {
     [[nodiscard]] std::size_t id() const;
     [[nodiscard]] std::size_t nbLifeTick() const;
     void kill();
+    void setPosition(Position pos);
 
   private:
     std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> _inventory{};

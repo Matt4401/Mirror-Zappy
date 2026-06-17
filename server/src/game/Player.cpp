@@ -122,4 +122,6 @@ void Player::moveWithOrientation(const Position& limit, cardinalPoint orientatio
     _pos.y = (_pos.y + snd + height) % height;
 }
 
+void Player::setPosition(const Position pos) { _pos = pos; }
+
 }  // namespace zappy::server::game
