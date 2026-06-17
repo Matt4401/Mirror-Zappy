@@ -271,6 +271,14 @@ void UIGridManager::handleMouseDrag(const raylib::rmath::Vector2& mousePos, floa
 }
 
 void UIGridManager::addPanel(const std::shared_ptr<UIGamePanel>& panel, int gridX, int gridY, int gridW, int gridH) {
+    if (!panel || gridX < 0 || gridY < 0 || gridW <= 0 || gridH <= 0 || gridX + gridW > GridCols ||
+        gridY + gridH > GridRows) {
+        return;
+    }
+    GridRect const newRect{.x = gridX, .y = gridY, .w = gridW, .h = gridH};
+    if (checkOverlap(newRect, nullptr)) {
+        return;
+    }
     _panels.push_back(PanelData{.panel = panel,
                                 .originalGrid = {.x = gridX, .y = gridY, .w = gridW, .h = gridH},
                                 .grid = {.x = gridX, .y = gridY, .w = gridW, .h = gridH}});
