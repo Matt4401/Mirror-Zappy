@@ -1,0 +1,11 @@
+Model Information:
+* title:	Proptober Day 11: Iron Ore Vein
+* source:	https://sketchfab.com/3d-models/proptober-day-11-iron-ore-vein-3b71de02d90e48e5b11824da99c37ccf
+* author:	Nicholas DaRocha (https://sketchfab.com/LionRiderKing)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Proptober Day 11: Iron Ore Vein" (https://sketchfab.com/3d-models/proptober-day-11-iron-ore-vein-3b71de02d90e48e5b11824da99c37ccf) by Nicholas DaRocha (https://sketchfab.com/LionRiderKing) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

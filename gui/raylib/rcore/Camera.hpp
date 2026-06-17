@@ -14,7 +14,7 @@
 namespace zappy::gui::raylib::rcore {
 class Camera {
   public:
-    static constexpr float MAX_RENDER_DISTANCE = 80.0F;
+    static constexpr float MAX_RENDER_DISTANCE = 160.0F;
     static constexpr float VIEW_PADDING_DEGREES = 35.0F;
     static constexpr float MIN_DISTANCE = 2.0F;
     static constexpr float VISIBILITY_ORIGIN_BACKSTEP = 4.0F;
