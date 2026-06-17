@@ -149,13 +149,13 @@ void Core::handleClientMessage(int clientId, std::string_view message) {
 }
 
 void Core::handleHandshake(int clientId, std::string_view teamName) {
-    const auto playerIdOpt = _world->spawnPlayer(teamName);
-
     if (teamName == "GRAPHIC") {
         _clientStates[clientId] = ClientState::GUI;
         sendGuiInitialState(clientId);
         return;
     }
+
+    const auto playerIdOpt = _world->spawnPlayer(teamName);
     if (!playerIdOpt.has_value()) {
         _sessionManager->sendMessage(clientId, "ko\n");
         return;
