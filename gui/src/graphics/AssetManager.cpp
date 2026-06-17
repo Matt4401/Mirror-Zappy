@@ -21,7 +21,7 @@ AssetManager& AssetManager::getInstance() {
 }
 
 bool AssetManager::loadFont(const std::string& id, const std::string& path) {
-    if (_fonts.find(id) != _fonts.end()) {
+    if (_fonts.contains(id)) {
         return true;
     }
     auto font = std::make_shared<raylib::rtext::Font>(path);
@@ -34,9 +34,8 @@ bool AssetManager::loadFont(const std::string& id, const std::string& path) {
 }
 
 std::shared_ptr<raylib::rtext::Font> AssetManager::getFont(const std::string& id) {
-    auto it = _fonts.find(id);
-    if (it != _fonts.end()) {
-        return it->second;
+    if (_fonts.contains(id)) {
+        return _fonts[id];
     }
     return nullptr;
 }
