@@ -45,7 +45,10 @@ class UIGamePanel : public IUIComponent {
     void addComponent(const std::shared_ptr<IUIComponent>& component);
     void removeComponent(const std::shared_ptr<IUIComponent>& component);
 
-    void setNextPanel(const std::shared_ptr<UIGamePanel>& panel);
+    void setConfigMode(bool configMode) { _isConfigMode = configMode; }
+    void updateChildrenLayout();
+
+    void setNextPanel(const std::shared_ptr<UIGamePanel>& panel, float gapPixels = 0.0F);
     [[nodiscard]] raylib::rmath::Vector2 getPosition() const { return _position; }
 
   private:
@@ -61,10 +64,15 @@ class UIGamePanel : public IUIComponent {
     std::vector<std::shared_ptr<IUIComponent>> _contentChildren;
 
     std::weak_ptr<UIGamePanel> _nextPanel;
+    float _nextPanelGap{0.0F};
 
     bool _isCollapsed{false};
+    bool _isConfigMode{false};
     float _expandedHeight;
     float _currentHeight;
+
+    float _scrollOffset{0.0F};
+    float _maxScroll{0.0F};
 
     static constexpr int MouseLeftButton = 0;
     static constexpr float DefaultHeaderHeight = 40.0F;
@@ -72,6 +80,7 @@ class UIGamePanel : public IUIComponent {
     static constexpr float LerpSpeedMultiplier = 15.0F;
     static constexpr int DefaultFontSize = 20;
     static constexpr float TextSpacing = 2.0F;
+    static constexpr float ScrollSpeed = 30.0F;
 
     static const raylib::Color PrimaryColor;
     static const raylib::Color SecondaryColor;

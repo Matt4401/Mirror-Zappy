@@ -12,8 +12,8 @@
 #include <algorithm>
 #include <cmath>
 #include <memory>
-#include <ranges>
 #include <string>
+#include <vector>
 
 #include "../../graphics/AssetManager.hpp"
 #include "Color.hpp"
@@ -76,9 +76,11 @@ void UIGamePanel::draw() {
     BeginScissorMode(static_cast<int>(_position.x()), static_cast<int>(_position.y() + DefaultHeaderHeight),
                      static_cast<int>(_size.x()), static_cast<int>(_currentHeight - DefaultHeaderHeight));
 
-    for (auto& child : _contentChildren) {
-        if (child->isVisible()) {
-            child->draw();
+    if (!_isConfigMode) {
+        for (auto& child : _contentChildren) {
+            if (child->isVisible()) {
+                child->draw();
+            }
         }
     }
 
@@ -90,9 +92,8 @@ void UIGamePanel::update() {
         return;
     }
 
-    float const targetHeight = _isCollapsed ? DefaultHeaderHeight : _expandedHeight;
+    float const targetHeight = (_isCollapsed && !_isConfigMode) ? DefaultHeaderHeight : _expandedHeight;
     float const lerpSpeed = LerpSpeedMultiplier * raylib::rcore::Window::frameTime();
-    float const previousHeight = _currentHeight;
 
     _currentHeight += (targetHeight - _currentHeight) * lerpSpeed;
 
@@ -100,12 +101,8 @@ void UIGamePanel::update() {
         _currentHeight = targetHeight;
     }
 
-    float const deltaHeight = _currentHeight - previousHeight;
-    if (deltaHeight != 0.0F) {
-        if (auto next = _nextPanel.lock()) {
-            raylib::rmath::Vector2 const nextPos = next->getPosition();
-            next->setPosition(nextPos.x(), nextPos.y() + deltaHeight);
-        }
+    if (auto next = _nextPanel.lock()) {
+        next->setPosition(_position.x(), _position.y() + _currentHeight + _nextPanelGap);
     }
 
     _mainPanel->setSize(_size.x(), _currentHeight);
@@ -142,10 +139,26 @@ void UIGamePanel::handleEvent(const raylib::rcore::Event& event) {
 
     _mainPanel->handleEvent(event);
 
-    if (_currentHeight > DefaultHeaderHeight + 1.0F) {
-        for (auto& it : std::ranges::reverse_view(_contentChildren)) {
-            if (it->isVisible()) {
-                it->handleEvent(event);
+    if (_isCollapsed) {
+        return;
+    }
+
+    if (!_isConfigMode) {
+        raylib::rmath::Vector2 const mousePos = raylib::rcore::Event::getMousePositionStatic();
+        Rectangle const contentRec = {_position.x(), _position.y() + DefaultHeaderHeight, _size.x(),
+                                      _currentHeight - DefaultHeaderHeight};
+        if (CheckCollisionPointRec(mousePos.vector(), contentRec)) {
+            float const wheelMove = ::GetMouseWheelMove();
+            if (wheelMove != 0.0F) {
+                _scrollOffset -= wheelMove * ScrollSpeed;
+                _scrollOffset = std::clamp(_scrollOffset, 0.0F, _maxScroll);
+                updateChildrenLayout();
+            }
+
+            for (auto& child : _contentChildren) {
+                if (child->isVisible()) {
+                    child->handleEvent(event);
+                }
             }
         }
     }
@@ -163,7 +176,7 @@ void UIGamePanel::setPosition(float x, float y) {
 void UIGamePanel::setSize(float width, float height) {
     _size = raylib::rmath::Vector2(width, height);
     _expandedHeight = height;
-    if (!_isCollapsed) {
+    if (_isConfigMode) {
         _currentHeight = height;
     }
     _mainPanel->setSize(width, _currentHeight);
@@ -172,6 +185,7 @@ void UIGamePanel::setSize(float width, float height) {
     _contentPanel->setSize(width - (2.0F * Padding), contentHeight);
 
     updateTextPosition();
+    updateChildrenLayout();
 }
 
 bool UIGamePanel::isVisible() const { return _isVisible; }
@@ -181,6 +195,7 @@ void UIGamePanel::setVisible(bool visible) { _isVisible = visible; }
 void UIGamePanel::addComponent(const std::shared_ptr<IUIComponent>& component) {
     if (component) {
         _contentChildren.emplace_back(component);
+        updateChildrenLayout();
     }
 }
 
@@ -191,7 +206,10 @@ void UIGamePanel::removeComponent(const std::shared_ptr<IUIComponent>& component
     }
 }
 
-void UIGamePanel::setNextPanel(const std::shared_ptr<UIGamePanel>& panel) { _nextPanel = panel; }
+void UIGamePanel::setNextPanel(const std::shared_ptr<UIGamePanel>& panel, float gapPixels) {
+    _nextPanel = panel;
+    _nextPanelGap = gapPixels;
+}
 
 void UIGamePanel::updateTextPosition() {
     if (!_titleText) {
@@ -209,6 +227,40 @@ void UIGamePanel::updateTextPosition() {
 
     _titleText->setPosition(_position.x() + ((_size.x() - textWidth) / 2.0F),
                             _position.y() + ((DefaultHeaderHeight - textHeight) / 2.0F));
+}
+
+void UIGamePanel::updateChildrenLayout() {
+    if (_contentChildren.empty()) {
+        return;
+    }
+
+    float const innerPadding = Padding * 2.0F;
+    float const paddingWidth = Padding * 4.0F;
+    float const startX = _position.x() + paddingWidth;
+    float const startY = _position.y() + DefaultHeaderHeight + innerPadding;
+
+    float const availableWidth = _size.x() - (2.0F * paddingWidth);
+    float const availableHeight = _expandedHeight - DefaultHeaderHeight - (2.0F * innerPadding);
+
+    if (availableWidth <= 0.0F) {
+        return;
+    }
+
+    float const itemHeight = 40.0F;
+    float const spacing = 10.0F;
+    float const totalContentHeight = ((itemHeight + spacing) * static_cast<float>(_contentChildren.size())) - spacing;
+    _maxScroll = std::max(0.0F, totalContentHeight - availableHeight);
+    _scrollOffset = std::clamp(_scrollOffset, 0.0F, _maxScroll);
+
+    float currentY = startY - _scrollOffset;
+    for (auto& child : _contentChildren) {
+        child->setPosition(startX, currentY);
+        child->setSize(availableWidth, itemHeight);
+        bool const isInside = (currentY + itemHeight > startY) && (currentY < startY + availableHeight);
+        child->setVisible(isInside);
+
+        currentY += itemHeight + spacing;
+    }
 }
 
 }  // namespace zappy::gui::ui::components
