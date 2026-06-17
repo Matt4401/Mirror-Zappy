@@ -110,7 +110,7 @@ void UIGridManager::handleEvent(const raylib::rcore::Event& event) {
 
 void UIGridManager::updateResizeStack(PanelData* startPanel) {
     _resizeStack.clear();
-    PanelData* current = startPanel;
+    PanelData const* current = startPanel;
     while (true) {
         PanelData* next = nullptr;
         for (auto& data : _panels) {
@@ -151,16 +151,16 @@ void UIGridManager::handleMousePressed(const raylib::rmath::Vector2& mousePos, f
         }
     }
 
-    for (auto it = _panels.rbegin(); it != _panels.rend(); ++it) {
-        raylib::rmath::Vector2 const pos = it->panel->getPosition();
-        float const w = static_cast<float>(it->grid.w) * cellW;
-        float const h = static_cast<float>(it->grid.h) * cellH;
-        Rectangle const panelRec = {pos.x(), pos.y(), w, h};
+    for (auto& it : std::ranges::reverse_view(_panels)) {
+        raylib::rmath::Vector2 const pos = it.panel->getPosition();
+        float const w = static_cast<float>(it.grid.w) * cellW;
+        float const h = static_cast<float>(it.grid.h) * cellH;
+        Rectangle const panelRec{.x = pos.x(), .y = pos.y(), .width = w, .height = h};
 
         if (CheckCollisionPointRec(mousePos.vector(), panelRec)) {
-            _draggedPanel = it->panel;
-            it->originalGrid = it->grid;
-            _previewGrid = it->grid;
+            _draggedPanel = it.panel;
+            it.originalGrid = it.grid;
+            _previewGrid = it.grid;
             _dragOffset = raylib::rmath::Vector2(mousePos.x() - pos.x(), mousePos.y() - pos.y());
             return;
         }
@@ -271,8 +271,9 @@ void UIGridManager::handleMouseDrag(const raylib::rmath::Vector2& mousePos, floa
 }
 
 void UIGridManager::addPanel(const std::shared_ptr<UIGamePanel>& panel, int gridX, int gridY, int gridW, int gridH) {
-    _panels.push_back(
-        {panel, {.x = gridX, .y = gridY, .w = gridW, .h = gridH}, {.x = gridX, .y = gridY, .w = gridW, .h = gridH}});
+    _panels.push_back(PanelData{.panel = panel,
+                                .originalGrid = {.x = gridX, .y = gridY, .w = gridW, .h = gridH},
+                                .grid = {.x = gridX, .y = gridY, .w = gridW, .h = gridH}});
 }
 
 void UIGridManager::setConfigMode(bool configMode) {
@@ -304,8 +305,10 @@ void UIGridManager::drawResizeHandles() const {
         raylib::rmath::Vector2 const pos = data.panel->getPosition();
         float const w = static_cast<float>(data.grid.w) * cellW;
         float const h = static_cast<float>(data.grid.h) * cellH;
-        Rectangle const handleRec = {pos.x() + w - ResizeHandleSize, pos.y() + h - ResizeHandleSize, ResizeHandleSize,
-                                     ResizeHandleSize};
+        Rectangle const handleRec{.x = pos.x() + w - ResizeHandleSize,
+                                  .y = pos.y() + h - ResizeHandleSize,
+                                  .width = ResizeHandleSize,
+                                  .height = ResizeHandleSize};
         DrawRectangleRec(handleRec, ColorAlpha(RED, 0.8F));
     }
 }
