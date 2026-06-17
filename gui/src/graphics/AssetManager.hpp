@@ -17,9 +17,6 @@ namespace zappy::gui::graphics {
 
 class AssetManager {
   public:
-    AssetManager() = default;
-    ~AssetManager() = default;
-
     AssetManager(const AssetManager&) = delete;
     AssetManager& operator=(const AssetManager&) = delete;
     AssetManager(AssetManager&&) = delete;
@@ -32,6 +29,8 @@ class AssetManager {
     void clear();
 
   private:
+    AssetManager() = default;
+    ~AssetManager() = default;
     std::unordered_map<std::string, std::shared_ptr<raylib::rtext::Font>> _fonts;
 };
 
