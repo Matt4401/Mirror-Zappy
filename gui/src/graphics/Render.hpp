@@ -11,6 +11,7 @@
 #include <string>
 
 #include "../ui/UIManager.hpp"
+#include "../ui/components/UIGamePanel.hpp"
 #include "../ui/menus/PauseMenu.hpp"
 #include "Map.hpp"
 #include "SkyBackground.hpp"
@@ -43,6 +44,7 @@ class Render {
     void render2D();
     void render3D();
     void handleEvents();
+
     raylib::rcore::Window _window{WINDOW_NAME.c_str()};
     std::shared_ptr<raylib::rcore::Camera> _camera{
         std::make_shared<raylib::rcore::Camera>(raylib::rmath::Vector3{10.0F, 10.0F, 10.0F})};
@@ -54,6 +56,11 @@ class Render {
     events::EventDispatcher::EventToken _mszToken{0};
     ui::UIManager _uiManager;
     std::shared_ptr<ui::menus::PauseMenu> _pauseMenu;
+    std::shared_ptr<ui::components::UIGamePanel> _demoPanel;
     bool _isExiting{false};
+    bool _uiMode{false};
+
+    static constexpr int EscapeKey = 256;
+    static constexpr int LeftAltKey = 342;
 };
 }  // namespace zappy::gui::graphics
