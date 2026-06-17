@@ -5,16 +5,11 @@
 ** Command facotry for gui commands test
 */
 
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <string>
 
 #include "command/CommandFactory.hpp"
-#include "guiCommand/Bct.hpp"
-#include "guiCommand/Mct.hpp"
-#include "guiCommand/Msz.hpp"
-#include "guiCommand/Tna.hpp"
 
 TEST(GuiCommandFactoryTest, CreateMszCommand) {
     const zappy::server::command::CommandFactory factory;
@@ -23,7 +18,6 @@ TEST(GuiCommandFactoryTest, CreateMszCommand) {
 
     EXPECT_NE(command, nullptr);
 }
-
 TEST(GuiCommandFactoryTest, CreateInvalidCommandReturnsNullptr) {
     const zappy::server::command::CommandFactory factory;
     const std::string rawCommand = "invalid_command";
