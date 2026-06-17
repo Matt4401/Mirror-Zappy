@@ -174,6 +174,7 @@ void UIGamePanel::setPosition(float x, float y) {
     _contentPanel->setPosition(x + Padding, y + DefaultHeaderHeight);
 
     updateTextPosition();
+    updateChildrenLayout();
 }
 
 void UIGamePanel::setSize(float width, float height) {
@@ -206,6 +207,7 @@ void UIGamePanel::removeComponent(const std::shared_ptr<IUIComponent>& component
     auto it = std::ranges::find(_contentChildren, component);
     if (it != _contentChildren.end()) {
         _contentChildren.erase(it);
+        updateChildrenLayout();
     }
 }
 
@@ -234,6 +236,8 @@ void UIGamePanel::updateTextPosition() {
 
 void UIGamePanel::updateChildrenLayout() {
     if (_contentChildren.empty()) {
+        _maxScroll = 0.0F;
+        _scrollOffset = 0.0F;
         return;
     }
 
