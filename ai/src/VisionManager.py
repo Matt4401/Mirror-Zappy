@@ -42,3 +42,5 @@ class VisionManager:
                 return index
         return None
 
+    def reset_on_turn(self):
+        self.tiles = []
