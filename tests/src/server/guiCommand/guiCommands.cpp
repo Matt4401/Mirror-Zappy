@@ -72,7 +72,7 @@ TEST(BctCommandTest, ExecuteFailsSafelyOnOutOfBounds) {
     zappy::server::guiCommand::Bct command{999, 999};
     const std::string response = command.execute(core);
 
-    EXPECT_TRUE(response == "sbp\n" || response.empty());
+    EXPECT_TRUE(response == "sbp\n");
 }
 
 TEST(MctCommandTest, ExecuteReturnsAllTileContents) {
