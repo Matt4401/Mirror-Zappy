@@ -61,13 +61,13 @@ TEST(RightTest, CheckTurnMovementBordure) {
     };
     game::World world{config};
     auto [maxX, maxY] = world.sizeMap();
-    game::Player player{0, maxX, maxY, game::cardinalPoint::NORTH};
+    game::Player player{0, maxX - 1, maxY - 1, game::cardinalPoint::NORTH};
 
     right->execute(world, player);
     ASSERT_EQ(player.orientation(), game::cardinalPoint::EAST);
     forward->execute(world, player);
     auto [fst, snd] = player.position();
     ASSERT_EQ(fst, 0);
-    ASSERT_EQ(snd, maxY);
+    ASSERT_EQ(snd, maxY - 1);
 }
 }  // namespace zappy::server::command
