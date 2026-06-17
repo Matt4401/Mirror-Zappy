@@ -20,9 +20,9 @@ class TooMuchCmd : public shared::exception::Exception {
     static constexpr std::string_view PREFIX = "[TooMuchCmd error]: ";
 
     template <typename... Args>
-    explicit TooMuchCmd(const std::string_view fmt, Args... args)
-        : Exception(std::string(PREFIX) + std::vformat(fmt, std::make_format_args(args...)),
-                    shared::exception::source::current()) {}
+    explicit TooMuchCmd(const std::string_view fmt, Args... args,
+                        const shared::exception::source &location = shared::exception::source::current())
+        : Exception(std::string(PREFIX) + std::vformat(fmt, std::make_format_args(args...)), location) {}
 
     explicit TooMuchCmd(const std::string_view msg,
                         const shared::exception::source &location = shared::exception::source::current())
