@@ -32,7 +32,7 @@ PauseMenu::PauseMenu(std::shared_ptr<events::EventDispatcher> dispatcher,
     _backgroundPanel->setRounded(false);
 
     float const startX = (static_cast<float>(screenWidth) - _panelWidth) / 2.0F;
-    float const startY = (static_cast<float>(screenHeight) - (_buttonHeight * 4 + _buttonSpacing * 3)) / 2.0F;
+    float const startY = (static_cast<float>(screenHeight) - ((_buttonHeight * 4) + (_buttonSpacing * 3))) / 2.0F;
     _resumeBtn =
         std::make_unique<components::UIButton>(startX, startY, _panelWidth, _buttonHeight, "Back to Game", font);
     _settingsBtn = std::make_unique<components::UIButton>(startX, startY + _buttonHeight + _buttonSpacing, _panelWidth,
