@@ -5,6 +5,7 @@
 ** Eject command tests
 */
 
+// NOLINTBEGIN
 #include "command/Eject.hpp"
 
 #include <gtest/gtest.h>
@@ -114,3 +115,4 @@ TEST(EjectTest, ExecuteDestroysEggsOnTile) {
 }
 
 }  // namespace zappy::server::command
+// NOLINTEND
