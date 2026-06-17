@@ -8,10 +8,13 @@
 #pragma once
 #include <functional>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
 #include "Tile3D.hpp"
+#include "game/GameModel.hpp"
+#include "game/Team.hpp"
 #include "game/components/IObject.hpp"
 #include "rcore/Camera.hpp"
 #include "rmodels/Model.hpp"
@@ -31,7 +34,7 @@ class Map {
     static constexpr const char* MENDIANE_MODEL_RESOURCE = "assets/orange-ore/scene.gltf";
     static constexpr const char* FOOD_TEXTURE_RESOURCE = "assets/food.glb";
 
-    Map(int width, int height);
+    Map(int width, int height, std::shared_ptr<raylib::rcore::Camera> camera);
     ~Map() = default;
     Map(const Map& other) = delete;
     Map& operator=(const Map& other) = delete;
@@ -40,13 +43,16 @@ class Map {
 
     void resize(int width, int height);
 
-    void draw(const raylib::rcore::Camera& camera) const;
+    void draw() const;
 
   protected:
   private:
     void drawItems(const Tile3D& tile) const;
 
+    std::shared_ptr<raylib::rcore::Camera> _camera;
     std::vector<Tile3D> _tiles;
+    std::vector<game::Team> _teams;
+    game::GameModel _gameModel;
     std::map<std::string, ItemFunc> _itemDrawFunctions;
     raylib::rmodels::Model _tileModel{TILE_MODEL_RESOURCE};
     raylib::rmodels::Model _deraumereModel{DERAUMERE_MODEL_RESOURCE};

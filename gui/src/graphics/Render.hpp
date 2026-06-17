@@ -9,14 +9,11 @@
 
 #include <memory>
 #include <string>
-#include <vector>
 
 #include "Map.hpp"
 #include "SkyBackground.hpp"
-#include "Team.hpp"
 #include "context/EventContext.hpp"
 #include "events/EventDispatcher.hpp"
-#include "game/GameModel.hpp"
 #include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
@@ -50,10 +47,8 @@ class Render {
     EventContext _eventContext{_camera};
     scene::SkyBackground _skyBackground;
     raylib::rcore::Event _event;
-    scene::Map _map{2, 2};  // TEMPORARY MAP SIZE, JUST FOR TESTING
+    scene::Map _map{2, 2, _camera};  // TEMPORARY MAP SIZE, JUST FOR TESTING
     std::shared_ptr<events::EventDispatcher> _dispatcher;
     events::EventDispatcher::EventToken _mszToken{0};
-    game::GameModel _gameModel{_camera};
-    std::vector<game::Team> _teams;
 };
 }  // namespace zappy::gui::graphics

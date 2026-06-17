@@ -8,6 +8,7 @@
 #include "Map.hpp"
 
 #include <memory>
+#include <utility>
 
 #include "Tile3D.hpp"
 #include "game/components/IObject.hpp"
@@ -15,7 +16,8 @@
 #include "rmath/Vector3.hpp"
 
 namespace zappy::gui::graphics::scene {
-Map::Map(int width, int height) {
+Map::Map(int width, int height, std::shared_ptr<raylib::rcore::Camera> camera)
+    : _camera(std::move(camera)), _gameModel(_camera) {
     resize(width, height);
     _itemDrawFunctions["Deraumere"] = [this](const game::IObject& object) { object.draw(_deraumereModel); };
     _itemDrawFunctions["Linemate"] = [this](const game::IObject& object) { object.draw(_linemateModel); };
@@ -24,6 +26,9 @@ Map::Map(int width, int height) {
     _itemDrawFunctions["Thystame"] = [this](const game::IObject& object) { object.draw(_thystameModel); };
     _itemDrawFunctions["Mendiane"] = [this](const game::IObject& object) { object.draw(_mendianeModel); };
     _itemDrawFunctions["Food"] = [this](const game::IObject& object) { object.draw(_foodModel); };
+    // std::string teamName = "Team1"; // TEMPORARY TEAM NAME, JUST FOR TESTING
+    // _teams.emplace_back(game::Team(teamName, 5)); // TEMPORARY TEAM, JUST FOR TESTING
+    // _teams[0].addPlayer({10.0F, scene::Tile3D::TILE_SIZE * 1.4, 0.0F}); // TEMPORARY PLAYER, JUST FOR TESTING
 }
 
 void Map::resize(int width, int height) {
@@ -47,14 +52,17 @@ void Map::resize(int width, int height) {
     }
 }
 
-void Map::draw(const raylib::rcore::Camera& camera) const {
+void Map::draw() const {
     for (const auto& tile : _tiles) {
-        if (camera.isVisibleFromCamera(tile.position())) {
+        if (_camera->isVisibleFromCamera(tile.position())) {
             tile.draw(_tileModel);
             if (tile.itemBag().hasItems()) {
                 drawItems(tile);
             }
         }
+    }
+    for (const auto& team : _teams) {
+        team.draw(_gameModel);
     }
 }
 

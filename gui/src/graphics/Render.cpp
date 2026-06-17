@@ -13,7 +13,6 @@
 #include <utility>
 
 #include "events/EventDispatcher.hpp"
-#include "game/Team.hpp"
 #include "protocol/Commands.hpp"
 #include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
@@ -22,9 +21,6 @@
 
 namespace zappy::gui::graphics {
 Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher) : _dispatcher(std::move(dispatcher)) {
-    // std::string teamName = "Team1"; // TEMPORARY TEAM NAME, JUST FOR TESTING
-    // _teams.emplace_back(game::Team(teamName, 5)); // TEMPORARY TEAM, JUST FOR TESTING
-    // _teams[0].addPlayer({10.0F, scene::Tile3D::TILE_SIZE * 1.4, 0.0F}); // TEMPORARY PLAYER, JUST FOR TESTING
     if (_dispatcher) {
         _mszToken = _dispatcher->subscribe<shared::protocol::server::Msz>(
             [this](const shared::protocol::server::Msz& cmd) { _map.resize(cmd.width, cmd.height); });
@@ -64,10 +60,7 @@ void Render::render2D() { _skyBackground.draw(_window); }
 
 void Render::render3D() {
     _camera->beginMode3D();
-    _map.draw(*_camera);
-    for (const auto& team : _teams) {
-        team.draw(_gameModel);
-    }
+    _map.draw();
     raylib::rcore::Camera::endMode3D();
 }
 }  // namespace zappy::gui::graphics
