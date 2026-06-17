@@ -18,6 +18,8 @@
 
 namespace network::socket {
 
+constexpr auto delimiter = "\n";
+
 class ClientSocket : public BaseSocket, public zappy::shared::network::IClientSocket {
   public:
     ClientSocket() = delete;

@@ -7,13 +7,17 @@
 
 #include "Core.hpp"
 
+#include <chrono>
 #include <exception>
+#include <format>
 #include <iostream>
 #include <memory>
+#include <optional>
 #include <span>
 #include <string>
+#include <string_view>
 #include <utility>
-#include <variant>
+#include <vector>
 
 #include "Parser.hpp"
 #include "SessionManager.hpp"
@@ -22,7 +26,6 @@
 #include "network/ISessionManager.hpp"
 #include "protocol/Commands.hpp"
 #include "protocol/Emitter.hpp"
-#include "protocol/Parser.hpp"
 #include "strategy/ServerStrategy.hpp"
 
 namespace zappy::server {
@@ -56,41 +59,188 @@ void Core::setup() {
     _timeUnit = static_cast<int>(1.0F / static_cast<float>(_config.freq) * 1000);
 }
 
-void Core::loop() const {
-    shared::network::ISessionManager::NetworkEvent message{};
+void Core::loop() {
+    auto nextTickTarget = std::chrono::steady_clock::now() + std::chrono::milliseconds{_timeUnit};
 
     while (_isRunning) {
         try {
-            _sessionManager->pollNetwork(_timeUnit);
-            while (_sessionManager->tryPopMessage(message)) {
-                // TODO: Example of parsing the command (to be moved to a proper CommandHandler)
-                auto clientCmd = shared::protocol::Parser::parseClientCommand(message.message);
+            const auto now = std::chrono::steady_clock::now();
+            const int nextExecutionTick = _world->getNextExecutionTick();
 
-                if (std::holds_alternative<shared::protocol::client::Msz>(
-                        clientCmd)) {  // TODO: instead of using holds_alternative, we should use std::visit with
-                                       // an overloaded lambda to avoid multiple parsing of the same command
-                    std::cout << "Client " << message.clientId << " requested MSZ." << std::endl;
-
-                    shared::protocol::server::Msz responseCmd{};
-                    responseCmd.width = 16;   // TODO: get real map size from world
-                    responseCmd.height = 16;  // TODO: get real map size from world
-                    std::string const responseStr = shared::protocol::Emitter::build(responseCmd);
-
-                    _sessionManager->sendMessage(message.clientId, responseStr);
-                } else if (std::holds_alternative<shared::protocol::UnknownCommand>(clientCmd)) {
-                    std::string const responseStr = shared::protocol::Emitter::build(shared::protocol::server::Suc{});
-                    _sessionManager->sendMessage(message.clientId, responseStr);
-                } else {
-                    std::cout << "Received other message from client " << message.clientId << ": " << message.message
-                              << std::endl;
-                }
+            if (nextExecutionTick == -1) {
+                _sessionManager->pollNetwork(-1);
+                processNetworkEvents();
+                nextTickTarget = std::chrono::steady_clock::now() + std::chrono::milliseconds{_timeUnit};
+                continue;
             }
+            int pollTimeout = -1;
+            auto targetTime = nextTickTarget + std::chrono::milliseconds{_timeUnit * (nextExecutionTick - 1)};
+
+            if (now < targetTime) {
+                pollTimeout =
+                    static_cast<int>(std::chrono::duration_cast<std::chrono::milliseconds>(targetTime - now).count());
+            } else {
+                pollTimeout = 0;
+            }
+
+            _sessionManager->pollNetwork(pollTimeout);
+            processGameTick(nextTickTarget);
+            processNetworkEvents();
         } catch (const std::exception& e) {
             std::cerr << "Error in main loop: " << e.what() << std::endl;
         }
     }
 }
+void Core::processNetworkEvents() {
+    shared::network::ISessionManager::NetworkEvent message{};
 
-void Core::stop() { _isRunning = false; }
+    while (_sessionManager->tryPopMessage(message)) {
+        if (message.type == shared::network::ISessionManager::EventType::CLIENT_CONNECTED) {
+            handleNewClient(message.clientId);
+        }
+        if (message.type == shared::network::ISessionManager::EventType::CLIENT_DISCONNECTED) {
+            handleClientDisconnection(message.clientId);
+        }
+        if (message.type == shared::network::ISessionManager::EventType::MESSAGE_RECEIVED) {
+            formatReceivedString(message.message);
+            handleClientMessage(message.clientId, message.message);
+        }
+    }
+}
+
+void Core::processGameTick(std::chrono::steady_clock::time_point& nextTickTarget) {
+    const auto now = std::chrono::steady_clock::now();
+
+    while (now >= nextTickTarget) {
+        _world->update();
+        flushPlayerResponses();
+        flushGuiResponses();
+        nextTickTarget += std::chrono::milliseconds(_timeUnit);
+    }
+}
+
+void Core::formatReceivedString(std::string& str) {
+    if (!str.empty() && str.back() == '\n') {
+        str.pop_back();
+    }
+    if (!str.empty() && str.back() == '\r') {
+        str.pop_back();
+    }
+}
+
+void Core::handleNewClient(int clientId) {
+    _sessionManager->sendMessage(clientId, "WELCOME\n");
+    _clientStates.emplace(clientId, ClientState::WAITING_TEAM_SELECTION);
+}
+
+void Core::handleClientMessage(int clientId, std::string_view message) {
+    auto it = _clientStates.find(clientId);
+    if (it == _clientStates.end()) {
+        return;
+    }
+
+    if (it->second == ClientState::WAITING_TEAM_SELECTION) {
+        handleHandshake(clientId, message);
+    } else if (it->second == ClientState::IN_GAME) {
+        handleInGameMessage(clientId, message);
+    } else if (it->second == ClientState::GUI) {
+        handleGuiMessage(clientId, message);
+    }
+}
+
+void Core::handleHandshake(int clientId, std::string_view teamName) {
+    if (teamName == "GRAPHIC") {
+        _clientStates[clientId] = ClientState::GUI;
+        sendGuiInitialState(clientId);
+        return;
+    }
+
+    const auto playerIdOpt = _world->spawnPlayer(teamName);
+    if (!playerIdOpt.has_value()) {
+        _sessionManager->sendMessage(clientId, "ko\n");
+        return;
+    }
+    _clientToPlayer[clientId] = playerIdOpt.value();
+    _clientStates[clientId] = ClientState::IN_GAME;
+    _sessionManager->sendMessage(clientId, std::format("{}\n{} {}\n", _world->getAvailableSlotInTeam(teamName),
+                                                       _world->sizeMap().x, _world->sizeMap().y));
+}
+
+void Core::handleInGameMessage(int clientId, std::string_view message) {
+    const auto playerIdIt = _clientToPlayer.find(clientId);
+    if (playerIdIt == _clientToPlayer.end()) {
+        return;
+    }
+    const auto playerId = playerIdIt->second;
+    auto command = _commandFactory.createCommand(message);
+
+    if (command != nullptr) {
+        _world->pushCommandToPlayer(playerId, std::move(command));
+    } else {
+        _sessionManager->sendMessage(clientId, "ko\n");
+    }
+}
+
+void Core::handleGuiMessage(int clientId, std::string_view message) {
+    auto command = _commandFactory.createGuiCommand(message);
+
+    if (command != nullptr) {
+        const std::string response = command->execute(*this);
+
+        if (!response.empty()) {
+            _sessionManager->sendMessage(clientId, response);
+        }
+    } else {
+        _sessionManager->sendMessage(clientId, "suc\n");
+    }
+}
+
+void Core::handleClientDisconnection(int clientId) {
+    _clientStates.erase(clientId);
+    if (!_clientToPlayer.contains(clientId)) {
+        return;
+    }
+    _world->removePlayer(_clientToPlayer.at(clientId));
+    _clientToPlayer.erase(clientId);
+}
+
+void Core::flushPlayerResponses() {
+    const auto responses = _world->getAllResponsesBuffer();
+
+    for (const auto& [clientId, playerId] : _clientToPlayer) {
+        const auto it = responses.find(playerId);
+
+        if (it == responses.end()) {
+            continue;
+        }
+        for (const auto& message : it->second) {
+            _sessionManager->sendMessage(clientId, message);
+        }
+    }
+}
+
+void Core::flushGuiResponses() {
+    auto events = _world->getAndClearGuiEvents();
+    if (events.empty()) {
+        return;
+    }
+
+    for (const auto& [clientId, state] : _clientStates) {
+        if (state == ClientState::GUI) {
+            for (const auto& eventMsg : events) {
+                _sessionManager->sendMessage(clientId, eventMsg);
+            }
+        }
+    }
+}
+
+void Core::sendGuiInitialState(int clientId) {
+    _sessionManager->sendMessage(clientId, shared::protocol::Emitter::build(shared::protocol::server::Msz{
+                                               .width = static_cast<int>(_world->sizeMap().x),
+                                               .height = static_cast<int>(_world->sizeMap().y)}));
+    _sessionManager->sendMessage(
+        clientId,
+        shared::protocol::Emitter::build(shared::protocol::server::Sgt{.timeUnit = static_cast<int>(_config.freq)}));
+}
 
 }  // namespace zappy::server

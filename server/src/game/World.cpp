@@ -7,7 +7,6 @@
 
 #include "World.hpp"
 
-#include <cmath>
 #include <cstdint>
 #include <ctime>
 #include <memory>
@@ -63,7 +62,7 @@ World::World(const parser::ServerConfig& config) : _heightMap(config.height), _w
 }
 
 Position World::sizeMap() const {
-    return Position{.x = _widthMap == 0 ? 0 : _widthMap - 1, .y = _heightMap == 0 ? 0 : _heightMap - 1};
+    return Position{.x = _widthMap == 0 ? 0 : _widthMap, .y = _heightMap == 0 ? 0 : _heightMap};
 }
 
 void World::eraseEggFromTile(const std::size_t position1dVec, const std::size_t id) {
@@ -195,6 +194,15 @@ std::vector<std::size_t> World::collectAndKillDeadPlayers() const {
     return deadIds;
 }
 
+std::size_t World::getAvailableSlotInTeam(std::string_view teamName) const {
+    const auto team = _teamList.find(std::string(teamName));
+
+    if (team == _teamList.end()) {
+        return 0;
+    }
+    return team->second->availableSlot();
+}
+
 void World::eject(const std::size_t id) {
     const auto& pushingPlayer = _playerList.at(id);
     const auto orientation = pushingPlayer->orientation();
@@ -215,6 +223,32 @@ void World::eject(const std::size_t id) {
         _vecEggs.erase(idEgg);
         eraseEggFromTile(position, idEgg);
     }
+}
+
+std::vector<std::string> World::getAndClearGuiEvents() {
+    std::vector<std::string> events = std::move(_guiEvents);
+
+    _guiEvents.clear();
+    return events;
+}
+
+int World::getNextExecutionTick() const {
+    int nextTick = -1;
+
+    for (const auto& player : _playerList | std::ranges::views::values) {
+        int playerNextEvent = static_cast<int>(player->nbLifeTick());
+
+        if (player->cmdTick() > 0 && player->cmdTick() < playerNextEvent) {
+            playerNextEvent = player->cmdTick();
+        } else if (player->cmdTick() == 0 && player->hasCommands()) {
+            playerNextEvent = 1;
+        }
+
+        if (nextTick == -1 || playerNextEvent < nextTick) {
+            nextTick = playerNextEvent;
+        }
+    }
+    return nextTick;
 }
 
 }  // namespace zappy::server::game
