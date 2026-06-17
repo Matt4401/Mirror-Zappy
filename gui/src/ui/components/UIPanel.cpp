@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <memory>
 #include <ranges>
+#include <vector>
 
 #include "Color.hpp"
 #include "rcore/Event.hpp"
@@ -77,15 +78,14 @@ bool UIPanel::isVisible() const { return _isVisible; }
 void UIPanel::setVisible(bool visible) { _isVisible = visible; }
 
 void UIPanel::addComponent(const std::shared_ptr<IUIComponent>& component) {
-    if (component) {
+    if (component && std::ranges::find(_children, component) == _children.end()) {
         _children.emplace_back(component);
     }
 }
 
 void UIPanel::removeComponent(const std::shared_ptr<IUIComponent>& component) {
-    auto it = std::ranges::find(_children, component);
-    if (it != _children.end()) {
-        _children.erase(it);
+    if (component) {
+        std::erase(_children, component);
     }
 }
 
