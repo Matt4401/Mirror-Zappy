@@ -2,6 +2,7 @@ add_library(zappy_gui_ui
     UIManager.cpp
     components/UIText.cpp
     components/UIPanel.cpp
+    components/UIGamePanel.cpp
     components/UIButton.cpp
     menus/PauseMenu.cpp
 )
@@ -13,6 +14,7 @@ target_sources(zappy_gui_ui PUBLIC
         UIManager.hpp
         components/UIText.hpp
         components/UIPanel.hpp
+        components/UIGamePanel.hpp
         components/UIButton.hpp
         menus/PauseMenu.hpp
 )
