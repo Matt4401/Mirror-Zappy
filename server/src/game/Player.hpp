@@ -67,10 +67,6 @@ class Player {
     [[nodiscard]] std::size_t nbLifeTick() const;
     void kill();
 
-    [[nodiscard]] int cmdTick() const;
-
-    [[nodiscard]] bool hasCommands() const;
-
   private:
     std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> _inventory{};
     cardinalPoint _orientation;
