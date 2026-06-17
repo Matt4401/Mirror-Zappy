@@ -9,7 +9,6 @@ class PlayerState:
         self.direction = random.randint(1, 8)
         self.vision = None
         self.inventory = Inventory()
-        self.food_remaining = 0
 
     def get_food(self):
         return self.food_remaining
