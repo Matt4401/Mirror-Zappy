@@ -1,4 +1,4 @@
-from src.InventoryClass import Inventory
+import re
 
 
 class ParseCommand:
