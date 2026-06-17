@@ -64,7 +64,7 @@ void UIButton::draw() {
         return;
     }
 
-    Rectangle const rec = {_position.x(), _position.y(), _size.x(), _size.y()};
+    Rectangle const rec{.x = _position.x(), .y = _position.y(), .width = _size.x(), .height = _size.y()};
 
     raylib::Color innerFill = _isHovered ? HoveredFillColor : NormalFillColor;
     raylib::Color topBorder = BrightBorderColor;
@@ -78,29 +78,40 @@ void UIButton::draw() {
 
     raylib::rshapes::Shapes::drawRectangleRec(rec, OuterBorderColor);
 
-    raylib::rshapes::Shapes::drawRectangleRec({rec.x + BorderThickness, rec.y + BorderThickness,
-                                               rec.width - (BorderThickness * 2), rec.height - (BorderThickness * 2)},
+    raylib::rshapes::Shapes::drawRectangleRec({.x = rec.x + BorderThickness,
+                                               .y = rec.y + BorderThickness,
+                                               .width = rec.width - (BorderThickness * 2),
+                                               .height = rec.height - (BorderThickness * 2)},
                                               innerFill);
 
-    raylib::rshapes::Shapes::drawRectangleRec(
-        {rec.x + BorderThickness, rec.y + BorderThickness, rec.width - (BorderThickness * 2), BorderThickness},
-        topBorder);
-    raylib::rshapes::Shapes::drawRectangleRec(
-        {rec.x + BorderThickness, rec.y + BorderThickness, BorderThickness, rec.height - (BorderThickness * 2)},
-        topBorder);
+    raylib::rshapes::Shapes::drawRectangleRec({.x = rec.x + BorderThickness,
+                                               .y = rec.y + BorderThickness,
+                                               .width = rec.width - (BorderThickness * 2),
+                                               .height = BorderThickness},
+                                              topBorder);
+    raylib::rshapes::Shapes::drawRectangleRec({.x = rec.x + BorderThickness,
+                                               .y = rec.y + BorderThickness,
+                                               .width = BorderThickness,
+                                               .height = rec.height - (BorderThickness * 2)},
+                                              topBorder);
 
-    raylib::rshapes::Shapes::drawRectangleRec({rec.x + BorderThickness, rec.y + rec.height - (BorderThickness * 2),
-                                               rec.width - (BorderThickness * 2), BorderThickness},
+    raylib::rshapes::Shapes::drawRectangleRec({.x = rec.x + BorderThickness,
+                                               .y = rec.y + rec.height - (BorderThickness * 2),
+                                               .width = rec.width - (BorderThickness * 2),
+                                               .height = BorderThickness},
                                               bottomBorder);
-    raylib::rshapes::Shapes::drawRectangleRec({rec.x + rec.width - (BorderThickness * 2), rec.y + BorderThickness,
-                                               BorderThickness, rec.height - (BorderThickness * 2)},
+    raylib::rshapes::Shapes::drawRectangleRec({.x = rec.x + rec.width - (BorderThickness * 2),
+                                               .y = rec.y + BorderThickness,
+                                               .width = BorderThickness,
+                                               .height = rec.height - (BorderThickness * 2)},
                                               bottomBorder);
 
     if (_isHovered && !_isPressed) {
-        raylib::rshapes::Shapes::drawRectangleLinesEx(
-            {rec.x + OutlineThickness, rec.y + OutlineThickness, rec.width - (OutlineThickness * 2),
-             rec.height - (OutlineThickness * 2)},
-            OutlineThickness, HoverOutlineColor);
+        raylib::rshapes::Shapes::drawRectangleLinesEx({.x = rec.x + OutlineThickness,
+                                                       .y = rec.y + OutlineThickness,
+                                                       .width = rec.width - (OutlineThickness * 2),
+                                                       .height = rec.height - (OutlineThickness * 2)},
+                                                      OutlineThickness, HoverOutlineColor);
     }
 
     if (_label) {
@@ -115,7 +126,7 @@ void UIButton::update() {
     }
 
     raylib::rmath::Vector2 const mousePos = raylib::rcore::Event::getMousePositionStatic();
-    Rectangle const rec = {_position.x(), _position.y(), _size.x(), _size.y()};
+    Rectangle const rec{.x = _position.x(), .y = _position.y(), .width = _size.x(), .height = _size.y()};
     _isHovered = (mousePos.x() >= rec.x && mousePos.x() <= rec.x + rec.width && mousePos.y() >= rec.y &&
                   mousePos.y() <= rec.y + rec.height);
 
