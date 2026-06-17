@@ -112,6 +112,7 @@ void UIGridManager::updateResizeStack(PanelData* startPanel) {
     _resizeStack.clear();
     PanelData const* current = startPanel;
     while (true) {
+        // NOLINTNEXTLINE
         PanelData* next = nullptr;
         for (auto& data : _panels) {
             if (&data == current) {
@@ -137,8 +138,10 @@ void UIGridManager::handleMousePressed(const raylib::rmath::Vector2& mousePos, f
         raylib::rmath::Vector2 const pos = _panel.panel->getPosition();
         float const w = static_cast<float>(_panel.grid.w) * cellW;
         float const h = static_cast<float>(_panel.grid.h) * cellH;
-        Rectangle const handleRec = {pos.x() + w - ResizeHandleSize, pos.y() + h - ResizeHandleSize, ResizeHandleSize,
-                                     ResizeHandleSize};
+        Rectangle const handleRec = {.x = pos.x() + w - ResizeHandleSize,
+                                     .y = pos.y() + h - ResizeHandleSize,
+                                     .width = ResizeHandleSize,
+                                     .height = ResizeHandleSize};
 
         if (CheckCollisionPointRec(mousePos.vector(), handleRec)) {
             _resizedPanel = _panel.panel;
