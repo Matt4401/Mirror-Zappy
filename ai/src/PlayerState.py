@@ -7,9 +7,7 @@ class PlayerState:
         self.level = 0
         self.team_name = team_name
         self.direction = random.randint(1, 8)
-        self.vision = (
-            None
-        )
+        self.vision = None
         self.inventory = Inventory()
         self.food_remaining = 0
 
