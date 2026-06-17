@@ -18,6 +18,7 @@
 #include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
+#include "scene/Tile3D.hpp"
 #include "ui/components/UIButton.hpp"
 #include "ui/components/UIGamePanel.hpp"
 #include "ui/components/UIGridManager.hpp"
@@ -123,8 +124,8 @@ void Render::update() {
 
     if (!_pauseMenu->isVisible() && !_uiMode) {
         _camera->updateCamera(CAMERA_FREE);
-        if (_camera->position().y() < 2.5F) {
-            _camera->setPosition({_camera->position().x(), 2.5F, _camera->position().z()});
+        if (_camera->position().y() < scene::Tile3D::TILE_SIZE * 1.3F) {
+            _camera->setPosition({_camera->position().x(), scene::Tile3D::TILE_SIZE * 1.3F, _camera->position().z()});
             _camera->setTarget({_camera->target().x(),
                                 _camera->target().y() + (raylib::rcore::Window::frameTime() * 2.0F),
                                 _camera->target().z()});
@@ -141,7 +142,7 @@ void Render::render2D() { _skyBackground.draw(_window); }
 
 void Render::render3D() {
     _camera->beginMode3D();
-    _map.draw(*_camera);
+    _map.draw();
     raylib::rcore::Camera::endMode3D();
 }
 }  // namespace zappy::gui::graphics

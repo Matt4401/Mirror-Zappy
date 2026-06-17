@@ -1,3 +1,4 @@
+add_subdirectory(game)
 add_subdirectory(graphics)
 add_subdirectory(network)
 add_subdirectory(context)

@@ -9,7 +9,10 @@
 
 #include <gtest/gtest.h>
 
+#include <memory>
+
 #include "command/Forward.hpp"
+#include "guiCommand/IGuiCommand.hpp"
 
 namespace zappy::server::command {
 
@@ -31,6 +34,23 @@ TEST(CommandFactoryTest, CreateCommandIgnoresExtraArguments) {
     auto command = factory.createCommand("Forward\n");
     EXPECT_NE(command, nullptr);
     EXPECT_TRUE(dynamic_cast<Forward*>(command.get()) != nullptr);
+}
+
+TEST(CommandFactoryTest, CreateGuiCommandReturnsMszCommand) {
+    const zappy::server::command::CommandFactory factory{};
+
+    const std::unique_ptr<zappy::server::guiCommand::IGuiCommand> command = factory.createGuiCommand("msz");
+
+    EXPECT_NE(command, nullptr);
+}
+
+TEST(CommandFactoryTest, CreateGuiCommandReturnsNullptrForUnknownCommand) {
+    const zappy::server::command::CommandFactory factory{};
+
+    const std::unique_ptr<zappy::server::guiCommand::IGuiCommand> command =
+        factory.createGuiCommand("invalid_gui_string");
+
+    EXPECT_EQ(command, nullptr);
 }
 
 }  // namespace zappy::server::command
