@@ -7,11 +7,13 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.
 from ai.src.InventoryClass import Inventory
 from ai.src.ParseCommand import ParseCommand
 
+
 def test_inventory():
     inventory = Inventory()
     parser = ParseCommand(inventory)
-    cmd = "linemate 5, deraumere 4, sibur 5, mendiane 0, phiras 55, thystame 8, food 444"
-
+    cmd = (
+        "linemate 5, deraumere 4, sibur 5, mendiane 0, phiras 55, thystame 8, food 444"
+    )
 
     parser.parse_inventory(cmd)
     assert inventory.linemate == 5
