@@ -13,25 +13,25 @@ class PlayerState:
         self.inventory = Inventory()
         self.food_remaining = 0
 
-    def food(self):
+    def get_food(self):
         return self.food_remaining
 
     def update_food(self, new_food):
         self.food_remaining += new_food
 
-    def direction(self):
+    def get_direction(self):
         return self.direction
 
     def update_direction(self, new_direction):
         self.direction = new_direction
 
-    def vision(self):
+    def get_vision(self):
         return self.vision
 
     def update_vision(self, new_vision):
         self.vision = new_vision
 
-    def inventory(self):
+    def get_inventory(self):
         return self.inventory
 
     def update_inventory(self, new_inventory):
@@ -40,5 +40,5 @@ class PlayerState:
     def upgrade_level(self):
         self.level += 1
 
-    def level(self):
+    def get_level(self):
         return self.level
