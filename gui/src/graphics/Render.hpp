@@ -21,6 +21,7 @@
 #include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
 #include "rmath/Vector3.hpp"
+#include "ui/components/UIGridManager.hpp"
 
 namespace zappy::gui::graphics {
 class Render {
@@ -44,6 +45,8 @@ class Render {
     void render2D();
     void render3D();
     void handleEvents();
+    void updateCursorState() const;
+    void handleInput();
 
     raylib::rcore::Window _window{WINDOW_NAME.c_str()};
     std::shared_ptr<raylib::rcore::Camera> _camera{
@@ -57,6 +60,7 @@ class Render {
     ui::UIManager _uiManager;
     std::shared_ptr<ui::menus::PauseMenu> _pauseMenu;
     std::shared_ptr<ui::components::UIGamePanel> _demoPanel;
+    std::shared_ptr<ui::components::UIGridManager> _gridManager;
     bool _isExiting{false};
     bool _uiMode{false};
 

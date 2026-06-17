@@ -3,6 +3,7 @@ add_library(zappy_gui_ui
     components/UIText.cpp
     components/UIPanel.cpp
     components/UIGamePanel.cpp
+    components/UIGridManager.cpp
     components/UIButton.cpp
     menus/PauseMenu.cpp
 )

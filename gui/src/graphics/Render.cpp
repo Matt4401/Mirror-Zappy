@@ -20,6 +20,7 @@
 #include "rcore/Window.hpp"
 #include "ui/components/UIButton.hpp"
 #include "ui/components/UIGamePanel.hpp"
+#include "ui/components/UIGridManager.hpp"
 #include "ui/components/UIText.hpp"
 #include "ui/menus/PauseMenu.hpp"
 
@@ -35,24 +36,32 @@ Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher) : _dispatche
     AssetManager::getInstance().loadFont("Minecraft", "assets/fonts/Minecraft.ttf");
 
     // Temporary tests panels
-    _demoPanel = std::make_shared<ui::components::UIGamePanel>(50.0F, 50.0F, 300.0F, 400.0F, "Player Info");
+    _gridManager = std::make_shared<ui::components::UIGridManager>();
+    _uiManager.addComponent(_gridManager);
+
+    _demoPanel = std::make_shared<ui::components::UIGamePanel>(0, 0, 0, 0, "Player Info");
     auto font = AssetManager::getInstance().getFont("Minecraft");
     auto btn = std::make_shared<ui::components::UIButton>(100.0F, 120.0F, 200.0F, 40.0F, "Click me!", font);
     auto text = std::make_shared<ui::components::UIText>("Level 8 Player", font);
     text->setPosition(100.0F, 200.0F);
     _demoPanel->addComponent(btn);
     _demoPanel->addComponent(text);
-    _uiManager.addComponent(_demoPanel);
 
-    auto _demoPanel2 = std::make_shared<ui::components::UIGamePanel>(50.0F, 460.0F, 300.0F, 200.0F, "Inventory");
+    auto _demoPanel2 = std::make_shared<ui::components::UIGamePanel>(0, 0, 0, 0, "Inventory");
     auto text2 = std::make_shared<ui::components::UIText>("Empty", font);
-    text2->setPosition(100.0F, 520.0F);
+    text2->setPosition(100.0F, 200.0F);
     _demoPanel2->addComponent(text2);
-    _uiManager.addComponent(_demoPanel2);
-    _demoPanel->setNextPanel(_demoPanel2);
+
+    _gridManager->addPanel(_demoPanel, 1, 1, 12, 18);
+    _gridManager->addPanel(_demoPanel2, 1, 19, 12, 8);
 
     _pauseMenu = std::make_shared<ui::menus::PauseMenu>(_dispatcher, AssetManager::getInstance().getFont("Minecraft"));
     _pauseMenu->setOnExit([this]() { _isExiting = true; });
+    _pauseMenu->setOnUIConfig([this]() {
+        _gridManager->setConfigMode(true);
+        _uiMode = true;
+        _pauseMenu->setVisible(false);
+    });
     _uiManager.addComponent(_pauseMenu);
 }
 
@@ -79,24 +88,35 @@ void Render::renderFrame() {
     raylib::rcore::Window::endDrawing();
 }
 
-void Render::update() {
+void Render::updateCursorState() const {
+    if (_pauseMenu->isVisible() || _uiMode) {
+        raylib::rcore::Window::enableCursor();
+    } else {
+        raylib::rcore::Window::disableCursor();
+    }
+}
+
+void Render::handleInput() {
     if (raylib::rcore::Event::isKeyPressed(EscapeKey)) {
-        _pauseMenu->setVisible(!_pauseMenu->isVisible());
-        if (_pauseMenu->isVisible() || _uiMode) {
-            raylib::rcore::Window::enableCursor();
+        if (_gridManager && _gridManager->isConfigMode()) {
+            _gridManager->setConfigMode(false);
+            _uiMode = false;
         } else {
-            raylib::rcore::Window::disableCursor();
+            _pauseMenu->setVisible(!_pauseMenu->isVisible());
         }
+        updateCursorState();
     }
 
     if (raylib::rcore::Event::isKeyPressed(LeftAltKey)) {
-        _uiMode = !_uiMode;
-        if (_pauseMenu->isVisible() || _uiMode) {
-            raylib::rcore::Window::enableCursor();
-        } else {
-            raylib::rcore::Window::disableCursor();
+        if (!_gridManager || !_gridManager->isConfigMode()) {
+            _uiMode = !_uiMode;
+            updateCursorState();
         }
     }
+}
+
+void Render::update() {
+    handleInput();
 
     _uiManager.update();
     _uiManager.handleEvent(_event);
