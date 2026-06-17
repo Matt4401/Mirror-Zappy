@@ -128,7 +128,8 @@ void UIGamePanel::handleEvent(const raylib::rcore::Event& event) {
     }
 
     raylib::rmath::Vector2 const mousePos = raylib::rcore::Event::getMousePositionStatic();
-    Rectangle const headerRec = {_position.x(), _position.y(), _size.x(), DefaultHeaderHeight};
+    Rectangle const headerRec{
+        .x = _position.x(), .y = _position.y(), .width = _size.x(), .height = DefaultHeaderHeight};
 
     bool const isHovered = (mousePos.x() >= headerRec.x && mousePos.x() <= headerRec.x + headerRec.width &&
                             mousePos.y() >= headerRec.y && mousePos.y() <= headerRec.y + headerRec.height);
@@ -145,8 +146,10 @@ void UIGamePanel::handleEvent(const raylib::rcore::Event& event) {
 
     if (!_isConfigMode) {
         raylib::rmath::Vector2 const mousePos = raylib::rcore::Event::getMousePositionStatic();
-        Rectangle const contentRec = {_position.x(), _position.y() + DefaultHeaderHeight, _size.x(),
-                                      _currentHeight - DefaultHeaderHeight};
+        Rectangle const contentRec{.x = _position.x(),
+                                   .y = _position.y() + DefaultHeaderHeight,
+                                   .width = _size.x(),
+                                   .height = _currentHeight - DefaultHeaderHeight};
         if (CheckCollisionPointRec(mousePos.vector(), contentRec)) {
             float const wheelMove = ::GetMouseWheelMove();
             if (wheelMove != 0.0F) {
