@@ -36,7 +36,7 @@ const raylib::Color UIButton::TextNormalColor(220, 220, 220, 255);
 
 UIButton::UIButton(float x, float y, float width, float height, const std::string& text,
                    std::shared_ptr<raylib::rtext::Font> font)
-    : _position(x, y), _size(width, height), _fontRef(std::move(font)) {
+    : _position(x, y), _size(width, height), _fontRef(std::move(font)), _fontSize(DefaultFontSize) {
     _label = std::make_unique<UIText>(text, _fontRef);
     updateTextPosition();
 }
@@ -45,7 +45,7 @@ void UIButton::updateTextPosition() {
     if (!_label) {
         return;
     }
-    int const fontSize = _fontRef && _fontRef->valid() ? _fontRef->baseSize() : static_cast<int>(DefaultFontSize);
+    int const fontSize = static_cast<int>(_fontSize);
     raylib::rtext::Font const defaultFont;
     float const textWidth = raylib::rtext::Text::measureText(_fontRef && _fontRef->valid() ? *_fontRef : defaultFont,
                                                              _label->text(), static_cast<float>(fontSize), TextSpacing)
@@ -115,6 +115,7 @@ void UIButton::draw() {
     }
 
     if (_label) {
+        _label->setFontSize(_fontSize);
         _label->setColor(_isHovered ? TextHoverColor : TextNormalColor);
         _label->draw();
     }
@@ -171,5 +172,10 @@ bool UIButton::isVisible() const { return _isVisible; }
 void UIButton::setVisible(bool visible) { _isVisible = visible; }
 
 void UIButton::setOnClick(std::function<void()> callback) { _onClick = std::move(callback); }
+
+void UIButton::setFontSize(float size) {
+    _fontSize = size;
+    updateTextPosition();
+}
 
 }  // namespace zappy::gui::ui::components

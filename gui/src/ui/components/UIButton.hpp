@@ -41,6 +41,7 @@ class UIButton : public IUIComponent {
     void setVisible(bool visible) override;
 
     void setOnClick(std::function<void()> callback);
+    void setFontSize(float size);
 
   private:
     void updateTextPosition();
@@ -53,6 +54,7 @@ class UIButton : public IUIComponent {
     std::function<void()> _onClick;
     std::shared_ptr<raylib::rtext::Font> _fontRef;
     std::unique_ptr<UIText> _label;
+    float _fontSize;
 
     static constexpr int MouseLeftButton = 0;
     static constexpr float DefaultFontSize = 20.0F;
