@@ -16,6 +16,7 @@ target_sources(zappy_gui_ui PUBLIC
         components/UIText.hpp
         components/UIPanel.hpp
         components/UIGamePanel.hpp
+        components/UIGridManager.hpp
         components/UIButton.hpp
         menus/PauseMenu.hpp
 )
