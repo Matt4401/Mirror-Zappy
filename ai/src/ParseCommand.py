@@ -8,7 +8,15 @@ class ParseCommand:
     def parse_inventory(self, data):
         items = re.findall(r"(\w+)\s+(\d+)", data)
         data_dict = {name: int(value) for name, value in items}
-        required = ["linemate", "deraumere", "sibur", "mendiane", "phiras", "thystame", "food"]
+        required = [
+            "linemate",
+            "deraumere",
+            "sibur",
+            "mendiane",
+            "phiras",
+            "thystame",
+            "food",
+        ]
         missing = [k for k in required if k not in data_dict]
         if missing:
             raise ValueError(f"Missing inventory fields: {', '.join(missing)}")
