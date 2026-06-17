@@ -8,7 +8,7 @@ class PlayerState:
         self.team_name = team_name
         self.direction = random.randint(1, 8)
         self.vision = (
-            None  # TODO we have to create a norm for the vision in an other issu
+            None
         )
         self.inventory = Inventory()
         self.food_remaining = 0
