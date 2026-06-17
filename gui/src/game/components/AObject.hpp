@@ -24,7 +24,7 @@ class AObject : public IObject {
     AObject& operator=(AObject&& other) noexcept = default;
 
     void draw(const raylib::rmodels::Model& model) const override {
-        model.drawModel(_position, 1.0F, raylib::Color::White());
+        model.drawModel(position(), scale(), raylib::Color::White());
     }
 
     [[nodiscard]] raylib::rmath::Vector3 position() const { return _position; }
@@ -32,15 +32,15 @@ class AObject : public IObject {
     void setPositionX(float x) { _position.setX(x); }
     void setPositionY(float y) { _position.setY(y); }
     void setPositionZ(float z) { _position.setZ(z); }
-    [[nodiscard]] double density() const { return _density; }
-    void setDensity(double density) { _density = density; }
+    [[nodiscard]] float scale() const { return _scale; }
+    void setScale(float scale) { _scale = scale; }
     [[nodiscard]] std::string name() const override { return _name; }
     void setName(const std::string& name) { _name = name; }
 
   protected:
   private:
     raylib::rmath::Vector3 _position;
-    double _density{0.0};
+    float _scale{0.0};
     std::string _name{"Object"};
 };
 }  // namespace zappy::gui::game

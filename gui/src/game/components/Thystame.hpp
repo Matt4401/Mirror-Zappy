@@ -8,21 +8,19 @@
 #pragma once
 
 #include "AObject.hpp"
-#include "Color.hpp"
 #include "graphics/scene/Tile3D.hpp"
 #include "rmath/Vector3.hpp"
-#include "rmodels/Model.hpp"
 
 namespace zappy::gui::game {
 class Thystame : public AObject {
   public:
-    static constexpr auto THYSTAME_DENSITY = 0.05F;
+    static constexpr auto THYSTAME_SCALE = 0.5F;
     static constexpr auto THYSTAME_X_OFFSET = 7.0F;
     static constexpr auto THYSTAME_Z_OFFSET = 0.5F;
 
     Thystame(raylib::rmath::Vector3 position) : AObject(position) {
         setName("Thystame");
-        setDensity(THYSTAME_DENSITY);
+        setScale(THYSTAME_SCALE);
         setPositionY(position.y() + graphics::scene::Tile3D::TILE_SIZE);
         setPositionX(position.x() - THYSTAME_X_OFFSET);
         setPositionZ(position.z() - THYSTAME_Z_OFFSET);
@@ -32,9 +30,6 @@ class Thystame : public AObject {
     Thystame& operator=(const Thystame& other) = delete;
     Thystame(Thystame&& other) noexcept = default;
     Thystame& operator=(Thystame&& other) noexcept = default;
-    void draw(const raylib::rmodels::Model& model) const override {
-        model.drawModel(position(), 0.5F, raylib::Color::White());
-    }
 
   protected:
   private:
