@@ -1,10 +1,9 @@
 import sys
 import os
-import pytest
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
 
-from ai.src.VisionManager import VisionManager
+from ai.src.util.VisionManager import VisionManager
 
 
 def test_vision_manager_initialization():
