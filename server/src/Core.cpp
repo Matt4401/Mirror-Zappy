@@ -23,6 +23,8 @@
 #include "SessionManager.hpp"
 #include "exception/Exception.hpp"
 #include "game/World.hpp"
+#include "guiCommand/Bct.hpp"
+#include "guiCommand/Mct.hpp"
 #include "network/ISessionManager.hpp"
 #include "protocol/Commands.hpp"
 #include "protocol/Emitter.hpp"
@@ -241,6 +243,8 @@ void Core::sendGuiInitialState(int clientId) {
     _sessionManager->sendMessage(
         clientId,
         shared::protocol::Emitter::build(shared::protocol::server::Sgt{.timeUnit = static_cast<int>(_config.freq)}));
+    guiCommand::Mct mct{};
+    _sessionManager->sendMessage(clientId, mct.execute(*this));
 }
 
 }  // namespace zappy::server
