@@ -23,7 +23,6 @@
 #include "SessionManager.hpp"
 #include "exception/Exception.hpp"
 #include "game/World.hpp"
-#include "guiCommand/Bct.hpp"
 #include "guiCommand/Mct.hpp"
 #include "network/ISessionManager.hpp"
 #include "protocol/Commands.hpp"
