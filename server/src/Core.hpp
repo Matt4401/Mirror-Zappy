@@ -41,7 +41,7 @@ class Core {
 
     static void formatReceivedString(std::string& str);
 
-    void processNetworkEvents();
+    void processNetworkEvents(int timeout);
     void processGameTick(std::chrono::steady_clock::time_point& nextTickTarget);
 
     void handleNewClient(int clientId);
