@@ -40,6 +40,7 @@ class PauseMenu : public IUIComponent {
     void setVisible(bool visible) override;
 
     void setOnExit(std::function<void()> callback);
+    void setOnUIConfig(std::function<void()> callback);
 
   private:
     std::shared_ptr<events::EventDispatcher> _dispatcher;
@@ -56,6 +57,7 @@ class PauseMenu : public IUIComponent {
 
     bool _isVisible{false};
     std::function<void()> _onExit;
+    std::function<void()> _onUIConfig;
 };
 
 }  // namespace zappy::gui::ui::menus

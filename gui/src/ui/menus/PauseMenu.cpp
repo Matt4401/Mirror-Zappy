@@ -47,6 +47,12 @@ PauseMenu::PauseMenu(std::shared_ptr<events::EventDispatcher> dispatcher,
         raylib::rcore::Window::disableCursor();
     });
 
+    _uiConfigBtn->setOnClick([this]() {
+        if (this->_onUIConfig) {
+            this->_onUIConfig();
+        }
+    });
+
     _exitBtn->setOnClick([this]() {
         if (this->_onExit) {
             this->_onExit();
@@ -93,5 +99,6 @@ bool PauseMenu::isVisible() const { return _isVisible; }
 void PauseMenu::setVisible(bool visible) { _isVisible = visible; }
 
 void PauseMenu::setOnExit(std::function<void()> callback) { _onExit = std::move(callback); }
+void PauseMenu::setOnUIConfig(std::function<void()> callback) { _onUIConfig = std::move(callback); }
 
 }  // namespace zappy::gui::ui::menus
