@@ -24,6 +24,8 @@
 #include "exception/Exception.hpp"
 #include "game/World.hpp"
 #include "network/ISessionManager.hpp"
+#include "protocol/Commands.hpp"
+#include "protocol/Emitter.hpp"
 #include "strategy/ServerStrategy.hpp"
 
 namespace zappy::server {
@@ -147,12 +149,13 @@ void Core::handleClientMessage(int clientId, std::string_view message) {
 }
 
 void Core::handleHandshake(int clientId, std::string_view teamName) {
-    const auto playerIdOpt = _world->spawnPlayer(teamName);
-
     if (teamName == "GRAPHIC") {
         _clientStates[clientId] = ClientState::GUI;
+        sendGuiInitialState(clientId);
         return;
     }
+
+    const auto playerIdOpt = _world->spawnPlayer(teamName);
     if (!playerIdOpt.has_value()) {
         _sessionManager->sendMessage(clientId, "ko\n");
         return;
@@ -182,7 +185,7 @@ void Core::handleGuiMessage(int clientId, std::string_view message) {
     auto command = _commandFactory.createGuiCommand(message);
 
     if (command != nullptr) {
-        const std::string response = command->execute(*_world);
+        const std::string response = command->execute(*this);
 
         if (!response.empty()) {
             _sessionManager->sendMessage(clientId, response);
@@ -229,6 +232,15 @@ void Core::flushGuiResponses() {
             }
         }
     }
+}
+
+void Core::sendGuiInitialState(int clientId) {
+    _sessionManager->sendMessage(clientId, shared::protocol::Emitter::build(shared::protocol::server::Msz{
+                                               .width = static_cast<int>(_world->sizeMap().x),
+                                               .height = static_cast<int>(_world->sizeMap().y)}));
+    _sessionManager->sendMessage(
+        clientId,
+        shared::protocol::Emitter::build(shared::protocol::server::Sgt{.timeUnit = static_cast<int>(_config.freq)}));
 }
 
 }  // namespace zappy::server

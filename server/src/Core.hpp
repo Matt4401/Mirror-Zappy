@@ -36,6 +36,9 @@ class Core {
     int run();
     void stop();
 
+    [[nodiscard]] const game::World& world() const { return *_world; }
+    [[nodiscard]] parser::ServerConfig& config() { return _config; }
+
   private:
     enum class ClientState : std::uint8_t { WAITING_TEAM_SELECTION, IN_GAME, GUI };
 
@@ -56,6 +59,7 @@ class Core {
 
     void flushPlayerResponses();
     void flushGuiResponses();
+    void sendGuiInitialState(int clientId);
 
     parser::ServerConfig _config;
     std::unique_ptr<shared::network::ISessionManager> _sessionManager;

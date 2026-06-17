@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2026
 ** zappy
 ** File description:
-** msz
+** Sgt
 */
 
 #pragma once
@@ -13,14 +13,14 @@
 
 namespace zappy::server::guiCommand {
 
-class Msz : public IGuiCommand {
+class Sgt : public IGuiCommand {
   public:
-    Msz() = default;
-    Msz(const Msz& other) = delete;
-    Msz& operator=(const Msz& other) = delete;
-    Msz(Msz&& other) = delete;
-    Msz& operator=(Msz&& other) = delete;
-    ~Msz() override = default;
+    Sgt() = default;
+    Sgt(const Sgt& other) = delete;
+    Sgt& operator=(const Sgt& other) = delete;
+    Sgt(Sgt&& other) = delete;
+    Sgt& operator=(Sgt&& other) = delete;
+    ~Sgt() override = default;
 
     std::string execute(Core& core) override;
 };
