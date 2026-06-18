@@ -26,4 +26,7 @@ class ParsingError : public Exception {
     explicit ParsingError(const std::string_view msg, const source &location = source::current())
         : Exception(std::string(PREFIX) + std::string(msg), location) {}
 };
+
+#define PARSING_ERROR(fmt, ...) \
+    ParsingError(std::format(fmt __VA_OPT__(, ) __VA_ARGS__), std::source_location::current())
 }  // namespace zappy::shared::exception
