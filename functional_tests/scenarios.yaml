@@ -17,3 +17,46 @@
   steps:
     - send: "Inventory\n"
     - expect: '^\[ food \d+, linemate \d+, deraumere \d+, sibur \d+, mendiane \d+, phiras \d+, thystame \d+ \]\n$'
+
+- name: "GUI_Map_Content_MCT"
+  client_type: "GUI"
+  steps:
+    - send: "mct\n"
+    - expect: '^(bct \d+ \d+( \d+){7}\n)+$'
+
+- name: "GUI_Team_Names_TNA"
+  client_type: "GUI"
+  steps:
+    - send: "tna\n"
+    - expect: '^(tna \w+\n)+$'
+
+- name: "GUI_Unknown_Command_SBP"
+  client_type: "GUI"
+  steps:
+    - send: "hello_server\n"
+    - expect: '^sbp\n$'
+
+- name: "AI_Movement_Chaining"
+  client_type: "AI"
+  team: "team1"
+  steps:
+    - send: "Forward\n"
+    - expect: '^ok\n$'
+    - send: "Right\n"
+    - expect: '^ok\n$'
+    - send: "Left\n"
+    - expect: '^ok\n$'
+
+- name: "AI_Look_Initial_Format"
+  client_type: "AI"
+  team: "team1"
+  steps:
+    - send: "Look\n"
+    - expect: '^\[ player[^\]]* \]\n$'
+
+- name: "AI_Death_By_Starvation"
+  client_type: "AI"
+  team: "team2"
+  steps:
+    - sleep: 13.0
+    - expect: '^dead\n$'
