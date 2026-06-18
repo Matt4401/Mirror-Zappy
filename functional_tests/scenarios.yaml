@@ -34,7 +34,7 @@
   client_type: "GUI"
   steps:
     - send: "hello_server\n"
-    - expect: '^sbp\n$'
+    - expect: '^suc\n$'
 
 - name: "AI_Movement_Chaining"
   client_type: "AI"

@@ -86,7 +86,7 @@ def test_integration_gui_observes_starvation(server):
     while True:
         msg = gui.read_until()
         if msg.startswith("pnw "):
-            match = re.search(r"^pnw (\d+) ", msg)
+            match = re.search(r"^pnw #?(\d+)", msg) 
             player_id = match.group(1)
             break
 
