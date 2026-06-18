@@ -29,6 +29,7 @@ struct Position {
 
 enum class ItemType : uint8_t { Food, Linemate, Deraumere, Sibur, Mendiane, Phiras, Thystame, COUNT };
 
+// NOLINTNEXTLINE
 const std::map<std::string, ItemType> kMapItemString = {
     {"linemate", ItemType::Linemate}, {"deraumere", ItemType::Deraumere}, {"sibur", ItemType::Sibur},
     {"mendiane", ItemType::Mendiane}, {"phiras", ItemType::Phiras},       {"thystame", ItemType::Thystame},
