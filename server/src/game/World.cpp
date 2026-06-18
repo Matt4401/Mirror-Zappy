@@ -8,8 +8,9 @@
 #include "World.hpp"
 
 #include <array>
+#include <cmath>
+#include <cstddef>
 #include <cstdint>
-#include <ctime>
 #include <memory>
 #include <optional>
 #include <random>
@@ -267,6 +268,18 @@ int World::getNextExecutionTick() const {
         }
     }
     return nextTick;
+}
+
+void World::addItemOnGround(ItemType item, const Position pos) {
+    _tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(item))++;
+}
+
+void World::removeItemOnGround(ItemType item, const Position pos) {
+    _tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(item))--;
+}
+
+std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> World::tileResources(const Position position) const {
+    return _tiles.at(getTileIndex(position)).resources;
 }
 
 std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> World::getResourcesAt(const std::size_t x,
