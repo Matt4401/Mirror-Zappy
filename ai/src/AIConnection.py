@@ -5,6 +5,19 @@ import time
 from queue import Queue
 
 
+class CommandRequest:
+    def __init__(self, command, id, time_answer):
+        self.command = command
+        self.id = id
+
+
+class CommandResponse:
+    def __init__(self, command, id, time_answered):
+        self.command = command
+        self.id = id
+        self.time_answered = time_answered
+
+
 class AIConnection:
     def __init__(self, host, port, team_name):
         self.host = host
@@ -15,10 +28,19 @@ class AIConnection:
         self.sub_character = "\n"
         self.response_queue = Queue()
         self.socket_lock = threading.Lock()
+        self.send_lock = threading.Lock()
         self.reader_thread = None
         self._connect(host, port)
         self._do_handshake()
         self._start_reader()
+        self._star_receive_poll_cmd()
+
+        self.pending_commands = {}
+        self.command_queue = deque()
+
+        self.response_buffer = {}
+        self.failed_commands = deque()
+        self.cmd_counter = 0
 
     def _connect(self, host, port):
         try:
@@ -119,6 +141,32 @@ class AIConnection:
             self.reader_thread.join(timeout=2.0)
             if self.reader_thread.is_alive():
                 print("Warning: reader thread did not terminate gracefully")
+
+    def check_response(self):
+        idx = 00
+        while idx < 10:
+            for recv_cmd in self.pending_commands:
+                # if recv_cmd.id == response.id()
+                    # idx++
+                # self.response_queue.put(recv_cmd)
+
+    def send_cmd_buffer(self):
+        for cmd in self.command_queue:
+            self.send_command(cmd)
+
+    def run_receive_poll_cmd(self):
+        while self.running:
+            if self.command_queue.size() == 10:
+                self.send_cmd_buffer()
+                # check_answer()
+                # send_to_player()
+
+
+    def _start_receive_poll_cmd(self):
+        self.reader_thread = threading.Thread(
+            target=self.run_receive_poll_cmd(), daemon=False, name="AIConnection-Receive"
+        )
+        self.reader_thread.start()
 
     def __del__(self):
         try:
