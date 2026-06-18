@@ -8,6 +8,8 @@
 #pragma once
 
 #include "command/ACommand.hpp"
+#include "game/Player.hpp"
+#include "game/World.hpp"
 
 namespace zappy::server::command {
 class Inventory : public ACommand {
