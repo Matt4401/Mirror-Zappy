@@ -108,25 +108,24 @@ void UIGridManager::handleEvent(const raylib::rcore::Event& event) {
     handleMouseDrag(mousePos, cellW, cellH);
 }
 
-void UIGridManager::updateResizeStack(PanelData* startPanel) {
+void UIGridManager::updateResizeStack(PanelData& startPanel) {
     _resizeStack.clear();
-    PanelData const* current = startPanel;
+    std::reference_wrapper<PanelData> current = startPanel;
     while (true) {
-        // NOLINTNEXTLINE
         PanelData* next = nullptr;
         for (auto& data : _panels) {
-            if (&data == current) {
+            if (&data == &current.get()) {
                 continue;
             }
-            int const gap = data.grid.y - (current->grid.y + current->grid.h);
-            if (data.grid.x == current->grid.x && (gap == 0 || gap == 1)) {
+            int const gap = data.grid.y - (current.get().grid.y + current.get().grid.h);
+            if (data.grid.x == current.get().grid.x && (gap == 0 || gap == 1)) {
                 next = &data;
                 break;
             }
         }
         if (next != nullptr) {
-            _resizeStack.push_back(next);
-            current = next;
+            _resizeStack.emplace_back(*next);
+            current = *next;
         } else {
             break;
         }
@@ -149,7 +148,7 @@ void UIGridManager::handleMousePressed(const raylib::rmath::Vector2& mousePos, f
                 data.originalGrid = data.grid;
             }
             _previewGrid = _panel.grid;
-            updateResizeStack(&_panel);
+            updateResizeStack(_panel);
             return;
         }
     }
@@ -187,8 +186,9 @@ void UIGridManager::handleMouseReleased() {
         if (it != _panels.end()) {
             int const deltaH = it->grid.h - it->originalGrid.h;
             if (deltaH <= 0) {
-                for (auto* sp : _resizeStack) {
-                    sp->grid.y = sp->originalGrid.y + deltaH;
+                for (auto& spRef : _resizeStack) {
+                    PanelData& sp = spRef.get();
+                    sp.grid.y = sp.originalGrid.y + deltaH;
                 }
             }
         }
@@ -203,8 +203,9 @@ bool UIGridManager::isRectOverlappingStaticPanels(const GridRect& rect, int delt
             return false;
         }
         if (deltaH > 0) {
-            bool const inStack =
-                std::ranges::any_of(_resizeStack, [&data](PanelData* sp) { return sp->panel == data.panel; });
+            bool const inStack = std::ranges::any_of(
+                _resizeStack,
+                [&data](const std::reference_wrapper<PanelData>& sp) { return sp.get().panel == data.panel; });
             if (inStack) {
                 return false;
             }
@@ -216,8 +217,9 @@ bool UIGridManager::isRectOverlappingStaticPanels(const GridRect& rect, int delt
 }
 
 bool UIGridManager::canPushStack(int deltaH) const {
-    return std::ranges::none_of(_resizeStack, [this, deltaH](PanelData* sp) {
-        GridRect spTest = sp->originalGrid;
+    return std::ranges::none_of(_resizeStack, [this, deltaH](const std::reference_wrapper<PanelData>& spRef) {
+        PanelData const& sp = spRef.get();
+        GridRect spTest = sp.originalGrid;
         spTest.y += deltaH;
         if (spTest.y + spTest.h > GridRows) {
             return true;
@@ -242,8 +244,9 @@ void UIGridManager::checkAndApplyResize(std::vector<PanelData>::iterator it, int
         it->grid.h = newGridH;
         _previewGrid = it->grid;
 
-        for (auto* sp : _resizeStack) {
-            sp->grid.y = sp->originalGrid.y + std::max(0, deltaH);
+        for (auto& spRef : _resizeStack) {
+            PanelData& sp = spRef.get();
+            sp.grid.y = sp.originalGrid.y + std::max(0, deltaH);
         }
     }
 }

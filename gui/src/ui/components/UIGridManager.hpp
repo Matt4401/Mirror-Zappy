@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <vector>
 
@@ -63,7 +64,7 @@ class UIGridManager : public IUIComponent {
     void handleMousePressed(const raylib::rmath::Vector2& mousePos, float cellW, float cellH);
     void handleMouseReleased();
     void handleMouseDrag(const raylib::rmath::Vector2& mousePos, float cellW, float cellH);
-    void updateResizeStack(PanelData* startPanel);
+    void updateResizeStack(PanelData& startPanel);
     void checkAndApplyResize(std::vector<PanelData>::iterator it, int newGridW, int newGridH, int deltaH);
     [[nodiscard]] bool isRectOverlappingStaticPanels(const GridRect& rect, int deltaH) const;
     [[nodiscard]] bool canPushStack(int deltaH) const;
@@ -78,7 +79,7 @@ class UIGridManager : public IUIComponent {
 
     std::shared_ptr<UIGamePanel> _draggedPanel;
     std::shared_ptr<UIGamePanel> _resizedPanel;
-    std::vector<PanelData*> _resizeStack;
+    std::vector<std::reference_wrapper<PanelData>> _resizeStack;
     raylib::rmath::Vector2 _dragOffset{0.0F, 0.0F};
     GridRect _previewGrid{.x = 0, .y = 0, .w = 0, .h = 0};
 };
