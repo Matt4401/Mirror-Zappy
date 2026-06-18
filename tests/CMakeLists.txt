@@ -16,6 +16,7 @@ add_executable(unit_tests
         src/server/Player.cpp
         src/server/command/Right.cpp
         src/server/command/Left.cpp
+        src/server/guiCommand/guiCommands.cpp
         src/server/World.cpp
         src/protocol/ProtocolTest.cpp
         src/server/command/Eject.cpp
