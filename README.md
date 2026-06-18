@@ -20,18 +20,19 @@ Ensure you have the following installed on your system before compiling:
 sudo apt-get update
 sudo apt-get install build-essential cmake libconfig++-dev libraylib-dev
 ```
+*(Arch Linux users: `sudo pacman -S base-devel cmake libconfig raylib`)*
 
 ### Python Environment (For AI)
 
 ```bash
-pip install torch ruff pre-commit
+python3 -m pip install torch ruff pre-commit
 ```
 
 ---
 
 ## Compilation
 
-The project Makefile contains rules to compile the eponymous binaries:
+This project relies on **CMake** and **Makefile** for its build system. It is highly recommended to use an out-of-source build by generating files into a `build/` directory.
 
 ```bash
 # Compile all binaries (Server, GUI, and AI launcher)
@@ -60,7 +61,6 @@ make fclean
 ```
 
 **Options description:**
-
 * `-p port`: Port number.
 * `-x width`: Width of the world.
 * `-y height`: Height of the world.
@@ -93,14 +93,65 @@ make fclean
 
 ---
 
-<!-- Upcoming ## Quick Sandbox Execution
+## Testing
 
-For local testing, a quick-launch script can spin up a local instance:
+The project includes a robust, data-driven functional test suite built with Python and `pytest`. 
+
+The test suite performs **differential testing**: it automatically boots both the official reference binary and your custom `zappy_server`, executes a series of TCP network scenarios (defined in `functional_tests/scenarios.yaml`), and ensures your server's responses match the official protocol perfectly.
+
+To launch the test suite, use the dedicated CMake target. This command will automatically rebuild the server if needed, create a safe Python virtual environment, install dependencies, and run the tests:
 
 ```bash
-chmod +x run.sh
-./run.sh
-``` -->
+cmake --build build --target tests_functional
+```
+
+*Note: The test script automatically manages its own dependencies inside `functional_tests/.venv` to avoid polluting your global Python environment.*
+
+---
+
+## Contributors
+
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/EstebanPeroz">
+        <img src="https://github.com/EstebanPeroz.png?size=100" width="100px;" alt="EstebanPeroz"/>
+        <br />
+        <sub><b>EstebanPeroz</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/TomGatin">
+        <img src="https://github.com/TomGatin.png?size=100" width="100px;" alt="TomGatin"/>
+        <br />
+        <sub><b>TomGatin</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/N0AH-sve">
+        <img src="https://github.com/N0AH-sve.png?size=100" width="100px;" alt="N0AH-sve"/>
+        <br />
+        <sub><b>N0AH-sve</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/Matt4401">
+        <img src="https://github.com/Matt4401.png?size=100" width="100px;" alt="Matt4401"/>
+        <br />
+        <sub><b>Matt4401</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/eliottraguin">
+        <img src="https://github.com/eliottraguin.png?size=100" width="100px;" alt="eliottraguin"/>
+        <br />
+        <sub><b>eliottraguin</b></sub>
+      </a>
+    </td>
+  </tr>
+</table>
+
+------
 
 ## Contributing
 
