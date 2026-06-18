@@ -90,7 +90,7 @@ def test_integration_gui_observes_starvation(server):
             player_id = match.group(1)
             break
 
-    time.sleep(13.0) 
+    time.sleep(1.5) 
     
     assert ai.read_until(timeout=5.0) == "dead\n"
     
@@ -98,7 +98,7 @@ def test_integration_gui_observes_starvation(server):
     while True:
         try:
             msg = gui.read_until(timeout=1.0)
-            if msg == f"pdi {player_id}\n":
+            if re.search(rf"^pdi #?{player_id}\n", msg):
                 found_death = True
                 break
         except TimeoutError:

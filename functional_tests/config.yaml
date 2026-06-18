@@ -7,4 +7,4 @@ server_args:
   height: "10"
   teams: ["team1", "team2"]
   clients_per_team: "5"
-  freq: "100"
+  freq: "1000"

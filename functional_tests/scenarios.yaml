@@ -58,5 +58,5 @@
   client_type: "AI"
   team: "team2"
   steps:
-    - sleep: 13.0
+    - sleep: 1.5
     - expect: '^dead\n$'
