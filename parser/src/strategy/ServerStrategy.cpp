@@ -33,11 +33,11 @@ int ServerStrategy::parseNumericArg(const std::string& arg, const std::string& f
         const int val = static_cast<int>(std::stol(arg));
 
         if (val <= 0) {
-            throw shared::exception::ParsingError("Invalid value for {}: must be greater than 0.", flagName);
+            throw shared::exception::PARSING_ERROR("Invalid value for {}: must be greater than 0.", flagName);
         }
         return val;
     } catch (const std::exception&) {
-        throw shared::exception::ParsingError("Invalid formatting for {}: '{}' is not a valid number.", flagName, arg);
+        throw shared::exception::PARSING_ERROR("Invalid formatting for {}: '{}' is not a valid number.", flagName, arg);
     }
 }
 
