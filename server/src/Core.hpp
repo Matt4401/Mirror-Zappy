@@ -35,6 +35,7 @@ class Core {
 
     int run();
     void stop();
+    void setup();
 
     [[nodiscard]] const game::World& world() const { return *_world; }
     [[nodiscard]] parser::ServerConfig& config() { return _config; }
@@ -54,7 +55,6 @@ class Core {
     void handleInGameMessage(int clientId, std::string_view message);
     void handleGuiMessage(int clientId, std::string_view message);
 
-    void setup();
     void loop();
 
     void flushPlayerResponses();

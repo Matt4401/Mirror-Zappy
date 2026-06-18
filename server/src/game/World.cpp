@@ -7,6 +7,7 @@
 
 #include "World.hpp"
 
+#include <array>
 #include <cstdint>
 #include <ctime>
 #include <memory>
@@ -266,6 +267,12 @@ int World::getNextExecutionTick() const {
         }
     }
     return nextTick;
+}
+
+std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> World::getResourcesAt(const std::size_t x,
+                                                                                     const std::size_t y) const {
+    const auto tileIndex = getTileIndex(x, y);
+    return _tiles.at(tileIndex).resources;
 }
 
 }  // namespace zappy::server::game

@@ -78,6 +78,8 @@ class World {
     const std::unordered_map<std::size_t, std::unique_ptr<Player>>& playerList() const;
 
     [[nodiscard]] int getNextExecutionTick() const;
+    [[nodiscard]] std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> getResourcesAt(std::size_t x,
+                                                                                                std::size_t y) const;
 
   private:
     std::unordered_map<std::string, std::unique_ptr<Team>> _teamList;
