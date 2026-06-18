@@ -47,7 +47,7 @@ class Render {
     EventContext _eventContext{_camera};
     scene::SkyBackground _skyBackground;
     raylib::rcore::Event _event;
-    scene::Map _map{10, 10};  // TEMPORARY MAP SIZE, JUST FOR TESTING
+    scene::Map _map{2, 2, _camera};  // TEMPORARY MAP SIZE, JUST FOR TESTING
     std::shared_ptr<events::EventDispatcher> _dispatcher;
     events::EventDispatcher::EventToken _mszToken{0};
 };
