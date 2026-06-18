@@ -1,5 +1,3 @@
-add_subdirectory(components)
-
 add_library(zappy_gui_graphics_scene
         Map.cpp
         SkyBackground.cpp
@@ -21,5 +19,6 @@ target_include_directories(zappy_gui_graphics_scene PUBLIC
 target_link_libraries(zappy_gui_graphics_scene PUBLIC
         zappy_shared
         zappy_gui_raylib
-        zappy_gui_graphics_scene_components
+        zappy_gui_game
+        zappy_gui_game_components
 )

@@ -25,6 +25,7 @@ class Team {
     void addInTeam(std::size_t id);
     void addNewTeamSlot();
     void removeTeamSlot();
+    [[nodiscard]] std::size_t availableSlot() const;
     [[nodiscard]] std::vector<std::size_t> listPlayerId() const;
 
   private:

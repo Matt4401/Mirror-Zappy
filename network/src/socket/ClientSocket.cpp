@@ -117,12 +117,15 @@ std::optional<std::string> ClientSocket::tryPopMessage() {
         throw exception::SocketError{"read buffer overflow, disconnecting client"};
     }
     _buffer += newData;
-    const std::size_t newlinePos = _buffer.find('\n');
+    const std::size_t newlinePos = _buffer.find(delimiter);
 
     if (newlinePos == std::string::npos) {
         return std::nullopt;
     }
     std::string message = _buffer.substr(0, newlinePos);
+    if (!message.empty() && message.back() == '\r') {
+        message.pop_back();
+    }
     _buffer.erase(0, newlinePos + 1);
     return message;
 }

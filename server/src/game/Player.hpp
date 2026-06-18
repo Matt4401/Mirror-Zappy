@@ -74,7 +74,14 @@ class Player {
     [[nodiscard]] std::size_t id() const;
     [[nodiscard]] std::size_t nbLifeTick() const;
     void kill();
+    /*
+     * @brief: don't une this function it's for test.
+     **/
     void setPosition(Position pos);
+
+    [[nodiscard]] int cmdTick() const;
+
+    [[nodiscard]] bool hasCommands() const;
 
   private:
     std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> _inventory{};
