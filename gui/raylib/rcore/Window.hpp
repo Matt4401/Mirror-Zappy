@@ -40,6 +40,12 @@ class Window {
     int getScreenWidth();
     int getScreenHeight();
 
+    static void setExitKey(int key) { SetExitKey(key); }
+    static void enableCursor() { EnableCursor(); }
+    static void disableCursor() { DisableCursor(); }
+    static int screenWidth() { return GetScreenWidth(); }
+    static int screenHeight() { return GetScreenHeight(); }
+
   protected:
   private:
     bool _ownsWindow = false;

@@ -13,8 +13,9 @@
 namespace zappy::gui::raylib {
 class Color {
   public:
-    constexpr Color(std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint8_t a = 255) : _color(r, g, b, a) {}
-    constexpr Color(::Color color) : _color{color} {}
+    constexpr Color(std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint8_t a = 255) noexcept
+        : _color(r, g, b, a) {}
+    constexpr Color(::Color color) noexcept : _color{color} {}
     ~Color() = default;
     Color(const Color& other) = default;
     Color& operator=(const Color& other) = default;
