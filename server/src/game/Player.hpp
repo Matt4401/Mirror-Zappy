@@ -68,6 +68,10 @@ class Player {
     void kill();
     void setPosition(Position pos);
 
+    [[nodiscard]] int cmdTick() const;
+
+    [[nodiscard]] bool hasCommands() const;
+
   private:
     std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> _inventory{};
     cardinalPoint _orientation;
