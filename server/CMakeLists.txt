@@ -30,6 +30,10 @@ add_library(zappy_server_objects OBJECT
         src/game/Team.hpp
         src/command/Eject.cpp
         src/command/Eject.hpp
+        src/command/Set.cpp
+        src/command/Set.hpp
+        src/command/Take.cpp
+        src/command/Take.hpp
 )
 target_include_directories(zappy_server_objects PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src

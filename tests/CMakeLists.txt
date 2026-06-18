@@ -20,6 +20,8 @@ add_executable(unit_tests
         src/server/World.cpp
         src/protocol/ProtocolTest.cpp
         src/server/command/Eject.cpp
+        src/server/command/Take.cpp
+        src/server/command/Set.cpp
 )
 target_include_directories(unit_tests PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src

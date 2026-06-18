@@ -100,14 +100,17 @@ TEST(EjectTest, ExecuteDestroysEggsOnTile) {
     auto& launcher = *playerList.at(idLauncher);
     game::Position pos = game::Position{.x = 0, .y = 0};
     auto ogPos = launcher.position();
-    while (!world.isEggOnTile(pos)) {
-        if (pos.x < kDefaultConfig.width) {
-            pos.x++;
-        } else {
-            pos.x = 0;
-            pos.y++;
+    bool foundEgg = false;
+    for (std::size_t y = 0; y < kDefaultConfig.height && !foundEgg; ++y) {
+        for (std::size_t x = 0; x < kDefaultConfig.width; ++x) {
+            pos = game::Position{.x = x, .y = y};
+            if (world.isEggOnTile(pos)) {
+                foundEgg = true;
+                break;
+            }
         }
     }
+    ASSERT_TRUE(foundEgg);
     launcher.setPosition(pos);
     world.updatePositionOnMap(idLauncher, ogPos, pos);
 
