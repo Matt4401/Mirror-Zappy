@@ -60,8 +60,8 @@ void ServerStrategy::processOptions(const int argc, char** argv, ServerConfig& c
         if (auto it = argumentHandlers.find(static_cast<char>(opt)); it != argumentHandlers.end()) {
             it->second(encapsulation::GetOptWrapper::getOptionArg());
         } else {
-            throw shared::exception::ParsingError("Unknown option or missing argument near '-{}'",
-                                                  std::string(1, encapsulation::GetOptWrapper::getUnknownOption()));
+            throw shared::exception::PARSING_ERROR("Unknown option or missing argument near '-{}'",
+                                                   std::string(1, encapsulation::GetOptWrapper::getUnknownOption()));
         }
     }
 }
