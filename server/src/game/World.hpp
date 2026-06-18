@@ -10,6 +10,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <map>
 #include <memory>
 #include <optional>
 #include <string>
@@ -34,6 +35,14 @@ struct Tile {
     std::vector<std::size_t> players;
     std::vector<std::size_t> eggs;
     std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> resources;
+};
+
+// NOLINTNEXTLINE
+const std::map<cardinalPoint, std::string> kCardinalPointToStr = {
+    {cardinalPoint::NORTH, "north"},
+    {cardinalPoint::EAST, "east"},
+    {cardinalPoint::SOUTH, "south"},
+    {cardinalPoint::WEST, "west"},
 };
 
 class World {
@@ -63,6 +72,10 @@ class World {
     std::vector<std::size_t> collectAndKillDeadPlayers() const;
     std::size_t getAvailableSlotInTeam(std::string_view teamName) const;
     void eject(std::size_t id);
+    bool hasEjectableTargetOnTile(const Position& position, std::size_t id) const;
+    bool isEggOnTile(const Position& position) const;
+
+    const std::unordered_map<std::size_t, std::unique_ptr<Player>>& playerList() const;
 
     [[nodiscard]] int getNextExecutionTick() const;
     [[nodiscard]] std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> getResourcesAt(std::size_t x,
