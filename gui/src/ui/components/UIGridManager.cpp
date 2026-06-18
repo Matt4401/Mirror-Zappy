@@ -13,6 +13,7 @@
 #include <cmath>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <ranges>
 #include <vector>
 
@@ -113,20 +114,20 @@ void UIGridManager::updateResizeStack(PanelData& startPanel) {
     _resizeStack.clear();
     std::reference_wrapper<PanelData> current = startPanel;
     while (true) {
-        PanelData* next = nullptr;
+        std::optional<std::reference_wrapper<PanelData>> next;
         for (auto& data : _panels) {
             if (&data == &current.get()) {
                 continue;
             }
             int const gap = data.grid.y - (current.get().grid.y + current.get().grid.h);
             if (data.grid.x == current.get().grid.x && (gap == 0 || gap == 1)) {
-                next = &data;
+                next.emplace(data);
                 break;
             }
         }
-        if (next != nullptr) {
-            _resizeStack.emplace_back(*next);
-            current = *next;
+        if (next.has_value()) {
+            _resizeStack.emplace_back(next->get());
+            current = next->get();
         } else {
             break;
         }
