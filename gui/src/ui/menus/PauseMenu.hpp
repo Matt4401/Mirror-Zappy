@@ -10,12 +10,12 @@
 #include <functional>
 #include <memory>
 
-#include "../IUIComponent.hpp"
-#include "../components/UIButton.hpp"
-#include "../components/UIPanel.hpp"
 #include "events/EventDispatcher.hpp"
 #include "rcore/Event.hpp"
 #include "rtext/Font.hpp"
+#include "ui/IUIComponent.hpp"
+#include "ui/components/UIButton.hpp"
+#include "ui/components/UIPanel.hpp"
 #include "ui/components/UIText.hpp"
 
 namespace zappy::gui::ui::menus {

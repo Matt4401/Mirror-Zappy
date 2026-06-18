@@ -29,13 +29,13 @@ bool AssetManager::loadFont(const std::string& id, const std::string& path) {
         std::cerr << "Failed to load font: " << path << std::endl;
         return false;
     }
-    _fonts[id] = font;
+    _fonts.insert_or_assign(id, font);
     return true;
 }
 
 std::shared_ptr<raylib::rtext::Font> AssetManager::getFont(const std::string& id) {
     if (_fonts.contains(id)) {
-        return _fonts[id];
+        return _fonts.at(id);
     }
     return nullptr;
 }

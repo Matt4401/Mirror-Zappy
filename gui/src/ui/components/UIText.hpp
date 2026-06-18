@@ -10,11 +10,11 @@
 #include <memory>
 #include <string>
 
-#include "../IUIComponent.hpp"
 #include "Color.hpp"
 #include "rcore/Event.hpp"
 #include "rmath/Vector2.hpp"
 #include "rtext/Font.hpp"
+#include "ui/IUIComponent.hpp"
 
 namespace zappy::gui::ui::components {
 

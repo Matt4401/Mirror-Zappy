@@ -15,8 +15,8 @@
 #include <string>
 #include <vector>
 
-#include "../../graphics/AssetManager.hpp"
 #include "Color.hpp"
+#include "graphics/AssetManager.hpp"
 #include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
 #include "rmath/Vector2.hpp"

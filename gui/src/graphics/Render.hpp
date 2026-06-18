@@ -10,9 +10,6 @@
 #include <memory>
 #include <string>
 
-#include "../ui/UIManager.hpp"
-#include "../ui/components/UIGamePanel.hpp"
-#include "../ui/menus/PauseMenu.hpp"
 #include "Map.hpp"
 #include "SkyBackground.hpp"
 #include "context/EventContext.hpp"
@@ -21,7 +18,10 @@
 #include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
 #include "rmath/Vector3.hpp"
+#include "ui/UIManager.hpp"
+#include "ui/components/UIGamePanel.hpp"
 #include "ui/components/UIGridManager.hpp"
+#include "ui/menus/PauseMenu.hpp"
 
 namespace zappy::gui::graphics {
 class Render {
