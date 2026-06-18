@@ -11,6 +11,7 @@
 #include <string>
 #include <utility>
 
+#include "Color.hpp"
 #include "rmath/Vector2.hpp"
 #include "rtext/Font.hpp"
 
@@ -23,23 +24,30 @@ class Text {
     [[nodiscard]] const std::string& value() const { return _text; }
     void setValue(std::string text) { _text = std::move(text); }
 
-    void draw(int fontSize, Color color) const {
-        DrawText(_text.c_str(), static_cast<int>(_position.x()), static_cast<int>(_position.y()), fontSize, color);
+    void draw(int fontSize, zappy::gui::raylib::Color color) const {
+        DrawText(_text.c_str(), static_cast<int>(_position.x()), static_cast<int>(_position.y()), fontSize,
+                 color.color());
     }
 
-    void draw(const Font& font, float fontSize, float spacing, Color tint) const {
-        DrawTextEx(font.font(), _text.c_str(), _position.vector(), fontSize, spacing, tint);
+    void draw(const Font& font, float fontSize, float spacing, zappy::gui::raylib::Color tint) const {
+        DrawTextEx(font.font(), _text.c_str(), _position.vector(), fontSize, spacing, tint.color());
     }
 
     void draw(const Font& font, rmath::Vector2 origin, float rotation, float fontSize, float spacing,
-              Color tint) const {
-        DrawTextPro(font.font(), _text.c_str(), _position.vector(), origin.vector(), rotation, fontSize, spacing, tint);
+              zappy::gui::raylib::Color tint) const {
+        DrawTextPro(font.font(), _text.c_str(), _position.vector(), origin.vector(), rotation, fontSize, spacing,
+                    tint.color());
     }
 
     [[nodiscard]] int measure(int fontSize) const { return MeasureText(_text.c_str(), fontSize); }
 
     [[nodiscard]] rmath::Vector2 measure(const Font& font, float fontSize, float spacing) const {
         return MeasureTextEx(font.font(), _text.c_str(), fontSize, spacing);
+    }
+
+    [[nodiscard]] static rmath::Vector2 measureText(const Font& font, const std::string& text, float fontSize,
+                                                    float spacing) {
+        return MeasureTextEx(font.font(), text.c_str(), fontSize, spacing);
     }
 
     [[nodiscard]] int codepointCount() const { return GetCodepointCount(_text.c_str()); }
