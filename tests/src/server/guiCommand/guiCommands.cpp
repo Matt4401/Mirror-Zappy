@@ -1,3 +1,10 @@
+/*
+** EPITECH PROJECT, 2026
+** zappy
+** File description:
+** guicommands tests
+*/
+
 #include <gtest/gtest.h>
 
 #include <span>
@@ -9,6 +16,7 @@
 #include "guiCommand/Mct.hpp"
 #include "guiCommand/Msz.hpp"
 #include "guiCommand/Sgt.hpp"
+#include "guiCommand/Tna.hpp"
 
 // NOLINTBEGIN
 const auto createDummyArgs = []() {
@@ -21,12 +29,13 @@ const auto createDummyArgs = []() {
     static char arg6[] = "20";
     static char arg7[] = "-n";
     static char arg8[] = "teamA";
-    static char arg9[] = "-c";
-    static char arg10[] = "5";
-    static char arg11[] = "-f";
-    static char arg12[] = "50";
+    static char arg9[] = "teamB";
+    static char arg10[] = "-c";
+    static char arg11[] = "5";
+    static char arg12[] = "-f";
+    static char arg13[] = "50";
 
-    return std::vector<char*>{arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12};
+    return std::vector<char*>{arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13};
 };
 // NOLINTEND
 
@@ -89,4 +98,15 @@ TEST(MctCommandTest, ExecuteReturnsAllTileContents) {
         }
     }
     EXPECT_EQ(response, expectedResponse);
+}
+
+TEST(TnaCommandTest, ExecuteReturnsTeamNames) {
+    auto args = createDummyArgs();
+    zappy::server::Core core{std::span<char*>(args)};
+    core.setup();
+
+    zappy::server::guiCommand::Tna command{};
+    const std::string response = command.execute(core);
+
+    EXPECT_EQ(response, "tna teamA\ntna teamB\n");
 }

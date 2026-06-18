@@ -17,6 +17,7 @@ add_executable(unit_tests
         src/server/command/Right.cpp
         src/server/command/Left.cpp
         src/server/guiCommand/guiCommands.cpp
+        src/server/guiCommand/guiCommandFactory.cpp
         src/server/World.cpp
         src/protocol/ProtocolTest.cpp
         src/server/command/Eject.cpp
