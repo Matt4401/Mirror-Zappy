@@ -15,7 +15,9 @@ namespace zappy::server::command {
 
 Eject::Eject() : ACommand{kTimeLimit} {}
 
-bool Eject::start(game::World& world, game::Player& player) { return world.isPeopleOrEggOnTile(player.position()); }
+bool Eject::start(game::World& world, game::Player& player) {
+    return world.hasEjectableTargetOnTile(player.position(), player.id());
+}
 
 void Eject::execute(game::World& world, game::Player& player) { world.eject(player.id()); }
 

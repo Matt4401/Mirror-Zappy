@@ -45,7 +45,7 @@ TEST(EjectTest, StartFailsIfTileIsEmpty) {
 
     const std::unique_ptr<ICommand> eject = std::make_unique<Eject>();
 
-    ASSERT_TRUE(eject->start(world, player));
+    ASSERT_FALSE(eject->start(world, player));
 }
 
 TEST(EjectTest, ExecuteEjectsOtherPlayerAndSendsResponse) {
@@ -98,20 +98,26 @@ TEST(EjectTest, ExecuteDestroysEggsOnTile) {
 
     const auto& playerList = world.playerList();
     auto& launcher = *playerList.at(idLauncher);
+    game::Position pos = game::Position{.x = 0, .y = 0};
+    auto ogPos = launcher.position();
+    while (!world.isEggOnTile(pos)) {
+        if (pos.x < kDefaultConfig.width) {
+            pos.x++;
+        } else {
+            pos.x = 0;
+            pos.y++;
+        }
+    }
+    launcher.setPosition(pos);
+    world.updatePositionOnMap(idLauncher, ogPos, pos);
 
-    launcher.setPosition(game::Position{.x = 0, .y = 0});
-    world.updatePositionOnMap(idLauncher, game::Position{.x = 0, .y = 0}, game::Position{.x = 0, .y = 0});
-
-    ASSERT_TRUE(world.isPeopleOrEggOnTile(game::Position{.x = 0, .y = 0}));
+    ASSERT_TRUE(world.hasEjectableTargetOnTile(pos, launcher.id()));
 
     const std::unique_ptr<ICommand> eject = std::make_unique<Eject>();
     eject->execute(world, launcher);
 
-    EXPECT_EQ(launcher.position().x, 0);
-    EXPECT_EQ(launcher.position().y, 0);
-
-    EXPECT_TRUE(world.isPeopleOrEggOnTile(game::Position{.x = 0, .y = 0}));
-    EXPECT_FALSE(world.isEggOnTile(game::Position{.x = 0, .y = 0}));
+    EXPECT_FALSE(world.hasEjectableTargetOnTile(pos, launcher.id()));
+    EXPECT_FALSE(world.isEggOnTile(pos));
 }
 
 }  // namespace zappy::server::command

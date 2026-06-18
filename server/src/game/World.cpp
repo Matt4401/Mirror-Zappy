@@ -229,8 +229,9 @@ void World::eject(const std::size_t id) {
     pushingPlayer->addResponse("ok\n");
 }
 
-bool World::isPeopleOrEggOnTile(const Position& position) const {
-    const auto tile = _tiles.at(getTileIndex(position));
+bool World::hasEjectableTargetOnTile(const Position& position, const std::size_t id) const {
+    auto tile = _tiles.at(getTileIndex(position));
+    std::erase(tile.players, id);
     return !tile.players.empty() || !tile.eggs.empty();
 }
 
