@@ -28,4 +28,7 @@ class TooMuchCmd : public shared::exception::Exception {
                         const shared::exception::source &location = shared::exception::source::current())
         : Exception(std::string(PREFIX) + std::string(msg), location) {}
 };
+
+#define TOMUCHCMD_ERROR(fmt, ...) \
+    TooMuchCmd(std::format(fmt __VA_OPT__(, ) __VA_ARGS__), std::source_location::current())
 }  // namespace zappy::server::exception

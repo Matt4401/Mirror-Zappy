@@ -16,9 +16,8 @@ namespace zappy::shared::exception {
 using source = std::source_location;
 
 class Exception : public std::exception {
-public:
-    explicit Exception(std::string_view,
-                       const source &location = source::current());
+  public:
+    explicit Exception(std::string_view, const source &location = source::current());
     Exception(const Exception &) = default;
     Exception(Exception &&) = default;
     ~Exception() override = default;
@@ -29,7 +28,7 @@ public:
     [[nodiscard]] const char *what() const noexcept override;
     [[nodiscard]] const source &location() const noexcept;
 
-protected:
+  protected:
     std::string _message;
     std::source_location _location;
     std::string _fullMessage;
