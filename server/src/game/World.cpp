@@ -7,6 +7,7 @@
 
 #include "World.hpp"
 
+#include <array>
 #include <cmath>
 #include <cstdint>
 #include <ctime>
@@ -239,6 +240,10 @@ void World::addItemOnGround(ItemType item, const Position pos) {
 
 void World::removeItemOnGround(ItemType item, const Position pos) {
     _tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(item))--;
+}
+
+std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> World::tileResources(const Position position) const {
+    return _tiles.at(getTileIndex(position)).resources;
 }
 
 }  // namespace zappy::server::game

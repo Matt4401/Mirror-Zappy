@@ -2,10 +2,10 @@
 ** EPITECH PROJECT, 2026
 ** zappy
 ** File description:
-** Set
+** Take
 */
 
-#include "Set.hpp"
+#include "Take.hpp"
 
 #include <cstdint>
 #include <string>
@@ -16,21 +16,19 @@
 #include "game/World.hpp"
 
 namespace zappy::server::command {
+Take::Take(std::string arg) : ACommand{kTimeLimit}, _arg(std::move(arg)) {}
 
-Set::Set(std::string arg) : ACommand{kTimeLimit}, _arg(std::move(arg)) {}
-
-bool Set::start(game::World& /*world*/, game::Player& player) {
+bool Take::start(game::World& world, game::Player& player) {
     const auto it = game::kMapItemString.find(_arg);
     if (it == game::kMapItemString.end()) {
         return false;
     }
-    const auto inventory = player.inventory();
-
-    return inventory.at(static_cast<std::uint8_t>(it->second)) > 0;
+    const auto& resources = world.tileResources(player.position());
+    return resources.at(static_cast<std::uint8_t>(it->second)) > 0;
 }
-void Set::execute(game::World& world, game::Player& player) {
+void Take::execute(game::World& world, game::Player& player) {
     const game::ItemType item = game::kMapItemString.at(_arg);
-    player.subItem(item);
-    world.addItemOnGround(item, player.position());
+    world.removeItemOnGround(item, player.position());
+    player.addItem(item);
 }
 }  // namespace zappy::server::command

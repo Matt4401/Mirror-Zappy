@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2026
 ** zappy
 ** File description:
-** Set
+** Take
 */
 
 #pragma once
@@ -13,15 +13,14 @@
 #include "game/World.hpp"
 
 namespace zappy::server::command {
-
-class Set : public ACommand {
+class Take : public ACommand {
   public:
-    explicit Set(std::string arg);
-    ~Set() override = default;
-    Set(const Set& other) = delete;
-    Set& operator=(const Set& other) = delete;
-    Set(Set&& other) = delete;
-    Set& operator=(Set&& other) = delete;
+    explicit Take(std::string arg);
+    ~Take() override = default;
+    Take(const Take& other) = delete;
+    Take& operator=(const Take& other) = delete;
+    Take(Take&& other) = delete;
+    Take& operator=(Take&& other) = delete;
 
     bool start(game::World& world, game::Player& player) override;
     void execute(game::World& world, game::Player& player) override;
