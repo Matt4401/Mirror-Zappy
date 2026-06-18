@@ -34,14 +34,14 @@ Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher) : _dispatche
     _window.setTargetFPS(DefaultFps);
     raylib::rcore::Window::setExitKey(0);
 
-    AssetManager::getInstance().loadFont("Minecraft", "assets/fonts/Minecraft.ttf");
+    AssetManager::getInstance().loadFont(DefaultFontName, "assets/fonts/Minecraft.ttf");
 
     // Temporary tests panels
     _gridManager = std::make_shared<ui::components::UIGridManager>();
     _uiManager.addComponent(_gridManager);
 
     _demoPanel = std::make_shared<ui::components::UIGamePanel>(0, 0, 0, 0, "Player Info");
-    auto font = AssetManager::getInstance().getFont("Minecraft");
+    auto font = AssetManager::getInstance().getFont(DefaultFontName);
     auto btn = std::make_shared<ui::components::UIButton>(100.0F, 120.0F, 200.0F, 40.0F, "Click me!", font);
     auto text = std::make_shared<ui::components::UIText>("Level 8 Player", font);
     text->setPosition(100.0F, 200.0F);
@@ -56,7 +56,8 @@ Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher) : _dispatche
     _gridManager->addPanel(_demoPanel, 1, 1, 12, 18);
     _gridManager->addPanel(_demoPanel2, 1, 19, 12, 8);
 
-    _pauseMenu = std::make_shared<ui::menus::PauseMenu>(_dispatcher, AssetManager::getInstance().getFont("Minecraft"));
+    _pauseMenu =
+        std::make_shared<ui::menus::PauseMenu>(_dispatcher, AssetManager::getInstance().getFont(DefaultFontName));
     _pauseMenu->setOnExit([this]() { _isExiting = true; });
     _pauseMenu->setOnUIConfig([this]() {
         _gridManager->setConfigMode(true);

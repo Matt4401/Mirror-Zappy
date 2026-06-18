@@ -81,6 +81,7 @@ class UIGamePanel : public IUIComponent {
     static constexpr int DefaultFontSize = 20;
     static constexpr float TextSpacing = 2.0F;
     static constexpr float ScrollSpeed = 30.0F;
+    static constexpr std::string DefaultFontName = "Minecraft";
 
     static const raylib::Color PrimaryColor;
     static const raylib::Color SecondaryColor;

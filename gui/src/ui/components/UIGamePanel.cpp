@@ -38,7 +38,7 @@ UIGamePanel::UIGamePanel(float x, float y, float width, float height, const std:
     _contentPanel = std::make_shared<UIPanel>(x + Padding, y + DefaultHeaderHeight, width - (2 * Padding),
                                               height - DefaultHeaderHeight - Padding, SecondaryColor);
 
-    auto font = graphics::AssetManager::getInstance().getFont("Minecraft");
+    auto font = graphics::AssetManager::getInstance().getFont(DefaultFontName);
     _titleText = std::make_shared<UIText>(title, font);
     _titleText->setColor(TitleColor);
 
@@ -56,7 +56,7 @@ UIGamePanel::UIGamePanel(float x, float y, float width, float height, const std:
     _contentPanel = std::make_shared<UIPanel>(x + Padding, y + DefaultHeaderHeight, width - (2 * Padding),
                                               height - DefaultHeaderHeight - Padding, secondaryColor);
 
-    auto font = graphics::AssetManager::getInstance().getFont("Minecraft");
+    auto font = graphics::AssetManager::getInstance().getFont(DefaultFontName);
     _titleText = std::make_shared<UIText>(title, font);
     _titleText->setColor(titleColor);
 
@@ -221,7 +221,7 @@ void UIGamePanel::updateTextPosition() {
         return;
     }
 
-    auto font = graphics::AssetManager::getInstance().getFont("Minecraft");
+    auto font = graphics::AssetManager::getInstance().getFont(DefaultFontName);
     int const fontSize = font && font->valid() ? font->baseSize() : DefaultFontSize;
     raylib::rtext::Font const defaultFont;
     float const textWidth =

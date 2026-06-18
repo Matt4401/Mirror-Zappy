@@ -76,5 +76,6 @@ class Render {
     static constexpr int EscapeKey = 256;
     static constexpr int LeftAltKey = 342;
     static constexpr int DefaultFps = 60;
+    static constexpr std::string DefaultFontName = "Minecraft";
 };
 }  // namespace zappy::gui::graphics
