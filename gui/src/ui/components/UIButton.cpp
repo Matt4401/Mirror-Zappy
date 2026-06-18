@@ -24,6 +24,8 @@
 
 namespace zappy::gui::ui::components {
 
+using Shapes = raylib::rshapes::Shapes;
+
 const raylib::Color UIButton::OuterBorderColor(0, 0, 0, 255);
 const raylib::Color UIButton::NormalFillColor(120, 120, 120, 255);
 const raylib::Color UIButton::HoveredFillColor(160, 160, 190, 255);
@@ -76,42 +78,42 @@ void UIButton::draw() {
         bottomBorder = BrightBorderColor;
     }
 
-    raylib::rshapes::Shapes::drawRectangleRec(rec, OuterBorderColor);
+    Shapes::drawRectangleRec(rec, OuterBorderColor);
 
-    raylib::rshapes::Shapes::drawRectangleRec({.x = rec.x + BorderThickness,
-                                               .y = rec.y + BorderThickness,
-                                               .width = rec.width - (BorderThickness * 2),
-                                               .height = rec.height - (BorderThickness * 2)},
-                                              innerFill);
+    Shapes::drawRectangleRec({.x = rec.x + BorderThickness,
+                              .y = rec.y + BorderThickness,
+                              .width = rec.width - (BorderThickness * 2),
+                              .height = rec.height - (BorderThickness * 2)},
+                             innerFill);
 
-    raylib::rshapes::Shapes::drawRectangleRec({.x = rec.x + BorderThickness,
-                                               .y = rec.y + BorderThickness,
-                                               .width = rec.width - (BorderThickness * 2),
-                                               .height = BorderThickness},
-                                              topBorder);
-    raylib::rshapes::Shapes::drawRectangleRec({.x = rec.x + BorderThickness,
-                                               .y = rec.y + BorderThickness,
-                                               .width = BorderThickness,
-                                               .height = rec.height - (BorderThickness * 2)},
-                                              topBorder);
+    Shapes::drawRectangleRec({.x = rec.x + BorderThickness,
+                              .y = rec.y + BorderThickness,
+                              .width = rec.width - (BorderThickness * 2),
+                              .height = BorderThickness},
+                             topBorder);
+    Shapes::drawRectangleRec({.x = rec.x + BorderThickness,
+                              .y = rec.y + BorderThickness,
+                              .width = BorderThickness,
+                              .height = rec.height - (BorderThickness * 2)},
+                             topBorder);
 
-    raylib::rshapes::Shapes::drawRectangleRec({.x = rec.x + BorderThickness,
-                                               .y = rec.y + rec.height - (BorderThickness * 2),
-                                               .width = rec.width - (BorderThickness * 2),
-                                               .height = BorderThickness},
-                                              bottomBorder);
-    raylib::rshapes::Shapes::drawRectangleRec({.x = rec.x + rec.width - (BorderThickness * 2),
-                                               .y = rec.y + BorderThickness,
-                                               .width = BorderThickness,
-                                               .height = rec.height - (BorderThickness * 2)},
-                                              bottomBorder);
+    Shapes::drawRectangleRec({.x = rec.x + BorderThickness,
+                              .y = rec.y + rec.height - (BorderThickness * 2),
+                              .width = rec.width - (BorderThickness * 2),
+                              .height = BorderThickness},
+                             bottomBorder);
+    Shapes::drawRectangleRec({.x = rec.x + rec.width - (BorderThickness * 2),
+                              .y = rec.y + BorderThickness,
+                              .width = BorderThickness,
+                              .height = rec.height - (BorderThickness * 2)},
+                             bottomBorder);
 
     if (_isHovered && !_isPressed) {
-        raylib::rshapes::Shapes::drawRectangleLinesEx({.x = rec.x + OutlineThickness,
-                                                       .y = rec.y + OutlineThickness,
-                                                       .width = rec.width - (OutlineThickness * 2),
-                                                       .height = rec.height - (OutlineThickness * 2)},
-                                                      OutlineThickness, HoverOutlineColor);
+        Shapes::drawRectangleLinesEx({.x = rec.x + OutlineThickness,
+                                      .y = rec.y + OutlineThickness,
+                                      .width = rec.width - (OutlineThickness * 2),
+                                      .height = rec.height - (OutlineThickness * 2)},
+                                     OutlineThickness, HoverOutlineColor);
     }
 
     if (_label) {
