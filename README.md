@@ -1,4 +1,4 @@
-# ⚡ Zappy - AI Network Game
+# Zappy - AI Network Game
 
 Zappy is a network game where several teams confront each other on a tile map containing resources. The game board represents the entirety of this world's surface like a flat world map, meaning if a player exits to the right, they come back through the left, and similarly for up/down directions. The winning team is the first one where at least 6 players reach the maximum elevation level (level 8).
 
@@ -10,7 +10,7 @@ This repository contains three distinct software components working together ove
 
 ---
 
-## 🛠️ Prerequisites & Dependencies
+## Prerequisites & Dependencies
 
 Ensure you have the following installed on your system before compiling:
 
@@ -29,7 +29,7 @@ pip install torch ruff pre-commit
 
 ---
 
-## 🏗️ Compilation
+## Compilation
 
 The project Makefile contains rules to compile the eponymous binaries:
 
@@ -51,7 +51,7 @@ make fclean
 
 ---
 
-## 🚀 Usage Guide
+## Usage Guide
 
 ### 1. Starting the Server
 
@@ -93,7 +93,7 @@ make fclean
 
 ---
 
-<!-- Upcoming ## 🧪 Quick Sandbox Execution
+<!-- Upcoming ## Quick Sandbox Execution
 
 For local testing, a quick-launch script can spin up a local instance:
 
@@ -102,6 +102,6 @@ chmod +x run.sh
 ./run.sh
 ``` -->
 
-## 🤝 Contributing
+## Contributing
 
 Please refer to [CONTRIBUTING.md](docs/CONTRIBUTING.md) for guidelines regarding our strict Conventional Commits policy, pre-commit configuration hooks, and code review workflows.
