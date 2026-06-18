@@ -7,6 +7,9 @@
 
 #pragma once
 
+#include <sys/types.h>
+
+#include <cstdint>
 #include <memory>
 #include <string>
 
@@ -41,6 +44,11 @@ class Render {
 
   protected:
   private:
+    enum class UpdateMode : uint8_t {
+        All,
+        PauseMenuOnly,
+    };
+
     void update();
     void render2D();
     void render3D();
@@ -63,8 +71,10 @@ class Render {
     std::shared_ptr<ui::components::UIGridManager> _gridManager;
     bool _isExiting{false};
     bool _uiMode{false};
+    UpdateMode _updateMode{UpdateMode::All};
 
     static constexpr int EscapeKey = 256;
     static constexpr int LeftAltKey = 342;
+    static constexpr int DefaultFps = 60;
 };
 }  // namespace zappy::gui::graphics

@@ -31,7 +31,7 @@ Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher) : _dispatche
         _mszToken = _dispatcher->subscribe<shared::protocol::server::Msz>(
             [this](const shared::protocol::server::Msz& cmd) { _map.resize(cmd.width, cmd.height); });
     }
-    _window.setTargetFPS(60);
+    _window.setTargetFPS(DefaultFps);
     raylib::rcore::Window::setExitKey(0);
 
     AssetManager::getInstance().loadFont("Minecraft", "assets/fonts/Minecraft.ttf");
@@ -79,7 +79,7 @@ bool Render::isRunning() const { return !_window.shouldClose() && !_isExiting; }
 
 void Render::renderFrame() {
     update();
-    if (!_pauseMenu->isVisible()) {
+    if (_updateMode == UpdateMode::All) {
         _event.handleEvent(_eventContext);
     }
     _window.beginDrawing();
@@ -102,8 +102,11 @@ void Render::handleInput() {
         if (_gridManager && _gridManager->isConfigMode()) {
             _gridManager->setConfigMode(false);
             _uiMode = false;
+            _updateMode = UpdateMode::All;
         } else {
-            _pauseMenu->setVisible(!_pauseMenu->isVisible());
+            bool const pauseVisible = !_pauseMenu->isVisible();
+            _pauseMenu->setVisible(pauseVisible);
+            _updateMode = pauseVisible ? UpdateMode::PauseMenuOnly : UpdateMode::All;
         }
         updateCursorState();
     }
@@ -122,7 +125,11 @@ void Render::update() {
     _uiManager.update();
     _uiManager.handleEvent(_event);
 
-    if (!_pauseMenu->isVisible() && !_uiMode) {
+    if (_updateMode == UpdateMode::PauseMenuOnly) {
+        return;
+    }
+
+    if (!_uiMode) {
         _camera->updateCamera(CAMERA_FREE);
         if (_camera->position().y() < scene::Tile3D::TILE_SIZE * 1.3F) {
             _camera->setPosition({_camera->position().x(), scene::Tile3D::TILE_SIZE * 1.3F, _camera->position().z()});
@@ -133,9 +140,7 @@ void Render::update() {
         _event.update();
     }
 
-    if (!_pauseMenu->isVisible()) {
-        _skyBackground.update(raylib::rcore::Window::frameTime());
-    }
+    _skyBackground.update(raylib::rcore::Window::frameTime());
 }
 
 void Render::render2D() { _skyBackground.draw(_window); }
