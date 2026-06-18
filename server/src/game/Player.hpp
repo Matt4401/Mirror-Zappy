@@ -66,6 +66,9 @@ class Player {
     [[nodiscard]] std::size_t id() const;
     [[nodiscard]] std::size_t nbLifeTick() const;
     void kill();
+    /*
+     * @brief: don't une this function it's for test.
+     **/
     void setPosition(Position pos);
 
     [[nodiscard]] int cmdTick() const;
