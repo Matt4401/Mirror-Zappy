@@ -64,6 +64,6 @@ def server(request):
     process.terminate()
     try:
         process.wait(timeout=5)
-    catch subprocess.TimeoutExpired:
+    except subprocess.TimeoutExpired:
         process.kill()
         process.wait(timeout=5)

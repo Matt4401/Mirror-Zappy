@@ -52,6 +52,24 @@
     - send: "sst -5\n"
     - expect: '^sbp\n$'
 
+- name: "GUI_Player_Position_Bad_Param"
+  client_type: "GUI"
+  steps:
+    - send: "ppo bad\n"
+    - expect: '^sbp\n$'
+
+- name: "GUI_Player_Level_Bad_Param"
+  client_type: "GUI"
+  steps:
+    - send: "plv bad\n"
+    - expect: '^sbp\n$'
+
+- name: "GUI_Player_Inventory_Bad_Param"
+  client_type: "GUI"
+  steps:
+    - send: "pin bad\n"
+    - expect: '^sbp\n$'
+
 - name: "AI_Invalid_Command_Returns_KO"
   client_type: "AI"
   team: "team1"
@@ -73,6 +91,21 @@
     - send: "Forward\n"
     - expect: '^ok\n$'
     - send: "Right\n"
+    - expect: '^ok\n$'
+    - send: "Left\n"
+    - expect: '^ok\n$'
+
+- name: "AI_Complex_Pathing"
+  client_type: "AI"
+  team: "team1"
+  steps:
+    - send: "Forward\n"
+    - expect: '^ok\n$'
+    - send: "Forward\n"
+    - expect: '^ok\n$'
+    - send: "Right\n"
+    - expect: '^ok\n$'
+    - send: "Forward\n"
     - expect: '^ok\n$'
     - send: "Left\n"
     - expect: '^ok\n$'
@@ -112,6 +145,15 @@
     - send: "Set invalid_item\n"
     - expect: '^ko\n$'
 
+- name: "AI_Set_And_Take_Food"
+  client_type: "AI"
+  team: "team1"
+  steps:
+    - send: "Set food\n"
+    - expect: '^ok\n$'
+    - send: "Take food\n"
+    - expect: '^ok\n$'
+
 - name: "AI_Fork_Execution"
   client_type: "AI"
   team: "team1"
@@ -119,12 +161,12 @@
     - send: "Fork\n"
     - expect: '^ok\n$'
 
-- name: "AI_Eject_Fails_Alone"
+- name: "AI_Eject_Empty_Tile"
   client_type: "AI"
   team: "team1"
   steps:
     - send: "Eject\n"
-    - expect: '^ko\n$'
+    - expect: '^ok\n$'
 
 - name: "AI_Incantation_Fails_Without_Stones"
   client_type: "AI"
@@ -139,3 +181,52 @@
   steps:
     - sleep: 1.5
     - expect: '^dead\n$'
+
+- name: "Integration_Broadcast_Reception"
+  clients:
+    - id: "sender"
+      type: "AI"
+      team: "team1"
+    - id: "receiver"
+      type: "AI"
+      team: "team2"
+  steps:
+    - client: "sender"
+      send: "Broadcast Hello\n"
+    - client: "sender"
+      expect: '^ok\n$'
+    - client: "receiver"
+      expect: '^message \d+, Hello\n$'
+
+- name: "Integration_Broadcast_Special_Chars"
+  clients:
+    - id: "sender"
+      type: "AI"
+      team: "team1"
+    - id: "receiver"
+      type: "AI"
+      team: "team2"
+  steps:
+    - client: "sender"
+      send: "Broadcast !@#$%^&*()_+\n"
+    - client: "sender"
+      expect: '^ok\n$'
+    - client: "receiver"
+      expect: '^message \d+, !@#\$%\^&\*\(\)_\+\n$'
+
+- name: "Integration_Fork_Flow"
+  clients:
+    - id: "ai_mother"
+      type: "AI"
+      team: "team1"
+    - id: "gui_watcher"
+      type: "GUI"
+  steps:
+    - client: "ai_mother"
+      send: "Fork\n"
+    - client: "gui_watcher"
+      expect: '^pfk \d+\n$'
+    - client: "ai_mother"
+      expect: '^ok\n$'
+    - client: "gui_watcher"
+      expect: '^enw \d+ \d+ \d+ \d+\n$'

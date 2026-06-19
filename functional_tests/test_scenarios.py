@@ -4,6 +4,7 @@ import re
 import time
 import socket
 from conftest import ZappyClient
+from pathlib import Path
 
 with Path(__file__).with_name("scenarios.yaml").open("r", encoding="utf-8") as f:
     SCENARIOS = yaml.safe_load(f)
@@ -21,30 +22,39 @@ def flush_gui_handshake(client: ZappyClient):
 @pytest.mark.parametrize("scenario", SCENARIOS, ids=[s["name"] for s in SCENARIOS])
 def test_yaml_scenario(server, scenario):
     port, binary_name = server
-    client = ZappyClient(port)
+    active_clients = {}
     
-    assert client.read_until() == "WELCOME\n"
+    clients_config = scenario.get("clients", [{"id": "default", "type": scenario.get("client_type"), "team": scenario.get("team")}])
     
-    if scenario["client_type"] == "GUI":
-        client.send("GRAPHIC\n")
-        flush_gui_handshake(client)
+    for client_cfg in clients_config:
+        c = ZappyClient(port)
+        assert c.read_until() == "WELCOME\n"
         
-    elif scenario["client_type"] == "AI":
-        client.send(f"{scenario['team']}\n")
-        client.read_until()
-        client.read_until()
-    
+        if client_cfg["type"] == "GUI":
+            c.send("GRAPHIC\n")
+            flush_gui_handshake(c)
+        elif client_cfg["type"] == "AI":
+            c.send(f"{client_cfg['team']}\n")
+            c.read_until()
+            c.read_until()
+            
+        active_clients[client_cfg["id"]] = c
+
     for step in scenario["steps"]:
+        client_id = step.get("client", clients_config[0]["id"])
+        c = active_clients[client_id]
+        
         if "send" in step:
-            client.send(step["send"])
+            c.send(step["send"])
         if "sleep" in step:
             time.sleep(step["sleep"])
         if "expect" in step:
-            response = client.read_until(timeout=3.0)
+            response = c.read_until(timeout=3.0)
             match = re.search(step["expect"], response)
-            assert match is not None, f"[{binary_name}] Expected regex '{step['expect']}' but got '{response}'"
+            assert match is not None, f"[{binary_name}] {client_id} expected regex '{step['expect']}' but got '{response}'"
             
-    client.close()
+    for c in active_clients.values():
+        c.close()
 
 def test_integration_team_limit_exhaustion(server):
     port, binary_name = server
