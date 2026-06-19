@@ -1,7 +1,7 @@
 import sys
 import argparse
-from AITeamClass import AITeam
-from TrantorianClass import Trantorian
+from src.AITeamClass import AITeam
+from src.TrantorianClass import Trantorian
 from util.IdGenerator import generate_id
 from util.InitLogger import setup_logging
 
