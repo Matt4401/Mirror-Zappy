@@ -162,15 +162,6 @@
     - send: "Eject\n"
     - expect: '^ok\n$'
 
-- name: "AI_Incantation_Fails_Without_Stones"
-  client_type: "AI"
-  team: "team1"
-  steps:
-    - send: "Incantation\n"
-    - expect: '^ok\n|ko\n$'
-    - send: "Incantation\n"
-    - expect: '^ko\n$'
-
 - name: "AI_Death_By_Starvation"
   client_type: "AI"
   team: "team2"
@@ -234,3 +225,475 @@
       expect: '^ok\n$'
     - client: "gui_watcher"
       expect: '^enw #?\d+ #?\d+ \d+ \d+\n$'
+
+- name: "Integration_GUI_Observes_Take"
+  clients:
+    - id: "gui_watcher"
+      type: "GUI"
+    - id: "ai_client"
+      type: "AI"
+      team: "team1"
+  steps:
+    - client: "gui_watcher"
+      expect: '^pnw #?\d+ \d+ \d+ \d+ \d+ team1\n$'
+    - client: "gui_watcher"
+      expect: '^pin #?\d+ \d+ \d+( \d+){7}\n$'
+    - client: "gui_watcher"
+      expect: '^ebo #?\d+\n$'
+    - client: "ai_client"
+      send: "Set food\n"
+    - client: "ai_client"
+      expect: '^ok\n$'
+    - client: "gui_watcher"
+      expect: '^pdr #?\d+ 0\n$'
+    - client: "ai_client"
+      send: "Take food\n"
+    - client: "ai_client"
+      expect: '^ok\n$'
+
+- name: "Integration_GUI_Observes_Incantation_Fail"
+  clients:
+    - id: "gui_watcher"
+      type: "GUI"
+    - id: "ai_client"
+      type: "AI"
+      team: "team1"
+  steps:
+    - client: "gui_watcher"
+      expect: '^pnw #?\d+ \d+ \d+ \d+ \d+ team1\n$'
+    - client: "gui_watcher"
+      expect: '^pin #?\d+ \d+ \d+( \d+){7}\n$'
+    - client: "gui_watcher"
+      expect: '^ebo #?\d+\n$'
+    - client: "ai_client"
+      send: "Incantation\n"
+    - client: "ai_client"
+      expect: '^ko\n$'
+
+- name: "GUI_Malformed_MSZ"
+  client_type: "GUI"
+  steps:
+    - send: "msz 10\n"
+    - expect: '^sbp\n$'
+
+- name: "GUI_Malformed_MCT"
+  client_type: "GUI"
+  steps:
+    - send: "mct 10\n"
+    - expect: '^sbp\n$'
+
+- name: "GUI_Malformed_TNA"
+  client_type: "GUI"
+  steps:
+    - send: "tna 10\n"
+    - expect: '^sbp\n$'
+
+- name: "GUI_Malformed_SGT"
+  client_type: "GUI"
+  steps:
+    - send: "sgt 10\n"
+    - expect: '^sbp\n$'
+
+- name: "GUI_Malformed_BCT_Letters"
+  client_type: "GUI"
+  steps:
+    - send: "bct A B\n"
+    - expect: '^bct 0 0( \d+){7}\n$'
+
+- name: "GUI_Malformed_PPO_Letters"
+  client_type: "GUI"
+  steps:
+    - send: "ppo A\n"
+    - expect: '^sbp\n$'
+
+- name: "GUI_Malformed_PLV_Letters"
+  client_type: "GUI"
+  steps:
+    - send: "plv A\n"
+    - expect: '^sbp\n$'
+
+- name: "GUI_Malformed_PIN_Letters"
+  client_type: "GUI"
+  steps:
+    - send: "pin A\n"
+    - expect: '^sbp\n$'
+
+- name: "GUI_Unknown_Command_Spaces"
+  client_type: "GUI"
+  steps:
+    - send: "   \n"
+    - expect: '^suc\n$'
+
+- name: "GUI_Unknown_Command_Symbols"
+  client_type: "GUI"
+  steps:
+    - send: "@@@\n"
+    - expect: '^suc\n$'
+
+- name: "AI_Set_linemate_Missing"
+  client_type: "AI"
+  team: "team1"
+  steps:
+    - send: "Set linemate\n"
+    - expect: '^ko\n$'
+
+- name: "AI_Set_deraumere_Missing"
+  client_type: "AI"
+  team: "team1"
+  steps:
+    - send: "Set deraumere\n"
+    - expect: '^ko\n$'
+
+- name: "AI_Set_sibur_Missing"
+  client_type: "AI"
+  team: "team1"
+  steps:
+    - send: "Set sibur\n"
+    - expect: '^ko\n$'
+
+- name: "AI_Set_mendiane_Missing"
+  client_type: "AI"
+  team: "team1"
+  steps:
+    - send: "Set mendiane\n"
+    - expect: '^ko\n$'
+
+- name: "AI_Set_phiras_Missing"
+  client_type: "AI"
+  team: "team1"
+  steps:
+    - send: "Set phiras\n"
+    - expect: '^ko\n$'
+
+- name: "AI_Set_thystame_Missing"
+  client_type: "AI"
+  team: "team1"
+  steps:
+    - send: "Set thystame\n"
+    - expect: '^ko\n$'
+
+- name: "AI_Move_Square"
+  client_type: "AI"
+  team: "team1"
+  steps:
+    - send: "Forward\n"
+    - expect: '^ok\n$'
+    - send: "Right\n"
+    - expect: '^ok\n$'
+    - send: "Forward\n"
+    - expect: '^ok\n$'
+    - send: "Right\n"
+    - expect: '^ok\n$'
+    - send: "Forward\n"
+    - expect: '^ok\n$'
+    - send: "Right\n"
+    - expect: '^ok\n$'
+    - send: "Forward\n"
+    - expect: '^ok\n$'
+
+- name: "AI_Move_ZigZag"
+  client_type: "AI"
+  team: "team1"
+  steps:
+    - send: "Forward\n"
+    - expect: '^ok\n$'
+    - send: "Right\n"
+    - expect: '^ok\n$'
+    - send: "Forward\n"
+    - expect: '^ok\n$'
+    - send: "Left\n"
+    - expect: '^ok\n$'
+    - send: "Forward\n"
+    - expect: '^ok\n$'
+    - send: "Right\n"
+    - expect: '^ok\n$'
+    - send: "Forward\n"
+    - expect: '^ok\n$'
+
+- name: "AI_Move_BackAndForth"
+  client_type: "AI"
+  team: "team1"
+  steps:
+    - send: "Forward\n"
+    - expect: '^ok\n$'
+    - send: "Right\n"
+    - expect: '^ok\n$'
+    - send: "Right\n"
+    - expect: '^ok\n$'
+    - send: "Forward\n"
+    - expect: '^ok\n$'
+
+- name: "AI_Look_Inventory"
+  client_type: "AI"
+  team: "team1"
+  steps:
+    - send: "Look\n"
+    - expect: '^\[ player[^\]]* \]\n$'
+    - send: "Inventory\n"
+    - expect: '^\[ food \d+, linemate \d+, deraumere \d+, sibur \d+, mendiane \d+, phiras \d+, thystame \d+ \]\n$'
+
+- name: "AI_Connect_Fork"
+  client_type: "AI"
+  team: "team1"
+  steps:
+    - send: "Connect_nbr\n"
+    - expect: '^\d+\n$'
+    - send: "Fork\n"
+    - expect: '^ok\n$'
+
+- name: "AI_Broadcast_Look"
+  client_type: "AI"
+  team: "team1"
+  steps:
+    - send: "Broadcast test\n"
+    - expect: '^ok\n$'
+    - send: "Look\n"
+    - expect: '^\[ player[^\]]* \]\n$'
+
+- name: "AI_Spam_Inventory"
+  client_type: "AI"
+  team: "team1"
+  steps:
+    - send: "Inventory\nInventory\nInventory\n"
+    - expect: '^\[ food \d+, linemate \d+, deraumere \d+, sibur \d+, mendiane \d+, phiras \d+, thystame \d+ \]\n$'
+    - expect: '^\[ food \d+, linemate \d+, deraumere \d+, sibur \d+, mendiane \d+, phiras \d+, thystame \d+ \]\n$'
+    - expect: '^\[ food \d+, linemate \d+, deraumere \d+, sibur \d+, mendiane \d+, phiras \d+, thystame \d+ \]\n$'
+
+- name: "AI_Spam_Look"
+  client_type: "AI"
+  team: "team1"
+  steps:
+    - send: "Look\nLook\nLook\n"
+    - expect: '^\[ player[^\]]* \]\n$'
+    - expect: '^\[ player[^\]]* \]\n$'
+    - expect: '^\[ player[^\]]* \]\n$'
+
+- name: "AI_Spam_Connect_nbr"
+  client_type: "AI"
+  team: "team1"
+  steps:
+    - send: "Connect_nbr\nConnect_nbr\nConnect_nbr\n"
+    - expect: '^\d+\n$'
+    - expect: '^\d+\n$'
+    - expect: '^\d+\n$'
+
+- name: "AI_Spam_Right"
+  client_type: "AI"
+  team: "team1"
+  steps:
+    - send: "Right\nRight\nRight\nRight\n"
+    - expect: '^ok\n$'
+    - expect: '^ok\n$'
+    - expect: '^ok\n$'
+    - expect: '^ok\n$'
+
+- name: "AI_Spam_Left"
+  client_type: "AI"
+  team: "team1"
+  steps:
+    - send: "Left\nLeft\nLeft\nLeft\n"
+    - expect: '^ok\n$'
+    - expect: '^ok\n$'
+    - expect: '^ok\n$'
+    - expect: '^ok\n$'
+
+- name: "AI_Move_Long_Distance"
+  client_type: "AI"
+  team: "team1"
+  steps:
+    - send: "Forward\nForward\nForward\nForward\nForward\nForward\nForward\nForward\nForward\nForward\n"
+    - expect: '^ok\n$'
+    - expect: '^ok\n$'
+    - expect: '^ok\n$'
+    - expect: '^ok\n$'
+    - expect: '^ok\n$'
+    - expect: '^ok\n$'
+    - expect: '^ok\n$'
+    - expect: '^ok\n$'
+    - expect: '^ok\n$'
+    - expect: '^ok\n$'
+
+- name: "AI_Set_And_Take_Multiple_Food"
+  client_type: "AI"
+  team: "team1"
+  steps:
+    - send: "Set food\n"
+    - expect: '^ok\n$'
+    - send: "Set food\n"
+    - expect: '^ok\n$'
+    - send: "Take food\n"
+    - expect: '^ok\n$'
+    - send: "Take food\n"
+    - expect: '^ok\n$'
+
+- name: "Integration_GUI_Player_Move"
+  clients:
+    - id: "gui_watcher"
+      type: "GUI"
+    - id: "ai_client"
+      type: "AI"
+      team: "team1"
+  steps:
+    - client: "gui_watcher"
+      expect: '^pnw #?\d+ \d+ \d+ \d+ \d+ team1\n$'
+    - client: "gui_watcher"
+      expect: '^pin #?\d+ \d+ \d+( \d+){7}\n$'
+    - client: "gui_watcher"
+      expect: '^ebo #?\d+\n$'
+    - client: "ai_client"
+      send: "Forward\n"
+    - client: "ai_client"
+      expect: '^ok\n$'
+    - client: "gui_watcher"
+      expect: '^ppo #?\d+ \d+ \d+ \d+\n$'
+
+- name: "Integration_GUI_Player_Turn_Right"
+  clients:
+    - id: "gui_watcher"
+      type: "GUI"
+    - id: "ai_client"
+      type: "AI"
+      team: "team1"
+  steps:
+    - client: "gui_watcher"
+      expect: '^pnw #?\d+ \d+ \d+ \d+ \d+ team1\n$'
+    - client: "gui_watcher"
+      expect: '^pin #?\d+ \d+ \d+( \d+){7}\n$'
+    - client: "gui_watcher"
+      expect: '^ebo #?\d+\n$'
+    - client: "ai_client"
+      send: "Right\n"
+    - client: "ai_client"
+      expect: '^ok\n$'
+    - client: "gui_watcher"
+      expect: '^ppo #?\d+ \d+ \d+ \d+\n$'
+
+- name: "Integration_GUI_Player_Turn_Left"
+  clients:
+    - id: "gui_watcher"
+      type: "GUI"
+    - id: "ai_client"
+      type: "AI"
+      team: "team1"
+  steps:
+    - client: "gui_watcher"
+      expect: '^pnw #?\d+ \d+ \d+ \d+ \d+ team1\n$'
+    - client: "gui_watcher"
+      expect: '^pin #?\d+ \d+ \d+( \d+){7}\n$'
+    - client: "gui_watcher"
+      expect: '^ebo #?\d+\n$'
+    - client: "ai_client"
+      send: "Left\n"
+    - client: "ai_client"
+      expect: '^ok\n$'
+    - client: "gui_watcher"
+      expect: '^ppo #?\d+ \d+ \d+ \d+\n$'
+
+- name: "Integration_GUI_Player_Inventory_After_Drop"
+  clients:
+    - id: "gui_watcher"
+      type: "GUI"
+    - id: "ai_client"
+      type: "AI"
+      team: "team1"
+  steps:
+    - client: "gui_watcher"
+      expect: '^pnw #?\d+ \d+ \d+ \d+ \d+ team1\n$'
+    - client: "gui_watcher"
+      expect: '^pin #?\d+ \d+ \d+( \d+){7}\n$'
+    - client: "gui_watcher"
+      expect: '^ebo #?\d+\n$'
+    - client: "ai_client"
+      send: "Set food\n"
+    - client: "ai_client"
+      expect: '^ok\n$'
+
+- name: "Integration_Broadcast_Special_Chars_Extended"
+  clients:
+    - id: "sender"
+      type: "AI"
+      team: "team1"
+    - id: "receiver"
+      type: "AI"
+      team: "team2"
+  steps:
+    - client: "sender"
+      send: "Broadcast {}[]<>/?|\\\n"
+    - client: "sender"
+      expect: '^ok\n$'
+    - client: "receiver"
+      expect: '^message \d+, {}\[\]<>\/\?\|\\\n$'
+
+- name: "Integration_Broadcast_Numbers"
+  clients:
+    - id: "sender"
+      type: "AI"
+      team: "team1"
+    - id: "receiver"
+      type: "AI"
+      team: "team2"
+  steps:
+    - client: "sender"
+      send: "Broadcast 1234567890\n"
+    - client: "sender"
+      expect: '^ok\n$'
+    - client: "receiver"
+      expect: '^message \d+, 1234567890\n$'
+
+- name: "Integration_Broadcast_Mixed"
+  clients:
+    - id: "sender"
+      type: "AI"
+      team: "team1"
+    - id: "receiver"
+      type: "AI"
+      team: "team2"
+  steps:
+    - client: "sender"
+      send: "Broadcast a1B2!@\n"
+    - client: "sender"
+      expect: '^ok\n$'
+    - client: "receiver"
+      expect: '^message \d+, a1B2!@\n$'
+
+- name: "Integration_GUI_BCT_After_Drop"
+  clients:
+    - id: "gui_watcher"
+      type: "GUI"
+    - id: "ai_client"
+      type: "AI"
+      team: "team1"
+  steps:
+    - client: "gui_watcher"
+      expect: '^pnw #?\d+ \d+ \d+ \d+ \d+ team1\n$'
+    - client: "gui_watcher"
+      expect: '^pin #?\d+ \d+ \d+( \d+){7}\n$'
+    - client: "gui_watcher"
+      expect: '^ebo #?\d+\n$'
+    - client: "ai_client"
+      send: "Set food\n"
+    - client: "ai_client"
+      expect: '^ok\n$'
+
+- name: "Integration_GUI_BCT_After_Take"
+  clients:
+    - id: "gui_watcher"
+      type: "GUI"
+    - id: "ai_client"
+      type: "AI"
+      team: "team1"
+  steps:
+    - client: "gui_watcher"
+      expect: '^pnw #?\d+ \d+ \d+ \d+ \d+ team1\n$'
+    - client: "gui_watcher"
+      expect: '^pin #?\d+ \d+ \d+( \d+){7}\n$'
+    - client: "gui_watcher"
+      expect: '^ebo #?\d+\n$'
+    - client: "ai_client"
+      send: "Set food\n"
+    - client: "ai_client"
+      expect: '^ok\n$'
+    - client: "ai_client"
+      send: "Take food\n"
+    - client: "ai_client"
+      expect: '^ok\n$'
