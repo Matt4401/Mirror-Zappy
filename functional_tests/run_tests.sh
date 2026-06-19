@@ -19,18 +19,17 @@ fi
 
 set +e
 
-echo ""
 echo -e "${PURPLE}======================================================================${NC}"
 echo -e "${PURPLE}                  [1/2] TESTS REFERENCE BINARY                        ${NC}"
 echo -e "${PURPLE}======================================================================${NC}"
-./.venv/bin/pytest "$@" -k "reference"
+./.venv/bin/pytest "$@" -k "reference" --tb=no
 REF_STATUS=$?
 
 echo ""
 echo -e "${YELLOW}======================================================================${NC}"
 echo -e "${YELLOW}                  [2/2] TESTS CUSTOM BINARY                           ${NC}"
 echo -e "${YELLOW}======================================================================${NC}"
-./.venv/bin/pytest "$@" -k "custom"
+./.venv/bin/pytest "$@" -k "custom" --tb=no
 CUST_STATUS=$?
 
 set -e

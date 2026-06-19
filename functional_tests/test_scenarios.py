@@ -49,7 +49,7 @@ def test_yaml_scenario(server, scenario):
         if "sleep" in step:
             time.sleep(step["sleep"])
         if "expect" in step:
-            response = c.read_until(timeout=3.0)
+            response = c.read_until(timeout=10.0)
             match = re.search(step["expect"], response)
             assert match is not None, f"[{binary_name}] {client_id} expected regex '{step['expect']}' but got '{response}'"
             

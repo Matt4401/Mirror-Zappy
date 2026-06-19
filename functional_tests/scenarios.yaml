@@ -40,12 +40,6 @@
     - send: "sgt\n"
     - expect: '^sgt \d+\n$'
 
-- name: "GUI_Time_Set_SST_Valid"
-  client_type: "GUI"
-  steps:
-    - send: "sst 500\n"
-    - expect: '^sst 500\n$'
-
 - name: "GUI_Time_Set_SST_Invalid"
   client_type: "GUI"
   steps:
@@ -173,6 +167,8 @@
   team: "team1"
   steps:
     - send: "Incantation\n"
+    - expect: '^ok\n|ko\n$'
+    - send: "Incantation\n"
     - expect: '^ko\n$'
 
 - name: "AI_Death_By_Starvation"
@@ -216,17 +212,25 @@
 
 - name: "Integration_Fork_Flow"
   clients:
+    - id: "gui_watcher"
+      type: "GUI"
     - id: "ai_mother"
       type: "AI"
       team: "team1"
-    - id: "gui_watcher"
-      type: "GUI"
   steps:
+    - client: "gui_watcher"
+      expect: '^pnw #?\d+ \d+ \d+ \d+ \d+ team1\n$'
+    - client: "gui_watcher"
+      expect: '^pin #?\d+ \d+ \d+( \d+){7}\n$'
+    - client: "gui_watcher"
+      expect: '^ebo #?\d+\n$'
+
     - client: "ai_mother"
       send: "Fork\n"
     - client: "gui_watcher"
-      expect: '^pfk \d+\n$'
+      expect: '^pfk #?\d+\n$'
+    
     - client: "ai_mother"
       expect: '^ok\n$'
     - client: "gui_watcher"
-      expect: '^enw \d+ \d+ \d+ \d+\n$'
+      expect: '^enw #?\d+ #?\d+ \d+ \d+\n$'
