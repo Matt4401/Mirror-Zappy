@@ -138,12 +138,12 @@ void PlayerInspectorUI::onPinReceived(const shared::protocol::server::Pin& cmd) 
         updateHearts();
 
         if (_inventoryTexts.size() >= 6) {
-            _inventoryTexts[0]->setText(std::to_string(cmd.linemate));
-            _inventoryTexts[1]->setText(std::to_string(cmd.deraumere));
-            _inventoryTexts[2]->setText(std::to_string(cmd.sibur));
-            _inventoryTexts[3]->setText(std::to_string(cmd.mendiane));
-            _inventoryTexts[4]->setText(std::to_string(cmd.phiras));
-            _inventoryTexts[5]->setText(std::to_string(cmd.thystame));
+            _inventoryTexts.at(0)->setText(std::to_string(cmd.linemate));
+            _inventoryTexts.at(1)->setText(std::to_string(cmd.deraumere));
+            _inventoryTexts.at(2)->setText(std::to_string(cmd.sibur));
+            _inventoryTexts.at(3)->setText(std::to_string(cmd.mendiane));
+            _inventoryTexts.at(4)->setText(std::to_string(cmd.phiras));
+            _inventoryTexts.at(5)->setText(std::to_string(cmd.thystame));
         }
     }
 }
