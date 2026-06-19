@@ -35,11 +35,15 @@ bool AssetManager::loadFont(const std::string& id, const std::string& path) {
 }
 
 bool AssetManager::loadTexture(const std::string& id, const std::string& path) {
+    if (_textures.contains(id)) {
+        return true;
+    }
     auto texture = std::make_shared<raylib::rtextures::Texture2D>(path);
     if (!texture->valid()) {
+        std::cerr << "Failed to load texture: " << path << std::endl;
         return false;
     }
-    _textures[id] = texture;
+    _textures.insert_or_assign(id, texture);
     return true;
 }
 
