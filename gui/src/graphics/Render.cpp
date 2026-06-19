@@ -10,6 +10,7 @@
 #include <raylib.h>
 
 #include <memory>
+#include <string>
 #include <utility>
 
 #include "AssetManager.hpp"
@@ -24,6 +25,7 @@
 #include "ui/components/UIGridManager.hpp"
 #include "ui/components/UIText.hpp"
 #include "ui/menus/PauseMenu.hpp"
+#include "ui/menus/PlayerInspectorUI.hpp"
 
 namespace zappy::gui::graphics {
 Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher) : _dispatcher(std::move(dispatcher)) {
@@ -40,7 +42,7 @@ Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher) : _dispatche
     _gridManager = std::make_shared<ui::components::UIGridManager>();
     _uiManager.addComponent(_gridManager);
 
-    _demoPanel = std::make_shared<ui::components::UIGamePanel>(0, 0, 0, 0, "Player Info");
+    auto _demoPanel = std::make_shared<ui::components::UIGamePanel>(0, 0, 0, 0, "Player Info");
     auto font = AssetManager::getInstance().getFont(DefaultFontName);
     auto btn = std::make_shared<ui::components::UIButton>(100.0F, 120.0F, 200.0F, 40.0F, "Click me!", font);
     auto text = std::make_shared<ui::components::UIText>("Level 8 Player", font);
@@ -55,6 +57,10 @@ Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher) : _dispatche
 
     _gridManager->addPanel(_demoPanel, 1, 1, 12, 18);
     _gridManager->addPanel(_demoPanel2, 1, 19, 12, 8);
+
+    _inspector = std::make_shared<ui::menus::PlayerInspectorUI>(
+        0.0F, 0.0F, 300.0F, _dispatcher, font, [](const std::string& /*cmd*/) { /* fake callback for testing */ });
+    _gridManager->addPanel(_inspector, 14, 1, 10, 15);
 
     _pauseMenu =
         std::make_shared<ui::menus::PauseMenu>(_dispatcher, AssetManager::getInstance().getFont(DefaultFontName));
