@@ -14,7 +14,6 @@
 #include <utility>
 
 #include "Color.hpp"
-#include "rcore/Event.hpp"
 #include "rmath/Vector2.hpp"
 #include "rtext/Font.hpp"
 

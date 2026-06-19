@@ -18,7 +18,7 @@
 namespace zappy::gui::game {
 class Team {
   public:
-    Team(const std::string& name, std::size_t slot) : _name(name), _eggs(slot) {};
+    Team(std::string& name, std::size_t slot) : _name(name), _eggs(slot) {};
     ~Team() = default;
     Team(const Team& other) = delete;
     Team& operator=(const Team& other) = delete;
