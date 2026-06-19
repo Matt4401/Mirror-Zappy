@@ -31,6 +31,14 @@ add_custom_command(
 
 add_custom_target(prepare_script ALL DEPENDS ${CMAKE_SOURCE_DIR}/zappy_ai)
 
+add_custom_target(tests_functional
+    COMMAND bash run_tests.sh -v
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/functional_tests
+    DEPENDS zappy_server
+    COMMENT "Lancement des tests fonctionnels Zappy..."
+    USES_TERMINAL
+)
+
 add_subdirectory(shared)
 add_subdirectory(parser)
 add_subdirectory(server)
