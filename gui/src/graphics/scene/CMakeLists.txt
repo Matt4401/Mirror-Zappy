@@ -1,13 +1,13 @@
 add_library(zappy_gui_graphics_scene
         Map.cpp
-        SkyBackground.cpp
+        Skybox3D.cpp
         Tile3D.cpp
 )
 target_sources(zappy_gui_graphics_scene PUBLIC
         FILE_SET HEADERS
         BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
         FILES Map.hpp
-        SkyBackground.hpp
+        Skybox3D.hpp
         Tile3D.hpp
 )
 target_include_directories(zappy_gui_graphics_scene PUBLIC
