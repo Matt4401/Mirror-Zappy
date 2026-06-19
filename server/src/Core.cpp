@@ -23,6 +23,8 @@
 #include "SessionManager.hpp"
 #include "exception/Exception.hpp"
 #include "game/World.hpp"
+#include "guiCommand/Mct.hpp"
+#include "guiCommand/Tna.hpp"
 #include "network/ISessionManager.hpp"
 #include "protocol/Commands.hpp"
 #include "protocol/Emitter.hpp"
@@ -235,12 +237,16 @@ void Core::flushGuiResponses() {
 }
 
 void Core::sendGuiInitialState(int clientId) {
+    guiCommand::Mct mct{};
+    guiCommand::Tna tna{};
     _sessionManager->sendMessage(clientId, shared::protocol::Emitter::build(shared::protocol::server::Msz{
                                                .width = static_cast<int>(_world->sizeMap().x),
                                                .height = static_cast<int>(_world->sizeMap().y)}));
     _sessionManager->sendMessage(
         clientId,
         shared::protocol::Emitter::build(shared::protocol::server::Sgt{.timeUnit = static_cast<int>(_config.freq)}));
+    _sessionManager->sendMessage(clientId, mct.execute(*this));
+    _sessionManager->sendMessage(clientId, tna.execute(*this));
 }
 
 }  // namespace zappy::server

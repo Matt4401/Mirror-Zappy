@@ -7,6 +7,7 @@
 
 #include "game/Player.hpp"
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -52,7 +53,7 @@ void Player::pushCommand(std::unique_ptr<command::ICommand> command) {
     _commands.push(std::move(command));
 }
 
-void Player::update(game::World& world) {
+void Player::update(World& world) {
     _lifeTick--;
 
     if (_cmdTick > 0) {
@@ -127,5 +128,9 @@ void Player::moveWithOrientation(const Position& limit, cardinalPoint orientatio
 int Player::cmdTick() const { return static_cast<int>(_cmdTick); }
 
 bool Player::hasCommands() const { return _currentCommand != nullptr || !_commands.empty(); }
+
+void Player::setPosition(const Position pos) { _pos = pos; }
+
+std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> Player::inventory() const { return _inventory; }
 
 }  // namespace zappy::server::game

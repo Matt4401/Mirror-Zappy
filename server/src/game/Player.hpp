@@ -9,6 +9,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <map>
 #include <memory>
 #include <queue>
 #include <string>
@@ -27,6 +28,13 @@ struct Position {
 };
 
 enum class ItemType : uint8_t { Food, Linemate, Deraumere, Sibur, Mendiane, Phiras, Thystame, COUNT };
+
+// NOLINTNEXTLINE
+const std::map<std::string, ItemType> kMapItemString = {
+    {"linemate", ItemType::Linemate}, {"deraumere", ItemType::Deraumere}, {"sibur", ItemType::Sibur},
+    {"mendiane", ItemType::Mendiane}, {"phiras", ItemType::Phiras},       {"thystame", ItemType::Thystame},
+    {"food", ItemType::Food},
+};
 
 enum class cardinalPoint : uint8_t { NORTH, EAST, SOUTH, WEST, COUNT };
 
@@ -59,6 +67,7 @@ class Player {
     void addResponse(const std::string&);
     std::vector<std::string> responses();
     [[nodiscard]] Position position() const;
+    [[nodiscard]] std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> inventory() const;
 
     void setOrientation(cardinalPoint orient);
     [[nodiscard]] cardinalPoint orientation() const;
@@ -66,6 +75,10 @@ class Player {
     [[nodiscard]] std::size_t id() const;
     [[nodiscard]] std::size_t nbLifeTick() const;
     void kill();
+    /*
+     * @brief: don't une this function it's for test.
+     **/
+    void setPosition(Position pos);
 
     [[nodiscard]] int cmdTick() const;
 
