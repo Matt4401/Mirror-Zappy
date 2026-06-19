@@ -32,6 +32,8 @@ add_library(zappy_server_objects OBJECT
         src/game/Team.hpp
         src/command/Eject.cpp
         src/command/Eject.hpp
+        src/command/Fork.cpp
+        src/command/Fork.hpp
         src/command/Set.cpp
         src/command/Set.hpp
         src/command/Take.cpp
