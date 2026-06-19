@@ -19,6 +19,7 @@
 #include "Color.hpp"
 #include "events/EventDispatcher.hpp"
 #include "game/Player.hpp"
+#include "graphics/AssetManager.hpp"
 #include "protocol/Commands.hpp"
 #include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
@@ -270,8 +271,11 @@ void PlayerInspectorUI::setTargetPlayer(int playerId, const game::Player& initia
         _teamText->setColor(initialData.teamColor());
     }
     if (_avatarModel) {
-        if (initialData.texture()) {
-            _avatarModel->setMaterialTexture(0, 0 /* MATERIAL_MAP_ALBEDO */, *initialData.texture());
+        if (!initialData.textureId().empty()) {
+            auto tex = graphics::AssetManager::getInstance().getTexture(initialData.textureId());
+            if (tex) {
+                _avatarModel->setMaterialTexture(0, 0 /* MATERIAL_MAP_ALBEDO */, *tex);
+            }
         } else {
             _avatarModel->setMaterialTexture(0, 0 /* MATERIAL_MAP_ALBEDO */,
                                              raylib::rtextures::Texture2D{::Texture2D{}, false});

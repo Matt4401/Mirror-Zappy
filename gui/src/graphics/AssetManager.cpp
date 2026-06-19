@@ -11,6 +11,7 @@
 #include <memory>
 #include <string>
 
+#include "Texture2D.hpp"
 #include "rtext/Font.hpp"
 
 namespace zappy::gui::graphics {
@@ -33,6 +34,15 @@ bool AssetManager::loadFont(const std::string& id, const std::string& path) {
     return true;
 }
 
+bool AssetManager::loadTexture(const std::string& id, const std::string& path) {
+    auto texture = std::make_shared<raylib::rtextures::Texture2D>(path);
+    if (!texture->valid()) {
+        return false;
+    }
+    _textures[id] = texture;
+    return true;
+}
+
 std::shared_ptr<raylib::rtext::Font> AssetManager::getFont(const std::string& id) {
     if (_fonts.contains(id)) {
         return _fonts.at(id);
@@ -40,6 +50,17 @@ std::shared_ptr<raylib::rtext::Font> AssetManager::getFont(const std::string& id
     return nullptr;
 }
 
-void AssetManager::clear() { _fonts.clear(); }
+std::shared_ptr<raylib::rtextures::Texture2D> AssetManager::getTexture(const std::string& id) {
+    auto it = _textures.find(id);
+    if (it != _textures.end()) {
+        return it->second;
+    }
+    return nullptr;
+}
+
+void AssetManager::clear() {
+    _fonts.clear();
+    _textures.clear();
+}
 
 }  // namespace zappy::gui::graphics

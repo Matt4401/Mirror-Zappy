@@ -9,14 +9,12 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <memory>
 #include <string>
 #include <utility>
 
 #include "ItemBag.hpp"
 #include "gui/raylib/Color.hpp"
 #include "rmath/Vector3.hpp"
-#include "rtextures/Texture2D.hpp"
 
 namespace zappy::gui::game {
 class Player {
@@ -42,8 +40,8 @@ class Player {
     [[nodiscard]] std::string teamName() const { return _teamName; }
     [[nodiscard]] raylib::Color teamColor() const { return _teamColor; }
 
-    void setTexture(std::shared_ptr<raylib::rtextures::Texture2D> texture) { _texture = std::move(texture); }
-    [[nodiscard]] std::shared_ptr<raylib::rtextures::Texture2D> texture() const { return _texture; }
+    void setTextureId(const std::string& textureId) { _textureId = textureId; }
+    [[nodiscard]] std::string textureId() const { return _textureId; }
 
   protected:
   private:
@@ -55,6 +53,6 @@ class Player {
     raylib::Color _teamColor;
     std::size_t _level{1};
     std::size_t _life{10};
-    std::shared_ptr<raylib::rtextures::Texture2D> _texture{nullptr};
+    std::string _textureId;
 };
 }  // namespace zappy::gui::game
