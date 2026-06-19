@@ -27,23 +27,17 @@ handlers:
     backupCount: 3
 
   player_file_template:
-    class: logging.handlers.RotatingFileHandler
+#    class: logging.handlers.RotatingFileHandler
     level: INFO
     formatter: detailed
     filename: ~
     maxBytes: 100000
     backupCount: 5
 
-  other_file:
-    class: ~
-    level: ~
-    formatter: ~
-    filename: ~
-
 loggers:
   simpleLogger:
     level: WARNING
-    handlers: [ file, console ]
+    handlers: [ console ]
     propagate: no
   network_logger:
     level: INFO
