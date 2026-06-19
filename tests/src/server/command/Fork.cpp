@@ -16,6 +16,7 @@
 
 namespace zappy::server::game::test {
 
+// NOLINTBEGIN
 TEST(ForkTest, CheckRequiredTicks) {
     const command::Fork forkCmd{};
     ASSERT_EQ(forkCmd.requiredTicks(), 42);
@@ -154,5 +155,7 @@ TEST(ForkTest, CheckExecuteGeneratesPfkEvent) {
 
     ASSERT_TRUE(foundPfkEvent);
 }
+
+// NOLINTEND
 
 }  // namespace zappy::server::game::test
