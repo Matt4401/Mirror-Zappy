@@ -128,6 +128,8 @@ PlayerInspectorUI::PlayerInspectorUI(float x, float y, float width, std::shared_
         _eventTokens.push_back(_dispatcher->subscribe<shared::protocol::server::Sgt>(
             [this](const shared::protocol::server::Sgt& cmd) { onSgtReceived(cmd); }));
     }
+
+    _targetPlayerId = 1;  // Temporary default player ID for testing
 }
 
 void PlayerInspectorUI::onPinReceived(const shared::protocol::server::Pin& cmd) {
