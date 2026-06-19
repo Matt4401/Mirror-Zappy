@@ -64,7 +64,7 @@ TEST(InventoryTest, CheckExecuteDefaultInventoryFormat) {
     ASSERT_EQ(playerResponses.size(), 1);
 
     const std::string expectedResponse =
-        "[deraumere 0, food 10, linemate 0, mendiane 0, phiras 0, sibur 0, thystame 0]\n";
+        "[food 10, linemate 0, deraumere 0, sibur 0, mendiane 0, phiras 0, thystame 0]\n";
 
     ASSERT_EQ(playerResponses.at(0), expectedResponse);
 }
@@ -92,7 +92,7 @@ TEST(InventoryTest, CheckExecuteModifiedInventoryFormat) {
     ASSERT_EQ(playerResponses.size(), 1);
 
     const std::string expectedResponse =
-        "[deraumere 0, food 10, linemate 3, mendiane 0, phiras 0, sibur 5, thystame 1]\n";
+        "[food 10, linemate 3, deraumere 0, sibur 5, mendiane 0, phiras 0, thystame 1]\n";
 
     ASSERT_EQ(playerResponses.at(0), expectedResponse);
 }
