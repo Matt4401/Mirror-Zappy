@@ -2,7 +2,7 @@ add_library(zappy_gui_game_components INTERFACE)
 target_sources(zappy_gui_game_components INTERFACE
         FILE_SET HEADERS
         BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/..
-        FILES components/AObject.hpp
+        FILES AObject.hpp
         Deraumere.hpp
         Food.hpp
         IObject.hpp
