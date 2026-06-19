@@ -8,6 +8,7 @@
 #pragma once
 
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <utility>
@@ -15,12 +16,11 @@
 #include "ItemBag.hpp"
 #include "rmath/Vector3.hpp"
 #include "rtextures/Texture2D.hpp"
-#include "server/src/game/Player.hpp"
 
 namespace zappy::gui::game {
 class Player {
   public:
-    using cardinalPoint = server::game::cardinalPoint;
+    enum class cardinalPoint : std::uint8_t { NORTH = 1, EAST = 2, SOUTH = 3, WEST = 4 };
 
     Player(raylib::rmath::Vector3 position, std::string name, cardinalPoint orientation)
         : _position(position), _name(std::move(name)), _orientation(orientation) {}
