@@ -67,16 +67,22 @@ void Player::update(World& world) {
 }
 
 void Player::tryStartNextCommand(World& world) {
-    if (_cmdTick > 0 || _currentCommand != nullptr || _commands.empty()) {
+    if (_cmdTick > 0 || _currentCommand != nullptr) {
         return;
     }
-    _currentCommand = std::move(_commands.front());
-    _commands.pop();
-    while (!_currentCommand->start(world, *this)) {
-        _buffersResponses.emplace_back("ko\n");
-        _currentCommand = nullptr;
+
+    while (!_commands.empty()) {
+        _currentCommand = std::move(_commands.front());
+        _commands.pop();
+
+        if (!_currentCommand->start(world, *this)) {
+            _buffersResponses.emplace_back("ko\n");
+            _currentCommand = nullptr;
+        } else {
+            _cmdTick = _currentCommand->requiredTicks();
+            return;
+        }
     }
-    _cmdTick = _currentCommand->requiredTicks();
 }
 
 void Player::moveForward(const Position& limit) {
