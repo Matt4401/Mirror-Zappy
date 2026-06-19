@@ -11,6 +11,7 @@ target_sources(zappy_gui_events PUBLIC
 
 target_include_directories(zappy_gui_events PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../raylib
 )
 
 target_link_libraries(zappy_gui_events PUBLIC
