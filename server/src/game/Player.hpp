@@ -9,10 +9,10 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
-#include <map>
 #include <memory>
 #include <queue>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -30,11 +30,14 @@ struct Position {
 enum class ItemType : uint8_t { Food, Linemate, Deraumere, Sibur, Mendiane, Phiras, Thystame, COUNT };
 
 // NOLINTNEXTLINE
-const std::map<std::string, ItemType> kMapItemString = {
+const std::unordered_map<std::string, ItemType> kMapItemString = {
     {"linemate", ItemType::Linemate}, {"deraumere", ItemType::Deraumere}, {"sibur", ItemType::Sibur},
     {"mendiane", ItemType::Mendiane}, {"phiras", ItemType::Phiras},       {"thystame", ItemType::Thystame},
     {"food", ItemType::Food},
 };
+
+constexpr std::array<std::string, static_cast<std::size_t>(ItemType::COUNT)> kInventoryOrder = {
+    "food", "linemate", "deraumere", "sibur", "mendiane", "phiras", "thystame"};
 
 enum class cardinalPoint : uint8_t { NORTH, EAST, SOUTH, WEST, COUNT };
 
