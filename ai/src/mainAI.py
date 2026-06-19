@@ -2,6 +2,8 @@ import sys
 import argparse
 from src.AITeamClass import AITeam
 from src.TrantorianClass import Trantorian
+from util.IdGenerator import generate_id
+from util.InitLogger import PlayerLogger
 
 
 def mainAI():
@@ -21,6 +23,12 @@ def mainAI():
     port = args.p  # noqa: F841
     name = args.n  # noqa: F841
     machine = args.h
+
+    # TEMPORARY !!!!!!!!
+    team_name = "test"
+    player_id = generate_id(team_name)
+
+    PlayerLogger.setup_logging(player_id)
 
     trantorian = Trantorian("matt4401")
     main_class = AITeam(trantorian, port, machine, name)  # noqa: F841
