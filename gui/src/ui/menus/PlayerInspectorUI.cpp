@@ -180,13 +180,11 @@ void PlayerInspectorUI::onSgtReceived(const shared::protocol::server::Sgt& cmd) 
 }
 
 PlayerInspectorUI::~PlayerInspectorUI() {
-    if (_dispatcher) {
-        for (auto token : _eventTokens) {
-            _dispatcher->unsubscribe<shared::protocol::server::Pin>(token);
-            _dispatcher->unsubscribe<shared::protocol::server::Plv>(token);
-            _dispatcher->unsubscribe<shared::protocol::server::Ppo>(token);
-            _dispatcher->unsubscribe<shared::protocol::server::Sgt>(token);
-        }
+    if (_dispatcher && _eventTokens.size() >= 4) {
+        _dispatcher->unsubscribe<shared::protocol::server::Pin>(_eventTokens.at(0));
+        _dispatcher->unsubscribe<shared::protocol::server::Plv>(_eventTokens.at(1));
+        _dispatcher->unsubscribe<shared::protocol::server::Ppo>(_eventTokens.at(2));
+        _dispatcher->unsubscribe<shared::protocol::server::Sgt>(_eventTokens.at(3));
     }
 }
 
@@ -261,6 +259,10 @@ void PlayerInspectorUI::setTargetPlayer(int playerId, const game::Player& initia
     }
     if (_idText) {
         _idText->setText("ID: " + std::to_string(playerId));
+    }
+    if (_teamText) {
+        _teamText->setText("Team: " + initialData.teamName());
+        _teamText->setColor(initialData.teamColor());
     }
     if (initialData.texture() && _avatarModel) {
         _avatarModel->setMaterialTexture(0, 0 /* MATERIAL_MAP_ALBEDO */, *initialData.texture());
