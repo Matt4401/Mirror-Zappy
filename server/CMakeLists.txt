@@ -5,6 +5,17 @@ add_library(zappy_server_objects OBJECT
         src/game/World.hpp
         src/Core.cpp
         src/Core.hpp
+        src/guiCommand/IGuiCommand.hpp
+        src/guiCommand/Mct.cpp
+        src/guiCommand/Mct.hpp
+        src/guiCommand/Msz.cpp
+        src/guiCommand/Msz.hpp
+        src/guiCommand/Sgt.cpp
+        src/guiCommand/Sgt.hpp
+        src/guiCommand/Bct.cpp
+        src/guiCommand/Bct.hpp
+        src/guiCommand/Tna.cpp
+        src/guiCommand/Tna.hpp
         src/command/ICommand.hpp
         src/command/ACommand.hpp
         src/command/CommandFactory.cpp
@@ -19,6 +30,12 @@ add_library(zappy_server_objects OBJECT
         src/command/Right.hpp
         src/game/Team.cpp
         src/game/Team.hpp
+        src/command/Eject.cpp
+        src/command/Eject.hpp
+        src/command/Set.cpp
+        src/command/Set.hpp
+        src/command/Take.cpp
+        src/command/Take.hpp
 )
 target_include_directories(zappy_server_objects PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src

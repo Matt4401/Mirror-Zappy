@@ -11,14 +11,40 @@
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <variant>
 
 #include "command/Forward.hpp"
 #include "command/ICommand.hpp"
+#include "command/Left.hpp"
+#include "command/Right.hpp"
+#include "guiCommand/Bct.hpp"
+#include "guiCommand/IGuiCommand.hpp"
+#include "guiCommand/Mct.hpp"
+#include "guiCommand/Msz.hpp"
+#include "guiCommand/Sgt.hpp"
+#include "guiCommand/Tna.hpp"
+#include "protocol/Commands.hpp"
+#include "protocol/Parser.hpp"
 
 namespace zappy::server::command {
 
 CommandFactory::CommandFactory() {
     _creators.emplace("Forward", [](std::string_view) { return std::make_unique<Forward>(); });
+    _creators.emplace("Left", [](std::string_view) { return std::make_unique<Left>(); });
+    _creators.emplace("Right", [](std::string_view) { return std::make_unique<Right>(); });
+
+    _guiCreators.emplace("msz", [](std::string_view) { return std::make_unique<guiCommand::Msz>(); });
+    _guiCreators.emplace("sgt", [](std::string_view) { return std::make_unique<guiCommand::Sgt>(); });
+    _guiCreators.emplace("bct", [](std::string_view rawCommand) -> std::unique_ptr<guiCommand::IGuiCommand> {
+        auto parsedCmd = shared::protocol::Parser::parseClientCommand(rawCommand);
+
+        if (const auto* bctParams = std::get_if<shared::protocol::client::Bct>(&parsedCmd)) {
+            return std::make_unique<guiCommand::Bct>(bctParams->x, bctParams->y);
+        }
+        return nullptr;
+    });
+    _guiCreators.emplace("mct", [](std::string_view) { return std::make_unique<guiCommand::Mct>(); });
+    _guiCreators.emplace("tna", [](std::string_view) { return std::make_unique<guiCommand::Tna>(); });
 }
 
 std::unique_ptr<ICommand> CommandFactory::createCommand(std::string_view rawCommand) const {
@@ -26,6 +52,16 @@ std::unique_ptr<ICommand> CommandFactory::createCommand(std::string_view rawComm
     auto it = _creators.find(firstWord);
 
     if (it == _creators.end()) {
+        return nullptr;
+    }
+    return it->second(rawCommand);
+}
+
+std::unique_ptr<guiCommand::IGuiCommand> CommandFactory::createGuiCommand(std::string_view rawCommand) const {
+    const std::string firstWord = extractFirstWord(rawCommand);
+    auto it = _guiCreators.find(firstWord);
+
+    if (it == _guiCreators.end()) {
         return nullptr;
     }
     return it->second(rawCommand);

@@ -7,9 +7,10 @@
 
 #include "World.hpp"
 
+#include <array>
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
-#include <ctime>
 #include <memory>
 #include <optional>
 #include <random>
@@ -63,7 +64,7 @@ World::World(const parser::ServerConfig& config) : _heightMap(config.height), _w
 }
 
 Position World::sizeMap() const {
-    return Position{.x = _widthMap == 0 ? 0 : _widthMap - 1, .y = _heightMap == 0 ? 0 : _heightMap - 1};
+    return Position{.x = _widthMap == 0 ? 0 : _widthMap, .y = _heightMap == 0 ? 0 : _heightMap};
 }
 
 void World::eraseEggFromTile(const std::size_t position1dVec, const std::size_t id) {
@@ -195,12 +196,23 @@ std::vector<std::size_t> World::collectAndKillDeadPlayers() const {
     return deadIds;
 }
 
+std::size_t World::getAvailableSlotInTeam(std::string_view teamName) const {
+    const auto team = _teamList.find(std::string(teamName));
+
+    if (team == _teamList.end()) {
+        return 0;
+    }
+    return team->second->availableSlot();
+}
+
 void World::eject(const std::size_t id) {
     const auto& pushingPlayer = _playerList.at(id);
     const auto orientation = pushingPlayer->orientation();
     const auto position = getTileIndex(pushingPlayer->position());
-    const auto vecPlayerPush = _tiles.at(position).players;
-    const auto vecEggPush = _tiles.at(position).eggs;
+    const auto& tile = _tiles.at(position);
+    auto vecPlayerPush = tile.players;
+    std::erase(vecPlayerPush, id);
+    const auto vecEggPush = tile.eggs;
 
     for (const auto& idPushed : vecPlayerPush) {
         const auto& pushedPlayer = _playerList.at(idPushed);
@@ -210,11 +222,70 @@ void World::eject(const std::size_t id) {
         pushedPlayer->moveWithOrientation(Position{.x = limitX, .y = limitY}, orientation);
         const auto [newX, newY] = pushedPlayer->position();
         updatePositionOnMap(pushedPlayer->id(), {.x = oldX, .y = oldY}, {.x = newX, .y = newY});
+        pushedPlayer->addResponse("eject: " + kCardinalPointToStr.at(orientation) + "\n");
     }
     for (const auto idEgg : vecEggPush) {
         _vecEggs.erase(idEgg);
         eraseEggFromTile(position, idEgg);
     }
+    pushingPlayer->addResponse("ok\n");
+}
+
+bool World::hasEjectableTargetOnTile(const Position& position, const std::size_t id) const {
+    auto tile = _tiles.at(getTileIndex(position));
+    std::erase(tile.players, id);
+    return !tile.players.empty() || !tile.eggs.empty();
+}
+
+bool World::isEggOnTile(const Position& position) const {
+    const auto tile = _tiles.at(getTileIndex(position));
+    return !tile.eggs.empty();
+}
+
+const std::unordered_map<std::size_t, std::unique_ptr<Player>>& World::playerList() const { return _playerList; }
+
+std::vector<std::string> World::getAndClearGuiEvents() {
+    std::vector<std::string> events = std::move(_guiEvents);
+
+    _guiEvents.clear();
+    return events;
+}
+
+int World::getNextExecutionTick() const {
+    int nextTick = -1;
+
+    for (const auto& player : _playerList | std::ranges::views::values) {
+        int playerNextEvent = static_cast<int>(player->nbLifeTick());
+
+        if (player->cmdTick() > 0 && player->cmdTick() < playerNextEvent) {
+            playerNextEvent = player->cmdTick();
+        } else if (player->cmdTick() == 0 && player->hasCommands()) {
+            playerNextEvent = 1;
+        }
+
+        if (nextTick == -1 || playerNextEvent < nextTick) {
+            nextTick = playerNextEvent;
+        }
+    }
+    return nextTick;
+}
+
+void World::addItemOnGround(ItemType item, const Position pos) {
+    _tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(item))++;
+}
+
+void World::removeItemOnGround(ItemType item, const Position pos) {
+    _tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(item))--;
+}
+
+std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> World::tileResources(const Position position) const {
+    return _tiles.at(getTileIndex(position)).resources;
+}
+
+std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> World::getResourcesAt(const std::size_t x,
+                                                                                     const std::size_t y) const {
+    const auto tileIndex = getTileIndex(x, y);
+    return _tiles.at(tileIndex).resources;
 }
 
 }  // namespace zappy::server::game

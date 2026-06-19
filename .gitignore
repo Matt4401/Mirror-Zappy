@@ -15,3 +15,5 @@ test_binaries/
 .markdownlint.json
 *__pycache__*
 binary_ref/
+logs/
+*.log

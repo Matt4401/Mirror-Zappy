@@ -19,7 +19,6 @@
 
 #include "command/Forward.hpp"
 #include "game/Player.hpp"
-#include "game/Team.hpp"
 #include "strategy/ServerStrategy.hpp"
 
 namespace zappy::server::game {
@@ -35,8 +34,8 @@ TEST_F(WorldTest, ConstructorCreatesCorrectMapSize) {
     const World world{config};
     const auto [maxX, maxY] = world.sizeMap();
 
-    ASSERT_EQ(maxX, 9);
-    ASSERT_EQ(maxY, 9);
+    ASSERT_EQ(maxX, 10);
+    ASSERT_EQ(maxY, 10);
 }
 
 TEST_F(WorldTest, ConstructorInitializesTeams) {
@@ -186,8 +185,8 @@ TEST_F(WorldTest, SizeMapReturnsDimensions) {
     const World world{customConfig};
     const auto [maxX, maxY] = world.sizeMap();
 
-    ASSERT_EQ(maxX, 19);
-    ASSERT_EQ(maxY, 14);
+    ASSERT_EQ(maxX, 20);
+    ASSERT_EQ(maxY, 15);
 }
 
 TEST_F(WorldTest, RandomCardinalPointReturnsValidOrientation) {
@@ -263,23 +262,6 @@ TEST_F(WorldTest, UpdateExecutesCommandAfterRequiredTicks) {
     ASSERT_EQ(responses.at(playerId.value()).at(0), "ok\n");
 }
 
-TEST_F(WorldTest, UpdateDoesNotExecuteCommandBeforeRequiredTicks) {
-    World world{config};
-
-    const auto playerId = world.spawnPlayer("team1");
-    ASSERT_TRUE(playerId.has_value());
-
-    world.pushCommandToPlayer(playerId.value(), std::make_unique<command::Forward>());
-
-    for (int i = 0; i < 7; ++i) {
-        world.update();
-    }
-
-    const auto responses = world.getAllResponsesBuffer();
-    ASSERT_TRUE(responses.empty() || responses.find(playerId.value()) == responses.end() ||
-                responses.at(playerId.value()).empty());
-}
-
 TEST_F(WorldTest, UpdateExecutesMultipleCommandsInSequence) {
     World world{config};
 
@@ -293,23 +275,41 @@ TEST_F(WorldTest, UpdateExecutesMultipleCommandsInSequence) {
     for (int i = 0; i < 8; ++i) {
         world.update();
     }
-
     auto responses = world.getAllResponsesBuffer();
     ASSERT_EQ(responses.at(playerId.value()).size(), 1);
 
-    for (int i = 0; i < 9; ++i) {
+    for (int i = 0; i < 7; ++i) {
         world.update();
     }
-
     responses = world.getAllResponsesBuffer();
     ASSERT_EQ(responses.at(playerId.value()).size(), 1);
 
-    for (int i = 0; i < 9; ++i) {
+    for (int i = 0; i < 7; ++i) {
+        world.update();
+    }
+    responses = world.getAllResponsesBuffer();
+    ASSERT_EQ(responses.at(playerId.value()).size(), 1);
+}
+
+TEST_F(WorldTest, UpdateDoesNotExecuteCommandBeforeRequiredTicks) {
+    World world{config};
+    const auto playerId = world.spawnPlayer("team1");
+
+    ASSERT_TRUE(playerId.has_value());
+    world.pushCommandToPlayer(playerId.value(), std::make_unique<command::Forward>());
+    for (int i = 0; i < 7; ++i) {
         world.update();
     }
 
+    auto responses = world.getAllResponsesBuffer();
+    ASSERT_TRUE(responses.empty() || responses.find(playerId.value()) == responses.end() ||
+                responses.at(playerId.value()).empty());
+
+    world.update();
     responses = world.getAllResponsesBuffer();
-    ASSERT_EQ(responses.at(playerId.value()).size(), 1);
+
+    ASSERT_FALSE(responses.empty());
+    ASSERT_EQ(responses.at(playerId.value()).front(), "ok\n");
 }
 
 TEST_F(WorldTest, MultiplePlayersUpdateIndependently) {
