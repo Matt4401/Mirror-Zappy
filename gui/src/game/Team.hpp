@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 
+#include "Color.hpp"
 #include "Egg.hpp"
 #include "GameModel.hpp"
 #include "Player.hpp"
@@ -28,7 +29,8 @@ class Team {
     void draw(const GameModel& gameModel) const;
 
     void addPlayer(raylib::rmath::Vector3 position = {10.0F, 12.0F, 0.0F}) {
-        _players.emplace_back(position, _name + std::to_string(_players.size()), Player::cardinalPoint::NORTH);
+        _players.emplace_back(position, _name + std::to_string(_players.size()), Player::cardinalPoint::NORTH, _name,
+                              raylib::Color(255, 0, 0, 255));
     }  // TEMPORARY FUNCTION, JUST FOR TESTING
 
   protected:
