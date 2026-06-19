@@ -33,7 +33,7 @@ void Texture2D::drawCoverPanned(int width, int height, float horizontalPan, zapp
 }
 
 void Texture2D::reset() {
-    if (valid()) {
+    if (_ownsTexture && _texture.id != 0) {
         UnloadTexture(_texture);
     }
     _texture = {};
