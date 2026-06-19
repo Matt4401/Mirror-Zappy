@@ -7,6 +7,8 @@
 
 #include "PlayerInspectorUI.hpp"
 
+#include <raylib.h>
+
 #include <algorithm>
 #include <cstddef>
 #include <functional>
@@ -15,6 +17,7 @@
 #include <utility>
 
 #include "Color.hpp"
+#include "Texture2D.hpp"
 #include "events/EventDispatcher.hpp"
 #include "game/Player.hpp"
 #include "protocol/Commands.hpp"
@@ -264,8 +267,13 @@ void PlayerInspectorUI::setTargetPlayer(int playerId, const game::Player& initia
         _teamText->setText("Team: " + initialData.teamName());
         _teamText->setColor(initialData.teamColor());
     }
-    if (initialData.texture() && _avatarModel) {
-        _avatarModel->setMaterialTexture(0, 0 /* MATERIAL_MAP_ALBEDO */, *initialData.texture());
+    if (_avatarModel) {
+        if (initialData.texture()) {
+            _avatarModel->setMaterialTexture(0, 0 /* MATERIAL_MAP_ALBEDO */, *initialData.texture());
+        } else {
+            _avatarModel->setMaterialTexture(0, 0 /* MATERIAL_MAP_ALBEDO */,
+                                             raylib::rtextures::Texture2D{::Texture2D{}, false});
+        }
     }
 
     requestPlayerSync();
