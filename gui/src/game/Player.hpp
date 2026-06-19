@@ -8,11 +8,13 @@
 #pragma once
 
 #include <cstddef>
+#include <memory>
 #include <string>
 #include <utility>
 
 #include "ItemBag.hpp"
 #include "rmath/Vector3.hpp"
+#include "rtextures/Texture2D.hpp"
 #include "server/src/game/Player.hpp"
 
 namespace zappy::gui::game {
@@ -32,6 +34,9 @@ class Player {
     [[nodiscard]] std::string name() const { return _name; }
     [[nodiscard]] cardinalPoint orientation() const { return _orientation; }
 
+    void setTexture(std::shared_ptr<raylib::rtextures::Texture2D> texture) { _texture = std::move(texture); }
+    [[nodiscard]] std::shared_ptr<raylib::rtextures::Texture2D> texture() const { return _texture; }
+
   protected:
   private:
     game::ItemBag _itemBag;
@@ -40,5 +45,6 @@ class Player {
     cardinalPoint _orientation{cardinalPoint::NORTH};
     std::size_t _level{1};
     std::size_t _life{10};
+    std::shared_ptr<raylib::rtextures::Texture2D> _texture{nullptr};
 };
 }  // namespace zappy::gui::game
