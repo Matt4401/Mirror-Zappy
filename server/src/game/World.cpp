@@ -306,8 +306,6 @@ void World::layEgg(const Player& player) {
 
     _vecEggs[_newId] = Egg{.id = _newId, .position = pos, .teamName = teamName};
     _tiles.at(tileIndex).eggs.emplace_back(_newId);
-    _guiEvents.push_back("enw " + std::to_string(_newId) + " " + std::to_string(player.id()) + " " +
-                         std::to_string(pos.x) + " " + std::to_string(pos.y) + "\n");
     addGuiEvent(
         shared::protocol::Emitter::build(shared::protocol::server::Enw{.eggId = static_cast<int>(_newId),
                                                                        .playerId = static_cast<int>(player.id()),
