@@ -8,36 +8,36 @@ import time
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from AIConnection import AIConnection
+from Connection import Connection
 
 
-class TestAIConnectionUnit(unittest.TestCase):
-    @patch("AIConnection.socket.socket")
+class TestConnectionUnit(unittest.TestCase):
+    @patch("Connection.socket.socket")
     def test_successful_handshake(self, mock_socket_class):
         mock_socket = MagicMock()
         mock_socket_class.return_value = mock_socket
 
         mock_socket.recv.side_effect = [b"WELCOME\n", b"2\n", b"10 10\n"]
 
-        ai = AIConnection("127.0.0.1", 4242, "TeamA")
+        ai = Connection("127.0.0.1", 4242, "TeamA")
 
         mock_socket.connect.assert_called_with(("127.0.0.1", 4242))
         mock_socket.send.assert_called_with(b"TeamA\n")
         self.assertEqual(ai.client_num, 2)
         self.assertEqual(ai.width, 10)
 
-    @patch("AIConnection.socket.socket")
+    @patch("Connection.socket.socket")
     def test_handshake_bad_welcome(self, mock_socket_class):
         mock_socket = MagicMock()
         mock_socket_class.return_value = mock_socket
         mock_socket.recv.return_value = b"BAD MESSAGE\n"
 
         with self.assertRaises(SystemExit) as cm:
-            AIConnection("127.0.0.1", 4242, "TeamA")
+            Connection("127.0.0.1", 4242, "TeamA")
         self.assertEqual(cm.exception.code, 84)
 
 
-class TestAIConnectionFunctional(unittest.TestCase):
+class TestConnectionFunctional(unittest.TestCase):
     def setUp(self):
         self.host = "127.0.0.1"
         self.port = 8889
@@ -67,7 +67,7 @@ class TestAIConnectionFunctional(unittest.TestCase):
         server.close()
 
     def test_full_connection_and_command(self):
-        ai = AIConnection(self.host, self.port, "MyTeam")
+        ai = Connection(self.host, self.port, "MyTeam")
         success = ai.send_command("Forward")
         self.assertTrue(success)
 

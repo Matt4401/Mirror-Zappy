@@ -1,4 +1,4 @@
-from src.AIConnection import AIConnection
+from src.Connection import Connection
 from src.PlayerState import PlayerState
 from src.SendCommand import SendCommand
 import threading
@@ -11,7 +11,9 @@ class AITeam:
         self.answer_list = []
         self.data_lock = threading.Lock()
         self.team_name = team_name
-        self.connection = AIConnection(host, port, team_name)
+        self.connection = Connection(
+            host, port, team_name
+        )
         self.player_state = PlayerState(team_name)
         self.send_command = SendCommand(self.connection)
 

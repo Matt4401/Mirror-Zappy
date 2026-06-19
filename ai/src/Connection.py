@@ -25,11 +25,10 @@ class CommandResponse:
         self.time_answered = time_answered
 
 
-class AIConnection:
+class Connection:
     MAX_PENDING_COMMANDS = 10
 
     def __init__(self, host, port, team_name):
-
         self.host = host
         self.port = port
         self.team_name = team_name
@@ -43,20 +42,20 @@ class AIConnection:
         self.response_lock = threading.Lock()
         self.broadcast_lock = threading.Lock()
         self.reader_thread = None
-        self._connect(host, port)
-        self._do_handshake()
-        self._start_reader()
-        self._start_receive_poll_cmd()
-
-        self.pending_commands = {}
+        self.event_thread = None
+        self.connect(host, port)
+        self.do_handshake()
+        self.start_reader()
+        self.start_receive_poll_cmd()
+        self.pending_commands: Dict[int, CommandRequest] = {}
         self.command_queue = deque()
         self.event_queue = deque()
-
-        self.response_buffer = {}
+        self.run_receive_poll_cmd()
+        self.response_buffer: Dict[int, CommandRequest] = {}
         self.failed_commands = deque()
         self.cmd_counter = 0
 
-    def _connect(self, host, port):
+    def connect(self, host, port):
         try:
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         except socket.error as e:
@@ -68,7 +67,7 @@ class AIConnection:
             print(f"Failed to connect to {host}:{port}: {e}")
             sys.exit(84)
 
-    def _do_handshake(self):
+    def do_handshake(self):
         try:
             welcome_msg = self.socket.recv(1024).decode()
             if welcome_msg != "WELCOME\n":
@@ -97,13 +96,13 @@ class AIConnection:
             print(f"Handshake error: {e}")
             sys.exit(84)
 
-    def _start_reader(self):
+    def start_reader(self):
         self.reader_thread = threading.Thread(
-            target=self._run_reader, daemon=False, name="AIConnection-Reader"
+            target=self._run_reader, daemon=False, name="Connection-Reader"
         )
         self.reader_thread.start()
 
-    def _run_reader(self) -> None:
+    def _run_reader(self):
         buffer = ""
         try:
             self.socket.setblocking(False)
@@ -129,11 +128,6 @@ class AIConnection:
                                         message=msg_data["message"],
                                     )
                                 )
-                            if self.on_broadcast_received:
-                                self.on_broadcast_received(
-                                    msg_data["direction"], msg_data["message"]
-                                )
-
                         elif msg_type == "eject":
                             with self.event_lock:
                                 self.event_queue.append(
@@ -146,15 +140,11 @@ class AIConnection:
                                 self.event_queue.append(
                                     ServerEvent(event_type="dead", data=msg_data)
                                 )
-                            if self.on_event_received:
-                                self.on_event_received("dead", msg_data)
                         elif msg_type == "elevation":
                             with self.event_lock:
                                 self.event_queue.append(
                                     ServerEvent(event_type="elevation", data=msg_data)
                                 )
-                            if self.on_event_received:
-                                self.on_event_received("elevation", msg_data)
                         else:
                             with self.response_lock:
                                 self.command_responses.append(msg_data["content"])
@@ -178,11 +168,10 @@ class AIConnection:
             cmd_id = self.cmd_counter
             cmd_request = CommandRequest(
                 command=cmd,
-                cmd_id=cmd_id,
+                id=cmd_id,
             )
             self.command_queue.append(cmd_request)
         return cmd_id
-
 
     def disconnect(self):
         self.running = False
@@ -196,16 +185,15 @@ class AIConnection:
             if self.reader_thread.is_alive():
                 print("Warning: reader thread did not terminate gracefully")
 
-    def _parse_server_message(self, line: str):
+    def parse_server_message(self, line):
         line = line.strip()
         if not line:
             return None, None
-        if line.startswith("message "):
-            match = re.match(r"message\s+(\d+),\s*(.*)", line)
-            if match:
-                direction = int(match.group(1))
-                message = match.group(2)
-                return "broadcast", {"direction": direction, "message": message}
+        match = re.match(r"message\s+(\d+),\s*(.*)", line)
+        if match:
+            direction = int(match.group(1))
+            message = match.group(2)
+            return "broadcast", {"direction": direction, "message": message}
         if line.startswith("eject:"):
             match = re.match(r"eject:\s*(\d+)", line)
             if match:
@@ -217,31 +205,13 @@ class AIConnection:
             return "elevation", {"message": line}
         return "response", {"content": line}
 
-    def check_response(self):
-        while self.check_response:
-            try:
-                recv = self.response_queue.popleft()
-
-                with self.command_lock:
-                    if not self.pending_commands:
-                        continue
-
-                for recv_cmd in self.pending_commands:
-                    if recv.get_id() == self.pending_commands.id():
-                        idx += 1
-            except IndexError:
-                continue
-            except Exception as e:
-                print(f"Error processing response: {e}")
-
-    def _send_cmd_buffer(self):
+    def send_cmd_buffer(self):
         with self.command_lock:
             while (
                 len(self.pending_commands) < self.MAX_PENDING_COMMANDS
                 and len(self.command_queue) > 0
             ):
                 cmd_request = self.command_queue.popleft()
-
                 if self._send_raw_command(cmd_request.command):
                     cmd_request.sent_at = time.time()
                     self.pending_commands[cmd_request.cmd_id] = cmd_request
@@ -250,11 +220,43 @@ class AIConnection:
                     time.sleep(0.1)
                     break
 
-    def _start_receive_poll_cmd(self):
-        self.reader_thread = threading.Thread(
-            target=self.run_receive_poll_cmd, daemon=False, name="AIConnection-Receive"
+    def run_receive_poll_cmd(self):
+        while self.running:
+            try:
+                self.check_response()
+                self.send_cmd_buffer()
+                time.sleep(0.05)
+            except Exception as e:
+                print(f"Error in command worker: {e}")
+
+    def start_receive_poll_cmd(self):
+        self.event_thread = threading.Thread(
+            target=self.run_receive_poll_cmd, daemon=False, name="Connection-Receive"
         )
         self.reader_thread.start()
+
+    def check_response(self):
+        while self.command_responses:
+            try:
+                response_str = self.command_responses.popleft()
+
+                with self.command_lock:
+                    if not self.pending_commands:
+                        print(
+                            f"Unexpected response (no pending commands/..): {response_str}"
+                        )
+                        continue
+                    first_cmd_id = next(iter(self.pending_commands.keys()))
+                    cmd = self.pending_commands.pop(first_cmd_id)
+                    cmd_response = CommandResponse(
+                        cmd_id=first_cmd_id, response=response_str
+                    )
+                    with self.response_lock:
+                        self.response_buffer[first_cmd_id] = cmd_response
+            except IndexError:
+                break
+            except Exception as e:
+                print(f"Error processing command response: {e}")
 
     def get_broadcasts(self):
         with self.broadcast_lock:
