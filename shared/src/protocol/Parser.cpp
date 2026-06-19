@@ -219,7 +219,7 @@ ClientCommand parseClientMsz(std::istringstream& /*unused*/) { return client::Ms
 
 ClientCommand parseClientBct(std::istringstream& iss) {
     client::Bct cmd{};
-    if (iss >> cmd.x >> cmd.y) {
+    if (iss >> cmd.x >> cmd.y && iss.eof()) {
         return cmd;
     }
     return UnknownCommand{};

@@ -27,6 +27,7 @@
 #include "guiCommand/Mct.hpp"
 #include "guiCommand/Msz.hpp"
 #include "guiCommand/Sgt.hpp"
+#include "guiCommand/Tna.hpp"
 #include "protocol/Commands.hpp"
 #include "protocol/Parser.hpp"
 
@@ -67,6 +68,7 @@ CommandFactory::CommandFactory() {
         return nullptr;
     });
     _guiCreators.emplace("mct", [](std::string_view) { return std::make_unique<guiCommand::Mct>(); });
+    _guiCreators.emplace("tna", [](std::string_view) { return std::make_unique<guiCommand::Tna>(); });
 }
 
 std::unique_ptr<ICommand> CommandFactory::createCommand(std::string_view rawCommand) const {
