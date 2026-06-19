@@ -44,6 +44,27 @@ void World::setSpawnEggs(const std::size_t clientLimit, const std::string_view t
     }
 }
 
+void World::addItemToMap() {
+    if (_heightMap == 0 || _widthMap == 0) {
+        return;
+    }
+
+    std::random_device rd;
+    std::mt19937 e{rd()};
+    const std::size_t totalTiles = _heightMap * _widthMap;
+    std::uniform_int_distribution<std::size_t> dist{0, totalTiles - 1};
+
+    for (const auto& [itemType, density] : kDensityItem) {
+        const auto quantity = static_cast<std::size_t>(static_cast<double>(totalTiles) * density);
+
+        for (std::size_t i = 0; i < quantity; ++i) {
+            const std::size_t randomTileIndex = dist(e);
+            const auto itemIdx = static_cast<std::uint8_t>(itemType);
+            _tiles.at(randomTileIndex).resources.at(itemIdx) += 1;
+        }
+    }
+}
+
 cardinalPoint World::randomCardinalPoint() {
     std::random_device rd;
     std::mt19937 e{rd()};
@@ -61,6 +82,7 @@ World::World(const parser::ServerConfig& config) : _heightMap(config.height), _w
         _teamList[teamName] = std::make_unique<Team>(config.clientLimit);
         setSpawnEggs(config.clientLimit, teamName);
     }
+    addItemToMap();
 }
 
 Position World::sizeMap() const {
@@ -280,12 +302,6 @@ void World::removeItemOnGround(ItemType item, const Position pos) {
 
 std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> World::tileResources(const Position position) const {
     return _tiles.at(getTileIndex(position)).resources;
-}
-
-std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> World::getResourcesAt(const std::size_t x,
-                                                                                     const std::size_t y) const {
-    const auto tileIndex = getTileIndex(x, y);
-    return _tiles.at(tileIndex).resources;
 }
 
 }  // namespace zappy::server::game

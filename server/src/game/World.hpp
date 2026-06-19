@@ -10,7 +10,6 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
-#include <map>
 #include <memory>
 #include <optional>
 #include <string>
@@ -38,17 +37,23 @@ struct Tile {
 };
 
 // NOLINTNEXTLINE
-const std::map<cardinalPoint, std::string> kCardinalPointToStr = {
+const std::unordered_map<cardinalPoint, std::string> kCardinalPointToStr = {
     {cardinalPoint::NORTH, "north"},
     {cardinalPoint::EAST, "east"},
     {cardinalPoint::SOUTH, "south"},
     {cardinalPoint::WEST, "west"},
 };
 
+const std::unordered_map<ItemType, double> kDensityItem = {
+    {ItemType::Food, 0.5},     {ItemType::Linemate, 0.3}, {ItemType::Deraumere, 0.15}, {ItemType::Sibur, 0.1},
+    {ItemType::Mendiane, 0.1}, {ItemType::Phiras, 0.08},  {ItemType::Thystame, 0.05},
+};
+
 class World {
   public:
     explicit World(const parser::ServerConfig& config);
     void setSpawnEggs(size_t clientLimit, std::string_view teamName);
+    void addItemToMap();
     static cardinalPoint randomCardinalPoint();
     ~World() = default;
 
@@ -81,8 +86,6 @@ class World {
     std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> tileResources(Position position) const;
 
     [[nodiscard]] int getNextExecutionTick() const;
-    [[nodiscard]] std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> getResourcesAt(std::size_t x,
-                                                                                                std::size_t y) const;
 
   private:
     std::unordered_map<std::string, std::unique_ptr<Team>> _teamList;
