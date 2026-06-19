@@ -11,6 +11,7 @@
 #include <string>
 #include <utility>
 
+#include "Color.hpp"
 #include "rmath/Vector3.hpp"
 #include "rmodels/Mesh.hpp"
 #include "rtextures/Texture2D.hpp"
