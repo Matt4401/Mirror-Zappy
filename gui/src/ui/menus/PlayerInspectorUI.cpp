@@ -17,7 +17,6 @@
 #include <utility>
 
 #include "Color.hpp"
-#include "Texture2D.hpp"
 #include "events/EventDispatcher.hpp"
 #include "game/Player.hpp"
 #include "protocol/Commands.hpp"
@@ -29,6 +28,7 @@
 #include "rshapes/Shapes.hpp"
 #include "rtext/Font.hpp"
 #include "rtextures/RenderTexture2D.hpp"
+#include "rtextures/Texture2D.hpp"
 #include "ui/components/UIButton.hpp"
 #include "ui/components/UIGamePanel.hpp"
 #include "ui/components/UIImage.hpp"
@@ -91,7 +91,6 @@ constexpr float InvCellSpacing = 80.0F;
 constexpr float InvCellTextOffsetX = 10.0F;
 constexpr float InvCellTextOffsetY = 50.0F;
 constexpr float InvToBtnSpacing = 180.0F;
-constexpr int InvCols = 3;
 }  // namespace
 
 PlayerInspectorUI::PlayerInspectorUI(float x, float y, float width, std::shared_ptr<events::EventDispatcher> dispatcher,
@@ -100,26 +99,25 @@ PlayerInspectorUI::PlayerInspectorUI(float x, float y, float width, std::shared_
     : components::UIGamePanel(x, y, width, InspectorInitialHeight, "Player Inspector"),
       _dispatcher(std::move(dispatcher)),
       _font(font),
-      _onSendCommand(std::move(onSendCommand)) {
+      _onSendCommand(std::move(onSendCommand)),
+      _firstPersonBtn(std::make_shared<components::UIButton>(0.0F, 0.0F, FirstPersonBtnWidth, FirstPersonBtnHeight,
+                                                             "First Person", _font)),
+      _closeBtn(std::make_shared<components::UIButton>(x + width, y, 24.0F, 24.0F, "X", _font)),
+      _avatarCamera(raylib::rcore::Camera(raylib::rmath::Vector3{0.0F, 4.0F, 10.0F},
+                                          raylib::rmath::Vector3{0.0F, 3.0F, 0.0F},
+                                          raylib::rmath::Vector3{0.0F, 1.0F, 0.0F}, 45.0F, 0)),
+      _avatarModel(std::make_shared<raylib::rmodels::Model>("assets/jeffrey/scene.gltf")),
+      _avatarRenderTexture(std::make_shared<raylib::rtextures::RenderTexture2D>(static_cast<int>(AvatarWidth),
+                                                                                static_cast<int>(AvatarHeight))) {
     setCustomLayout(true);
     buildInfoPanel();
     buildInventoryPanel();
 
-    _firstPersonBtn = std::make_shared<components::UIButton>(0.0F, 0.0F, FirstPersonBtnWidth, FirstPersonBtnHeight,
-                                                             "First Person", _font);
     _firstPersonBtn->setFontSize(FirstPersonBtnFontSize);
 
-    _closeBtn = std::make_shared<components::UIButton>(x + width, y, 24.0F, 24.0F, "X", _font);
     _closeBtn->setFontSize(16.0F);
     _closeBtn->setOnClick([this]() { this->setVisible(false); });
     addHeaderComponent(_closeBtn);
-
-    _avatarModel = std::make_shared<raylib::rmodels::Model>("assets/jeffrey/scene.gltf");
-    _avatarRenderTexture = std::make_shared<raylib::rtextures::RenderTexture2D>(static_cast<int>(AvatarWidth),
-                                                                                static_cast<int>(AvatarHeight));
-    _avatarCamera =
-        raylib::rcore::Camera(raylib::rmath::Vector3{0.0F, 4.0F, 10.0F}, raylib::rmath::Vector3{0.0F, 3.0F, 0.0F},
-                              raylib::rmath::Vector3{0.0F, 1.0F, 0.0F}, 45.0F, 0);
 
     if (_dispatcher) {
         _eventTokens.push_back(_dispatcher->subscribe<shared::protocol::server::Pin>(
@@ -251,6 +249,10 @@ void PlayerInspectorUI::buildInventoryPanel() {
         text->setFontSize(static_cast<int>(InfoFontSize));
         text->setColor(raylib::Color::White());
         _inventoryTexts.push_back(text);
+
+        auto img = std::make_shared<components::UIImage>("assets/images/ui/id.png");
+        img->setSize(30.0F, 30.0F);
+        _inventoryImages.push_back(img);
     }
 }
 
@@ -523,9 +525,10 @@ void PlayerInspectorUI::draw() {
     currentY += InvTitleToGridSpacing;
 
     float const gridX = startX + ((panelW - InvGridTotalWidth) / 2.0F);
-    int col = 0;
-    int row = 0;
-    for (auto& _inventoryText : _inventoryTexts) {
+    for (size_t i = 0; i < _inventoryTexts.size(); ++i) {
+        const int row = static_cast<int>(i) / 3;
+        const int col = static_cast<int>(i) % 3;
+        auto& _inventoryText = _inventoryTexts.at(i);
         float const cellX = gridX + (static_cast<float>(col) * InvCellSpacing);
         float const cellY = currentY + (static_cast<float>(row) * InvCellSpacing);
 
@@ -535,11 +538,9 @@ void PlayerInspectorUI::draw() {
         _inventoryText->setPosition(cellX + InvCellTextOffsetX, cellY + InvCellTextOffsetY);
         _inventoryText->draw();
 
-        col++;
-        if (col >= InvCols) {
-            col = 0;
-            row++;
-        }
+        auto img = _inventoryImages.at(i);
+        img->setPosition(cellX + InvCellTextOffsetX, cellY + InvCellTextOffsetY);
+        img->draw();
     }
     currentY += InvToBtnSpacing;
 

@@ -13,8 +13,8 @@
 #include <string>
 #include <utility>
 
-#include "Color.hpp"
 #include "ItemBag.hpp"
+#include "gui/raylib/Color.hpp"
 #include "rmath/Vector3.hpp"
 #include "rtextures/Texture2D.hpp"
 
