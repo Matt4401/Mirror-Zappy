@@ -44,6 +44,7 @@ const std::unordered_map<cardinalPoint, std::string> kCardinalPointToStr = {
     {cardinalPoint::WEST, "west"},
 };
 
+// NOLINTNEXTLINE
 const std::unordered_map<ItemType, double> kDensityItem = {
     {ItemType::Food, 0.5},     {ItemType::Linemate, 0.3}, {ItemType::Deraumere, 0.15}, {ItemType::Sibur, 0.1},
     {ItemType::Mendiane, 0.1}, {ItemType::Phiras, 0.08},  {ItemType::Thystame, 0.05},
