@@ -25,7 +25,7 @@ class Matrix {
 
     [[nodiscard]] ::Matrix matrix() const { return _matrix; }
 
-    static Matrix rotateY(float angle) { return Matrix(MatrixRotateY(angle)); }
+    static Matrix rotateY(float angle) { return {MatrixRotateY(angle)}; }
 
   protected:
   private:
