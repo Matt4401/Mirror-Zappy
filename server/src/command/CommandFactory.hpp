@@ -12,6 +12,7 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <vector>
 
 #include "ICommand.hpp"
 #include "guiCommand/IGuiCommand.hpp"
@@ -38,6 +39,7 @@ class CommandFactory {
     std::unordered_map<std::string, GuiCommandCreator> _guiCreators;
 
     [[nodiscard]] static std::string extractFirstWord(std::string_view rawCommand);
+    static std::vector<std::string> extractAllCmd(std::string_view rawCommand);
 };
 
 }  // namespace zappy::server::command
