@@ -11,6 +11,7 @@
 #include <string>
 #include <utility>
 
+#include "Color.hpp"
 #include "rmath/Vector3.hpp"
 #include "rmodels/Mesh.hpp"
 #include "rtextures/Texture2D.hpp"
@@ -48,18 +49,28 @@ class Image {
     [[nodiscard]] Texture2D toTexture() const { return Texture2D{LoadTextureFromImage(_image)}; }
     [[nodiscard]] bool exportTo(const std::string& path) const { return ExportImage(_image, path.c_str()); }
 
+    static Image genColor(int width, int height, Color color) {
+        return Image{GenImageColor(width, height, color.color())};
+    }
+
+    void draw(const Image& src, Rectangle srcRec, Rectangle dstRec, Color tint) {
+        ImageDraw(&_image, src.image(), srcRec, dstRec, tint.color());
+    }
+
     void resize(int width, int height) { ImageResize(&_image, width, height); }
     void resizeNearestNeighbor(int width, int height) { ImageResizeNN(&_image, width, height); }
     void crop(Rectangle rectangle) { ImageCrop(&_image, rectangle); }
     void flipVertical() { ImageFlipVertical(&_image); }
     void flipHorizontal() { ImageFlipHorizontal(&_image); }
     void rotate(int degrees) { ImageRotate(&_image, degrees); }
-    void tint(Color color) { ImageColorTint(&_image, color); }
+    void tint(Color color) { ImageColorTint(&_image, color.color()); }
     void invert() { ImageColorInvert(&_image); }
     void grayscale() { ImageColorGrayscale(&_image); }
     void contrast(float value) { ImageColorContrast(&_image, value); }
     void brightness(int value) { ImageColorBrightness(&_image, value); }
-    void replaceColor(Color color, Color replacement) { ImageColorReplace(&_image, color, replacement); }
+    void replaceColor(Color color, Color replacement) {
+        ImageColorReplace(&_image, color.color(), replacement.color());
+    }
 
     rmodels::Mesh genMeshHeightmap(rmath::Vector3 size) {
         return rmodels::Mesh{GenMeshHeightmap(_image, size.vector())};
