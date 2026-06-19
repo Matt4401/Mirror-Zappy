@@ -16,7 +16,6 @@ class TestConnectionUnit(unittest.TestCase):
     def test_successful_handshake(self, mock_socket_class):
         mock_socket = MagicMock()
         mock_socket_class.return_value = mock_socket
-
         mock_socket.recv.side_effect = [b"WELCOME\n", b"2\n", b"10 10\n"]
 
         ai = Connection("127.0.0.1", 4242, "TeamA")
@@ -25,6 +24,7 @@ class TestConnectionUnit(unittest.TestCase):
         mock_socket.send.assert_called_with(b"TeamA\n")
         self.assertEqual(ai.client_num, 2)
         self.assertEqual(ai.width, 10)
+        self.assertEqual(ai.height, 10)
 
     @patch("Connection.socket.socket")
     def test_handshake_bad_welcome(self, mock_socket_class):
@@ -54,6 +54,7 @@ class TestConnectionFunctional(unittest.TestCase):
         server.bind((self.host, self.port))
         server.listen(1)
         self.server_ready.set()
+
         conn, addr = server.accept()
         conn.sendall(b"WELCOME\n")
         conn.recv(1024)
@@ -63,17 +64,21 @@ class TestConnectionFunctional(unittest.TestCase):
         data = conn.recv(1024)
         if data == b"Forward\n":
             conn.sendall(b"ok\n")
+
         conn.close()
         server.close()
 
     def test_full_connection_and_command(self):
         ai = Connection(self.host, self.port, "MyTeam")
-        success = ai.send_command("Forward")
-        self.assertTrue(success)
+        ai.start()
+        cmd_id = ai.send_command("Forward")
+        self.assertGreater(cmd_id, 0)
+        time.sleep(0.2)
+        self.assertIn(cmd_id, ai.response_buffer)
+        response_obj = ai.response_buffer[cmd_id]
+        self.assertEqual(response_obj.command, "ok")
+        self.assertEqual(response_obj.id, cmd_id)
 
-        time.sleep(0.1)
-        response = ai.response_queue.get(timeout=1.0)
-        self.assertEqual(response, "ok")
         ai.disconnect()
 
 

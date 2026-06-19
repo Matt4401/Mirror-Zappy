@@ -29,11 +29,14 @@ loggers:
 
 
 @patch("yaml.safe_load")
-@patch("src.util.InitLogger.Path.open", new_callable=mock_open, read_data=FAKE_YAML_CONTENT)
+@patch(
+    "src.util.InitLogger.Path.open", new_callable=mock_open, read_data=FAKE_YAML_CONTENT
+)
 @patch("src.util.InitLogger.logging.config.dictConfig")
 @patch("src.util.InitLogger.Path.mkdir")
 def test_setup_logging(mock_mkdir, mock_dict_config, mock_open_file, mock_yaml_load):
     import yaml
+
     config_dict = yaml.unsafe_load(FAKE_YAML_CONTENT)
     mock_yaml_load.return_value = config_dict
     test_player_id = "42"
@@ -59,4 +62,6 @@ def test_setup_logging(mock_mkdir, mock_dict_config, mock_open_file, mock_yaml_l
 
     assert "server.log" in final_config["handlers"]["network_file"]["filename"]
     assert "commands.log" in final_config["handlers"]["command_file"]["filename"]
-    assert "player/server.log" not in final_config["handlers"]["network_file"]["filename"]
+    assert (
+        "player/server.log" not in final_config["handlers"]["network_file"]["filename"]
+    )

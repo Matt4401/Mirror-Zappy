@@ -2,12 +2,14 @@ import socket
 import sys
 import threading
 import time
+import re
+from typing import Dict
 from queue import Queue
 from collections import deque
 
 
 class CommandRequest:
-    def __init__(self, command, id, time_answer):
+    def __init__(self, command, id):
         self.command = command
         self.id = id
 
@@ -19,10 +21,9 @@ class CommandRequest:
 
 
 class CommandResponse:
-    def __init__(self, command, id, time_answered):
+    def __init__(self, command, id):
         self.command = command
         self.id = id
-        self.time_answered = time_answered
 
 
 class Connection:
@@ -33,27 +34,24 @@ class Connection:
         self.port = port
         self.team_name = team_name
         self.socket = None
-        self.running = True
-        self.check_response = True
-        self.sub_character = "\n"
-        self.response_queue = Queue()
+        self.running = False
+        self.message_delimiter = "\n"
+        self.command_queue = deque()
+        self.active_requests: Dict[int, CommandRequest] = {}
+        self.broadcast_queue = deque()
+        self.event_queue = deque()
+        self.command_responses = deque()
+        self.response_buffer: Dict[int, CommandResponse] = {}
         self.socket_lock = threading.Lock()
         self.command_lock = threading.Lock()
         self.response_lock = threading.Lock()
         self.broadcast_lock = threading.Lock()
+        self.event_lock = threading.Lock()
+        self.next_command_id = 0
         self.reader_thread = None
         self.event_thread = None
         self.connect(host, port)
         self.do_handshake()
-        self.start_reader()
-        self.start_receive_poll_cmd()
-        self.pending_commands: Dict[int, CommandRequest] = {}
-        self.command_queue = deque()
-        self.event_queue = deque()
-        self.run_receive_poll_cmd()
-        self.response_buffer: Dict[int, CommandRequest] = {}
-        self.failed_commands = deque()
-        self.cmd_counter = 0
 
     def connect(self, host, port):
         try:
@@ -75,7 +73,7 @@ class Connection:
                 sys.exit(84)
 
             with self.socket_lock:
-                self.socket.send((self.team_name + self.sub_character).encode())
+                self.socket.send((self.team_name + self.message_delimiter).encode())
             client_num = self.socket.recv(1024).decode().strip()
             if not client_num.isdigit() or int(client_num) <= 0:
                 print(f"Handshake failed: invalid client number '{client_num}'")
@@ -96,13 +94,18 @@ class Connection:
             print(f"Handshake error: {e}")
             sys.exit(84)
 
-    def start_reader(self):
+    def start(self):
+        self.running = True
         self.reader_thread = threading.Thread(
-            target=self._run_reader, daemon=False, name="Connection-Reader"
+            target=self.run_reader, daemon=False, name="Connection-Reader"
         )
         self.reader_thread.start()
+        self.event_thread = threading.Thread(
+            target=self.run_receive_poll_cmd, daemon=False, name="Connection-Receive"
+        )
+        self.event_thread.start()
 
-    def _run_reader(self):
+    def run_reader(self):
         buffer = ""
         try:
             self.socket.setblocking(False)
@@ -114,12 +117,12 @@ class Connection:
                         self.running = False
                         break
                     buffer += data
-                    while self.sub_character in buffer:
-                        line, buffer = buffer.split(self.sub_character, 1)
+                    while self.message_delimiter in buffer:
+                        line, buffer = buffer.split(self.message_delimiter, 1)
                         line = line.strip()
                         if not line:
                             continue
-                        msg_type, msg_data = self._parse_server_message(line)
+                        msg_type, msg_data = self.parse_server_message(line)
                         if msg_type == "broadcast":
                             with self.broadcast_lock:
                                 self.broadcast_queue.append(
@@ -159,19 +162,28 @@ class Connection:
             print(f"Fatal reader socket error: {e}")
             self.running = False
 
-    def send_command(self, cmd: str):
+    def send_command(self, cmd):
         if not self.running:
             print("Cannot send: connection is not active")
             return 84
         with self.command_lock:
-            self.cmd_counter += 1
-            cmd_id = self.cmd_counter
+            self.next_command_id += 1
+            cmd_id = self.next_command_id
             cmd_request = CommandRequest(
                 command=cmd,
                 id=cmd_id,
             )
             self.command_queue.append(cmd_request)
         return cmd_id
+
+    def send_raw_command(self, cmd):
+        try:
+            with self.socket_lock:
+                self.socket.send((cmd + self.message_delimiter).encode())
+            return True
+        except Exception as e:
+            print(f"Failed to send command: {e}")
+            return False
 
     def disconnect(self):
         self.running = False
@@ -208,13 +220,13 @@ class Connection:
     def send_cmd_buffer(self):
         with self.command_lock:
             while (
-                len(self.pending_commands) < self.MAX_PENDING_COMMANDS
+                len(self.active_requests) < self.MAX_PENDING_COMMANDS
                 and len(self.command_queue) > 0
             ):
                 cmd_request = self.command_queue.popleft()
-                if self._send_raw_command(cmd_request.command):
+                if self.send_raw_command(cmd_request.command):
                     cmd_request.sent_at = time.time()
-                    self.pending_commands[cmd_request.cmd_id] = cmd_request
+                    self.active_requests[cmd_request.id] = cmd_request
                 else:
                     self.command_queue.appendleft(cmd_request)
                     time.sleep(0.1)
@@ -223,33 +235,28 @@ class Connection:
     def run_receive_poll_cmd(self):
         while self.running:
             try:
-                self.check_response()
+                self.process_incoming_responses()
                 self.send_cmd_buffer()
                 time.sleep(0.05)
             except Exception as e:
                 print(f"Error in command worker: {e}")
+                time.sleep(0.05)
+        self.process_incoming_responses()
 
-    def start_receive_poll_cmd(self):
-        self.event_thread = threading.Thread(
-            target=self.run_receive_poll_cmd, daemon=False, name="Connection-Receive"
-        )
-        self.reader_thread.start()
-
-    def check_response(self):
-        while self.command_responses:
+    def process_incoming_responses(self):
+        while True:
             try:
                 response_str = self.command_responses.popleft()
-
                 with self.command_lock:
-                    if not self.pending_commands:
+                    if not self.active_requests:
                         print(
                             f"Unexpected response (no pending commands/..): {response_str}"
                         )
                         continue
-                    first_cmd_id = next(iter(self.pending_commands.keys()))
-                    cmd = self.pending_commands.pop(first_cmd_id)
+                    first_cmd_id = next(iter(self.active_requests.keys()))
+                    cmd = self.active_requests.pop(first_cmd_id)
                     cmd_response = CommandResponse(
-                        cmd_id=first_cmd_id, response=response_str
+                        command=response_str, id=first_cmd_id
                     )
                     with self.response_lock:
                         self.response_buffer[first_cmd_id] = cmd_response
