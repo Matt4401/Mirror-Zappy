@@ -42,7 +42,7 @@ class Shader {
 
     void setLocation(int locationIndex, int loc) const {
         std::span<int> const locs{_shader.locs, 32};
-        locs[locationIndex] = loc;
+        locs.subspan(locationIndex, 1).front() = loc;
     }
 
   protected:

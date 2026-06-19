@@ -48,12 +48,12 @@ class Model {
 
     void setMaterialShader(int materialIndex, const Shader& shader) const {
         std::span<::Material> const materials{_model.materials, static_cast<std::size_t>(_model.materialCount)};
-        materials[materialIndex].shader = shader.shader();
+        materials.subspan(materialIndex, 1).front().shader = shader.shader();
     }
     void setMaterialTexture(int materialIndex, int mapType, const rtextures::Texture2D& texture) const {
         std::span<::Material> const materials{_model.materials, static_cast<std::size_t>(_model.materialCount)};
-        std::span<::MaterialMap> const maps{materials[materialIndex].maps, 12};
-        maps[mapType].texture = texture.texture();
+        std::span<::MaterialMap> const maps{materials.subspan(materialIndex, 1).front().maps, 12};
+        maps.subspan(mapType, 1).front().texture = texture.texture();
     }
     void setTransform(const rcore::Matrix& transform) { _model.transform = transform.matrix(); }
 
