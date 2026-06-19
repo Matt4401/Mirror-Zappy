@@ -65,19 +65,22 @@ void Skybox3D::loadCubemap() {
 
     int const w = right.width();
     int const h = right.height();
+    float const wf = static_cast<float>(w);
+    float const hf = static_cast<float>(h);
     raylib::rtextures::Image cubemapImage = raylib::rtextures::Image::genColor(w, h * 6, raylib::Color{0, 0, 0, 0});
 
-    cubemapImage.draw(right, {0, 0, (float)w, (float)h}, {0, 0, (float)w, (float)h}, raylib::Color{255, 255, 255, 255});
-    cubemapImage.draw(left, {0, 0, (float)w, (float)h}, {0, (float)h, (float)w, (float)h},
-                      raylib::Color{255, 255, 255, 255});
-    cubemapImage.draw(top, {0, 0, (float)w, (float)h}, {0, (float)h * 2.0F, (float)w, (float)h},
-                      raylib::Color{255, 255, 255, 255});
-    cubemapImage.draw(bottom, {0, 0, (float)w, (float)h}, {0, (float)h * 3.0F, (float)w, (float)h},
-                      raylib::Color{255, 255, 255, 255});
-    cubemapImage.draw(front, {0, 0, (float)w, (float)h}, {0, (float)h * 4.0F, (float)w, (float)h},
-                      raylib::Color{255, 255, 255, 255});
-    cubemapImage.draw(back, {0, 0, (float)w, (float)h}, {0, (float)h * 5.0F, (float)w, (float)h},
-                      raylib::Color{255, 255, 255, 255});
+    cubemapImage.draw(right, {.x = 0.0F, .y = 0.0F, .width = wf, .height = hf},
+                      {.x = 0.0F, .y = 0.0F, .width = wf, .height = hf}, raylib::Color{255, 255, 255, 255});
+    cubemapImage.draw(left, {.x = 0.0F, .y = 0.0F, .width = wf, .height = hf},
+                      {.x = 0.0F, .y = hf, .width = wf, .height = hf}, raylib::Color{255, 255, 255, 255});
+    cubemapImage.draw(top, {.x = 0.0F, .y = 0.0F, .width = wf, .height = hf},
+                      {.x = 0.0F, .y = hf * 2.0F, .width = wf, .height = hf}, raylib::Color{255, 255, 255, 255});
+    cubemapImage.draw(bottom, {.x = 0.0F, .y = 0.0F, .width = wf, .height = hf},
+                      {.x = 0.0F, .y = hf * 3.0F, .width = wf, .height = hf}, raylib::Color{255, 255, 255, 255});
+    cubemapImage.draw(front, {.x = 0.0F, .y = 0.0F, .width = wf, .height = hf},
+                      {.x = 0.0F, .y = hf * 4.0F, .width = wf, .height = hf}, raylib::Color{255, 255, 255, 255});
+    cubemapImage.draw(back, {.x = 0.0F, .y = 0.0F, .width = wf, .height = hf},
+                      {.x = 0.0F, .y = hf * 5.0F, .width = wf, .height = hf}, raylib::Color{255, 255, 255, 255});
 
     _cubemap.emplace(raylib::rtextures::Texture2D::loadCubemap(cubemapImage, CUBEMAP_LAYOUT_LINE_VERTICAL));
     _model.setMaterialTexture(0, MATERIAL_MAP_CUBEMAP, *_cubemap);
