@@ -18,7 +18,7 @@
 
 namespace zappy::gui::ui::components {
 
-UIImage::UIImage(const std::string& path) {
+UIImage::UIImage(const std::string& path) : _path(path) {
     try {
         _texture = std::make_unique<raylib::rtextures::Texture2D>(path);
         if (_texture && _texture->valid()) {
@@ -62,6 +62,7 @@ void UIImage::setScale(float scale) {
 }
 
 void UIImage::setTexture(const std::string& path) {
+    _path = path;
     try {
         _texture = std::make_unique<raylib::rtextures::Texture2D>(path);
         if (_texture && _texture->valid()) {
