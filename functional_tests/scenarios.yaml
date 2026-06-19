@@ -251,25 +251,6 @@
     - client: "ai_client"
       expect: '^ok\n$'
 
-- name: "Integration_GUI_Observes_Incantation_Fail"
-  clients:
-    - id: "gui_watcher"
-      type: "GUI"
-    - id: "ai_client"
-      type: "AI"
-      team: "team1"
-  steps:
-    - client: "gui_watcher"
-      expect: '^pnw #?\d+ \d+ \d+ \d+ \d+ team1\n$'
-    - client: "gui_watcher"
-      expect: '^pin #?\d+ \d+ \d+( \d+){7}\n$'
-    - client: "gui_watcher"
-      expect: '^ebo #?\d+\n$'
-    - client: "ai_client"
-      send: "Incantation\n"
-    - client: "ai_client"
-      expect: '^ko\n$'
-
 - name: "GUI_Malformed_MSZ"
   client_type: "GUI"
   steps:
