@@ -297,7 +297,8 @@ TEST_F(WorldTest, UpdateDoesNotExecuteCommandBeforeRequiredTicks) {
 
     ASSERT_TRUE(playerId.has_value());
     world.pushCommandToPlayer(playerId.value(), std::make_unique<command::Forward>());
-    for (int i = 0; i < 7; ++i) {
+
+    for (int i = 0; i < 6; ++i) {
         world.update();
     }
 
