@@ -1,10 +1,10 @@
-from Constant import SURVIVAL_THRESHOLD
-# from ai.src.fsm.states.AttackState import AttackState
-# from ai.src.fsm.states.ReproduceState import ReproduceState
-from ai.src.fsm.states.EvolveState import EvolveState
-from ai.src.fsm.states.GatherState import GatherState
-from ai.src.fsm.states.SurviveState import SurviveState
-from AState import AState
+from .Constant import SURVIVAL_THRESHOLD
+# from .states.AttackState import AttackState
+# from .states.ReproduceState import ReproduceState
+from .states.EvolveState import EvolveState
+from .states.GatherState import GatherState
+from .states.SurviveState import SurviveState
+from .AState import AState
 
 
 class FiniteStateMachine:
