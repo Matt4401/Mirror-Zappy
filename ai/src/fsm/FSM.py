@@ -1,4 +1,4 @@
-from FsmConstant import SURVIVAL_THRESHOLD
+from Constant import SURVIVAL_THRESHOLD
 # from ai.src.fsm.states.AttackState import AttackState
 # from ai.src.fsm.states.ReproduceState import ReproduceState
 from ai.src.fsm.states.EvolveState import EvolveState
