@@ -21,6 +21,7 @@
 
 #include "Parser.hpp"
 #include "SessionManager.hpp"
+#include "command/Unknown.hpp"
 #include "exception/Exception.hpp"
 #include "game/World.hpp"
 #include "guiCommand/Mct.hpp"
@@ -182,7 +183,7 @@ void Core::handleInGameMessage(int clientId, std::string_view message) {
     if (command != nullptr) {
         _world->pushCommandToPlayer(playerId, std::move(command));
     } else {
-        _sessionManager->sendMessage(clientId, "ko\n");
+        _world->pushCommandToPlayer(playerId, std::make_unique<command::Unknown>());
     }
 }
 
