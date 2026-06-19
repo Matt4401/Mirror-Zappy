@@ -46,7 +46,14 @@ class UIGamePanel : public IUIComponent {
     void addHeaderComponent(const std::shared_ptr<IUIComponent>& component);
     void removeComponent(const std::shared_ptr<IUIComponent>& component);
 
-    void setConfigMode(bool configMode) { _isConfigMode = configMode; }
+    virtual void setConfigMode(bool configMode) {
+        _isConfigMode = configMode;
+        if (_isConfigMode) {
+            setVisible(true);
+            _isCollapsed = false;
+        }
+    }
+    [[nodiscard]] bool isConfigMode() const { return _isConfigMode; }
     void setCustomLayout(bool customLayout) { _customLayout = customLayout; }
     void updateChildrenLayout();
 
