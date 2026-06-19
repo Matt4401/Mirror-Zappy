@@ -322,8 +322,8 @@ void PlayerInspectorUI::updateHearts() {
     }
 
     for (int i = 0; i < MaxHearts; ++i) {
-        auto& baseH = _baseHearts[static_cast<size_t>(i)];
-        auto& overH = _overlapHearts[static_cast<size_t>(i)];
+        auto& baseH = _baseHearts.at(static_cast<size_t>(i));
+        auto& overH = _overlapHearts.at(static_cast<size_t>(i));
 
         if (baseH->getPath() != baseColorPath) {
             baseH->setTexture(baseColorPath);
@@ -348,7 +348,7 @@ void PlayerInspectorUI::updateHearts() {
     }
 
     for (int i = 0; i < MaxXp; ++i) {
-        auto& xp = _xpBar[static_cast<size_t>(i)];
+        auto& xp = _xpBar.at(static_cast<size_t>(i));
         if (i < _levelValue) {
             if (xp->getPath() != "assets/images/ui/full_xp.png") {
                 xp->setTexture("assets/images/ui/full_xp.png");
@@ -494,8 +494,8 @@ void PlayerInspectorUI::draw() {
     float const heartW = (HeartBaseSegments * HeartIconSpacing) + HeartBarExtraWidth;
     float heartX = startX + ((panelW - heartW) / 2.0F);
     for (int i = 0; i < MaxHearts; ++i) {
-        auto& baseH = _baseHearts[static_cast<size_t>(i)];
-        auto& overH = _overlapHearts[static_cast<size_t>(i)];
+        auto& baseH = _baseHearts.at(static_cast<size_t>(i));
+        auto& overH = _overlapHearts.at(static_cast<size_t>(i));
 
         baseH->setPosition(heartX, currentY);
         baseH->draw();

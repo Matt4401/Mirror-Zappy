@@ -14,6 +14,7 @@
 
 #include "events/EventDispatcher.hpp"
 #include "game/Player.hpp"
+#include "protocol/Commands.hpp"
 #include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
 #include "rmodels/Model.hpp"
