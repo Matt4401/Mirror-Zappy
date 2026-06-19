@@ -13,7 +13,6 @@
 
 #include "Map.hpp"
 #include "Skybox3D.hpp"
-#include "context/EventContext.hpp"
 #include "events/EventDispatcher.hpp"
 #include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
@@ -22,6 +21,7 @@
 #include "ui/UIManager.hpp"
 #include "ui/components/UIGamePanel.hpp"
 #include "ui/components/UIGridManager.hpp"
+#include "ui/components/UIText.hpp"
 #include "ui/menus/PauseMenu.hpp"
 
 namespace zappy::gui::graphics {
@@ -50,24 +50,24 @@ class Render {
     void update();
     void render2D();
     void render3D();
-    void handleEvents();
     void updateCursorState() const;
     void handleInput();
 
     raylib::rcore::Window _window{WINDOW_NAME.c_str()};
     std::shared_ptr<raylib::rcore::Camera> _camera{
         std::make_shared<raylib::rcore::Camera>(raylib::rmath::Vector3{10.0F, 10.0F, 10.0F})};
-    EventContext _eventContext{_camera};
     scene::Skybox3D _skybox;
     raylib::rcore::Event _event;
-    scene::Map _map{2, 2, _camera};  // TEMPORARY MAP SIZE, JUST FOR TESTING
     std::shared_ptr<events::EventDispatcher> _dispatcher;
+    scene::Map _map;
     events::EventDispatcher::EventToken _mszToken{0};
     events::EventDispatcher::EventToken _sgtToken{0};
     float _serverFrequency{100.0F};
+    events::EventDispatcher::EventToken _playerClickedToken{0};
     ui::UIManager _uiManager;
     std::shared_ptr<ui::menus::PauseMenu> _pauseMenu;
     std::shared_ptr<ui::components::UIGamePanel> _demoPanel;
+    std::shared_ptr<ui::components::UIText> _selectedPlayerText;
     std::shared_ptr<ui::components::UIGridManager> _gridManager;
     bool _isExiting{false};
     bool _uiMode{false};

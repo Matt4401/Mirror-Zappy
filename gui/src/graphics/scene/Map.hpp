@@ -13,10 +13,13 @@
 #include <vector>
 
 #include "Tile3D.hpp"
+#include "events/EventDispatcher.hpp"
 #include "game/GameModel.hpp"
+#include "game/Player.hpp"
 #include "game/Team.hpp"
 #include "game/components/IObject.hpp"
 #include "rcore/Camera.hpp"
+#include "rcore/Event.hpp"
 #include "rmodels/Model.hpp"
 
 namespace zappy::gui::graphics::scene {
@@ -34,7 +37,8 @@ class Map {
     static constexpr const char* MENDIANE_MODEL_RESOURCE = "assets/orange-ore/scene.gltf";
     static constexpr const char* FOOD_TEXTURE_RESOURCE = "assets/food.glb";
 
-    Map(int width, int height, std::shared_ptr<raylib::rcore::Camera> camera);
+    Map(int width, int height, std::shared_ptr<raylib::rcore::Camera> camera,
+        std::shared_ptr<events::EventDispatcher> dispatcher = nullptr);
     ~Map() = default;
     Map(const Map& other) = delete;
     Map& operator=(const Map& other) = delete;
@@ -44,15 +48,20 @@ class Map {
     void resize(int width, int height);
 
     void draw() const;
+    void handleEvent(const raylib::rcore::Event& event);
 
   protected:
   private:
     void drawItems(const Tile3D& tile) const;
+    void dispatchClickedPlayer(const game::Team& team, const game::Player& player) const;
 
     std::shared_ptr<raylib::rcore::Camera> _camera;
+    std::shared_ptr<events::EventDispatcher> _dispatcher;
     std::vector<Tile3D> _tiles;
     std::vector<game::Team> _teams;
     game::GameModel _gameModel;
+    int _width{0};
+    int _height{0};
     std::map<std::string, ItemFunc> _itemDrawFunctions;
     raylib::rmodels::Model _tileModel{TILE_MODEL_RESOURCE};
     raylib::rmodels::Model _deraumereModel{DERAUMERE_MODEL_RESOURCE};
@@ -62,5 +71,7 @@ class Map {
     raylib::rmodels::Model _thystameModel{THYSTAME_MODEL_RESOURCE};
     raylib::rmodels::Model _mendianeModel{MENDIANE_MODEL_RESOURCE};
     raylib::rmodels::Model _foodModel{FOOD_TEXTURE_RESOURCE};
+
+    static constexpr int MOUSE_LEFT_CLICK = 0;
 };
 }  // namespace zappy::gui::graphics::scene

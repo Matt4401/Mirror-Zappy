@@ -6,6 +6,7 @@ target_sources(zappy_gui_events PUBLIC
         FILE_SET HEADERS
         BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
         FILES EventDispatcher.hpp
+        GuiEvents.hpp
 )
 
 target_include_directories(zappy_gui_events PUBLIC

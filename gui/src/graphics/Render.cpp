@@ -10,10 +10,12 @@
 #include <raylib.h>
 
 #include <memory>
+#include <string>
 #include <utility>
 
 #include "AssetManager.hpp"
 #include "events/EventDispatcher.hpp"
+#include "events/GuiEvents.hpp"
 #include "protocol/Commands.hpp"
 #include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
@@ -26,12 +28,16 @@
 #include "ui/menus/PauseMenu.hpp"
 
 namespace zappy::gui::graphics {
-Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher) : _dispatcher(std::move(dispatcher)) {
+Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher)
+    : _dispatcher(std::move(dispatcher)), _map(2, 2, _camera, _dispatcher) {
     if (_dispatcher) {
         _mszToken = _dispatcher->subscribe<shared::protocol::server::Msz>(
             [this](const shared::protocol::server::Msz& cmd) { _map.resize(cmd.width, cmd.height); });
         _sgtToken = _dispatcher->subscribe<shared::protocol::server::Sgt>(
             [this](const shared::protocol::server::Sgt& cmd) { _serverFrequency = static_cast<float>(cmd.timeUnit); });
+        _playerClickedToken = _dispatcher->subscribe<events::PlayerClicked>([this](const events::PlayerClicked& event) {
+            _selectedPlayerText->setText("Player #" + std::to_string(event.playerId) + " - " + event.teamName);
+        });
     }
     _window.setTargetFPS(DefaultFps);
     raylib::rcore::Window::setExitKey(0);
@@ -45,14 +51,14 @@ Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher) : _dispatche
     _demoPanel = std::make_shared<ui::components::UIGamePanel>(0, 0, 0, 0, "Player Info");
     auto font = AssetManager::getInstance().getFont(DefaultFontName);
     auto btn = std::make_shared<ui::components::UIButton>(100.0F, 120.0F, 200.0F, 40.0F, "Click me!", font);
-    auto text = std::make_shared<ui::components::UIText>("Level 8 Player", font);
-    text->setPosition(100.0F, 200.0F);
+    _selectedPlayerText = std::make_shared<ui::components::UIText>("No player selected", font);
+    _selectedPlayerText->setPosition(40.0F, 200.0F);
     _demoPanel->addComponent(btn);
-    _demoPanel->addComponent(text);
+    _demoPanel->addComponent(_selectedPlayerText);
 
     auto _demoPanel2 = std::make_shared<ui::components::UIGamePanel>(0, 0, 0, 0, "Inventory");
     auto text2 = std::make_shared<ui::components::UIText>("Empty", font);
-    text2->setPosition(100.0F, 200.0F);
+    text2->setPosition(40.0F, 200.0F);
     _demoPanel2->addComponent(text2);
 
     _gridManager->addPanel(_demoPanel, 1, 1, 12, 18);
@@ -78,6 +84,9 @@ Render::~Render() {
             _dispatcher->unsubscribe<shared::protocol::server::Sgt>(_sgtToken);
         }
     }
+    if (_dispatcher && _playerClickedToken != 0) {
+        _dispatcher->unsubscribe<events::PlayerClicked>(_playerClickedToken);
+    }
     _pauseMenu.reset();
     _uiManager.clear();
     AssetManager::getInstance().clear();
@@ -87,9 +96,6 @@ bool Render::isRunning() const { return !_window.shouldClose() && !_isExiting; }
 
 void Render::renderFrame() {
     update();
-    if (_updateMode == UpdateMode::All) {
-        _event.handleEvent(_eventContext);
-    }
     _window.beginDrawing();
     render2D();
     render3D();
@@ -128,6 +134,7 @@ void Render::handleInput() {
 }
 
 void Render::update() {
+    _event.update();
     handleInput();
 
     _uiManager.update();
@@ -145,7 +152,10 @@ void Render::update() {
                                 _camera->target().y() + (raylib::rcore::Window::frameTime() * 2.0F),
                                 _camera->target().z()});
         }
-        _event.update();
+    }
+
+    if (_uiMode) {
+        _map.handleEvent(_event);
     }
 
     _skybox.update(raylib::rcore::Window::frameTime(), _serverFrequency);

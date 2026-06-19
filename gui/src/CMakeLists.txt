@@ -1,8 +1,7 @@
 add_subdirectory(game)
+add_subdirectory(events)
 add_subdirectory(graphics)
 add_subdirectory(network)
-add_subdirectory(context)
-add_subdirectory(events)
 add_subdirectory(ui)
 
 add_library(zappy_gui_core
@@ -22,7 +21,6 @@ target_link_libraries(zappy_gui_core PUBLIC
         zappy_gui_graphics
         network
         zappy_gui_network
-        zappy_gui_context
         zappy_gui_events
         zappy_gui_ui
 )
