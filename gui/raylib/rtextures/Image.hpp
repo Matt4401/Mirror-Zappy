@@ -55,12 +55,14 @@ class Image {
     void flipVertical() { ImageFlipVertical(&_image); }
     void flipHorizontal() { ImageFlipHorizontal(&_image); }
     void rotate(int degrees) { ImageRotate(&_image, degrees); }
-    void tint(Color color) { ImageColorTint(&_image, color); }
+    void tint(Color color) { ImageColorTint(&_image, color.color()); }
     void invert() { ImageColorInvert(&_image); }
     void grayscale() { ImageColorGrayscale(&_image); }
     void contrast(float value) { ImageColorContrast(&_image, value); }
     void brightness(int value) { ImageColorBrightness(&_image, value); }
-    void replaceColor(Color color, Color replacement) { ImageColorReplace(&_image, color, replacement); }
+    void replaceColor(Color color, Color replacement) {
+        ImageColorReplace(&_image, color.color(), replacement.color());
+    }
 
     rmodels::Mesh genMeshHeightmap(rmath::Vector3 size) {
         return rmodels::Mesh{GenMeshHeightmap(_image, size.vector())};

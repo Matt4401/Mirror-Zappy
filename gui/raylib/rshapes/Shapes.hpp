@@ -18,15 +18,17 @@ namespace zappy::gui::raylib::rshapes {
 class Shapes {
   public:
     static void drawRectangleRec(rmath::Rectangle rec, Color color) {
-        ::DrawRectangleRec({rec.x, rec.y, rec.width, rec.height}, color.color());
+        ::DrawRectangleRec({.x = rec.x, .y = rec.y, .width = rec.width, .height = rec.height}, color.color());
     }
 
     static void drawRectangleRounded(rmath::Rectangle rec, float roundness, int segments, Color color) {
-        ::DrawRectangleRounded({rec.x, rec.y, rec.width, rec.height}, roundness, segments, color.color());
+        ::DrawRectangleRounded({.x = rec.x, .y = rec.y, .width = rec.width, .height = rec.height}, roundness, segments,
+                               color.color());
     }
 
     static void drawRectangleLinesEx(rmath::Rectangle rec, float lineThick, Color color) {
-        ::DrawRectangleLinesEx({rec.x, rec.y, rec.width, rec.height}, lineThick, color.color());
+        ::DrawRectangleLinesEx({.x = rec.x, .y = rec.y, .width = rec.width, .height = rec.height}, lineThick,
+                               color.color());
     }
 
     static void drawLine(int startPosX, int startPosY, int endPosX, int endPosY, Color color) {
@@ -34,7 +36,8 @@ class Shapes {
     }
 
     static bool checkCollisionPointRec(rmath::Vector2 point, rmath::Rectangle rec) {
-        return ::CheckCollisionPointRec(point.vector(), {rec.x, rec.y, rec.width, rec.height});
+        return ::CheckCollisionPointRec(point.vector(),
+                                        {.x = rec.x, .y = rec.y, .width = rec.width, .height = rec.height});
     }
 };
 

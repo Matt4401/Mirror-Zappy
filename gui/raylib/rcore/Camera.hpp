@@ -22,7 +22,11 @@ class Camera {
     Camera() : _camera{} {}
     Camera(rmath::Vector3 position);
     Camera(rmath::Vector3 position, rmath::Vector3 target, rmath::Vector3 up, float fovy, int projection)
-        : _camera{position.vector(), target.vector(), up.vector(), fovy, projection} {}
+        : _camera{.position = position.vector(),
+                  .target = target.vector(),
+                  .up = up.vector(),
+                  .fovy = fovy,
+                  .projection = projection} {}
     ~Camera() = default;
     Camera(const Camera& other) = delete;
     Camera& operator=(const Camera& other) = delete;
