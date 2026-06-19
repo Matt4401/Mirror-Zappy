@@ -40,8 +40,10 @@ class RenderTexture2D {
     [[nodiscard]] ::Texture2D rawTexture() const { return _renderTexture.texture; }
 
     void draw(rmath::Vector2 position, Color tint) const {
-        Rectangle const source{0.0F, 0.0F, static_cast<float>(_renderTexture.texture.width),
-                               static_cast<float>(-_renderTexture.texture.height)};
+        Rectangle const source{.x = 0.0F,
+                               .y = 0.0F,
+                               .width = static_cast<float>(_renderTexture.texture.width),
+                               .height = static_cast<float>(-_renderTexture.texture.height)};
         ::DrawTextureRec(_renderTexture.texture, source, position.vector(), tint.color());
     }
 
