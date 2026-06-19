@@ -40,7 +40,7 @@ class Skybox3D {
 
   protected:
   private:
-    raylib::Color currentTint() const;
+    [[nodiscard]] raylib::Color currentTint() const;
 
     void loadCubemap();
 

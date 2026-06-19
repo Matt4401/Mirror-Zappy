@@ -65,8 +65,8 @@ void Skybox3D::loadCubemap() {
 
     int const w = right.width();
     int const h = right.height();
-    float const wf = static_cast<float>(w);
-    float const hf = static_cast<float>(h);
+    auto const wf = static_cast<float>(w);
+    auto const hf = static_cast<float>(h);
     raylib::rtextures::Image cubemapImage = raylib::rtextures::Image::genColor(w, h * 6, raylib::Color{0, 0, 0, 0});
 
     cubemapImage.draw(right, {.x = 0.0F, .y = 0.0F, .width = wf, .height = hf},
