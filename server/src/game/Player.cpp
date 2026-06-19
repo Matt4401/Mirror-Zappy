@@ -47,7 +47,7 @@ std::size_t Player::getItem(ItemType item) const { return _inventory.at(static_c
 void Player::setItem(ItemType item, const size_t amount) { _inventory.at(static_cast<size_t>(item)) = amount; }
 
 void Player::pushCommand(std::unique_ptr<command::ICommand> command) {
-    if (_commands.size() >= kMaxNbCmd) {
+    if (_commands.size() + (_currentCommand != nullptr ? 1 : 0) >= kMaxNbCmd) {
         throw exception::TooMuchCmd{"Player " + std::to_string(_id) + " has too much commands queued"};
     }
     _commands.push(std::move(command));
