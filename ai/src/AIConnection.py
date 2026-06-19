@@ -3,12 +3,19 @@ import sys
 import threading
 import time
 from queue import Queue
+from collections import deque
 
 
 class CommandRequest:
     def __init__(self, command, id, time_answer):
         self.command = command
         self.id = id
+
+    def get_id(self):
+        return self.id
+
+    def get_command(self):
+        return self.command
 
 
 class CommandResponse:
@@ -19,24 +26,31 @@ class CommandResponse:
 
 
 class AIConnection:
+    MAX_PENDING_COMMANDS = 10
+
     def __init__(self, host, port, team_name):
+
         self.host = host
         self.port = port
         self.team_name = team_name
         self.socket = None
         self.running = True
+        self.check_response = True
         self.sub_character = "\n"
         self.response_queue = Queue()
         self.socket_lock = threading.Lock()
-        self.send_lock = threading.Lock()
+        self.command_lock = threading.Lock()
+        self.response_lock = threading.Lock()
+        self.broadcast_lock = threading.Lock()
         self.reader_thread = None
         self._connect(host, port)
         self._do_handshake()
         self._start_reader()
-        self._star_receive_poll_cmd()
+        self._start_receive_poll_cmd()
 
         self.pending_commands = {}
         self.command_queue = deque()
+        self.event_queue = deque()
 
         self.response_buffer = {}
         self.failed_commands = deque()
@@ -89,7 +103,7 @@ class AIConnection:
         )
         self.reader_thread.start()
 
-    def _run_reader(self):
+    def _run_reader(self) -> None:
         buffer = ""
         try:
             self.socket.setblocking(False)
@@ -97,17 +111,55 @@ class AIConnection:
                 try:
                     data = self.socket.recv(1024).decode()
                     if not data:
+                        print("Server closed connection")
                         self.running = False
                         break
                     buffer += data
                     while self.sub_character in buffer:
                         line, buffer = buffer.split(self.sub_character, 1)
                         line = line.strip()
-                        if line:
-                            self.response_queue.put(line)
+                        if not line:
+                            continue
+                        msg_type, msg_data = self._parse_server_message(line)
+                        if msg_type == "broadcast":
+                            with self.broadcast_lock:
+                                self.broadcast_queue.append(
+                                    BroadcastMessage(
+                                        direction=msg_data["direction"],
+                                        message=msg_data["message"],
+                                    )
+                                )
+                            if self.on_broadcast_received:
+                                self.on_broadcast_received(
+                                    msg_data["direction"], msg_data["message"]
+                                )
+
+                        elif msg_type == "eject":
+                            with self.event_lock:
+                                self.event_queue.append(
+                                    ServerEvent(event_type="eject", data=msg_data)
+                                )
+                            if self.on_event_received:
+                                self.on_event_received("eject", msg_data)
+                        elif msg_type == "dead":
+                            with self.event_lock:
+                                self.event_queue.append(
+                                    ServerEvent(event_type="dead", data=msg_data)
+                                )
+                            if self.on_event_received:
+                                self.on_event_received("dead", msg_data)
+                        elif msg_type == "elevation":
+                            with self.event_lock:
+                                self.event_queue.append(
+                                    ServerEvent(event_type="elevation", data=msg_data)
+                                )
+                            if self.on_event_received:
+                                self.on_event_received("elevation", msg_data)
+                        else:
+                            with self.response_lock:
+                                self.command_responses.append(msg_data["content"])
                 except BlockingIOError:
                     time.sleep(0.01)
-                    continue
                 except Exception as e:
                     if self.running:
                         print(f"Error reading from socket: {e}")
@@ -117,18 +169,20 @@ class AIConnection:
             print(f"Fatal reader socket error: {e}")
             self.running = False
 
-    def send_command(self, cmd):
-        if not self.running or not self.socket:
-            print("Cannot send: connection not active")
-            return False
-        try:
-            with self.socket_lock:
-                self.socket.send((cmd + self.sub_character).encode())
-            return True
-        except Exception as e:
-            print(f"Error sending command '{cmd}': {e}")
-            self.running = False
-            return False
+    def send_command(self, cmd: str):
+        if not self.running:
+            print("Cannot send: connection is not active")
+            return 84
+        with self.command_lock:
+            self.cmd_counter += 1
+            cmd_id = self.cmd_counter
+            cmd_request = CommandRequest(
+                command=cmd,
+                cmd_id=cmd_id,
+            )
+            self.command_queue.append(cmd_request)
+        return cmd_id
+
 
     def disconnect(self):
         self.running = False
@@ -142,31 +196,97 @@ class AIConnection:
             if self.reader_thread.is_alive():
                 print("Warning: reader thread did not terminate gracefully")
 
+    def _parse_server_message(self, line: str):
+        line = line.strip()
+        if not line:
+            return None, None
+        if line.startswith("message "):
+            match = re.match(r"message\s+(\d+),\s*(.*)", line)
+            if match:
+                direction = int(match.group(1))
+                message = match.group(2)
+                return "broadcast", {"direction": direction, "message": message}
+        if line.startswith("eject:"):
+            match = re.match(r"eject:\s*(\d+)", line)
+            if match:
+                direction = int(match.group(1))
+                return "eject", {"direction": direction}
+        if line == "dead":
+            return "dead", {}
+        if "Elevation" in line or "Current level" in line:
+            return "elevation", {"message": line}
+        return "response", {"content": line}
+
     def check_response(self):
-        idx = 00
-        while idx < 10:
-            for recv_cmd in self.pending_commands:
-                # if recv_cmd.id == response.id()
-                    # idx++
-                # self.response_queue.put(recv_cmd)
+        while self.check_response:
+            try:
+                recv = self.response_queue.popleft()
 
-    def send_cmd_buffer(self):
-        for cmd in self.command_queue:
-            self.send_command(cmd)
+                with self.command_lock:
+                    if not self.pending_commands:
+                        continue
 
-    def run_receive_poll_cmd(self):
-        while self.running:
-            if self.command_queue.size() == 10:
-                self.send_cmd_buffer()
-                # check_answer()
-                # send_to_player()
+                for recv_cmd in self.pending_commands:
+                    if recv.get_id() == self.pending_commands.id():
+                        idx += 1
+            except IndexError:
+                continue
+            except Exception as e:
+                print(f"Error processing response: {e}")
 
+    def _send_cmd_buffer(self):
+        with self.command_lock:
+            while (
+                len(self.pending_commands) < self.MAX_PENDING_COMMANDS
+                and len(self.command_queue) > 0
+            ):
+                cmd_request = self.command_queue.popleft()
+
+                if self._send_raw_command(cmd_request.command):
+                    cmd_request.sent_at = time.time()
+                    self.pending_commands[cmd_request.cmd_id] = cmd_request
+                else:
+                    self.command_queue.appendleft(cmd_request)
+                    time.sleep(0.1)
+                    break
 
     def _start_receive_poll_cmd(self):
         self.reader_thread = threading.Thread(
-            target=self.run_receive_poll_cmd(), daemon=False, name="AIConnection-Receive"
+            target=self.run_receive_poll_cmd, daemon=False, name="AIConnection-Receive"
         )
         self.reader_thread.start()
+
+    def get_broadcasts(self):
+        with self.broadcast_lock:
+            broadcasts = list(self.broadcast_queue)
+            self.broadcast_queue.clear()
+            return broadcasts
+
+    def get_next_broadcast(self):
+        with self.broadcast_lock:
+            if self.broadcast_queue:
+                return self.broadcast_queue.popleft()
+            return None
+
+    def broadcast_count(self):
+        with self.broadcast_lock:
+            return len(self.broadcast_queue)
+
+    def get_events(self):
+        with self.event_lock:
+            events = list(self.event_queue)
+            self.event_queue.clear()
+            return events
+
+    def get_next_event(self):
+        with self.event_lock:
+            if self.event_queue:
+                return self.event_queue.popleft()
+            return None
+
+    def event_count(self):
+        with self.event_lock:
+            return len(self.event_queue)
 
     def __del__(self):
         try:
