@@ -11,6 +11,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <utility>
 
 #include "Color.hpp"
 #include "rcore/Event.hpp"
@@ -62,12 +63,16 @@ void UIImage::setScale(float scale) {
 }
 
 void UIImage::setTexture(const std::string& path) {
-    _path = path;
     try {
-        _texture = std::make_unique<raylib::rtextures::Texture2D>(path);
-        if (_texture && _texture->valid()) {
-            _size = {static_cast<float>(_texture->width()), static_cast<float>(_texture->height())};
-            _scale = 1.0F;
+        auto newTexture = std::make_unique<raylib::rtextures::Texture2D>(path);
+        if (!newTexture || !newTexture->valid()) {
+            std::cerr << "[UIImage] Error loading texture: Invalid texture" << std::endl;
+            return;
+        }
+        _texture = std::move(newTexture);
+        _size = {static_cast<float>(_texture->width()), static_cast<float>(_texture->height())};
+        if (_texture->width() > 0) {
+            _scale = _size.x() / static_cast<float>(_texture->width());
         }
     } catch (const std::exception& e) {
         std::cerr << "[UIImage] Error loading texture: " << e.what() << std::endl;
