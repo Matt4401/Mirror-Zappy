@@ -26,16 +26,17 @@ class PlayerLogger:
 
     @staticmethod
     def setup_logging(player_id: str):
-        RACINE_PROJECT = Path(__file__).resolve().parent
-        DOSSIER_LOGS = RACINE_PROJECT / "logs"
-        DOSSIER_LOGS.mkdir(parents=True, exist_ok=True)
+        PATH_UTIL = Path(__file__).resolve().parent
+        ROOT_PROJECT = PATH_UTIL.parent.parent.parent
+        FOLDER_LOGS = ROOT_PROJECT / "logs"
+        FOLDER_LOGS.mkdir(parents=True, exist_ok=True)
 
-        with open(RACINE_PROJECT / "logger_config.yaml", "r") as f:
+        with open(PATH_UTIL / "logger_config.yaml", "r") as f:
             config = yaml.safe_load(f)
 
-        PlayerLogger.setup_player_logging(player_id, config, DOSSIER_LOGS)
+        PlayerLogger.setup_player_logging(player_id, config, FOLDER_LOGS)
 
-        config['handlers']['network_file']['filename'] = str(DOSSIER_LOGS / "server.log")
-        config['handlers']['command_file']['filename'] = str(DOSSIER_LOGS / "commands.log")
+        config['handlers']['network_file']['filename'] = str(FOLDER_LOGS / "server.log")
+        config['handlers']['command_file']['filename'] = str(FOLDER_LOGS / "commands.log")
 
         logging.config.dictConfig(config)

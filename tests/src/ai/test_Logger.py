@@ -29,7 +29,7 @@ loggers:
 
 
 @patch("yaml.safe_load")
-@patch("src.util.InitLogger.open", new_callable=mock_open, read_data=FAKE_YAML_CONTENT)
+@patch("src.util.InitLogger.Path.open", new_callable=mock_open, read_data=FAKE_YAML_CONTENT)
 @patch("src.util.InitLogger.logging.config.dictConfig")
 @patch("src.util.InitLogger.Path.mkdir")
 def test_setup_logging(mock_mkdir, mock_dict_config, mock_open_file, mock_yaml_load):
@@ -39,12 +39,12 @@ def test_setup_logging(mock_mkdir, mock_dict_config, mock_open_file, mock_yaml_l
     test_player_id = "42"
 
     PlayerLogger.setup_logging(test_player_id)
+
     assert mock_mkdir.call_count == 2
     mock_mkdir.assert_called_with(parents=True, exist_ok=True)
 
     mock_dict_config.assert_called_once()
     final_config = mock_dict_config.call_args[0][0]
-
     assert "player_file_template" not in final_config["handlers"]
 
     expected_handler_name = f"player_{test_player_id}_file"
