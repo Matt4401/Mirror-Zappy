@@ -4,8 +4,19 @@ import threading
 import time
 import re
 from typing import Dict
-from queue import Queue
 from collections import deque
+
+
+class BroadcastMessage:
+    def __init__(self, direction, message):
+        self.direction = direction
+        self.message = message
+
+
+class ServerEvent:
+    def __init__(self, type, message):
+        self.event_type = type
+        self.data = message
 
 
 class CommandRequest:
@@ -254,7 +265,6 @@ class Connection:
                         )
                         continue
                     first_cmd_id = next(iter(self.active_requests.keys()))
-                    cmd = self.active_requests.pop(first_cmd_id)
                     cmd_response = CommandResponse(
                         command=response_str, id=first_cmd_id
                     )
