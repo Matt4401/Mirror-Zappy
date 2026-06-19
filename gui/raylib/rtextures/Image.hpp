@@ -49,6 +49,14 @@ class Image {
     [[nodiscard]] Texture2D toTexture() const { return Texture2D{LoadTextureFromImage(_image)}; }
     [[nodiscard]] bool exportTo(const std::string& path) const { return ExportImage(_image, path.c_str()); }
 
+    static Image genColor(int width, int height, Color color) {
+        return Image{GenImageColor(width, height, color.color())};
+    }
+
+    void draw(const Image& src, Rectangle srcRec, Rectangle dstRec, Color tint) {
+        ImageDraw(&_image, src.image(), srcRec, dstRec, tint.color());
+    }
+
     void resize(int width, int height) { ImageResize(&_image, width, height); }
     void resizeNearestNeighbor(int width, int height) { ImageResizeNN(&_image, width, height); }
     void crop(Rectangle rectangle) { ImageCrop(&_image, rectangle); }

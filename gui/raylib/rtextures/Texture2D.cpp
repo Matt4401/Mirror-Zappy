@@ -10,6 +10,7 @@
 #include <raylib.h>
 
 #include "Color.hpp"
+#include "Image.hpp"
 
 namespace zappy::gui::raylib::rtextures {
 void Texture2D::drawCoverPanned(int width, int height, float horizontalPan, zappy::gui::raylib::Color tint) const {
@@ -37,5 +38,9 @@ void Texture2D::reset() {
         UnloadTexture(_texture);
     }
     _texture = {};
+}
+
+Texture2D Texture2D::loadCubemap(const Image& image, int layoutType) {
+    return Texture2D{LoadTextureCubemap(image.image(), layoutType)};
 }
 }  // namespace zappy::gui::raylib::rtextures

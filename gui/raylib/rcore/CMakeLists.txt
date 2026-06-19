@@ -10,6 +10,7 @@ target_sources(zappy_gui_raylib_rcore PUBLIC
                 Camera.hpp
                 Event.hpp
                 Matrix.hpp
+                Rlgl.hpp
 )
 target_include_directories(zappy_gui_raylib_rcore PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/..

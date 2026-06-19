@@ -15,6 +15,8 @@
 #include "rmath/Vector2.hpp"
 
 namespace zappy::gui::raylib::rtextures {
+class Image;
+
 class Texture2D {
   public:
     explicit Texture2D(const std::string& path) : _texture{LoadTexture(path.c_str())} {}
@@ -42,6 +44,8 @@ class Texture2D {
     [[nodiscard]] int height() const { return _texture.height; }
     [[nodiscard]] ::Texture2D texture() const { return _texture; }
     [[nodiscard]] unsigned int id() const { return _texture.id; }
+
+    static Texture2D loadCubemap(const Image& image, int layoutType);
 
     void draw(rmath::Vector2 position, Color tint) const { DrawTextureV(_texture, position.vector(), tint.color()); }
     void draw(rmath::Vector2 position, float rotation, float scale, Color tint) const {
