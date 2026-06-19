@@ -20,7 +20,7 @@ def setup_logging(player_id: str, team_name: str):
     DOSSIER_LOGS = RACINE_PROJECT / "logs"
     DOSSIER_LOGS.mkdir(parents=True, exist_ok=True)
 
-    with open(RACINE_PROJECT / "config.yml", "r") as f:
+    with open(RACINE_PROJECT / "logger_config.yaml", "r") as f:
         config = yaml.safe_load(f)
 
     setup_player_logging(player_id, team_name, config, DOSSIER_LOGS)
