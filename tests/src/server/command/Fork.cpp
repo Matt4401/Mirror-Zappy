@@ -9,6 +9,9 @@
 
 #include <gtest/gtest.h>
 
+#include <sstream>
+#include <string>
+
 #include "command/ICommand.hpp"
 #include "game/Player.hpp"
 #include "game/World.hpp"
@@ -154,6 +157,46 @@ TEST(ForkTest, CheckExecuteGeneratesPfkEvent) {
     }
 
     ASSERT_TRUE(foundPfkEvent);
+}
+
+TEST(ForkTest, CheckExecuteGeneratesPfkEventWithCorrectPlayerId) {
+    const auto config = parser::ServerConfig{
+        .port = 80,
+        .width = 16,
+        .height = 16,
+        .teamNames = {"test"},
+        .clientLimit = 1,
+        .freq = 100,
+    };
+    game::World world{config};
+    const auto playerId = world.spawnPlayer("test");
+    ASSERT_TRUE(playerId.has_value());
+    auto& player = *world.playerList().at(playerId.value());
+
+    auto events = world.getAndClearGuiEvents();
+
+    command::Fork forkCmd{};
+    forkCmd.start(world, player);
+    forkCmd.execute(world, player);
+
+    events = world.getAndClearGuiEvents();
+    bool foundPfkEventWithCorrectId = false;
+
+    for (const auto& event : events) {
+        if (event.starts_with("pfk ")) {
+            std::istringstream iss(event);
+            std::string prefix;
+            int eventPlayerId;
+            iss >> prefix >> eventPlayerId;
+
+            if (eventPlayerId == static_cast<int>(player.id())) {
+                foundPfkEventWithCorrectId = true;
+                break;
+            }
+        }
+    }
+
+    ASSERT_TRUE(foundPfkEventWithCorrectId);
 }
 
 // NOLINTEND
