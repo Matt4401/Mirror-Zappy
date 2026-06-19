@@ -12,7 +12,12 @@
 #include <string>
 #include <string_view>
 #include <variant>
+#include <vector>
 
+#include "Eject.hpp"
+#include "Inventory.hpp"
+#include "Set.hpp"
+#include "Take.hpp"
 #include "command/Forward.hpp"
 #include "command/ICommand.hpp"
 #include "command/Left.hpp"
@@ -31,6 +36,25 @@ CommandFactory::CommandFactory() {
     _creators.emplace("Forward", [](std::string_view) { return std::make_unique<Forward>(); });
     _creators.emplace("Left", [](std::string_view) { return std::make_unique<Left>(); });
     _creators.emplace("Right", [](std::string_view) { return std::make_unique<Right>(); });
+    _creators.emplace("Eject", [](std::string_view) { return std::make_unique<Eject>(); });
+    _creators.emplace("Inventory", [](std::string_view) { return std::make_unique<Inventory>(); });
+
+    _creators.emplace("Take", [](const std::string_view rawCommand) -> std::unique_ptr<ICommand> {
+        const auto& parseCmd = extractAllCmd(rawCommand);
+
+        if (parseCmd.size() == 2) {
+            return std::make_unique<Take>(std::string(parseCmd.at(1)));
+        }
+        return nullptr;
+    });
+    _creators.emplace("Set", [](const std::string_view rawCommand) -> std::unique_ptr<ICommand> {
+        const auto& parseCmd = extractAllCmd(rawCommand);
+
+        if (parseCmd.size() == 2) {
+            return std::make_unique<Set>(std::string(parseCmd.at(1)));
+        }
+        return nullptr;
+    });
 
     _guiCreators.emplace("msz", [](std::string_view) { return std::make_unique<guiCommand::Msz>(); });
     _guiCreators.emplace("sgt", [](std::string_view) { return std::make_unique<guiCommand::Sgt>(); });
@@ -65,12 +89,23 @@ std::unique_ptr<guiCommand::IGuiCommand> CommandFactory::createGuiCommand(std::s
     return it->second(rawCommand);
 }
 
-std::string CommandFactory::extractFirstWord(std::string_view rawCommand) {
+std::string CommandFactory::extractFirstWord(const std::string_view rawCommand) {
     std::istringstream stream(std::string{rawCommand});
     std::string word;
 
     stream >> word;
     return word;
+}
+
+std::vector<std::string> CommandFactory::extractAllCmd(const std::string_view rawCommand) {
+    std::istringstream stream(std::string{rawCommand});
+    std::string word;
+    std::vector<std::string> result;
+
+    while (stream >> word) {
+        result.push_back(word);
+    }
+    return result;
 }
 
 }  // namespace zappy::server::command
