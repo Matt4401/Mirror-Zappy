@@ -1,11 +1,10 @@
 import copy
+import yaml
 import logging.config
 from pathlib import Path
 
-import yaml
 
-
-def setup_player_logging(player_id: int, team_name: str, config, DOSSIER_LOGS):
+def setup_player_logging(player_id: str, team_name: str, config, DOSSIER_LOGS):
     name_handler = f"player_{team_name}_{player_id}_file"
     name_logger = f"player_{team_name}_{player_id}"
     path_file_log = DOSSIER_LOGS / f"player_{player_id}.log"
@@ -16,7 +15,7 @@ def setup_player_logging(player_id: int, team_name: str, config, DOSSIER_LOGS):
     config['loggers'][name_logger]['handlers'].append(name_handler)
 
 
-def setup_logging(player_id: int, team_name: str):
+def setup_logging(player_id: str, team_name: str):
     RACINE_PROJECT = Path(__file__).resolve().parent
     DOSSIER_LOGS = RACINE_PROJECT / "logs"
     DOSSIER_LOGS.mkdir(parents=True, exist_ok=True)
