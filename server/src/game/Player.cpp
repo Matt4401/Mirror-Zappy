@@ -48,7 +48,7 @@ void Player::setItem(ItemType item, const size_t amount) { _inventory.at(static_
 
 void Player::pushCommand(std::unique_ptr<command::ICommand> command) {
     if (_commands.size() >= kMaxNbCmd) {
-        throw exception::TOMUCHCMD_ERROR("Player {} has too much commands queued", _id);
+        throw exception::TooMuchCmd{"Player " + std::to_string(_id) + " has too much commands queued"};
     }
     _commands.push(std::move(command));
 }

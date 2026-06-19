@@ -1,19 +1,16 @@
 /*
 ** EPITECH PROJECT, 2026
-** zappy
+** Mirror-Zappy
 ** File description:
-** ParsingError
+** ParserError
 */
 
 #pragma once
-
 #include "Exception.hpp"
 
 namespace zappy::shared::exception {
-
-class ParsingError : public Exception {
+class ParserError : public Exception {
   public:
     using Exception::Exception;
 };
-
 }  // namespace zappy::shared::exception
