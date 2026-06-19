@@ -12,10 +12,27 @@ handlers:
     formatter: simple
     stream: ext://sys.stdout
   network_file:
-    class: logging.FileHandler
+    class: logging.handlers.RotatingFileHandler
     level: INFO
     formatter: detailed
     filename: ~
+    maxBytes: 50000
+    backupCount: 3
+  command_file:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: detailed
+    filename: ~
+    maxBytes: 50000
+    backupCount: 3
+
+  player_file_template:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: detailed
+    filename: ~
+    maxBytes: 100000
+    backupCount: 5
 
   other_file:
     class: ~
@@ -25,12 +42,21 @@ handlers:
 
 loggers:
   simpleLogger:
-    level: INFO
+    level: WARNING
     handlers: [ file, console ]
     propagate: no
   network_logger:
     level: INFO
     handlers: [ console, network_file ]
+    propagate: no
+  command_logger:
+    level: INFO
+    handlers: [ console, command_file ]
+    propagate: no
+
+  player_template:
+    level: INFO
+    handlers: [ console ]
     propagate: no
 
 root:
