@@ -46,9 +46,6 @@ class Model {
     [[nodiscard]] ::Model model() const { return _model; }
     [[nodiscard]] ::Model& model() { return _model; }
 
-    void setMaterialTexture(int materialIndex, int mapType, const rtextures::Texture2D& texture) const {
-        ::SetMaterialTexture(&_model.materials[materialIndex], mapType, texture.texture());  // NOLINT
-    }
     void setMaterialShader(int materialIndex, const Shader& shader) const {
         std::span<::Material> const materials{_model.materials, static_cast<std::size_t>(_model.materialCount)};
         materials.subspan(materialIndex, 1).front().shader = shader.shader();
