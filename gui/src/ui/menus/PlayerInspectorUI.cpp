@@ -323,15 +323,21 @@ void PlayerInspectorUI::updateHearts() {
         auto& baseH = _baseHearts[static_cast<size_t>(i)];
         auto& overH = _overlapHearts[static_cast<size_t>(i)];
 
-        baseH->setTexture(baseColorPath);
+        if (baseH->getPath() != baseColorPath) {
+            baseH->setTexture(baseColorPath);
+        }
         baseH->setSize(HeartIconSize, HeartIconSize);
 
         if (i < remainder) {
-            overH->setTexture(overlapColorPath);
+            if (overH->getPath() != overlapColorPath) {
+                overH->setTexture(overlapColorPath);
+            }
             overH->setSize(HeartIconSize, HeartIconSize);
             overH->setVisible(true);
         } else if (i == remainder && hasHalfHeart) {
-            overH->setTexture(halfOverlapColorPath);
+            if (overH->getPath() != halfOverlapColorPath) {
+                overH->setTexture(halfOverlapColorPath);
+            }
             overH->setSize(HeartIconSize, HeartIconSize);
             overH->setVisible(true);
         } else {
@@ -342,9 +348,13 @@ void PlayerInspectorUI::updateHearts() {
     for (int i = 0; i < MaxXp; ++i) {
         auto& xp = _xpBar[static_cast<size_t>(i)];
         if (i < _levelValue) {
-            xp->setTexture("assets/images/ui/full_xp.png");
+            if (xp->getPath() != "assets/images/ui/full_xp.png") {
+                xp->setTexture("assets/images/ui/full_xp.png");
+            }
         } else {
-            xp->setTexture("assets/images/ui/empty_xp.png");
+            if (xp->getPath() != "assets/images/ui/empty_xp.png") {
+                xp->setTexture("assets/images/ui/empty_xp.png");
+            }
         }
         xp->setSize(XpIconSize, XpIconSize);
     }
