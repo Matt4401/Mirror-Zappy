@@ -151,7 +151,7 @@ cmake --build build --target tests_functional
   </tr>
 </table>
 
-------
+---
 
 ## Contributing
 

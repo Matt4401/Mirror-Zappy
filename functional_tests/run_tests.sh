@@ -8,12 +8,14 @@ NC='\033[0m'
 
 echo -e "${BLUE}[Tester] Checking Python environment...${NC}"
 
+set -euo pipefail
 if [ ! -d ".venv" ]; then
     echo -e "${BLUE}[Tester] Creating virtual environment (.venv)...${NC}"
     python3 -m venv .venv
-    ./.venv/bin/python -m pip install -q --upgrade pip
-    ./.venv/bin/python -m pip install -q -r requirements.txt
 fi
+
+./.venv/bin/python -m pip install -q --upgrade pip
+./.venv/bin/python -m pip install -q -r requirements.txt
 
 set +e
 

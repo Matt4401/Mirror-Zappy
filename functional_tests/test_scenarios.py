@@ -5,7 +5,7 @@ import time
 import socket
 from conftest import ZappyClient
 
-with open("scenarios.yaml", "r") as f:
+with Path(__file__).with_name("scenarios.yaml").open("r", encoding="utf-8") as f:
     SCENARIOS = yaml.safe_load(f)
 
 def flush_gui_handshake(client: ZappyClient):

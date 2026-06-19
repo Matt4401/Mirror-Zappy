@@ -31,7 +31,7 @@
 - name: "GUI_Tile_Content_BCT_Out_Of_Bounds"
   client_type: "GUI"
   steps:
-    - send: "bct 99999999\n"
+    - send: "bct 9999 9999\n"
     - expect: '^sbp\n$'
 
 - name: "GUI_Time_Get_SGT"

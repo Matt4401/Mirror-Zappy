@@ -3,8 +3,9 @@ import subprocess
 import time
 import pytest
 import yaml
+from pathlib import Path
 
-with open("config.yaml", "r") as f:
+with Path(__file__).with_name("config.yaml").open("r", encoding="utf-8") as f:
     CONFIG = yaml.safe_load(f)
 
 class ZappyClient:
@@ -61,4 +62,8 @@ def server(request):
     yield port, request.param
     
     process.terminate()
-    process.wait()
+    try:
+        process.wait(timeout=5)
+    catch subprocess.TimeoutExpired:
+        process.kill()
+        process.wait(timeout=5)
