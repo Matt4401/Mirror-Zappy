@@ -122,10 +122,11 @@ std::optional<size_t> World::spawnPlayer(const std::string_view teamName) {
     return (position.y * _widthMap) + position.x;
 }
 
-void World::pushCommandToPlayer(const std::size_t playerId, std::unique_ptr<command::ICommand> command) const {
+void World::pushCommandToPlayer(const std::size_t playerId, std::unique_ptr<command::ICommand> command) {
     const auto& player = _playerList.at(playerId);
 
     player->pushCommand(std::move(command));
+    player->tryStartNextCommand(*this);
 }
 
 void World::removePlayerFromTeam(const std::size_t id) const {
@@ -304,6 +305,9 @@ void World::layEgg(const Player& player) {
     const auto tileIndex = getTileIndex(pos);
     const std::string teamName = getPlayerTeam(player.id());
 
+    if (teamName.empty()) {
+        return;
+    }
     _vecEggs[_newId] = Egg{.id = _newId, .position = pos, .teamName = teamName};
     _tiles.at(tileIndex).eggs.emplace_back(_newId);
     addGuiEvent(

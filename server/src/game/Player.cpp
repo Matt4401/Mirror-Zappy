@@ -59,27 +59,24 @@ void Player::update(World& world) {
     if (_cmdTick > 0) {
         _cmdTick--;
     }
-    while (_cmdTick == 0) {
-        if (_currentCommand != nullptr) {
-            _currentCommand->execute(world, *this);
-            _currentCommand = nullptr;
-        }
-        if (_commands.empty()) {
-            break;
-        }
-        _currentCommand = std::move(_commands.front());
-        _commands.pop();
-
-        if (!_currentCommand->start(world, *this)) {
-            _buffersResponses.emplace_back("ko\n");
-            _currentCommand = nullptr;
-            continue;
-        }
-        _cmdTick = _currentCommand->requiredTicks();
-        if (_cmdTick > 0) {
-            break;
-        }
+    if (_cmdTick == 0 && _currentCommand != nullptr) {
+        _currentCommand->execute(world, *this);
+        _currentCommand = nullptr;
     }
+    tryStartNextCommand(world);
+}
+
+void Player::tryStartNextCommand(World& world) {
+    if (_cmdTick > 0 || _currentCommand != nullptr || _commands.empty()) {
+        return;
+    }
+    _currentCommand = std::move(_commands.front());
+    _commands.pop();
+    while (!_currentCommand->start(world, *this)) {
+        _buffersResponses.emplace_back("ko\n");
+        _currentCommand = nullptr;
+    }
+    _cmdTick = _currentCommand->requiredTicks();
 }
 
 void Player::moveForward(const Position& limit) {

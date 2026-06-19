@@ -64,7 +64,7 @@ class World {
     void update();
     [[nodiscard]] std::unordered_map<std::size_t, std::vector<std::string>> getAllResponsesBuffer() const;
     [[nodiscard]] std::vector<std::string> getAndClearGuiEvents();
-    void pushCommandToPlayer(std::size_t playerId, std::unique_ptr<command::ICommand> command) const;
+    void pushCommandToPlayer(std::size_t playerId, std::unique_ptr<command::ICommand> command);
     void removePlayerFromTeam(std::size_t id) const;
     void updatePositionOnMap(std::size_t id, const Position& oldPosition, const Position& newPosition);
 
