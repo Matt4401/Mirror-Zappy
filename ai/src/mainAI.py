@@ -1,7 +1,9 @@
 import sys
 import argparse
-from src.AITeamClass import AITeam
-from src.TrantorianClass import Trantorian
+from AITeamClass import AITeam
+from TrantorianClass import Trantorian
+import logging
+from util.InitLogger import setup_logging
 
 
 def mainAI():
