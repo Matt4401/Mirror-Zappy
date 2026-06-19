@@ -30,6 +30,8 @@ Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher) : _dispatche
     if (_dispatcher) {
         _mszToken = _dispatcher->subscribe<shared::protocol::server::Msz>(
             [this](const shared::protocol::server::Msz& cmd) { _map.resize(cmd.width, cmd.height); });
+        _sgtToken = _dispatcher->subscribe<shared::protocol::server::Sgt>(
+            [this](const shared::protocol::server::Sgt& cmd) { _serverFrequency = static_cast<float>(cmd.timeUnit); });
     }
     _window.setTargetFPS(DefaultFps);
     raylib::rcore::Window::setExitKey(0);
@@ -68,8 +70,13 @@ Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher) : _dispatche
 }
 
 Render::~Render() {
-    if (_dispatcher && _mszToken != 0) {
-        _dispatcher->unsubscribe<shared::protocol::server::Msz>(_mszToken);
+    if (_dispatcher) {
+        if (_mszToken != 0) {
+            _dispatcher->unsubscribe<shared::protocol::server::Msz>(_mszToken);
+        }
+        if (_sgtToken != 0) {
+            _dispatcher->unsubscribe<shared::protocol::server::Sgt>(_sgtToken);
+        }
     }
     _pauseMenu.reset();
     _uiManager.clear();
@@ -141,13 +148,14 @@ void Render::update() {
         _event.update();
     }
 
-    _skyBackground.update(raylib::rcore::Window::frameTime());
+    _skybox.update(raylib::rcore::Window::frameTime(), _serverFrequency);
 }
 
-void Render::render2D() { _skyBackground.draw(_window); }
+void Render::render2D() {}
 
 void Render::render3D() {
     _camera->beginMode3D();
+    _skybox.draw();
     _map.draw();
     raylib::rcore::Camera::endMode3D();
 }

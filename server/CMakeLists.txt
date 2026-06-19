@@ -36,6 +36,8 @@ add_library(zappy_server_objects OBJECT
         src/command/Set.hpp
         src/command/Take.cpp
         src/command/Take.hpp
+        src/command/Inventory.cpp
+        src/command/Inventory.hpp
 )
 target_include_directories(zappy_server_objects PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src
