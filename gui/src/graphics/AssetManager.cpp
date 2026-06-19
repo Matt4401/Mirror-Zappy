@@ -11,8 +11,8 @@
 #include <memory>
 #include <string>
 
-#include "Texture2D.hpp"
 #include "rtext/Font.hpp"
+#include "rtextures/Texture2D.hpp"
 
 namespace zappy::gui::graphics {
 
