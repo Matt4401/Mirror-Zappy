@@ -14,7 +14,7 @@
 namespace zappy::gui::game {
 void Team::draw(const GameModel& gameModel) const {
     for (const auto& player : _players) {
-        gameModel.drawPlayer(player.position());
+        gameModel.drawPlayer(player.position(), player.texture());
     }
     for (const auto& egg : _eggs) {
         gameModel.drawEgg(egg.position());
