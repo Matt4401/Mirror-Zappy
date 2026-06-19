@@ -14,6 +14,7 @@
 #include "Color.hpp"
 #include "rmath/Vector3.hpp"
 #include "rmodels/Mesh.hpp"
+#include "rtextures/Texture2D.hpp"
 
 namespace zappy::gui::raylib::rmodels {
 class Model {
@@ -40,6 +41,10 @@ class Model {
     [[nodiscard]] bool valid() const { return IsModelValid(_model); }
     [[nodiscard]] ::Model model() const { return _model; }
     [[nodiscard]] ::Model& model() { return _model; }
+
+    void setMaterialTexture(int materialIndex, int mapType, const rtextures::Texture2D& texture) const {
+        ::SetMaterialTexture(&_model.materials[materialIndex], mapType, texture.texture());  // NOLINT
+    }
 
     void drawModel(rmath::Vector3 position, float scale, Color tint) const {
         DrawModel(_model, position.vector(), scale, tint.color());

@@ -44,6 +44,7 @@ class Event {
     [[nodiscard]] static rmath::Vector2 getMousePositionStatic() {
         return {GetMousePosition().x, GetMousePosition().y};
     }
+    [[nodiscard]] static float getMouseWheelMoveStatic() { return GetMouseWheelMove(); }
 
   protected:
   private:
