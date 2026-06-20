@@ -66,8 +66,8 @@ class TestConnectionUnit(unittest.TestCase):
 
         self.assertEqual(ai.event_count(), 0)
         self.assertIsNone(ai.get_next_event())
-        ai.event_queue.append(ServerEvent(type="eject", message={"direction": 2}))
-        ai.event_queue.append(ServerEvent(type="dead", message={}))
+        ai.event_queue.append(ServerEvent(event_type="eject", message={"direction": 2}))
+        ai.event_queue.append(ServerEvent(event_type="dead", message={}))
 
         self.assertEqual(ai.event_count(), 2)
         first = ai.get_next_event()
