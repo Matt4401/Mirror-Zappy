@@ -77,33 +77,48 @@ class Connection:
             sys.exit(84)
 
     def do_handshake(self):
-        try:
-            welcome_msg = self.socket.recv(1024).decode()
-            if welcome_msg != "WELCOME\n":
-                print(f"Handshake failed: expected 'WELCOME\\n', got '{welcome_msg}'")
-                sys.exit(84)
-
-            with self.socket_lock:
-                self.socket.send((self.team_name + self.message_delimiter).encode())
-            client_num = self.socket.recv(1024).decode().strip()
-            if not client_num.isdigit() or int(client_num) <= 0:
-                print(f"Handshake failed: invalid client number '{client_num}'")
-                sys.exit(84)
-            self.client_num = int(client_num)
-            dims = self.socket.recv(1024).decode().strip()
-            if not dims:
-                print("Handshake failed: no dimensions received")
-                sys.exit(84)
+        buffer = ""
+        idx = 0
+        self.socket.setblocking(False)
+        while idx < 3:
             try:
-                x, y = map(int, dims.split())
-                self.width = x
-                self.height = y
-            except ValueError:
-                print(f"Handshake failed: invalid dimensions '{dims}'")
+                data = self.socket.recv(1024).decode()
+                if not data:
+                    print("Handshake failed: Connection closed by server")
+                    sys.exit(84)
+                buffer += data
+            except (BlockingIOError, InterruptedError):
+                time.sleep(0.01)
+                continue
+            except Exception as e:
+                print(f"Handshake error: {e}")
                 sys.exit(84)
-        except Exception as e:
-            print(f"Handshake error: {e}")
-            sys.exit(84)
+            while self.message_delimiter in buffer and idx < 3:
+                line, buffer = buffer.split(self.message_delimiter, 1)
+                line = line.strip()
+                if not line:
+                    continue
+                if idx == 0:
+                    if line != "WELCOME":
+                        print(f"Handshake failed: expected 'WELCOME', got '{line}'")
+                        sys.exit(84)
+                    idx += 1
+                    self.send_raw_command(self.team_name)
+                elif idx == 1:
+                    if not line.isdigit() or int(line) <= 0:
+                        print(f"Handshake failed: invalid client number '{line}'")
+                        sys.exit(84)
+                    self.client_num = int(line)
+                    idx += 1
+                elif idx == 2:
+                    try:
+                        x, y = map(int, line.split())
+                        self.width = x
+                        self.height = y
+                        idx += 1
+                    except ValueError:
+                        print(f"Handshake failled: invalid dimensions '{line}'")
+                        sys.exit(84)
 
     def start(self):
         self.running = True
