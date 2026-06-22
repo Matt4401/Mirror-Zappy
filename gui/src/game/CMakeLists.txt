@@ -4,6 +4,7 @@ add_library(zappy_gui_game
         ItemBag.cpp
         Team.cpp
         GameModel.cpp
+        Player.cpp
 )
 target_sources(zappy_gui_game PUBLIC
         FILE_SET HEADERS
