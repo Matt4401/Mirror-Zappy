@@ -1,4 +1,4 @@
-from ai.src.InventoryClass import Inventory
+from src.InventoryClass import Inventory
 import random
 
 
