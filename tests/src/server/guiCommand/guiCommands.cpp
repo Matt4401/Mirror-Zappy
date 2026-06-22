@@ -7,11 +7,14 @@
 
 #include <gtest/gtest.h>
 
+#include <cstddef>
+#include <cstdint>
 #include <span>
 #include <string>
 #include <vector>
 
 #include "Core.hpp"
+#include "game/Player.hpp"
 #include "guiCommand/Bct.hpp"
 #include "guiCommand/Mct.hpp"
 #include "guiCommand/Msz.hpp"
@@ -63,18 +66,29 @@ TEST(SgtCommandTest, ExecuteReturnsCorrectFrequency) {
 
 TEST(BctCommandTest, ExecuteReturnsProperlyFormattedTileContent) {
     auto args = createDummyArgs();
-    zappy::server::Core core{std::span<char*>(args)};
+    zappy::server::Core core{std::span(args)};
     core.setup();
 
     zappy::server::guiCommand::Bct command{5, 5};
     const std::string response = command.execute(core);
 
-    EXPECT_EQ(response, "bct 5 5 0 0 0 0 0 0 0\n");
+    auto resources = core.world().resourcesAt(zappy::server::game::Position{.x = 5, .y = 5});
+
+    std::string const expectedResponse =
+        "bct 5 5 " + std::to_string(resources.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Food))) +
+        " " + std::to_string(resources.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Linemate))) + " " +
+        std::to_string(resources.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Deraumere))) + " " +
+        std::to_string(resources.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Sibur))) + " " +
+        std::to_string(resources.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Mendiane))) + " " +
+        std::to_string(resources.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Phiras))) + " " +
+        std::to_string(resources.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Thystame))) + "\n";
+
+    EXPECT_EQ(response, expectedResponse);
 }
 
 TEST(BctCommandTest, ExecuteFailsSafelyOnOutOfBounds) {
     auto args = createDummyArgs();
-    zappy::server::Core core{std::span<char*>(args)};
+    zappy::server::Core core{std::span(args)};
     core.setup();
 
     zappy::server::guiCommand::Bct command{999, 999};
@@ -85,16 +99,27 @@ TEST(BctCommandTest, ExecuteFailsSafelyOnOutOfBounds) {
 
 TEST(MctCommandTest, ExecuteReturnsAllTileContents) {
     auto args = createDummyArgs();
-    zappy::server::Core core{std::span<char*>(args)};
+    zappy::server::Core core{std::span(args)};
     core.setup();
 
     zappy::server::guiCommand::Mct command{};
     const std::string response = command.execute(core);
-
+    const auto mapSize = core.world().sizeMap();
     std::string expectedResponse;
-    for (int x = 0; x < 10; ++x) {
-        for (int y = 0; y < 20; ++y) {
-            expectedResponse += "bct " + std::to_string(x) + " " + std::to_string(y) + " 0 0 0 0 0 0 0\n";
+
+    for (std::size_t x = 0; x < mapSize.x; ++x) {
+        for (std::size_t y = 0; y < mapSize.y; ++y) {
+            auto resources = core.world().resourcesAt(zappy::server::game::Position{.x = x, .y = y});
+            expectedResponse +=
+                "bct " + std::to_string(x) + " " + std::to_string(y) + " " +
+                std::to_string(resources.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Food))) + " " +
+                std::to_string(resources.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Linemate))) + " " +
+                std::to_string(resources.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Deraumere))) +
+                " " + std::to_string(resources.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Sibur))) +
+                " " + std::to_string(resources.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Mendiane))) +
+                " " + std::to_string(resources.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Phiras))) +
+                " " + std::to_string(resources.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Thystame))) +
+                "\n";
         }
     }
     EXPECT_EQ(response, expectedResponse);

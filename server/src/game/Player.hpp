@@ -29,13 +29,6 @@ struct Position {
 
 enum class ItemType : uint8_t { Food, Linemate, Deraumere, Sibur, Mendiane, Phiras, Thystame, COUNT };
 
-// NOLINTNEXTLINE
-const std::unordered_map<std::string, ItemType> kMapItemString = {
-    {"linemate", ItemType::Linemate}, {"deraumere", ItemType::Deraumere}, {"sibur", ItemType::Sibur},
-    {"mendiane", ItemType::Mendiane}, {"phiras", ItemType::Phiras},       {"thystame", ItemType::Thystame},
-    {"food", ItemType::Food},
-};
-
 constexpr std::array<std::string, static_cast<std::size_t>(ItemType::COUNT)> kInventoryOrder = {
     "food", "linemate", "deraumere", "sibur", "mendiane", "phiras", "thystame"};
 
@@ -46,6 +39,15 @@ constexpr std::array<std::pair<int, int>, 4> playerMove = {{{0, 1}, {1, 0}, {0, 
 static constexpr std::size_t kNbLifeTickFood = 126;
 static constexpr std::size_t kNbStartFood = 10;
 static constexpr std::uint8_t kMaxNbCmd = 10;
+
+static std::unordered_map<std::string, ItemType> mapItemString() {
+    static const std::unordered_map<std::string, ItemType> kMapItemString = {
+        {"linemate", ItemType::Linemate}, {"deraumere", ItemType::Deraumere}, {"sibur", ItemType::Sibur},
+        {"mendiane", ItemType::Mendiane}, {"phiras", ItemType::Phiras},       {"thystame", ItemType::Thystame},
+        {"food", ItemType::Food},
+    };
+    return kMapItemString;
+}
 
 class Player {
   public:

@@ -220,7 +220,7 @@
       send: "Fork\n"
     - client: "gui_watcher"
       expect: '^pfk #?\d+\n$'
-    
+
     - client: "ai_mother"
       expect: '^ok\n$'
     - client: "gui_watcher"

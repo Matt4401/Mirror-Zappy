@@ -23,7 +23,7 @@ void Inventory::execute(game::World& /*world*/, game::Player& player) {
 
     for (std::size_t i = 0; i < game::kInventoryOrder.size(); ++i) {
         const std::string& itemName = game::kInventoryOrder.at(i);
-        const game::ItemType itemEnum = game::kMapItemString.at(itemName);
+        const game::ItemType itemEnum = game::mapItemString().at(itemName);
         const auto quantity = player.inventory().at(static_cast<std::uint8_t>(itemEnum));
 
         response += itemName + " " + std::to_string(quantity);
