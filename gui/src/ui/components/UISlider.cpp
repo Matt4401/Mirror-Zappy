@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <stdexcept>
 #include <utility>
 
 #include "Color.hpp"
@@ -24,6 +25,9 @@ using Shapes = raylib::rshapes::Shapes;
 
 UISlider::UISlider(float x, float y, float width, float height, float min, float max, float initialValue)
     : _position(x, y), _size(width, height), _min(min), _max(max), _value(std::clamp(initialValue, min, max)) {
+    if (min > max) {
+        throw std::invalid_argument("UISlider: min must be <= max");
+    }
     updateHandlePositionFromValue();
 }
 
@@ -36,6 +40,9 @@ UISlider::UISlider(float x, float y, float width, float height, float min, float
       _value(std::clamp(initialValue, min, max)),
       _trackColor(trackColor),
       _handleNormalColor(handleNormalColor) {
+    if (min > max) {
+        throw std::invalid_argument("UISlider: min must be <= max");
+    }
     updateHandlePositionFromValue();
 }
 
