@@ -8,6 +8,7 @@
 #include "Client.hpp"
 
 #include <chrono>
+#include <iostream>
 #include <memory>
 #include <optional>
 #include <string>
@@ -15,6 +16,7 @@
 #include <utility>
 
 #include "EventDispatcher.hpp"
+#include "events/GuiEvents.hpp"
 #include "exception/SocketError.hpp"
 #include "protocol/Parser.hpp"
 #include "socket/ClientSocket.hpp"
@@ -40,6 +42,20 @@ Client::Client(const parser::GuiConfig& config, std::shared_ptr<events::EventDis
 
     if (_socket->send(DefaultTeamName) == 0) {
         throw ::network::exception::SocketError(std::string("failed to send team name"));
+    }
+
+    if (_dispatcher) {
+        _sendToken = _dispatcher->subscribe<events::SendCommand>([this](const events::SendCommand& cmd) {
+            if (_socket->send(cmd.payload) == 0) {
+                std::cerr << "Failed to send command to server: " << cmd.payload << std::endl;
+            }
+        });
+    }
+}
+
+Client::~Client() {
+    if (_dispatcher && _sendToken != 0) {
+        _dispatcher->unsubscribe<events::SendCommand>(_sendToken);
     }
 }
 
