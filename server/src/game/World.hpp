@@ -81,6 +81,7 @@ class World {
 
     void addGuiEvent(const std::string& event);
     std::string visionOfPlayer(const std::vector<Position>& Positions) const;
+    void clearAllResourcesAndEggs();
 
   private:
     std::unordered_map<std::string, std::unique_ptr<Team>> _teamList;

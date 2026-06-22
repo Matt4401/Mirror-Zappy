@@ -15,6 +15,7 @@
 #include "game/Player.hpp"
 #include "game/World.hpp"
 
+// NOLINTBEGIN
 namespace zappy::server::command {
 
 class LookTest : public ::testing::Test {
@@ -24,7 +25,7 @@ class LookTest : public ::testing::Test {
         .width = 10,
         .height = 10,
         .teamNames = {"Team1"},
-        .clientLimit = 10,
+        .clientLimit = 1,
         .freq = 100,
     };
 };
@@ -36,14 +37,20 @@ TEST_F(LookTest, CheckRequiredTicks) {
 
 TEST_F(LookTest, ExecuteLookLevel1EmptyMap) {
     game::World world{config};
-    game::Player player{1, 5, 5, game::cardinalPoint::NORTH};
 
+    const auto idOpt = world.spawnPlayer("Team1");
+    ASSERT_TRUE(idOpt.has_value());
+
+    const auto& playerList = world.playerList();
+    auto& player = *playerList.at(idOpt.value());
+
+    world.clearAllResourcesAndEggs();
     const std::unique_ptr<ICommand> look = std::make_unique<Look>();
     look->execute(world, player);
 
     auto responses = player.responses();
     ASSERT_FALSE(responses.empty());
-    std::string expectedStart = "[ player,,,";
+    static constexpr std::string expectedStart = "[ player,,,]";
     ASSERT_EQ(responses.front().substr(0, expectedStart.size()), expectedStart);
 }
 TEST_F(LookTest, ExecuteLookWithItemsAndPlayers) {
@@ -68,6 +75,7 @@ TEST_F(LookTest, ExecuteLookAtMapEdgeWrapping) {
 
     game::Player player{1, 5, 9, game::cardinalPoint::NORTH};
 
+    world.clearAllResourcesAndEggs();
     world.addItemOnGround(game::ItemType::Food, game::Position{.x = 5, .y = 0});
 
     const std::unique_ptr<ICommand> look = std::make_unique<Look>();
@@ -82,6 +90,7 @@ TEST_F(LookTest, ExecuteLookAtMapEdgeWrapping) {
 TEST_F(LookTest, CheckPositionsOrientationEast) {
     game::World world{config};
 
+    world.clearAllResourcesAndEggs();
     game::Player player{1, 5, 5, game::cardinalPoint::EAST};
 
     auto lookPositions = player.getLookPos(world.sizeMap());
@@ -94,3 +103,4 @@ TEST_F(LookTest, CheckPositionsOrientationEast) {
 }
 
 }  // namespace zappy::server::command
+// NOLINTEND

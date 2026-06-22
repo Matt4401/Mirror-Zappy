@@ -369,10 +369,10 @@ std::string World::transformResourcesToStr(const Tile& tile) {
     std::string str{};
 
     for (int i = 0; i < tile.eggs.size(); i++) {
-        str += "egg ";
+        str += " egg";
     }
     for (int i = 0; i < tile.players.size(); i++) {
-        str += "player ";
+        str += " player";
     }
     for (int i = 0; i < static_cast<int>(ItemType::COUNT); i++) {
         const auto name = resourcesName(static_cast<ItemType>(i));
@@ -399,5 +399,13 @@ std::string World::visionOfPlayer(const std::vector<Position>& Positions) const 
     }
     str += ']';
     return str;
+}
+
+void World::clearAllResourcesAndEggs() {
+    _vecEggs.clear();
+    for (auto& tile : _tiles) {
+        tile.resources.fill(0);
+        tile.eggs.clear();
+    }
 }
 }  // namespace zappy::server::game
