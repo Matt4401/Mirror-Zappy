@@ -47,10 +47,16 @@ class UIGamePanel : public IUIComponent {
     void removeComponent(const std::shared_ptr<IUIComponent>& component);
 
     virtual void setConfigMode(bool configMode) {
+        if (_isConfigMode == configMode) {
+            return;
+        }
         _isConfigMode = configMode;
         if (_isConfigMode) {
+            _wasVisibleBeforeConfig = _isVisible;
             setVisible(true);
             _isCollapsed = false;
+        } else {
+            setVisible(_wasVisibleBeforeConfig);
         }
     }
     [[nodiscard]] bool isConfigMode() const { return _isConfigMode; }
@@ -81,6 +87,7 @@ class UIGamePanel : public IUIComponent {
     bool _isCollapsed{false};
     bool _isConfigMode{false};
     bool _customLayout{false};
+    bool _wasVisibleBeforeConfig{true};
     float _expandedHeight;
     float _currentHeight;
 

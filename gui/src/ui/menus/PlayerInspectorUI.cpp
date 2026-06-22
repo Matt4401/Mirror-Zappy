@@ -102,6 +102,8 @@ PlayerInspectorUI::PlayerInspectorUI(float x, float y, float width, std::shared_
     if (getDispatcher()) {
         getEventTokens().push_back(getDispatcher()->subscribe<events::PlayerClicked>(
             [this](const events::PlayerClicked& e) { onPlayerClicked(e); }));
+        getEventTokens().push_back(getDispatcher()->subscribe<events::TileClicked>(
+            [this](const events::TileClicked& /*e*/) { setVisible(false); }));
         getEventTokens().push_back(getDispatcher()->subscribe<shared::protocol::server::Pin>(
             [this](const shared::protocol::server::Pin& cmd) { onPinReceived(cmd); }));
         getEventTokens().push_back(getDispatcher()->subscribe<shared::protocol::server::Plv>(
@@ -155,11 +157,12 @@ void PlayerInspectorUI::onPpoReceived(const shared::protocol::server::Ppo& cmd) 
 }
 
 PlayerInspectorUI::~PlayerInspectorUI() {
-    if (getDispatcher() && getEventTokens().size() >= 4) {
+    if (getDispatcher() && getEventTokens().size() >= 5) {
         getDispatcher()->unsubscribe<events::PlayerClicked>(getEventTokens().at(0));
-        getDispatcher()->unsubscribe<shared::protocol::server::Pin>(getEventTokens().at(1));
-        getDispatcher()->unsubscribe<shared::protocol::server::Plv>(getEventTokens().at(2));
-        getDispatcher()->unsubscribe<shared::protocol::server::Ppo>(getEventTokens().at(3));
+        getDispatcher()->unsubscribe<events::TileClicked>(getEventTokens().at(1));
+        getDispatcher()->unsubscribe<shared::protocol::server::Pin>(getEventTokens().at(2));
+        getDispatcher()->unsubscribe<shared::protocol::server::Plv>(getEventTokens().at(3));
+        getDispatcher()->unsubscribe<shared::protocol::server::Ppo>(getEventTokens().at(4));
     }
 }
 

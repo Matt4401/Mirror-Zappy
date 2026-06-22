@@ -86,6 +86,7 @@ AInspectorUI::AInspectorUI(float x, float y, float width, const std::string& tit
       _previewRenderTexture(std::make_shared<raylib::rtextures::RenderTexture2D>(static_cast<int>(AvatarWidth),
                                                                                  static_cast<int>(AvatarHeight))) {
     setCustomLayout(true);
+    setVisible(false);
 
     _closeBtn->setFontSize(CloseBtnFontSize);
     _closeBtn->setOnClick([this]() { this->setVisible(false); });
