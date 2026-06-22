@@ -36,7 +36,7 @@ GameHUD::GameHUD(std::shared_ptr<events::EventDispatcher> dispatcher, const std:
     _gridManager->addPanel(_playerInspector, 14, 1, 10, 15);
 
     _tileInspector = std::make_shared<menus::TileInspectorUI>(0.0F, 0.0F, 300.0F, _dispatcher, _font, sendCommand);
-    _gridManager->addPanel(_tileInspector, 14, 1, 10, 15, true);
+    _gridManager->addPanel(_tileInspector, 1, 1, 10, 16);
 
     _pauseMenu = std::make_shared<menus::PauseMenu>(_dispatcher, _font);
 }
