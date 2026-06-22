@@ -41,7 +41,7 @@ class World {
     explicit World(const parser::ServerConfig& config);
     void setSpawnEggs(size_t clientLimit, std::string_view teamName);
     /*
-     * @brief: this function spawn the resources on the map.
+     * @brief: this function spawns the resources on the map.
      **/
     void addItemsToMap();
     static cardinalPoint randomCardinalPoint();
