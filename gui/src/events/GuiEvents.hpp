@@ -29,6 +29,7 @@ struct SendCommand {
 struct PlayerNameChanged {
     int playerId;
     std::string newName;
+};
 
 struct TileClicked {
     int x{0};
