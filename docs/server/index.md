@@ -1,57 +1,23 @@
-```mermaid
-classDiagram
-    class Core {
-        -SessionManager _sessionManager
-        -World _world
-        -CommandFactory _commandFactory
-        -Map _clientStates
-        -Map _clientToPlayer
-        +loop() void
-        +processNetworkEvents() void
-        +processGameTick() void
-    }
+# Zappy Server Documentation
 
-    class SessionManager {
-        -ServerSocket _serverSocket
-        -Map _clients
-        -Queue _eventQueue
-        +pollNetwork(timeout)
-        +tryPopMessage()
-        +sendMessage(clientId, msg)
-    }
+## Overview
+Zappy is a network game where several teams confront each other on a geographically flat tile map containing resources. The ultimate goal for each team is to have at least 6 players reach the maximum elevation (Level 8) through a specific incantation ritual.
 
-    class CommandFactory {
-        +createCommand(text) ICommand
-    }
+The server acts as the authoritative game engine, managing the world state, enforcing rules, and broadcasting events to both AI clients (players) and GUI clients (spectators).
 
-    class World {
-        -Map _playerList
-        -Vector _guiEvents
-        +update() void
-        +pushCommandToPlayer(playerId, cmd) void
-    }
+## Technical Constraints
+This server is built to adhere to strict performance and architectural constraints defined by the project specifications:
 
-    class Player {
-        -Queue _commands
-        -ICommand _currentCommand
-        -int _cmdTick
-        +update(world) void
-        +tryStartNextCommand(world) void
-    }
+* **Language:** C++20.
+* **Execution Model:** Single-process and single-threaded. 
+* **Network Multiplexing:** Non-blocking asynchronous I/O using `poll()`.
+* **Active Waiting:** Strictly forbidden. The server must only unlock if an event occurs on a socket or a game tick is ready for execution.
+* **Time Management:** All game actions are bound to a strict frequency (`freq`), where 1 time unit equals `1.0 / freq` seconds.
 
-    class ICommand {
-        +start(world, player) bool
-        +execute(world, player) void
-    }
+## Documentation Structure
+This documentation breaks down the server into its three primary layers:
 
-    class ServerSocket
-    class ClientSocket
-
-    Core "1" *-- "1" SessionManager : Polls and Flushes
-    Core "1" *-- "1" World : Ticks time
-    Core "1" *-- "1" CommandFactory : Translates text
-    SessionManager "1" *-- "1" ServerSocket : Binds and listens
-    SessionManager "1" *-- "many" ClientSocket : Reads and Writes
-    World "1" *-- "many" Player : Manages
-    Player "1" *-- "many" ICommand : Queues
-```
+1.  **[Architecture](architecture.md):** The high-level design patterns.
+2.  **[Network Layer](network.md):** TCP socket management and message extraction.
+3.  **[Core Orchestrator](core.md):** Time synchronization and command translation.
+4.  **[Game Engine](game_engine.md):** Map data, player states, and command execution.
