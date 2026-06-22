@@ -70,7 +70,7 @@ void SessionManager::sendMessage(int clientId, std::string_view message) {
     }
     std::string& buffer = _writeBuffers[clientId];
 
-    if (message.size() + buffer.size() > 8192) {
+    if (message.size() + buffer.size() > socket::kMaxBufferSize) {
         disconnectClient(clientId);
         throw exception::SocketError{"write buffer overflow, disconnecting client"};
     }
@@ -144,7 +144,7 @@ void SessionManager::handleClientRead(const int clientId) {
             return;
         }
         _readBuffers[clientId] += data;
-        if (_readBuffers[clientId].size() > 8192) {
+        if (_readBuffers[clientId].size() > socket::kMaxBufferSize) {
             throw exception::SocketError{"read buffer overflow, disconnecting client"};
         }
         extractCompleteMessages(clientId);

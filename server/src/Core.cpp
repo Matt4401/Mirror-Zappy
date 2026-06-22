@@ -21,6 +21,7 @@
 
 #include "Parser.hpp"
 #include "SessionManager.hpp"
+#include "command/Unknown.hpp"
 #include "exception/Exception.hpp"
 #include "game/World.hpp"
 #include "guiCommand/Mct.hpp"
@@ -73,6 +74,8 @@ void Core::loop() {
                 _sessionManager->pollNetwork(-1);
                 processNetworkEvents();
                 nextTickTarget = std::chrono::steady_clock::now() + std::chrono::milliseconds{_timeUnit};
+                flushPlayerResponses();
+                flushGuiResponses();
                 continue;
             }
             int pollTimeout = -1;
@@ -88,6 +91,9 @@ void Core::loop() {
             _sessionManager->pollNetwork(pollTimeout);
             processGameTick(nextTickTarget);
             processNetworkEvents();
+
+            flushPlayerResponses();
+            flushGuiResponses();
         } catch (const std::exception& e) {
             std::cerr << "Error in main loop: " << e.what() << std::endl;
         }
@@ -115,8 +121,6 @@ void Core::processGameTick(std::chrono::steady_clock::time_point& nextTickTarget
 
     while (now >= nextTickTarget) {
         _world->update();
-        flushPlayerResponses();
-        flushGuiResponses();
         nextTickTarget += std::chrono::milliseconds(_timeUnit);
     }
 }
@@ -179,7 +183,7 @@ void Core::handleInGameMessage(int clientId, std::string_view message) {
     if (command != nullptr) {
         _world->pushCommandToPlayer(playerId, std::move(command));
     } else {
-        _sessionManager->sendMessage(clientId, "ko\n");
+        _world->pushCommandToPlayer(playerId, std::make_unique<command::Unknown>());
     }
 }
 
