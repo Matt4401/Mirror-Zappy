@@ -73,6 +73,9 @@ void ServerStrategy::validate(const ServerConfig& config) {
     isValidate(config.width, "Missing or invalid width (-x)");
     isValidate(config.height, "Missing or invalid height (-y)");
     isValidate(config.clientLimit, "Missing or invalid clientsNb (-c)");
+    if (config.width > 42 || config.height > 42 || config.width < 10 || config.height < 10) {
+        throw shared::exception::ParsingError("Width and height must be larger than 10 and smaller than 42 (-x, -y)");
+    }
     if (config.teamNames.empty()) {
         throw shared::exception::ParsingError("Server requires at least one team (-n)");
     }

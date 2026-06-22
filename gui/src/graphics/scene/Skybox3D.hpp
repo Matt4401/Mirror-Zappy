@@ -2,19 +2,21 @@
 ** EPITECH PROJECT, 2026
 ** Mirror-Zappy
 ** File description:
-** SkyBackground
+** Skybox3D
 */
 
 #pragma once
 
+#include <optional>
+
 #include "Color.hpp"
-#include "rcore/Window.hpp"
+#include "rmodels/Model.hpp"
+#include "rmodels/Shader.hpp"
 #include "rtextures/Texture2D.hpp"
 
 namespace zappy::gui::graphics::scene {
-class SkyBackground {
+class Skybox3D {
   public:
-    static constexpr const char* TEXTURE_PATH = "assets/sky.png";
     static constexpr float DAY_SPEED = 0.112F;
     static constexpr float FULL_DAY = 1.0F;
     static constexpr raylib::Color NIGHT{38, 48, 92, 255};
@@ -26,22 +28,25 @@ class SkyBackground {
     static constexpr float EVENING_START = 0.72F;
     static constexpr float NIGHT_START = 0.88F;
 
-    SkyBackground() = default;
-    ~SkyBackground() = default;
-    SkyBackground(const SkyBackground& other) = delete;
-    SkyBackground& operator=(const SkyBackground& other) = delete;
-    SkyBackground(SkyBackground&& other) noexcept = default;
-    SkyBackground& operator=(SkyBackground&& other) noexcept = default;
+    Skybox3D();
+    ~Skybox3D();
+    Skybox3D(const Skybox3D& other) = delete;
+    Skybox3D& operator=(const Skybox3D& other) = delete;
+    Skybox3D(Skybox3D&& other) noexcept;
+    Skybox3D& operator=(Skybox3D&& other) noexcept;
 
-    void update(float deltaTime);
-    void draw(raylib::rcore::Window& window) const;
+    void update(float deltaTime, float serverFrequency);
+    void draw() const;
 
   protected:
   private:
     [[nodiscard]] raylib::Color currentTint() const;
-    [[nodiscard]] float horizontalPan() const;
 
-    raylib::rtextures::Texture2D _texture{TEXTURE_PATH};
-    float _dayProgress = 0.25F;
+    void loadCubemap();
+
+    raylib::rmodels::Model _model;
+    raylib::rmodels::Shader _shader;
+    std::optional<raylib::rtextures::Texture2D> _cubemap;
+    float _dayProgress{0.25F};
 };
 }  // namespace zappy::gui::graphics::scene

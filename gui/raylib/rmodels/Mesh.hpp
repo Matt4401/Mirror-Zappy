@@ -44,6 +44,8 @@ class Mesh {
         DrawMesh(_mesh, material, transform.matrix());
     }
 
+    static Mesh genCube(float width, float height, float length) { return Mesh{GenMeshCube(width, height, length)}; }
+
     void genMeshPolygonal(int sides, float radius) { replace(GenMeshPoly(sides, radius)); }
     void genMeshPlane(float width, float length, int resX, int resZ) {
         replace(GenMeshPlane(width, length, resX, resZ));

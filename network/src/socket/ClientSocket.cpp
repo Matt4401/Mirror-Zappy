@@ -113,7 +113,7 @@ std::optional<std::string> ClientSocket::tryPopMessage() {
         return std::nullopt;
     }
 
-    if (newData.size() + _buffer.size() > 8192) {
+    if (newData.size() + _buffer.size() > kMaxBufferSize) {
         throw exception::SocketError{"read buffer overflow, disconnecting client"};
     }
     _buffer += newData;
