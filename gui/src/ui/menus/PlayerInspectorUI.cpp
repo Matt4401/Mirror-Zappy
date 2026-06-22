@@ -178,7 +178,7 @@ void PlayerInspectorUI::buildInfoPanel() {
     _nameBox = std::make_shared<components::UITextbox>(0.0F, 0.0F, 200.0F, NameBoxHeight, getFont(), "Enter Name...");
     _nameBox->setOnSubmit([this](const std::string& name) {
         if (getDispatcher() && _targetPlayerId != -1) {
-            getDispatcher()->dispatch(events::PlayerNameChanged{_targetPlayerId, name});
+            getDispatcher()->dispatch(events::PlayerNameChanged{.playerId = _targetPlayerId, .newName = name});
         }
     });
 
