@@ -40,6 +40,7 @@ class UIText : public IUIComponent {
     void setColor(raylib::Color color);
     void setSpacing(float spacing);
     [[nodiscard]] const std::string& text() const { return _text; }
+    [[nodiscard]] float getWidth() const;
 
   private:
     std::string _text;

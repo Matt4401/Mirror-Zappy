@@ -51,4 +51,11 @@ void UIText::setColor(raylib::Color color) { _color = color; }
 
 void UIText::setSpacing(float spacing) { _spacing = spacing; }
 
+float UIText::getWidth() const {
+    if (_text.empty() || !_font || !_font->valid()) {
+        return 0.0F;
+    }
+    return raylib::rtext::Text::measureText(*_font, _text, _fontSize, _spacing).x();
+}
+
 }  // namespace zappy::gui::ui::components

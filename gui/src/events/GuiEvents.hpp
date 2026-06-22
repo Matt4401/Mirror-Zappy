@@ -25,4 +25,9 @@ struct PlayerClicked {
 struct SendCommand {
     std::string payload;
 };
+
+struct TileClicked {
+    int x{0};
+    int y{0};
+};
 }  // namespace zappy::gui::events
