@@ -91,7 +91,7 @@ void UITextbox::updateHoverState() {
 void UITextbox::handleInput() {
     int key = raylib::rcore::Event::getCharPressed();
     while (key > 0) {
-        if ((key >= 48 && key <= 57) || (key >= 65 && key <= 90) || (key >= 97 && key <= 122)) {
+        if ((key >= '0' && key <= '9') || (key >= 'A' && key <= 'Z') || (key >= 'a' && key <= 'z')) {
             _text += static_cast<char>(key);
             updateTextPosition();
         }
