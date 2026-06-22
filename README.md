@@ -159,6 +159,13 @@ your global Python environment.*
         <sub><b>eliottraguin</b></sub>
       </a>
     </td>
+  <td align="center">
+      <a href="https://github.com/TristanFragnaud">
+        <img src="https://github.com/TristanFragnaud.png?size=100" width="100px;" alt="TristanFragnaud"/>
+        <br />
+        <sub><b>TristanFragnaud</b></sub>
+      </a>
+    </td>
   </tr>
 </table>
 
