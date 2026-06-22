@@ -80,7 +80,6 @@ class World {
     void layEgg(const Player& player);
 
     void addGuiEvent(const std::string& event);
-                                                                                                std::size_t y) const;
     std::string visionOfPlayer(const std::vector<Position>& Positions) const;
 
   private:

@@ -358,7 +358,7 @@ std::unordered_map<cardinalPoint, std::string> World::cardinalPointToStr() {
 }
 
 std::string World::resourcesName(const ItemType item) {
-    for (const auto& [itemString, type] : kMapItemString) {
+    for (const auto& [itemString, type] : mapItemString()) {
         if (type == item) {
             return itemString;
         }
