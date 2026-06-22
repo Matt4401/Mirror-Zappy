@@ -14,7 +14,7 @@ def flush_gui_handshake(client: ZappyClient):
     client.sock.settimeout(0.5)
     try:
         while True:
-            client.sock.recv(8192)
+            client.sock.recv(42000)
     except socket.timeout:
         pass
     client.buffer = ""

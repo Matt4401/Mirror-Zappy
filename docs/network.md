@@ -15,7 +15,7 @@ The `pollNetwork(int timeout)` function is driven entirely by the game clock. If
 
 To prevent memory exhaustion and buffer overflow attacks from malicious or buggy clients, the `SessionManager` implements strict buffer management:
 
-1.  **Read Buffers:** Incoming bytes are appended to a client-specific `std::string` buffer. If a client's read buffer exceeds **8192 bytes**, the server instantly throws a `SocketError` and forcefully disconnects the client.
+1.  **Read Buffers:** Incoming bytes are appended to a client-specific `std::string` buffer. If a client's read buffer exceeds **42000 bytes** (enough to send the whole maximum map size data), the server instantly throws a `SocketError` and forcefully disconnects the client.
 2.  **Message Extraction:** The server does not pass raw, fragmented bytes to the game engine. The `extractCompleteMessages` function continuously scans the read buffer for the newline character (`\n`). Once found, it extracts the complete command and pushes it to the event queue.
 3.  **Write Buffers:** Outgoing messages from the game engine are queued in a write buffer. During the polling phase, if a socket is ready for writing, the server flushes as much data as the TCP window allows.
 

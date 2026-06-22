@@ -8,7 +8,7 @@ The server acts as the authoritative game engine, managing the world state, enfo
 ## Technical Constraints
 This server is built to adhere to strict performance and architectural constraints defined by the project specifications:
 
-* **Language:** C++20.
+* **Language:** C++23.
 * **Execution Model:** Single-process and single-threaded. 
 * **Network Multiplexing:** Non-blocking asynchronous I/O using `poll()`.
 * **Active Waiting:** Strictly forbidden. The server must only unlock if an event occurs on a socket or a game tick is ready for execution.
