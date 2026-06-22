@@ -19,9 +19,7 @@
 #include "rcore/Window.hpp"
 #include "rmath/Vector3.hpp"
 #include "ui/UIManager.hpp"
-#include "ui/components/UIGridManager.hpp"
-#include "ui/menus/PauseMenu.hpp"
-#include "ui/menus/PlayerInspectorUI.hpp"
+#include "ui/hud/GameHUD.hpp"
 
 namespace zappy::gui::graphics {
 class Render {
@@ -63,9 +61,7 @@ class Render {
     events::EventDispatcher::EventToken _sgtToken{0};
     float _serverFrequency{100.0F};
     ui::UIManager _uiManager;
-    std::shared_ptr<ui::menus::PauseMenu> _pauseMenu;
-    std::shared_ptr<ui::menus::PlayerInspectorUI> _inspector;
-    std::shared_ptr<ui::components::UIGridManager> _gridManager;
+    std::shared_ptr<ui::hud::GameHUD> _gameHUD;
     bool _isExiting{false};
     bool _uiMode{false};
     UpdateMode _updateMode{UpdateMode::All};
