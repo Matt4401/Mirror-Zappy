@@ -69,6 +69,14 @@ void UITextbox::update() {
         return;
     }
 
+    updateHoverState();
+
+    if (_isFocused) {
+        handleInput();
+    }
+}
+
+void UITextbox::updateHoverState() {
     raylib::rmath::Vector2 const mousePos = raylib::rcore::Event::getMousePositionStatic();
     raylib::rmath::Rectangle const rec{.x = _position.x(), .y = _position.y(), .width = _size.x(), .height = _size.y()};
 
@@ -78,28 +86,28 @@ void UITextbox::update() {
         _isHovered = (mousePos.x() >= rec.x && mousePos.x() <= rec.x + rec.width && mousePos.y() >= rec.y &&
                       mousePos.y() <= rec.y + rec.height);
     }
+}
 
-    if (_isFocused) {
-        int key = raylib::rcore::Event::getCharPressed();
-        while (key > 0) {
-            if ((key >= AlphabetStart) && (key <= AlphabetEnd)) {
-                _text += static_cast<char>(key);
-                updateTextPosition();
-            }
-            key = raylib::rcore::Event::getCharPressed();
+void UITextbox::handleInput() {
+    int key = raylib::rcore::Event::getCharPressed();
+    while (key > 0) {
+        if ((key >= 48 && key <= 57) || (key >= 65 && key <= 90) || (key >= 97 && key <= 122)) {
+            _text += static_cast<char>(key);
+            updateTextPosition();
         }
-        if (raylib::rcore::Event::isKeyPressed(KeyBackspace) || raylib::rcore::Event::isKeyPressed(KEY_BACKSPACE)) {
-            if (!_text.empty()) {
-                _text.pop_back();
-                updateTextPosition();
-            }
+        key = raylib::rcore::Event::getCharPressed();
+    }
+    if (raylib::rcore::Event::isKeyPressed(KeyBackspace) || raylib::rcore::Event::isKeyPressed(KEY_BACKSPACE)) {
+        if (!_text.empty()) {
+            _text.pop_back();
+            updateTextPosition();
         }
-        if (raylib::rcore::Event::isKeyPressed(KeyEnter) || raylib::rcore::Event::isKeyPressed(KeyKpEnter)) {
-            if (_onSubmit) {
-                _onSubmit(_text);
-            }
-            _isFocused = false;
+    }
+    if (raylib::rcore::Event::isKeyPressed(KeyEnter) || raylib::rcore::Event::isKeyPressed(KeyKpEnter)) {
+        if (_onSubmit) {
+            _onSubmit(_text);
         }
+        _isFocused = false;
     }
 }
 

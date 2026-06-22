@@ -47,6 +47,8 @@ class UITextbox : public IUIComponent {
 
   private:
     void updateTextPosition();
+    void updateHoverState();
+    void handleInput();
 
     raylib::rmath::Vector2 _position;
     raylib::rmath::Vector2 _size;
@@ -70,8 +72,6 @@ class UITextbox : public IUIComponent {
     static constexpr int KeyKpEnter = 335;
     static constexpr int KeyMinusA = 45;
     static constexpr int KeyMajorZ = 90;
-    static constexpr int AlphabetStart = 65;
-    static constexpr int AlphabetEnd = 125;
 
     static constexpr raylib::Color BackgroundColor{40, 40, 40, 255};
     static constexpr raylib::Color BorderNormalColor{100, 100, 100, 255};
