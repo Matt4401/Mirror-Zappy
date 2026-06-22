@@ -64,7 +64,7 @@ classDiagram
     class ClientSocket
 
     Core "1" *-- "1" SessionManager : Polls and Flushes
-    Core "1" *-- "1" World : Ticks time
+    Core "1" *-- "1" World : Advances game clock
     Core "1" *-- "1" CommandFactory : Translates text
     SessionManager "1" *-- "1" ServerSocket : Binds and listens
     SessionManager "1" *-- "many" ClientSocket : Reads and Writes

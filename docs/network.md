@@ -22,6 +22,7 @@ To prevent memory exhaustion and buffer overflow attacks from malicious or buggy
 ## The Event Queue
 
 The `SessionManager` communicates with the main server loop via an internal `_eventQueue`. It translates raw socket activity into actionable `NetworkEvent` objects:
+
 * `CLIENT_CONNECTED`
 * `CLIENT_DISCONNECTED`
 * `MESSAGE_RECEIVED`
