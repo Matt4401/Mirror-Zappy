@@ -89,12 +89,12 @@ void Map::drawItems(const Tile3D& tile) const {
     }
 }
 
-void Map::handleEvent(const raylib::rcore::Event& event) {
+void Map::handleEvent(const raylib::rcore::Event& /*event*/) {
     if (!raylib::rcore::Event::isMouseButtonPressed(MOUSE_LEFT_CLICK) || !_camera) {
         return;
     }
 
-    const auto ray = event.mouseRay(*_camera);
+    const auto ray = raylib::rcore::Event::mouseRay(*_camera);
     std::optional<SelectedPlayer> selected;
     float nearestDistance = std::numeric_limits<float>::max();
 
