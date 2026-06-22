@@ -18,6 +18,8 @@
 
 namespace network::socket {
 
+constexpr auto kMaxBufferSize = 42000;
+
 constexpr auto delimiter = "\n";
 
 class ClientSocket : public BaseSocket, public zappy::shared::network::IClientSocket {
