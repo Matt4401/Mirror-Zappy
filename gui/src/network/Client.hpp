@@ -19,6 +19,8 @@ class Client {
     static constexpr auto DefaultTeamName = "GRAPHIC\n";
 
     explicit Client(const parser::GuiConfig& config, std::shared_ptr<events::EventDispatcher> dispatcher);
+    explicit Client(std::unique_ptr<shared::network::IClientSocket> socket,
+                    std::shared_ptr<events::EventDispatcher> dispatcher);
     ~Client();
     Client(const Client& other) = delete;
     Client& operator=(const Client& other) = delete;
@@ -34,6 +36,8 @@ class Client {
     void update();
 
   private:
+    void initNetwork();
+
     std::unique_ptr<shared::network::IClientSocket> _socket;
     std::shared_ptr<events::EventDispatcher> _dispatcher;
     events::EventDispatcher::EventToken _sendToken{0};

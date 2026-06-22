@@ -16,6 +16,7 @@
 #include <utility>
 
 #include "EventDispatcher.hpp"
+#include "IClientSocket.hpp"
 #include "events/GuiEvents.hpp"
 #include "exception/SocketError.hpp"
 #include "protocol/Parser.hpp"
@@ -26,6 +27,16 @@ namespace zappy::gui::network {
 Client::Client(const parser::GuiConfig& config, std::shared_ptr<events::EventDispatcher> dispatcher)
     : _socket{std::make_unique<::network::socket::ClientSocket>(config.machine, config.port)},
       _dispatcher{std::move(dispatcher)} {
+    initNetwork();
+}
+
+Client::Client(std::unique_ptr<shared::network::IClientSocket> socket,
+               std::shared_ptr<events::EventDispatcher> dispatcher)
+    : _socket{std::move(socket)}, _dispatcher{std::move(dispatcher)} {
+    initNetwork();
+}
+
+void Client::initNetwork() {
     std::optional<std::string> welcomeMsg;
     auto startTime = std::chrono::steady_clock::now();
     while (!(welcomeMsg = _socket->tryPopMessage())) {
