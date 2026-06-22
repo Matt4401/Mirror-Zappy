@@ -16,10 +16,10 @@
 #include <utility>
 
 #include "EventDispatcher.hpp"
-#include "IClientSocket.hpp"
 #include "events/GuiEvents.hpp"
 #include "exception/SocketError.hpp"
 #include "protocol/Parser.hpp"
+#include "shared/include/network/IClientSocket.hpp"
 #include "socket/ClientSocket.hpp"
 #include "strategy/GUIStrategy.hpp"
 
