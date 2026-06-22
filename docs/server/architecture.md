@@ -16,64 +16,58 @@ The following diagram illustrates the structural relationships between the major
 
 ```mermaid
 classDiagram
-    %% The Orchestrator
     class Core {
-        <<Orchestrator>>
         -SessionManager _sessionManager
         -World _world
         -CommandFactory _commandFactory
-        -map~int,ClientState~ _clientStates
-        -map~int,size_t~ _clientToPlayer
+        -Map _clientStates
+        -Map _clientToPlayer
         +loop() void
         +processNetworkEvents() void
         +processGameTick() void
     }
 
-    %% The Network Layer
     class SessionManager {
-        <<Network Layer>>
         -ServerSocket _serverSocket
-        -map~int,ClientSocket~ _clients
-        -queue~NetworkEvent~ _eventQueue
-        +pollNetwork(int timeout)
+        -Map _clients
+        -Queue _eventQueue
+        +pollNetwork(timeout)
         +tryPopMessage()
         +sendMessage(clientId, msg)
     }
 
-    %% The Translator
     class CommandFactory {
-        <<Translator>>
-        +createCommand(string_view) unique_ptr~ICommand~
+        +createCommand(text) ICommand
     }
 
-    %% The Game Engine
     class World {
-        <<Game Engine>>
-        -map~size_t,Player~ _playerList
-        -vector~string~ _guiEvents
-        +update()
-        +pushCommandToPlayer(playerId, ICommand)
+        -Map _playerList
+        -Vector _guiEvents
+        +update() void
+        +pushCommandToPlayer(playerId, cmd) void
     }
 
     class Player {
-        -queue~ICommand~ _commands
+        -Queue _commands
         -ICommand _currentCommand
         -int _cmdTick
-        +update(World)
-        +tryStartNextCommand(World)
+        +update(world) void
+        +tryStartNextCommand(world) void
     }
 
     class ICommand {
-        <<interface>>
-        +start(World, Player) bool
-        +execute(World, Player)
+        +start(world, player) bool
+        +execute(world, player) void
     }
 
-    %% Relationships
+    class ServerSocket
+    class ClientSocket
+
     Core "1" *-- "1" SessionManager : Polls and Flushes
     Core "1" *-- "1" World : Ticks time
     Core "1" *-- "1" CommandFactory : Translates text
     SessionManager "1" *-- "1" ServerSocket : Binds and listens
-    SessionManager "1" *-- "many" ClientSocket : Reads/Writes
+    SessionManager "1" *-- "many" ClientSocket : Reads and Writes
     World "1" *-- "many" Player : Manages
     Player "1" *-- "many" ICommand : Queues
+```
