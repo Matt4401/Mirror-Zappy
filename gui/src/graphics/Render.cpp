@@ -9,7 +9,6 @@
 
 #include <raylib.h>
 
-#include <iostream>
 #include <memory>
 #include <string>
 #include <utility>
@@ -37,10 +36,6 @@ Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher)
             [this](const shared::protocol::server::Msz& cmd) { _map.resize(cmd.width, cmd.height); });
         _sgtToken = _dispatcher->subscribe<shared::protocol::server::Sgt>(
             [this](const shared::protocol::server::Sgt& cmd) { _serverFrequency = static_cast<float>(cmd.timeUnit); });
-        _playerClickedToken = _dispatcher->subscribe<events::PlayerClicked>([this](const events::PlayerClicked& event) {
-            std::cout << "Player clicked: " << event.playerName << " from team " << event.teamName << " at position ("
-                      << event.position.x() << ", " << event.position.y() << ", " << event.position.z() << ")\n";
-        });
     }
     _window.setTargetFPS(DefaultFps);
     raylib::rcore::Window::setExitKey(0);
@@ -64,8 +59,12 @@ Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher)
     _gridManager->addPanel(_demoPanel, 1, 1, 12, 18);
     _gridManager->addPanel(_demoPanel2, 1, 19, 12, 8);
 
-    _inspector = std::make_shared<ui::menus::PlayerInspectorUI>(
-        0.0F, 0.0F, 300.0F, _dispatcher, font, [](const std::string& /*cmd*/) { /* fake callback for testing */ });
+    _inspector = std::make_shared<ui::menus::PlayerInspectorUI>(0.0F, 0.0F, 300.0F, _dispatcher, font,
+                                                                [this](const std::string& cmd) {
+                                                                    if (_dispatcher) {
+                                                                        _dispatcher->dispatch(events::SendCommand{cmd});
+                                                                    }
+                                                                });
     _gridManager->addPanel(_inspector, 14, 1, 10, 15);
 
     _pauseMenu =
@@ -87,9 +86,6 @@ Render::~Render() {
         if (_sgtToken != 0) {
             _dispatcher->unsubscribe<shared::protocol::server::Sgt>(_sgtToken);
         }
-    }
-    if (_dispatcher && _playerClickedToken != 0) {
-        _dispatcher->unsubscribe<events::PlayerClicked>(_playerClickedToken);
     }
     _pauseMenu.reset();
     _uiManager.clear();

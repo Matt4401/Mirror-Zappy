@@ -62,7 +62,6 @@ class Render {
     events::EventDispatcher::EventToken _mszToken{0};
     events::EventDispatcher::EventToken _sgtToken{0};
     float _serverFrequency{100.0F};
-    events::EventDispatcher::EventToken _playerClickedToken{0};
     ui::UIManager _uiManager;
     std::shared_ptr<ui::menus::PauseMenu> _pauseMenu;
     std::shared_ptr<ui::menus::PlayerInspectorUI> _inspector;
