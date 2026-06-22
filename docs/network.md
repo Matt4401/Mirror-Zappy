@@ -29,22 +29,32 @@ The `SessionManager` communicates with the main server loop via an internal `_ev
 
 This queue creates a perfect abstraction barrier. The rest of the server never interacts with file descriptors; it only processes events.
 
+## Asynchronous Writing (`POLLOUT`)
+
+In a single-threaded architecture, writing directly to a socket is dangerous; if the client has a slow connection, the `send()` system call will block the entire server. The `SessionManager` solves this using Write Buffers.
+
+1. **Queuing Messages:** When the `Core` calls `sendMessage()`, the data is not sent immediately. It is safely appended to the client's `_writeBuffer`.
+2. **The Write Event:** During the `poll()` phase, the server monitors all client sockets for the `POLLOUT` flag, which indicates the OS TCP window has available space.
+3. **Flushing:** If `POLLOUT` is triggered and the client's write buffer is not empty, the `SessionManager` performs a non-blocking `send()`. Any bytes that cannot be sent immediately remain in the buffer for the next polling cycle.
+
 ## System Diagram
 
 The following diagram illustrates the flow of data through the `SessionManager`:
 
 ```mermaid
 graph TD
-    A[TCP Socket Activity] --> B{Event Type}
+    A[TCP Socket Activity] --> B{poll flag}
     
-    B -- New Connection --> C[Accept and wrap in ClientSocket]
-    C --> D[Push CLIENT_CONNECTED to Queue]
-    
-    B -- Data Received --> E[Read bytes into Client Buffer]
-    E --> F{Buffer > 42000 bytes?}
-    
+    %% The Read Path
+    B -- POLLIN (Data Ready) --> E[Read bytes into Read Buffer]
+    E --> F{Read Buffer > 42000 bytes?}
     F -- Yes --> G[Force Disconnect to prevent flood]
     F -- No --> H[Extract complete newline messages]
     H --> I[Push MESSAGE_RECEIVED to Queue]
-
+    
+    %% The Write Path
+    B -- POLLOUT (Socket Ready) --> W1{Is Write Buffer Empty?}
+    W1 -- No --> W2[Send bytes to Socket]
+    W2 --> W3[Remove sent bytes from Write Buffer]
+    W1 -- Yes --> W4[Do Nothing]
 ```
