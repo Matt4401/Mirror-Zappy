@@ -45,8 +45,8 @@ class Map {
     ~Map();
     Map(const Map& other) = delete;
     Map& operator=(const Map& other) = delete;
-    Map(Map&& other) noexcept = default;
-    Map& operator=(Map&& other) noexcept = default;
+    Map(Map&& other) = delete;
+    Map& operator=(Map&& other) = delete;
 
     void resize(int width, int height);
 
