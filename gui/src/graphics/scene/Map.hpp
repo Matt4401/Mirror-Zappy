@@ -42,7 +42,7 @@ class Map {
 
     Map(int width, int height, std::shared_ptr<raylib::rcore::Camera> camera,
         std::shared_ptr<events::EventDispatcher> dispatcher = nullptr);
-    ~Map() = default;
+    ~Map();
     Map(const Map& other) = delete;
     Map& operator=(const Map& other) = delete;
     Map(Map&& other) noexcept = default;
@@ -74,6 +74,7 @@ class Map {
     raylib::rmodels::Model _thystameModel{THYSTAME_MODEL_RESOURCE};
     raylib::rmodels::Model _mendianeModel{MENDIANE_MODEL_RESOURCE};
     raylib::rmodels::Model _foodModel{FOOD_TEXTURE_RESOURCE};
+    events::EventDispatcher::EventToken _nameToken{0};
 
     static constexpr int MOUSE_LEFT_CLICK = 0;
 };
