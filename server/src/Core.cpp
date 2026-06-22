@@ -170,6 +170,15 @@ void Core::handleHandshake(int clientId, std::string_view teamName) {
     _clientStates[clientId] = ClientState::IN_GAME;
     _sessionManager->sendMessage(clientId, std::format("{}\n{} {}\n", _world->getAvailableSlotInTeam(teamName),
                                                        _world->sizeMap().x, _world->sizeMap().y));
+    const auto& playerList = _world->playerList();
+    _world->addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pnw{
+        .playerId = static_cast<int>(playerIdOpt.value()),
+        .x = static_cast<int>(playerList.at(playerIdOpt.value())->position().x),
+        .y = static_cast<int>(playerList.at(playerIdOpt.value())->position().y),
+        .orientation = static_cast<int>(playerList.at(playerIdOpt.value())->orientation()),
+        .level = 1,
+        .teamName = std::string{teamName},
+    }));
 }
 
 void Core::handleInGameMessage(int clientId, std::string_view message) {
