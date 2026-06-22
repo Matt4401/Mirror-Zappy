@@ -241,7 +241,7 @@ void Core::flushGuiResponses() {
 }
 
 void Core::sendGuiInitialState(int clientId) {
-    auto eggs = _world->vecEggs();
+    const auto& eggs = _world->vecEggs();
     guiCommand::Mct mct{};
     guiCommand::Tna tna{};
     _sessionManager->sendMessage(clientId, shared::protocol::Emitter::build(shared::protocol::server::Msz{
