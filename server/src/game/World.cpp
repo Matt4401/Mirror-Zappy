@@ -369,10 +369,10 @@ std::string World::transformResourcesToStr(const Tile& tile) {
     std::string str{};
 
     for (int i = 0; i < tile.eggs.size(); i++) {
-        str += " egg";
+        str += "egg ";
     }
     for (int i = 0; i < tile.players.size(); i++) {
-        str += " player";
+        str += "player ";
     }
     for (int i = 0; i < static_cast<int>(ItemType::COUNT); i++) {
         const auto name = resourcesName(static_cast<ItemType>(i));
@@ -380,7 +380,7 @@ std::string World::transformResourcesToStr(const Tile& tile) {
             continue;
         }
         for (int j = 0; std::cmp_less(j, tile.resources.at(i)); j++) {
-            str += name;
+            str += " " + name;
         }
     }
     return str;

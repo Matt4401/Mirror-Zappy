@@ -150,12 +150,13 @@ std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> Player::inventory
 
 std::vector<Position> Player::getLookPos(const Position mapLimit) {
     std::vector pos{{Position{.x = _pos.x, .y = _pos.y}}};
-    pos.reserve(kMaxLookPos);
-    Position actualDiagPos{};
+    pos.reserve((static_cast<std::size_t>(_level) + 1) * (static_cast<std::size_t>(_level) + 1));
+
     for (std::uint8_t i = 0; i < _level; i++) {
-        actualDiagPos = getNthDiagonalLeftPosition(i + 1, mapLimit);
+        const Position actualDiagPos = getNthDiagonalLeftPosition(i + 1, mapLimit);
         pos.emplace_back(actualDiagPos);
-        for (int j = 0; j < 2 + ((_level - 1) * 2); j++) {
+        const int stepsToRight = 2 * (i + 1);
+        for (int j = 0; j < stepsToRight; j++) {
             pos.emplace_back(getLeftTile(pos.back(), mapLimit));
         }
     }
