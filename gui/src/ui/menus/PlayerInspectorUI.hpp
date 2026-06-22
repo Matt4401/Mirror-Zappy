@@ -17,6 +17,7 @@
 #include "events/GuiEvents.hpp"
 #include "protocol/Commands.hpp"
 #include "rcore/Event.hpp"
+#include "rtext/Font.hpp"
 #include "ui/components/UIButton.hpp"
 #include "ui/components/UIImage.hpp"
 #include "ui/components/UIText.hpp"
