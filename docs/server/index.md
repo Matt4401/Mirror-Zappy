@@ -18,6 +18,6 @@ This server is built to adhere to strict performance and architectural constrain
 This documentation breaks down the server into its three primary layers:
 
 1.  **[Architecture](architecture.md):** The high-level design patterns.
-2.  **[Network Layer](network.md):** TCP socket management and message extraction.
+2.  **[Network Layer](../network.md):** TCP socket management and message extraction.
 3.  **[Core Orchestrator](core.md):** Time synchronization and command translation.
 4.  **[Game Engine](game_engine.md):** Map data, player states, and command execution.

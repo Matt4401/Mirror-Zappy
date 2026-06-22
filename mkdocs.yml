@@ -7,8 +7,10 @@ nav:
       - Architecture: server/architecture.md
       - Core Orchestrator: server/core.md
       - Game Engine: server/game_engine.md
-  - AI: ai/
-  - GUI: gui/
+  - AI:
+      - Overview: ai/index.md
+  - GUI:
+      - Overview: gui/index.md
 theme:
   name: readthedocs
 plugins:
