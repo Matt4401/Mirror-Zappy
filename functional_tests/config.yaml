@@ -5,6 +5,6 @@ binaries:
 server_args:
   width: "10"
   height: "10"
-  teams: ["team1", "team2"]
+  teams: [ "team1", "team2" ]
   clients_per_team: "5"
   freq: "1000"

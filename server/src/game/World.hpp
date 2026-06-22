@@ -10,7 +10,6 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
-#include <map>
 #include <memory>
 #include <optional>
 #include <string>
@@ -37,18 +36,14 @@ struct Tile {
     std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> resources;
 };
 
-// NOLINTNEXTLINE
-const std::map<cardinalPoint, std::string> kCardinalPointToStr = {
-    {cardinalPoint::NORTH, "north"},
-    {cardinalPoint::EAST, "east"},
-    {cardinalPoint::SOUTH, "south"},
-    {cardinalPoint::WEST, "west"},
-};
-
 class World {
   public:
     explicit World(const parser::ServerConfig& config);
     void setSpawnEggs(size_t clientLimit, std::string_view teamName);
+    /*
+     * @brief: this function spawns the resources on the map.
+     **/
+    void addItemsToMap();
     static cardinalPoint randomCardinalPoint();
     ~World() = default;
 
@@ -78,11 +73,9 @@ class World {
     const std::unordered_map<std::size_t, std::unique_ptr<Player>>& playerList() const;
     void addItemOnGround(ItemType item, Position pos);
     void removeItemOnGround(ItemType item, Position pos);
-    std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> tileResources(Position position) const;
 
     [[nodiscard]] int getNextExecutionTick() const;
-    [[nodiscard]] std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> getResourcesAt(std::size_t x,
-                                                                                                std::size_t y) const;
+    [[nodiscard]] std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> resourcesAt(Position pos) const;
     [[nodiscard]] std::string getPlayerTeam(std::size_t id) const;
     void layEgg(const Player& player);
 
@@ -96,6 +89,7 @@ class World {
     std::size_t _newId{0};
     std::vector<Tile> _tiles;
     std::unordered_map<std::size_t, Egg> _vecEggs;
+    std::size_t respawnTicks{0};
 
     std::vector<std::string> _guiEvents;
 
@@ -105,5 +99,9 @@ class World {
     void eraseEggFromTile(std::size_t position1dVec, std::size_t id);
     std::optional<Egg> getTeamEgg(const std::string_view& teamName);
     void removeFromMap(std::size_t id);
+    [[nodiscard]] static std::unordered_map<ItemType, double> densityItem();
+    [[nodiscard]] static std::unordered_map<cardinalPoint, std::string> cardinalPointToStr();
+
+    static constexpr std::size_t kNbTicksToRespawn = 20;
 };
 }  // namespace zappy::server::game
