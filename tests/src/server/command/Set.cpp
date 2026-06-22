@@ -71,7 +71,7 @@ TEST(SetTest, CheckStartSuccess) {
     game::World world{config};
     game::Player player{0, 5, 5, game::cardinalPoint::NORTH};
 
-    const game::ItemType item = game::kMapItemString.at("deraumere");
+    const game::ItemType item = game::mapItemString().at("deraumere");
     player.addItem(item);
 
     Set set{"deraumere"};
@@ -91,7 +91,7 @@ TEST(SetTest, CheckExecuteInventoryAndWorld) {
     game::World world{config};
     game::Player player{0, 5, 5, game::cardinalPoint::NORTH};
 
-    const game::ItemType item = game::kMapItemString.at("deraumere");
+    const game::ItemType item = game::mapItemString().at("deraumere");
     player.addItem(item);
 
     Set set{"deraumere"};

@@ -46,11 +46,7 @@ void World::setSpawnEggs(const std::size_t clientLimit, const std::string_view t
     }
 }
 
-void World::addItemToMap() {
-    if (_heightMap == 0 || _widthMap == 0) {
-        return;
-    }
-
+void World::addItemsToMap() {
     std::random_device rd;
     std::mt19937 e{rd()};
     const std::size_t totalTiles = _heightMap * _widthMap;
@@ -84,7 +80,7 @@ World::World(const parser::ServerConfig& config) : _heightMap(config.height), _w
         _teamList[teamName] = std::make_unique<Team>(config.clientLimit);
         setSpawnEggs(config.clientLimit, teamName);
     }
-    addItemToMap();
+    addItemsToMap();
 }
 
 Position World::sizeMap() const {
@@ -180,6 +176,11 @@ void World::updatePositionOnMap(const std::size_t id, const Position& oldPositio
 }
 
 void World::update() {
+    respawnTicks++;
+    if (respawnTicks == kNbTicksToRespawn) {
+        addItemsToMap();
+        respawnTicks = 0;
+    }
     for (const auto& player : _playerList | std::views::values) {
         player->update(*this);
     }
@@ -326,11 +327,12 @@ void World::layEgg(const Player& player) {
     }
     _vecEggs[_newId] = Egg{.id = _newId, .position = pos, .teamName = teamName};
     _tiles.at(tileIndex).eggs.emplace_back(_newId);
-    addGuiEvent(
-        shared::protocol::Emitter::build(shared::protocol::server::Enw{.eggId = static_cast<int>(_newId),
-                                                                       .playerId = static_cast<int>(player.id()),
-                                                                       .x = static_cast<int>(pos.x),
-                                                                       .y = static_cast<int>(pos.y)}));
+    addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Enw{
+        .eggId = static_cast<int>(_newId),
+        .playerId = static_cast<int>(player.id()),
+        .x = static_cast<int>(pos.x),
+        .y = static_cast<int>(pos.y),
+    }));
     _teamList.at(teamName)->addNewTeamSlot();
     _newId++;
 }

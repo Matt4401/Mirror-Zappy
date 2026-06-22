@@ -400,7 +400,7 @@ TEST(WorldResourcesTest, CheckZeroSizeMapDoesNotCrash) {
     };
     World world{config};
 
-    ASSERT_NO_THROW(world.addItemToMap());
+    ASSERT_NO_THROW(world.addItemsToMap());
 }
 
 }  // namespace zappy::server::game
