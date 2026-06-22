@@ -24,7 +24,7 @@ class VisionManager:
         new_tiles = [[] for _ in range(total_tiles)]
 
         for y in range(self.current_level):
-            current_row_start = y ** 2
+            current_row_start = y**2
             next_row_start = (y + 1) ** 2
             row_length = (y * 2) + 1
 
