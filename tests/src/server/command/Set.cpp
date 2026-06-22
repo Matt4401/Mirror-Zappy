@@ -71,7 +71,7 @@ TEST(SetTest, CheckStartSuccess) {
     game::World world{config};
     game::Player player{0, 5, 5, game::cardinalPoint::NORTH};
 
-    const game::ItemType item = game::kMapItemString.at("deraumere");
+    const game::ItemType item = game::mapItemString().at("deraumere");
     player.addItem(item);
 
     Set set{"deraumere"};
@@ -91,19 +91,19 @@ TEST(SetTest, CheckExecuteInventoryAndWorld) {
     game::World world{config};
     game::Player player{0, 5, 5, game::cardinalPoint::NORTH};
 
-    const game::ItemType item = game::kMapItemString.at("deraumere");
+    const game::ItemType item = game::mapItemString().at("deraumere");
     player.addItem(item);
 
     Set set{"deraumere"};
 
     const auto itemIdx = static_cast<std::uint8_t>(item);
-    const auto initialGroundCount = world.tileResources(player.position()).at(itemIdx);
+    const auto initialGroundCount = world.resourcesAt(player.position()).at(itemIdx);
 
     set.execute(world, player);
 
     ASSERT_EQ(player.inventory().at(itemIdx), 0);
 
-    const auto finalGroundCount = world.tileResources(player.position()).at(itemIdx);
+    const auto finalGroundCount = world.resourcesAt(player.position()).at(itemIdx);
     ASSERT_EQ(finalGroundCount, initialGroundCount + 1);
 }
 

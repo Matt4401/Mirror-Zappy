@@ -7,6 +7,7 @@
 
 #include "Bct.hpp"
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
 
@@ -26,7 +27,8 @@ std::string Bct::execute(Core& core) {
         static_cast<std::uint32_t>(_y) >= mapSize.y) {
         return "sbp\n";
     }
-    auto resources = core.world().getResourcesAt(_x, _y);
+    auto resources =
+        core.world().resourcesAt(game::Position{.x = static_cast<std::size_t>(_x), .y = static_cast<std::size_t>(_y)});
     auto payload = shared::protocol::Emitter::build(shared::protocol::server::Bct{
         .x = _x,
         .y = _y,

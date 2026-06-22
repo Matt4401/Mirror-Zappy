@@ -18,3 +18,6 @@ class Inventory:
         self.phiras = phiras
         self.thystame = thystame
         self.food = food
+
+    def get_food(self):
+        return self.food

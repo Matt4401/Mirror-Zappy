@@ -24,6 +24,8 @@
 #include "Player.hpp"
 #include "Team.hpp"
 #include "command/ICommand.hpp"
+#include "protocol/Commands.hpp"
+#include "protocol/Emitter.hpp"
 #include "strategy/ServerStrategy.hpp"
 
 namespace zappy::server::game {
@@ -44,6 +46,23 @@ void World::setSpawnEggs(const std::size_t clientLimit, const std::string_view t
     }
 }
 
+void World::addItemsToMap() {
+    std::random_device rd;
+    std::mt19937 e{rd()};
+    const std::size_t totalTiles = _heightMap * _widthMap;
+    std::uniform_int_distribution<std::size_t> dist{0, totalTiles - 1};
+
+    for (const auto& [itemType, density] : densityItem()) {
+        const auto quantity = static_cast<std::size_t>(static_cast<double>(totalTiles) * density);
+
+        for (std::size_t i = 0; i < quantity; ++i) {
+            const std::size_t randomTileIndex = dist(e);
+            const auto itemIdx = static_cast<std::uint8_t>(itemType);
+            _tiles.at(randomTileIndex).resources.at(itemIdx) += 1;
+        }
+    }
+}
+
 cardinalPoint World::randomCardinalPoint() {
     std::random_device rd;
     std::mt19937 e{rd()};
@@ -61,6 +80,7 @@ World::World(const parser::ServerConfig& config) : _heightMap(config.height), _w
         _teamList[teamName] = std::make_unique<Team>(config.clientLimit);
         setSpawnEggs(config.clientLimit, teamName);
     }
+    addItemsToMap();
 }
 
 Position World::sizeMap() const {
@@ -120,10 +140,11 @@ std::optional<size_t> World::spawnPlayer(const std::string_view teamName) {
     return (position.y * _widthMap) + position.x;
 }
 
-void World::pushCommandToPlayer(const std::size_t playerId, std::unique_ptr<command::ICommand> command) const {
+void World::pushCommandToPlayer(const std::size_t playerId, std::unique_ptr<command::ICommand> command) {
     const auto& player = _playerList.at(playerId);
 
     player->pushCommand(std::move(command));
+    player->tryStartNextCommand(*this);
 }
 
 void World::removePlayerFromTeam(const std::size_t id) const {
@@ -155,6 +176,11 @@ void World::updatePositionOnMap(const std::size_t id, const Position& oldPositio
 }
 
 void World::update() {
+    respawnTicks++;
+    if (respawnTicks == kNbTicksToRespawn) {
+        addItemsToMap();
+        respawnTicks = 0;
+    }
     for (const auto& player : _playerList | std::views::values) {
         player->update(*this);
     }
@@ -222,7 +248,7 @@ void World::eject(const std::size_t id) {
         pushedPlayer->moveWithOrientation(Position{.x = limitX, .y = limitY}, orientation);
         const auto [newX, newY] = pushedPlayer->position();
         updatePositionOnMap(pushedPlayer->id(), {.x = oldX, .y = oldY}, {.x = newX, .y = newY});
-        pushedPlayer->addResponse("eject: " + kCardinalPointToStr.at(orientation) + "\n");
+        pushedPlayer->addResponse("eject: " + cardinalPointToStr().at(orientation) + "\n");
     }
     for (const auto idEgg : vecEggPush) {
         _vecEggs.erase(idEgg);
@@ -278,14 +304,57 @@ void World::removeItemOnGround(ItemType item, const Position pos) {
     _tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(item))--;
 }
 
-std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> World::tileResources(const Position position) const {
+std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> World::resourcesAt(const Position position) const {
     return _tiles.at(getTileIndex(position)).resources;
 }
 
-std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> World::getResourcesAt(const std::size_t x,
-                                                                                     const std::size_t y) const {
-    const auto tileIndex = getTileIndex(x, y);
-    return _tiles.at(tileIndex).resources;
+std::string World::getPlayerTeam(const std::size_t playerId) const {
+    for (const auto& [teamName, teamObj] : _teamList) {
+        if (teamObj->isInTeam(playerId)) {
+            return teamName;
+        }
+    }
+    return "";
+}
+
+void World::layEgg(const Player& player) {
+    const auto pos = player.position();
+    const auto tileIndex = getTileIndex(pos);
+    const std::string teamName = getPlayerTeam(player.id());
+
+    if (teamName.empty()) {
+        return;
+    }
+    _vecEggs[_newId] = Egg{.id = _newId, .position = pos, .teamName = teamName};
+    _tiles.at(tileIndex).eggs.emplace_back(_newId);
+    addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Enw{
+        .eggId = static_cast<int>(_newId),
+        .playerId = static_cast<int>(player.id()),
+        .x = static_cast<int>(pos.x),
+        .y = static_cast<int>(pos.y),
+    }));
+    _teamList.at(teamName)->addNewTeamSlot();
+    _newId++;
+}
+
+void World::addGuiEvent(const std::string& event) { _guiEvents.push_back(event); }
+
+std::unordered_map<ItemType, double> World::densityItem() {
+    static const std::unordered_map<ItemType, double> kDensityItem = {
+        {ItemType::Food, 0.5},     {ItemType::Linemate, 0.3}, {ItemType::Deraumere, 0.15}, {ItemType::Sibur, 0.1},
+        {ItemType::Mendiane, 0.1}, {ItemType::Phiras, 0.08},  {ItemType::Thystame, 0.05},
+    };
+    return kDensityItem;
+}
+
+std::unordered_map<cardinalPoint, std::string> World::cardinalPointToStr() {
+    static const std::unordered_map<cardinalPoint, std::string> kCardinalPointToStr = {
+        {cardinalPoint::NORTH, "north"},
+        {cardinalPoint::EAST, "east"},
+        {cardinalPoint::SOUTH, "south"},
+        {cardinalPoint::WEST, "west"},
+    };
+    return kCardinalPointToStr;
 }
 
 std::string World::resourcesName(const ItemType item) {

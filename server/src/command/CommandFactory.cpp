@@ -18,6 +18,7 @@
 #include "Inventory.hpp"
 #include "Set.hpp"
 #include "Take.hpp"
+#include "command/Fork.hpp"
 #include "command/Forward.hpp"
 #include "command/ICommand.hpp"
 #include "command/Left.hpp"
@@ -56,6 +57,7 @@ CommandFactory::CommandFactory() {
         }
         return nullptr;
     });
+    _creators.emplace("Fork", [](std::string_view) { return std::make_unique<Fork>(); });
 
     _guiCreators.emplace("msz", [](std::string_view) { return std::make_unique<guiCommand::Msz>(); });
     _guiCreators.emplace("sgt", [](std::string_view) { return std::make_unique<guiCommand::Sgt>(); });

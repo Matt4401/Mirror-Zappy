@@ -9,18 +9,8 @@
 
 #include <raylib.h>
 
-#include "context/EventContext.hpp"
-
 namespace zappy::gui::raylib::rcore {
 Event::Event() = default;
-
-void Event::handleEvent(EventContext& context) {
-    for (const auto& [key, func] : _keyEvents) {
-        if (isKeyDown(key)) {
-            func(context);
-        }
-    }
-}
 
 void Event::update() {
     _pressedKeys.clear();

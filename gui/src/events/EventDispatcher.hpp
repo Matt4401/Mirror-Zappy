@@ -54,6 +54,19 @@ class EventDispatcher {
         }
     }
 
+    template <typename EventType>
+    void dispatch(const EventType& event) {
+        auto type = std::type_index(typeid(EventType));
+
+        if (auto it = _listeners.find(type); it != _listeners.end()) {
+            for (const auto& [token, anyCallback] : it->second) {
+                (void)token;
+                auto callback = std::any_cast<std::function<void(const EventType&)>>(anyCallback);
+                callback(event);
+            }
+        }
+    }
+
     /**
      * @brief Dispatch a command to all subscribed listeners.
      */

@@ -15,22 +15,26 @@
 #include "rmath/Vector2.hpp"
 
 namespace zappy::gui::raylib::rtextures {
+class Image;
+
 class Texture2D {
   public:
     explicit Texture2D(const std::string& path) : _texture{LoadTexture(path.c_str())} {}
-    explicit Texture2D(::Texture2D texture) : _texture{texture} {}
+    explicit Texture2D(::Texture2D texture, bool owns = true) : _texture{texture}, _ownsTexture{owns} {}
 
     ~Texture2D() { reset(); }
 
     Texture2D(const Texture2D& other) = delete;
     Texture2D& operator=(const Texture2D& other) = delete;
 
-    Texture2D(Texture2D&& other) noexcept : _texture{std::exchange(other._texture, {})} {}
+    Texture2D(Texture2D&& other) noexcept
+        : _texture{std::exchange(other._texture, {})}, _ownsTexture{std::exchange(other._ownsTexture, true)} {}
 
     Texture2D& operator=(Texture2D&& other) noexcept {
         if (this != &other) {
             reset();
             _texture = std::exchange(other._texture, {});
+            _ownsTexture = std::exchange(other._ownsTexture, true);
         }
         return *this;
     }
@@ -40,6 +44,8 @@ class Texture2D {
     [[nodiscard]] int height() const { return _texture.height; }
     [[nodiscard]] ::Texture2D texture() const { return _texture; }
     [[nodiscard]] unsigned int id() const { return _texture.id; }
+
+    static Texture2D loadCubemap(const Image& image, int layoutType);
 
     void draw(rmath::Vector2 position, Color tint) const { DrawTextureV(_texture, position.vector(), tint.color()); }
     void draw(rmath::Vector2 position, float rotation, float scale, Color tint) const {
@@ -57,5 +63,6 @@ class Texture2D {
   private:
     void reset();
     ::Texture2D _texture{};
+    bool _ownsTexture{true};
 };
 }  // namespace zappy::gui::raylib::rtextures

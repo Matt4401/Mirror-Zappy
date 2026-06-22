@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 
+#include "Color.hpp"
 #include "Egg.hpp"
 #include "GameModel.hpp"
 #include "Player.hpp"
@@ -18,7 +19,8 @@
 namespace zappy::gui::game {
 class Team {
   public:
-    Team(std::string& name, std::size_t slot) : _name(name), _eggs(slot) {};
+    Team(std::string& name, std::size_t slot, raylib::Color teamColor)
+        : _name(name), _teamColor(teamColor), _eggs(slot) {};
     ~Team() = default;
     Team(const Team& other) = delete;
     Team& operator=(const Team& other) = delete;
@@ -27,13 +29,18 @@ class Team {
 
     void draw(const GameModel& gameModel) const;
 
-    void addPlayer(raylib::rmath::Vector3 position = {10.0F, 12.0F, 0.0F}) {
-        _players.emplace_back(position, _name + std::to_string(_players.size()), Player::cardinalPoint::NORTH);
-    }  // TEMPORARY FUNCTION, JUST FOR TESTING
+    void addPlayer(int id, raylib::rmath::Vector3 position, Player::cardinalPoint orientation) {
+        _players.emplace_back(id, position, _name + std::to_string(id), orientation);
+    }
+
+    [[nodiscard]] const std::string& name() const { return _name; }
+    [[nodiscard]] const std::vector<Player>& players() const { return _players; }
+    [[nodiscard]] raylib::Color color() const { return _teamColor; }
 
   protected:
   private:
     std::string _name;
+    raylib::Color _teamColor;
     std::vector<Player> _players;
     std::vector<Egg> _eggs;
 };

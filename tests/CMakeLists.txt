@@ -8,6 +8,7 @@ add_executable(unit_tests
         src/server/parsing/Parser.cpp
         src/gui/parsing/Parser.cpp
         src/gui/events/EventDispatcherTest.cpp
+        src/gui/network/ClientTest.cpp
         src/network/Socket.cpp
         src/network/SessionManager.cpp
         src/server/Core.cpp
@@ -21,6 +22,7 @@ add_executable(unit_tests
         src/server/World.cpp
         src/protocol/ProtocolTest.cpp
         src/server/command/Eject.cpp
+        src/server/command/Fork.cpp
         src/server/command/Take.cpp
         src/server/command/Set.cpp
         src/server/command/Inventory.cpp
@@ -33,6 +35,7 @@ target_link_libraries(unit_tests PRIVATE
         zappy_parser
         zappy_server_objects
         zappy_gui_events
+        zappy_gui_network
         GTest::gtest
         GTest::gmock
         GTest::gmock_main
@@ -43,7 +46,7 @@ target_compile_definitions(unit_tests
 )
 
 add_test(NAME python_tests
-        COMMAND ${Python3_EXECUTABLE} -m pytest ${CMAKE_SOURCE_DIR}/tests/src/ai/test_main.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_AIConnection.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_inventory_class.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_VisionManager.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_Logger.py
+        COMMAND ${Python3_EXECUTABLE} -m pytest ${CMAKE_SOURCE_DIR}/tests/src/ai/test_main.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_Connection.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_inventory_class.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_VisionManager.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_Logger.py
 )
 
 set_tests_properties(python_tests PROPERTIES

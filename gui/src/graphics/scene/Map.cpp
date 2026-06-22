@@ -7,17 +7,26 @@
 
 #include "Map.hpp"
 
+#include <functional>
+#include <limits>
 #include <memory>
+#include <optional>
 #include <utility>
 
 #include "Tile3D.hpp"
+#include "events/EventDispatcher.hpp"
+#include "events/GuiEvents.hpp"
+#include "game/Player.hpp"
+#include "game/Team.hpp"
 #include "game/components/IObject.hpp"
 #include "rcore/Camera.hpp"
+#include "rcore/Event.hpp"
 #include "rmath/Vector3.hpp"
 
 namespace zappy::gui::graphics::scene {
-Map::Map(int width, int height, std::shared_ptr<raylib::rcore::Camera> camera)
-    : _camera(std::move(camera)), _gameModel(_camera) {
+Map::Map(int width, int height, std::shared_ptr<raylib::rcore::Camera> camera,
+         std::shared_ptr<events::EventDispatcher> dispatcher)
+    : _camera(std::move(camera)), _dispatcher(std::move(dispatcher)), _gameModel(_camera) {
     resize(width, height);
     _itemDrawFunctions["Deraumere"] = [this](const game::IObject& object) { object.draw(_deraumereModel); };
     _itemDrawFunctions["Linemate"] = [this](const game::IObject& object) { object.draw(_linemateModel); };
@@ -26,12 +35,11 @@ Map::Map(int width, int height, std::shared_ptr<raylib::rcore::Camera> camera)
     _itemDrawFunctions["Thystame"] = [this](const game::IObject& object) { object.draw(_thystameModel); };
     _itemDrawFunctions["Mendiane"] = [this](const game::IObject& object) { object.draw(_mendianeModel); };
     _itemDrawFunctions["Food"] = [this](const game::IObject& object) { object.draw(_foodModel); };
-    // std::string teamName = "Team1"; // TEMPORARY TEAM NAME, JUST FOR TESTING
-    // _teams.emplace_back(game::Team(teamName, 5)); // TEMPORARY TEAM, JUST FOR TESTING
-    // _teams[0].addPlayer({10.0F, scene::Tile3D::TILE_SIZE * 1.4, 0.0F}); // TEMPORARY PLAYER, JUST FOR TESTING
 }
 
 void Map::resize(int width, int height) {
+    _width = width;
+    _height = height;
     _tiles.clear();
     raylib::rmath::Vector3 position{0.0F, 0.0F, 0.0F};
 
@@ -41,14 +49,6 @@ void Map::resize(int width, int height) {
             position.setZ(static_cast<float>(static_cast<float>(z) * Tile3D::TILE_SIZE));
             _tiles.emplace_back(position);
         }
-        // TEMPORARY : Add a Deraumere item to the tile for testing
-        //  _tiles.back().itemBag().addItem(std::make_unique<game::Deraumere>(position));
-        // _tiles.back().itemBag().addItem(std::make_unique<game::Linemate>(position));
-        // _tiles.back().itemBag().addItem(std::make_unique<game::Sibur>(position));
-        // _tiles.back().itemBag().addItem(std::make_unique<game::Phiras>(position));
-        // _tiles.back().itemBag().addItem(std::make_unique<game::Thystame>(position));
-        // _tiles.back().itemBag().addItem(std::make_unique<game::Mendiane>(position));
-        // _tiles.back().itemBag().addItem(std::make_unique<game::Food>(position));
     }
 }
 
@@ -73,5 +73,43 @@ void Map::drawItems(const Tile3D& tile) const {
             it->second(*item.object);
         }
     }
+}
+
+void Map::handleEvent(const raylib::rcore::Event& event) {
+    if (!raylib::rcore::Event::isMouseButtonPressed(MOUSE_LEFT_CLICK) || !_camera) {
+        return;
+    }
+
+    const auto ray = event.mouseRay(*_camera);
+    std::optional<SelectedPlayer> selected;
+    float nearestDistance = std::numeric_limits<float>::max();
+
+    for (const auto& team : _teams) {
+        for (const auto& player : team.players()) {
+            const auto collision = ray.collision(player.boundingBox());
+            if (collision.hit && collision.distance < nearestDistance) {
+                nearestDistance = collision.distance;
+                selected = std::make_pair(std::cref(team), std::cref(player));
+            }
+        }
+    }
+
+    if (selected.has_value()) {
+        dispatchClickedPlayer(selected->first, selected->second);
+    }
+}
+
+void Map::dispatchClickedPlayer(const game::Team& team, const game::Player& player) const {
+    if (!_dispatcher) {
+        return;
+    }
+    _dispatcher->dispatch(events::PlayerClicked{
+        .playerId = player.id(),
+        .teamName = team.name(),
+        .playerName = player.name(),
+        .position = player.position(),
+        .teamColor = team.color(),
+        .textureId = player.textureId(),
+    });
 }
 }  // namespace zappy::gui::graphics::scene
