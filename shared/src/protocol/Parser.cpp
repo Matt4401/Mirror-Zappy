@@ -21,6 +21,16 @@ namespace {
 using ServerParseFunc = ServerCommand (*)(std::istringstream&);
 using ClientParseFunc = ClientCommand (*)(std::istringstream&);
 
+bool extractHashId(std::istringstream& iss, int& id) {
+    char hash = 0;
+    if (iss >> hash && hash == '#') {
+        if (iss >> id) {
+            return true;
+        }
+    }
+    return false;
+}
+
 ServerCommand parseServerMsz(std::istringstream& iss) {
     server::Msz cmd{};
     if (iss >> cmd.width >> cmd.height) {
@@ -48,7 +58,7 @@ ServerCommand parseServerTna(std::istringstream& iss) {
 
 ServerCommand parseServerPnw(std::istringstream& iss) {
     server::Pnw cmd{};
-    if (iss >> cmd.playerId >> cmd.x >> cmd.y >> cmd.orientation >> cmd.level >> cmd.teamName) {
+    if (extractHashId(iss, cmd.playerId) && iss >> cmd.x >> cmd.y >> cmd.orientation >> cmd.level >> cmd.teamName) {
         return cmd;
     }
     return UnknownCommand{};
@@ -56,7 +66,7 @@ ServerCommand parseServerPnw(std::istringstream& iss) {
 
 ServerCommand parseServerPpo(std::istringstream& iss) {
     server::Ppo cmd{};
-    if (iss >> cmd.playerId >> cmd.x >> cmd.y >> cmd.orientation) {
+    if (extractHashId(iss, cmd.playerId) && iss >> cmd.x >> cmd.y >> cmd.orientation) {
         return cmd;
     }
     return UnknownCommand{};
@@ -64,7 +74,7 @@ ServerCommand parseServerPpo(std::istringstream& iss) {
 
 ServerCommand parseServerPlv(std::istringstream& iss) {
     server::Plv cmd{};
-    if (iss >> cmd.playerId >> cmd.level) {
+    if (extractHashId(iss, cmd.playerId) && iss >> cmd.level) {
         return cmd;
     }
     return UnknownCommand{};
@@ -72,8 +82,8 @@ ServerCommand parseServerPlv(std::istringstream& iss) {
 
 ServerCommand parseServerPin(std::istringstream& iss) {
     server::Pin cmd{};
-    if (iss >> cmd.playerId >> cmd.x >> cmd.y >> cmd.food >> cmd.linemate >> cmd.deraumere >> cmd.sibur >>
-        cmd.mendiane >> cmd.phiras >> cmd.thystame) {
+    if (extractHashId(iss, cmd.playerId) && iss >> cmd.x >> cmd.y >> cmd.food >> cmd.linemate >> cmd.deraumere >>
+                                                cmd.sibur >> cmd.mendiane >> cmd.phiras >> cmd.thystame) {
         return cmd;
     }
     return UnknownCommand{};
@@ -81,7 +91,7 @@ ServerCommand parseServerPin(std::istringstream& iss) {
 
 ServerCommand parseServerPex(std::istringstream& iss) {
     server::Pex cmd{};
-    if (iss >> cmd.playerId) {
+    if (extractHashId(iss, cmd.playerId)) {
         return cmd;
     }
     return UnknownCommand{};
@@ -89,7 +99,7 @@ ServerCommand parseServerPex(std::istringstream& iss) {
 
 ServerCommand parseServerPbc(std::istringstream& iss) {
     server::Pbc cmd{};
-    if (iss >> cmd.playerId) {
+    if (extractHashId(iss, cmd.playerId)) {
         std::string msg;
         std::getline(iss, msg);
         if (!msg.empty() && msg.front() == ' ') {
@@ -105,7 +115,7 @@ ServerCommand parseServerPic(std::istringstream& iss) {
     server::Pic cmd{};
     if (iss >> cmd.x >> cmd.y >> cmd.level) {
         int p = 0;
-        while (iss >> p) {
+        while (extractHashId(iss, p)) {
             cmd.playerIds.push_back(p);
         }
         return cmd;
@@ -123,7 +133,7 @@ ServerCommand parseServerPie(std::istringstream& iss) {
 
 ServerCommand parseServerPfk(std::istringstream& iss) {
     server::Pfk cmd{};
-    if (iss >> cmd.playerId) {
+    if (extractHashId(iss, cmd.playerId)) {
         return cmd;
     }
     return UnknownCommand{};
@@ -131,7 +141,7 @@ ServerCommand parseServerPfk(std::istringstream& iss) {
 
 ServerCommand parseServerPdr(std::istringstream& iss) {
     server::Pdr cmd{};
-    if (iss >> cmd.playerId >> cmd.resourceId) {
+    if (extractHashId(iss, cmd.playerId) && iss >> cmd.resourceId) {
         return cmd;
     }
     return UnknownCommand{};
@@ -139,7 +149,7 @@ ServerCommand parseServerPdr(std::istringstream& iss) {
 
 ServerCommand parseServerPgt(std::istringstream& iss) {
     server::Pgt cmd{};
-    if (iss >> cmd.playerId >> cmd.resourceId) {
+    if (extractHashId(iss, cmd.playerId) && iss >> cmd.resourceId) {
         return cmd;
     }
     return UnknownCommand{};
@@ -147,7 +157,7 @@ ServerCommand parseServerPgt(std::istringstream& iss) {
 
 ServerCommand parseServerPdi(std::istringstream& iss) {
     server::Pdi cmd{};
-    if (iss >> cmd.playerId) {
+    if (extractHashId(iss, cmd.playerId)) {
         return cmd;
     }
     return UnknownCommand{};
@@ -155,7 +165,7 @@ ServerCommand parseServerPdi(std::istringstream& iss) {
 
 ServerCommand parseServerEnw(std::istringstream& iss) {
     server::Enw cmd{};
-    if (iss >> cmd.eggId >> cmd.playerId >> cmd.x >> cmd.y) {
+    if (extractHashId(iss, cmd.eggId) && extractHashId(iss, cmd.playerId) && iss >> cmd.x >> cmd.y) {
         return cmd;
     }
     return UnknownCommand{};
@@ -163,7 +173,7 @@ ServerCommand parseServerEnw(std::istringstream& iss) {
 
 ServerCommand parseServerEbo(std::istringstream& iss) {
     server::Ebo cmd{};
-    if (iss >> cmd.eggId) {
+    if (extractHashId(iss, cmd.eggId)) {
         return cmd;
     }
     return UnknownCommand{};
@@ -171,7 +181,7 @@ ServerCommand parseServerEbo(std::istringstream& iss) {
 
 ServerCommand parseServerEdi(std::istringstream& iss) {
     server::Edi cmd{};
-    if (iss >> cmd.eggId) {
+    if (extractHashId(iss, cmd.eggId)) {
         return cmd;
     }
     return UnknownCommand{};
@@ -230,7 +240,7 @@ ClientCommand parseClientTna(std::istringstream& /*unused*/) { return client::Tn
 
 ClientCommand parseClientPpo(std::istringstream& iss) {
     client::Ppo cmd{};
-    if (iss >> cmd.playerId) {
+    if (extractHashId(iss, cmd.playerId)) {
         return cmd;
     }
     return UnknownCommand{};
@@ -238,7 +248,7 @@ ClientCommand parseClientPpo(std::istringstream& iss) {
 
 ClientCommand parseClientPlv(std::istringstream& iss) {
     client::Plv cmd{};
-    if (iss >> cmd.playerId) {
+    if (extractHashId(iss, cmd.playerId)) {
         return cmd;
     }
     return UnknownCommand{};
@@ -246,7 +256,7 @@ ClientCommand parseClientPlv(std::istringstream& iss) {
 
 ClientCommand parseClientPin(std::istringstream& iss) {
     client::Pin cmd{};
-    if (iss >> cmd.playerId) {
+    if (extractHashId(iss, cmd.playerId)) {
         return cmd;
     }
     return UnknownCommand{};
