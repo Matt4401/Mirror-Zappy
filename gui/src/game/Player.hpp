@@ -13,7 +13,6 @@
 #include <utility>
 
 #include "ItemBag.hpp"
-#include "gui/raylib/Color.hpp"
 #include "rcore/BoundingBox.hpp"
 #include "rmath/Vector3.hpp"
 
@@ -45,8 +44,6 @@ class Player {
     raylib::rmath::Vector3 _position{10.0F, 10.0F, 0.0F};
     std::string _name;
     cardinalPoint _orientation{cardinalPoint::NORTH};
-    std::string _teamName;
-    raylib::Color _teamColor;
     std::size_t _level{1};
     std::size_t _life{10};
     std::string _textureId;

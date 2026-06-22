@@ -35,6 +35,7 @@ class Team {
 
     [[nodiscard]] const std::string& name() const { return _name; }
     [[nodiscard]] const std::vector<Player>& players() const { return _players; }
+    [[nodiscard]] raylib::Color color() const { return _teamColor; }
 
   protected:
   private:
