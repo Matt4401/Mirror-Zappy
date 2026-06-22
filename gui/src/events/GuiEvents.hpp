@@ -25,4 +25,9 @@ struct PlayerClicked {
 struct SendCommand {
     std::string payload;
 };
+
+struct PlayerNameChanged {
+    int playerId;
+    std::string newName;
+};
 }  // namespace zappy::gui::events
