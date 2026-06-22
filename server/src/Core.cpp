@@ -241,6 +241,7 @@ void Core::flushGuiResponses() {
 }
 
 void Core::sendGuiInitialState(int clientId) {
+    auto eggs = _world->vecEggs();
     guiCommand::Mct mct{};
     guiCommand::Tna tna{};
     _sessionManager->sendMessage(clientId, shared::protocol::Emitter::build(shared::protocol::server::Msz{
@@ -251,6 +252,13 @@ void Core::sendGuiInitialState(int clientId) {
         shared::protocol::Emitter::build(shared::protocol::server::Sgt{.timeUnit = static_cast<int>(_config.freq)}));
     _sessionManager->sendMessage(clientId, mct.execute(*this));
     _sessionManager->sendMessage(clientId, tna.execute(*this));
+    for (const auto& [eggId, egg] : eggs) {
+        _sessionManager->sendMessage(clientId, shared::protocol::Emitter::build(shared::protocol::server::Enw{
+                                                   .eggId = static_cast<int>(egg.id),
+                                                   .playerId = -1,
+                                                   .x = static_cast<int>(egg.position.x),
+                                                   .y = static_cast<int>(egg.position.y)}));
+    }
 }
 
 }  // namespace zappy::server

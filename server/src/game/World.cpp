@@ -357,4 +357,6 @@ std::unordered_map<cardinalPoint, std::string> World::cardinalPointToStr() {
     return kCardinalPointToStr;
 }
 
+const std::unordered_map<std::size_t, Egg>& World::vecEggs() const { return _vecEggs; }
+
 }  // namespace zappy::server::game
