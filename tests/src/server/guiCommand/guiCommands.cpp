@@ -45,7 +45,6 @@ const auto createDummyArgs = []() {
 TEST(MszCommandTest, ExecuteReturnsCorrectDimensions) {
     auto args = createDummyArgs();
     zappy::server::Core core{std::span<char*>(args)};
-    core.setup();
 
     zappy::server::guiCommand::Msz command{};
     const std::string response = command.execute(core);
@@ -56,7 +55,6 @@ TEST(MszCommandTest, ExecuteReturnsCorrectDimensions) {
 TEST(SgtCommandTest, ExecuteReturnsCorrectFrequency) {
     auto args = createDummyArgs();
     zappy::server::Core core{std::span<char*>(args)};
-    core.setup();
 
     zappy::server::guiCommand::Sgt command{};
     const std::string response = command.execute(core);
@@ -67,7 +65,6 @@ TEST(SgtCommandTest, ExecuteReturnsCorrectFrequency) {
 TEST(BctCommandTest, ExecuteReturnsProperlyFormattedTileContent) {
     auto args = createDummyArgs();
     zappy::server::Core core{std::span(args)};
-    core.setup();
 
     zappy::server::guiCommand::Bct command{5, 5};
     const std::string response = command.execute(core);
@@ -89,7 +86,6 @@ TEST(BctCommandTest, ExecuteReturnsProperlyFormattedTileContent) {
 TEST(BctCommandTest, ExecuteFailsSafelyOnOutOfBounds) {
     auto args = createDummyArgs();
     zappy::server::Core core{std::span(args)};
-    core.setup();
 
     zappy::server::guiCommand::Bct command{999, 999};
     const std::string response = command.execute(core);
@@ -100,7 +96,6 @@ TEST(BctCommandTest, ExecuteFailsSafelyOnOutOfBounds) {
 TEST(MctCommandTest, ExecuteReturnsAllTileContents) {
     auto args = createDummyArgs();
     zappy::server::Core core{std::span(args)};
-    core.setup();
 
     zappy::server::guiCommand::Mct command{};
     const std::string response = command.execute(core);
@@ -128,7 +123,6 @@ TEST(MctCommandTest, ExecuteReturnsAllTileContents) {
 TEST(TnaCommandTest, ExecuteReturnsTeamNames) {
     auto args = createDummyArgs();
     zappy::server::Core core{std::span<char*>(args)};
-    core.setup();
 
     zappy::server::guiCommand::Tna command{};
     const std::string response = command.execute(core);

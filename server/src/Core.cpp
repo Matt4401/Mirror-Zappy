@@ -33,11 +33,17 @@
 
 namespace zappy::server {
 
-Core::Core(const std::span<char*> args) : _args(args) {}
+Core::Core(const std::span<char*> args) : _args(args) {
+    try {
+        setup();
+    } catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        throw;
+    }
+}
 
 int Core::run() {
     try {
-        setup();
         loop();
     } catch (const zappy::shared::exception::Exception& e) {
         if (std::string(e.what()) == zappy::parser::kUsageThrowMessage) {
@@ -202,6 +208,7 @@ void Core::handleGuiMessage(int clientId, std::string_view message) {
     if (command != nullptr) {
         const std::string response = command->execute(*this);
 
+        _timeUnit = static_cast<int>(1.0F / static_cast<float>(_config.freq) * 1000);
         if (!response.empty()) {
             _sessionManager->sendMessage(clientId, response);
         }
