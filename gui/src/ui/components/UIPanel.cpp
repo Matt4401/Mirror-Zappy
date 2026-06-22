@@ -7,8 +7,6 @@
 
 #include "UIPanel.hpp"
 
-#include <raylib.h>
-
 #include <algorithm>
 #include <memory>
 #include <ranges>
@@ -16,6 +14,7 @@
 
 #include "Color.hpp"
 #include "rcore/Event.hpp"
+#include "rmath/Rectangle.hpp"
 #include "rmath/Vector2.hpp"
 #include "rshapes/Shapes.hpp"
 #include "ui/IUIComponent.hpp"
@@ -30,7 +29,7 @@ void UIPanel::draw() {
         return;
     }
 
-    Rectangle const rec{.x = _position.x(), .y = _position.y(), .width = _size.x(), .height = _size.y()};
+    raylib::rmath::Rectangle const rec{.x = _position.x(), .y = _position.y(), .width = _size.x(), .height = _size.y()};
     if (_isRounded) {
         raylib::rshapes::Shapes::drawRectangleRounded(rec, RoundednessFactor, RoundedSegments, _color);
     } else {

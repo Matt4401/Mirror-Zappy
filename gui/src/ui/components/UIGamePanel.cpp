@@ -7,8 +7,6 @@
 
 #include "UIGamePanel.hpp"
 
-#include <raylib.h>
-
 #include <algorithm>
 #include <cmath>
 #include <memory>
@@ -19,7 +17,9 @@
 #include "graphics/AssetManager.hpp"
 #include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
+#include "rmath/Rectangle.hpp"
 #include "rmath/Vector2.hpp"
+#include "rshapes/Shapes.hpp"
 #include "rtext/Font.hpp"
 #include "rtext/Text.hpp"
 #include "ui/IUIComponent.hpp"
@@ -73,8 +73,9 @@ void UIGamePanel::draw() {
 
     _mainPanel->draw();
 
-    BeginScissorMode(static_cast<int>(_position.x()), static_cast<int>(_position.y() + DefaultHeaderHeight),
-                     static_cast<int>(_size.x()), static_cast<int>(_currentHeight - DefaultHeaderHeight));
+    raylib::rcore::Window::beginScissorMode(
+        static_cast<int>(_position.x()), static_cast<int>(_position.y() + DefaultHeaderHeight),
+        static_cast<int>(_size.x()), static_cast<int>(_currentHeight - DefaultHeaderHeight));
 
     if (!_isConfigMode) {
         for (auto& child : _contentChildren) {
@@ -84,7 +85,7 @@ void UIGamePanel::draw() {
         }
     }
 
-    EndScissorMode();
+    raylib::rcore::Window::endScissorMode();
 }
 
 void UIGamePanel::update() {
@@ -128,7 +129,7 @@ void UIGamePanel::handleEvent(const raylib::rcore::Event& event) {
     }
 
     raylib::rmath::Vector2 const mousePos = raylib::rcore::Event::getMousePositionStatic();
-    Rectangle const headerRec{
+    raylib::rmath::Rectangle const headerRec{
         .x = _position.x(), .y = _position.y(), .width = _size.x(), .height = DefaultHeaderHeight};
 
     bool const isHovered = (mousePos.x() >= headerRec.x && mousePos.x() <= headerRec.x + headerRec.width &&
@@ -146,12 +147,12 @@ void UIGamePanel::handleEvent(const raylib::rcore::Event& event) {
 
     if (!_isConfigMode) {
         raylib::rmath::Vector2 const mousePos = raylib::rcore::Event::getMousePositionStatic();
-        Rectangle const contentRec{.x = _position.x(),
-                                   .y = _position.y() + DefaultHeaderHeight,
-                                   .width = _size.x(),
-                                   .height = _currentHeight - DefaultHeaderHeight};
-        if (CheckCollisionPointRec(mousePos.vector(), contentRec)) {
-            float const wheelMove = ::GetMouseWheelMove();
+        raylib::rmath::Rectangle const contentRec{.x = _position.x(),
+                                                  .y = _position.y() + DefaultHeaderHeight,
+                                                  .width = _size.x(),
+                                                  .height = _currentHeight - DefaultHeaderHeight};
+        if (raylib::rshapes::Shapes::checkCollisionPointRec(mousePos, contentRec)) {
+            float const wheelMove = raylib::rcore::Event::getMouseWheelMoveStatic();
             if (wheelMove != 0.0F) {
                 _scrollOffset -= wheelMove * ScrollSpeed;
                 _scrollOffset = std::clamp(_scrollOffset, 0.0F, _maxScroll);
@@ -203,6 +204,12 @@ void UIGamePanel::addComponent(const std::shared_ptr<IUIComponent>& component) {
     }
 }
 
+void UIGamePanel::addHeaderComponent(const std::shared_ptr<IUIComponent>& component) {
+    if (component && _mainPanel) {
+        _mainPanel->addComponent(component);
+    }
+}
+
 void UIGamePanel::removeComponent(const std::shared_ptr<IUIComponent>& component) {
     auto it = std::ranges::find(_contentChildren, component);
     if (it != _contentChildren.end()) {
@@ -235,7 +242,7 @@ void UIGamePanel::updateTextPosition() {
 }
 
 void UIGamePanel::updateChildrenLayout() {
-    if (_contentChildren.empty()) {
+    if (_contentChildren.empty() || _customLayout) {
         _maxScroll = 0.0F;
         _scrollOffset = 0.0F;
         return;

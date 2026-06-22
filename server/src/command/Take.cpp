@@ -19,15 +19,16 @@ namespace zappy::server::command {
 Take::Take(std::string arg) : ACommand{kTimeLimit}, _arg(std::move(arg)) {}
 
 bool Take::start(game::World& world, game::Player& player) {
-    const auto it = game::kMapItemString.find(_arg);
-    if (it == game::kMapItemString.end()) {
+    const auto mapItemString = game::mapItemString();
+    const auto it = mapItemString.find(_arg);
+    if (it == mapItemString.end()) {
         return false;
     }
-    const auto& resources = world.tileResources(player.position());
+    const auto& resources = world.resourcesAt(player.position());
     return resources.at(static_cast<std::uint8_t>(it->second)) > 0;
 }
 void Take::execute(game::World& world, game::Player& player) {
-    const game::ItemType item = game::kMapItemString.at(_arg);
+    const game::ItemType item = game::mapItemString().at(_arg);
     world.removeItemOnGround(item, player.position());
     player.addItem(item);
 }

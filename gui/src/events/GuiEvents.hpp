@@ -9,6 +9,7 @@
 
 #include <string>
 
+#include "Color.hpp"
 #include "rmath/Vector3.hpp"
 
 namespace zappy::gui::events {
@@ -17,5 +18,11 @@ struct PlayerClicked {
     std::string teamName;
     std::string playerName;
     raylib::rmath::Vector3 position;
+    raylib::Color teamColor{255, 255, 255, 255};
+    std::string textureId;
+};
+
+struct SendCommand {
+    std::string payload;
 };
 }  // namespace zappy::gui::events

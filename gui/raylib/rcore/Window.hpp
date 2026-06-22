@@ -35,6 +35,10 @@ class Window {
     static void endDrawing() { EndDrawing(); }
     static float frameTime() { return GetFrameTime(); }
     void clearBackground() { ClearBackground(_backgroundColor.color()); }
+    static void clearBackground(const raylib::Color& color) { ClearBackground(color.color()); }
+
+    static void beginScissorMode(int x, int y, int width, int height) { BeginScissorMode(x, y, width, height); }
+    static void endScissorMode() { EndScissorMode(); }
 
     void setTargetFPS(int fps);
     int getScreenWidth();
@@ -43,6 +47,7 @@ class Window {
     static void setExitKey(int key) { SetExitKey(key); }
     static void enableCursor() { EnableCursor(); }
     static void disableCursor() { DisableCursor(); }
+    static bool isCursorHidden() { return IsCursorHidden(); }
     static int screenWidth() { return GetScreenWidth(); }
     static int screenHeight() { return GetScreenHeight(); }
 

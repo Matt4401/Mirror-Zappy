@@ -1,11 +1,16 @@
 # Zappy - AI Network Game
 
-Zappy is a network game where several teams confront each other on a tile map containing resources. The game board represents the entirety of this world's surface like a flat world map, meaning if a player exits to the right, they come back through the left, and similarly for up/down directions. The winning team is the first one where at least 6 players reach the maximum elevation level (level 8).
+Zappy is a network game where several teams confront each other on a tile map containing resources. The game board
+represents the entirety of this world's surface like a flat world map, meaning if a player exits to the right, they come
+back through the left, and similarly for up/down directions. The winning team is the first one where at least 6 players
+reach the maximum elevation level (level 8).
 
 This repository contains three distinct software components working together over TCP sockets:
 
-1. **`zappy_server`**: A server written in C++ that generates the inhabitants' world. It runs as a single process and single thread, utilizing `poll` to handle socket multiplexing.
-2. **`zappy_gui`**: A graphical client written in C++ with Raylib used to watch what happens in the world. It authenticates itself by sending `GRAPHIC` to the server.
+1. **`zappy_server`**: A server written in C++ that generates the inhabitants' world. It runs as a single process and
+   single thread, utilizing `poll` to handle socket multiplexing.
+2. **`zappy_gui`**: A graphical client written in C++ with Raylib used to watch what happens in the world. It
+   authenticates itself by sending `GRAPHIC` to the server.
 3. **`zappy_ai`**: An autonomous client in Python that drives an inhabitant drone through orders.
 
 ---
@@ -20,6 +25,7 @@ Ensure you have the following installed on your system before compiling:
 sudo apt-get update
 sudo apt-get install build-essential cmake libconfig++-dev libraylib-dev
 ```
+
 *(Arch Linux users: `sudo pacman -S base-devel cmake libconfig raylib`)*
 
 ### Python Environment (For AI)
@@ -32,7 +38,8 @@ python3 -m pip install torch ruff pre-commit
 
 ## Compilation
 
-This project relies on **CMake** and **Makefile** for its build system. It is highly recommended to use an out-of-source build by generating files into a `build/` directory.
+This project relies on **CMake** and **Makefile** for its build system. It is highly recommended to use an out-of-source
+build by generating files into a `build/` directory.
 
 ```bash
 # Compile all binaries (Server, GUI, and AI launcher)
@@ -61,6 +68,7 @@ make fclean
 ```
 
 **Options description:**
+
 * `-p port`: Port number.
 * `-x width`: Width of the world.
 * `-y height`: Height of the world.
@@ -78,7 +86,6 @@ make fclean
 
 * `-p port`: Port number.
 * `-h machine`: Hostname of the server.
-
 ### 3. Deploying AI Agents
 
 ```bash
@@ -95,17 +102,21 @@ make fclean
 
 ## Testing
 
-The project includes a robust, data-driven functional test suite built with Python and `pytest`. 
+The project includes a robust, data-driven functional test suite built with Python and `pytest`.
 
-The test suite performs **differential testing**: it automatically boots both the official reference binary and your custom `zappy_server`, executes a series of TCP network scenarios (defined in `functional_tests/scenarios.yaml`), and ensures your server's responses match the official protocol perfectly.
+The test suite performs **differential testing**: it automatically boots both the official reference binary and your
+custom `zappy_server`, executes a series of TCP network scenarios (defined in `functional_tests/scenarios.yaml`), and
+ensures your server's responses match the official protocol perfectly.
 
-To launch the test suite, use the dedicated CMake target. This command will automatically rebuild the server if needed, create a safe Python virtual environment, install dependencies, and run the tests:
+To launch the test suite, use the dedicated CMake target. This command will automatically rebuild the server if needed,
+create a safe Python virtual environment, install dependencies, and run the tests:
 
 ```bash
 cmake --build build --target tests_functional
 ```
 
-*Note: The test script automatically manages its own dependencies inside `functional_tests/.venv` to avoid polluting your global Python environment.*
+*Note: The test script automatically manages its own dependencies inside `functional_tests/.venv` to avoid polluting
+your global Python environment.*
 
 ---
 
@@ -148,6 +159,13 @@ cmake --build build --target tests_functional
         <sub><b>eliottraguin</b></sub>
       </a>
     </td>
+  <td align="center">
+      <a href="https://github.com/TristanFragnaud">
+        <img src="https://github.com/TristanFragnaud.png?size=100" width="100px;" alt="TristanFragnaud"/>
+        <br />
+        <sub><b>TristanFragnaud</b></sub>
+      </a>
+    </td>
   </tr>
 </table>
 
@@ -155,4 +173,18 @@ cmake --build build --target tests_functional
 
 ## Contributing
 
-Please refer to [CONTRIBUTING.md](docs/CONTRIBUTING.md) for guidelines regarding our strict Conventional Commits policy, pre-commit configuration hooks, and code review workflows.
+Please refer to [CONTRIBUTING.md](docs/CONTRIBUTING.md) for guidelines regarding our strict Conventional Commits policy,
+pre-commit configuration hooks, and code review workflows.
+
+## Documentation
+
+The full technical documentation is available online at **[INSERT_LINK_WHEN_AVAILABLE]**.
+
+Architecture diagrams and source files are also located in the `docs/` folder. To serve the documentation locally:
+
+```bash
+python3 -m venv docs/.venv
+source docs/.venv/bin/activate
+pip install -r docs/requirements.txt
+mkdocs serve
+```

@@ -9,7 +9,6 @@
 
 #include <raylib.h>
 
-#include <iostream>
 #include <memory>
 #include <string>
 #include <utility>
@@ -27,6 +26,7 @@
 #include "ui/components/UIGridManager.hpp"
 #include "ui/components/UIText.hpp"
 #include "ui/menus/PauseMenu.hpp"
+#include "ui/menus/PlayerInspectorUI.hpp"
 
 namespace zappy::gui::graphics {
 Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher)
@@ -36,10 +36,6 @@ Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher)
             [this](const shared::protocol::server::Msz& cmd) { _map.resize(cmd.width, cmd.height); });
         _sgtToken = _dispatcher->subscribe<shared::protocol::server::Sgt>(
             [this](const shared::protocol::server::Sgt& cmd) { _serverFrequency = static_cast<float>(cmd.timeUnit); });
-        _playerClickedToken = _dispatcher->subscribe<events::PlayerClicked>([this](const events::PlayerClicked& event) {
-            std::cout << "Player clicked: " << event.playerName << " from team " << event.teamName << " at position ("
-                      << event.position.x() << ", " << event.position.y() << ", " << event.position.z() << ")\n";
-        });
     }
     _window.setTargetFPS(DefaultFps);
     raylib::rcore::Window::setExitKey(0);
@@ -50,7 +46,7 @@ Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher)
     _gridManager = std::make_shared<ui::components::UIGridManager>();
     _uiManager.addComponent(_gridManager);
 
-    _demoPanel = std::make_shared<ui::components::UIGamePanel>(0, 0, 0, 0, "Player Info");
+    auto _demoPanel = std::make_shared<ui::components::UIGamePanel>(0, 0, 0, 0, "Player Info");
     auto font = AssetManager::getInstance().getFont(DefaultFontName);
     auto btn = std::make_shared<ui::components::UIButton>(100.0F, 120.0F, 200.0F, 40.0F, "Click me!", font);
     _demoPanel->addComponent(btn);
@@ -62,6 +58,14 @@ Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher)
 
     _gridManager->addPanel(_demoPanel, 1, 1, 12, 18);
     _gridManager->addPanel(_demoPanel2, 1, 19, 12, 8);
+
+    _inspector = std::make_shared<ui::menus::PlayerInspectorUI>(0.0F, 0.0F, 300.0F, _dispatcher, font,
+                                                                [this](const std::string& cmd) {
+                                                                    if (_dispatcher) {
+                                                                        _dispatcher->dispatch(events::SendCommand{cmd});
+                                                                    }
+                                                                });
+    _gridManager->addPanel(_inspector, 14, 1, 10, 15);
 
     _pauseMenu =
         std::make_shared<ui::menus::PauseMenu>(_dispatcher, AssetManager::getInstance().getFont(DefaultFontName));
@@ -82,9 +86,6 @@ Render::~Render() {
         if (_sgtToken != 0) {
             _dispatcher->unsubscribe<shared::protocol::server::Sgt>(_sgtToken);
         }
-    }
-    if (_dispatcher && _playerClickedToken != 0) {
-        _dispatcher->unsubscribe<events::PlayerClicked>(_playerClickedToken);
     }
     _pauseMenu.reset();
     _uiManager.clear();
