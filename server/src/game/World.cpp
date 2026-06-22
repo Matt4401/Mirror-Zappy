@@ -24,6 +24,8 @@
 #include "Player.hpp"
 #include "Team.hpp"
 #include "command/ICommand.hpp"
+#include "protocol/Commands.hpp"
+#include "protocol/Emitter.hpp"
 #include "strategy/ServerStrategy.hpp"
 
 namespace zappy::server::game {
@@ -142,10 +144,11 @@ std::optional<size_t> World::spawnPlayer(const std::string_view teamName) {
     return (position.y * _widthMap) + position.x;
 }
 
-void World::pushCommandToPlayer(const std::size_t playerId, std::unique_ptr<command::ICommand> command) const {
+void World::pushCommandToPlayer(const std::size_t playerId, std::unique_ptr<command::ICommand> command) {
     const auto& player = _playerList.at(playerId);
 
     player->pushCommand(std::move(command));
+    player->tryStartNextCommand(*this);
 }
 
 void World::removePlayerFromTeam(const std::size_t id) const {
@@ -300,8 +303,38 @@ void World::removeItemOnGround(ItemType item, const Position pos) {
     _tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(item))--;
 }
 
-std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> World::tileResources(const Position position) const {
+std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> World::resourcesAt(const Position position) const {
     return _tiles.at(getTileIndex(position)).resources;
 }
+
+std::string World::getPlayerTeam(const std::size_t playerId) const {
+    for (const auto& [teamName, teamObj] : _teamList) {
+        if (teamObj->isInTeam(playerId)) {
+            return teamName;
+        }
+    }
+    return "";
+}
+
+void World::layEgg(const Player& player) {
+    const auto pos = player.position();
+    const auto tileIndex = getTileIndex(pos);
+    const std::string teamName = getPlayerTeam(player.id());
+
+    if (teamName.empty()) {
+        return;
+    }
+    _vecEggs[_newId] = Egg{.id = _newId, .position = pos, .teamName = teamName};
+    _tiles.at(tileIndex).eggs.emplace_back(_newId);
+    addGuiEvent(
+        shared::protocol::Emitter::build(shared::protocol::server::Enw{.eggId = static_cast<int>(_newId),
+                                                                       .playerId = static_cast<int>(player.id()),
+                                                                       .x = static_cast<int>(pos.x),
+                                                                       .y = static_cast<int>(pos.y)}));
+    _teamList.at(teamName)->addNewTeamSlot();
+    _newId++;
+}
+
+void World::addGuiEvent(const std::string& event) { _guiEvents.push_back(event); }
 
 }  // namespace zappy::server::game

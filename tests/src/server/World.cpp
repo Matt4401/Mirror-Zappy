@@ -22,13 +22,11 @@
 #include "strategy/ServerStrategy.hpp"
 
 namespace zappy::server::game {
-// NOLINTBEGIN
 class WorldTest : public testing::Test {
   protected:
     parser::ServerConfig config{
         .port = 4242, .width = 10, .height = 10, .teamNames = {"team1", "team2"}, .clientLimit = 3, .freq = 100};
 };
-// NOLINTEND
 
 TEST_F(WorldTest, ConstructorCreatesCorrectMapSize) {
     const World world{config};
@@ -141,8 +139,6 @@ TEST_F(WorldTest, UpdatePositionOnMapMovesPlayer) {
     // Cette méthode ne devrait pas crash
     ASSERT_NO_THROW(world.updatePositionOnMap(playerId.value(), oldPos, newPos));
 }
-
-// ========== Player Management ==========
 
 TEST_F(WorldTest, RemovePlayerRemovesFromWorld) {
     World world{config};
@@ -297,7 +293,8 @@ TEST_F(WorldTest, UpdateDoesNotExecuteCommandBeforeRequiredTicks) {
 
     ASSERT_TRUE(playerId.has_value());
     world.pushCommandToPlayer(playerId.value(), std::make_unique<command::Forward>());
-    for (int i = 0; i < 7; ++i) {
+
+    for (int i = 0; i < 6; ++i) {
         world.update();
     }
 
@@ -370,15 +367,12 @@ TEST_F(WorldTest, UpdateWithNoCommandsDoesNotGenerateResponses) {
 TEST_F(WorldTest, CheckSpawnQuantities) {
     World world{config};
 
-    // Tableau pour stocker la somme de chaque ressource trouvée sur la carte
     std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> totalSpawned{};
     totalSpawned.fill(0);
 
-    // Parcours de chaque case de la carte pour collecter les ressources
     for (std::size_t x = 0; x < 10; ++x) {
         for (std::size_t y = 0; y < 10; ++y) {
-            // Utilisation de getResourcesAt (méthode existante dans ton World.hpp)
-            auto tileRes = world.tileResources(game::Position{.x = x, .y = y});
+            auto tileRes = world.resourcesAt(game::Position{.x = x, .y = y});
 
             for (std::uint8_t i = 0; i < static_cast<uint8_t>(ItemType::COUNT); ++i) {
                 totalSpawned.at(i) += tileRes.at(i);
@@ -386,14 +380,6 @@ TEST_F(WorldTest, CheckSpawnQuantities) {
         }
     }
 
-    // Vérification stricte des quantités selon la formule (100 cases * densité) :
-    // Food:      100 * 0.5  = 50
-    // Linemate:  100 * 0.3  = 30
-    // Deraumere: 100 * 0.15 = 15
-    // Sibur:     100 * 0.1  = 10
-    // Mendiane:  100 * 0.1  = 10
-    // Phiras:    100 * 0.08 = 8
-    // Thystame:  100 * 0.05 = 5
     EXPECT_EQ(totalSpawned.at(static_cast<uint8_t>(ItemType::Food)), 50);
     EXPECT_EQ(totalSpawned.at(static_cast<uint8_t>(ItemType::Linemate)), 30);
     EXPECT_EQ(totalSpawned.at(static_cast<uint8_t>(ItemType::Deraumere)), 15);
@@ -403,7 +389,6 @@ TEST_F(WorldTest, CheckSpawnQuantities) {
     EXPECT_EQ(totalSpawned.at(static_cast<uint8_t>(ItemType::Thystame)), 5);
 }
 
-// Test de sécurité : s'assurer qu'une carte invalide (0x0) ne fait pas crash le serveur
 TEST(WorldResourcesTest, CheckZeroSizeMapDoesNotCrash) {
     const auto config = parser::ServerConfig{
         .port = 80,
@@ -415,7 +400,6 @@ TEST(WorldResourcesTest, CheckZeroSizeMapDoesNotCrash) {
     };
     World world{config};
 
-    // La fonction doit s'arrêter proprement grâce aux vérifications de sécurité au début
     ASSERT_NO_THROW(world.addItemToMap());
 }
 

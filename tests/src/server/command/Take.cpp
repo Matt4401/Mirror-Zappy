@@ -56,7 +56,7 @@ TEST(TakeTest, CheckStartValidItemButEmptyTile) {
 
     Take take{"food"};
 
-    while (world.tileResources(player.position()).at(static_cast<std::uint8_t>(game::ItemType::Food)) != 0) {
+    while (world.resourcesAt(player.position()).at(static_cast<std::uint8_t>(game::ItemType::Food)) != 0) {
         world.removeItemOnGround(game::ItemType::Food, player.position());
     }
 
@@ -94,7 +94,7 @@ TEST(TakeTest, CheckExecuteMovementAndInventory) {
     game::World world{config};
     game::Player player{0, 5, 5, game::cardinalPoint::NORTH};
 
-    auto nbActualFood = world.tileResources(player.position()).at(static_cast<std::uint8_t>(game::ItemType::Food));
+    auto nbActualFood = world.resourcesAt(player.position()).at(static_cast<std::uint8_t>(game::ItemType::Food));
     if (nbActualFood == 0) {
         world.addItemOnGround(game::ItemType::Food, player.position());
         nbActualFood++;
@@ -107,7 +107,7 @@ TEST(TakeTest, CheckExecuteMovementAndInventory) {
 
     take.execute(world, player);
 
-    const auto& resources = world.tileResources(player.position());
+    const auto& resources = world.resourcesAt(player.position());
 
     ASSERT_EQ(resources.at(static_cast<std::uint8_t>(game::ItemType::Food)), 0);
     ASSERT_EQ(player.inventory().at(static_cast<std::uint8_t>(game::ItemType::Food)), 11);

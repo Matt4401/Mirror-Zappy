@@ -70,7 +70,7 @@ class World {
     void update();
     [[nodiscard]] std::unordered_map<std::size_t, std::vector<std::string>> getAllResponsesBuffer() const;
     [[nodiscard]] std::vector<std::string> getAndClearGuiEvents();
-    void pushCommandToPlayer(std::size_t playerId, std::unique_ptr<command::ICommand> command) const;
+    void pushCommandToPlayer(std::size_t playerId, std::unique_ptr<command::ICommand> command);
     void removePlayerFromTeam(std::size_t id) const;
     void updatePositionOnMap(std::size_t id, const Position& oldPosition, const Position& newPosition);
 
@@ -84,9 +84,13 @@ class World {
     const std::unordered_map<std::size_t, std::unique_ptr<Player>>& playerList() const;
     void addItemOnGround(ItemType item, Position pos);
     void removeItemOnGround(ItemType item, Position pos);
-    std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> tileResources(Position position) const;
 
     [[nodiscard]] int getNextExecutionTick() const;
+    [[nodiscard]] std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> resourcesAt(Position pos) const;
+    [[nodiscard]] std::string getPlayerTeam(std::size_t id) const;
+    void layEgg(const Player& player);
+
+    void addGuiEvent(const std::string& event);
 
   private:
     std::unordered_map<std::string, std::unique_ptr<Team>> _teamList;

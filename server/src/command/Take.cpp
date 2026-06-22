@@ -23,7 +23,7 @@ bool Take::start(game::World& world, game::Player& player) {
     if (it == game::kMapItemString.end()) {
         return false;
     }
-    const auto& resources = world.tileResources(player.position());
+    const auto& resources = world.resourcesAt(player.position());
     return resources.at(static_cast<std::uint8_t>(it->second)) > 0;
 }
 void Take::execute(game::World& world, game::Player& player) {

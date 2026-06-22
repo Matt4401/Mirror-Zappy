@@ -72,7 +72,7 @@ TEST(BctCommandTest, ExecuteReturnsProperlyFormattedTileContent) {
     zappy::server::guiCommand::Bct command{5, 5};
     const std::string response = command.execute(core);
 
-    auto resources = core.world().tileResources(zappy::server::game::Position{.x = 5, .y = 5});
+    auto resources = core.world().resourcesAt(zappy::server::game::Position{.x = 5, .y = 5});
 
     std::string const expectedResponse =
         "bct 5 5 " + std::to_string(resources.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Food))) +
@@ -109,7 +109,7 @@ TEST(MctCommandTest, ExecuteReturnsAllTileContents) {
 
     for (std::size_t x = 0; x < mapSize.x; ++x) {
         for (std::size_t y = 0; y < mapSize.y; ++y) {
-            auto resources = core.world().tileResources(zappy::server::game::Position{.x = x, .y = y});
+            auto resources = core.world().resourcesAt(zappy::server::game::Position{.x = x, .y = y});
             expectedResponse +=
                 "bct " + std::to_string(x) + " " + std::to_string(y) + " " +
                 std::to_string(resources.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Food))) + " " +

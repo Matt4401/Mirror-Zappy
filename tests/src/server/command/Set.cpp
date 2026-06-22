@@ -97,13 +97,13 @@ TEST(SetTest, CheckExecuteInventoryAndWorld) {
     Set set{"deraumere"};
 
     const auto itemIdx = static_cast<std::uint8_t>(item);
-    const auto initialGroundCount = world.tileResources(player.position()).at(itemIdx);
+    const auto initialGroundCount = world.resourcesAt(player.position()).at(itemIdx);
 
     set.execute(world, player);
 
     ASSERT_EQ(player.inventory().at(itemIdx), 0);
 
-    const auto finalGroundCount = world.tileResources(player.position()).at(itemIdx);
+    const auto finalGroundCount = world.resourcesAt(player.position()).at(itemIdx);
     ASSERT_EQ(finalGroundCount, initialGroundCount + 1);
 }
 
