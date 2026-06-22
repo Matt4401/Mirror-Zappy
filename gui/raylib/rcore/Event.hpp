@@ -29,6 +29,7 @@ class Event {
     [[nodiscard]] static bool isKeyPressed(int key) { return IsKeyPressed(key); }
     [[nodiscard]] static bool isKeyDown(int key) { return IsKeyDown(key); }
     [[nodiscard]] static bool isKeyReleased(int key) { return IsKeyReleased(key); }
+    [[nodiscard]] static int getCharPressed() { return GetCharPressed(); }
 
     [[nodiscard]] rmath::Vector2 getMousePosition() const { return _mousePosition; }
     [[nodiscard]] float getMouseWheelMove() const { return _mouseWheelMove; }
