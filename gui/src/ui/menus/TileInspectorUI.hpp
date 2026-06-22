@@ -13,10 +13,10 @@
 
 #include "AInspectorUI.hpp"
 #include "EventDispatcher.hpp"
-#include "components/UIText.hpp"
 #include "events/GuiEvents.hpp"
 #include "protocol/Commands.hpp"
 #include "rtext/Font.hpp"
+#include "ui/components/UIText.hpp"
 
 namespace zappy::gui::ui::menus {
 
