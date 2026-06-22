@@ -77,11 +77,13 @@ class World {
     [[nodiscard]] int getNextExecutionTick() const;
     [[nodiscard]] std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> resourcesAt(Position pos) const;
     [[nodiscard]] std::string getPlayerTeam(std::size_t id) const;
-    void layEgg(const Player& player);
 
     void addGuiEvent(const std::string& event);
     std::string visionOfPlayer(const std::vector<Position>& Positions) const;
     void clearAllResourcesAndEggs();
+
+    void layEgg(const Player& player);
+    const std::unordered_map<std::size_t, Egg>& vecEggs() const;
 
   private:
     std::unordered_map<std::string, std::unique_ptr<Team>> _teamList;

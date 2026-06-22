@@ -56,17 +56,21 @@ void Player::pushCommand(std::unique_ptr<command::ICommand> command) {
 void Player::update(World& world) {
     _lifeTick--;
 
-    if (_cmdTick > 0) {
+    if (_isNewCommand) {
+        _isNewCommand = false;
+    } else if (_cmdTick > 0) {
         _cmdTick--;
     }
     if (_cmdTick == 0 && _currentCommand != nullptr) {
         _currentCommand->execute(world, *this);
         _currentCommand = nullptr;
     }
-    tryStartNextCommand(world);
+    if (_currentCommand == nullptr) {
+        tryStartNextCommand(world, false);
+    }
 }
 
-void Player::tryStartNextCommand(World& world) {
+void Player::tryStartNextCommand(World& world, bool isMidTick) {
     if (_cmdTick > 0 || _currentCommand != nullptr) {
         return;
     }
@@ -80,6 +84,7 @@ void Player::tryStartNextCommand(World& world) {
             _currentCommand = nullptr;
         } else {
             _cmdTick = _currentCommand->requiredTicks();
+            _isNewCommand = isMidTick;
             return;
         }
     }

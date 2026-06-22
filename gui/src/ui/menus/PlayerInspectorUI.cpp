@@ -22,16 +22,20 @@
 #include "components/UIGamePanel.hpp"
 #include "components/UIImage.hpp"
 #include "components/UIText.hpp"
+#include "components/UITextbox.hpp"
 #include "events/EventDispatcher.hpp"
 #include "events/GuiEvents.hpp"
 #include "graphics/AssetManager.hpp"
 #include "protocol/Commands.hpp"
 #include "protocol/Emitter.hpp"
+#include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
+#include "rmath/Vector3.hpp"
 #include "rmodels/Model.hpp"
 #include "rshapes/Shapes.hpp"
 #include "rtext/Font.hpp"
+#include "rtextures/RenderTexture2D.hpp"
 #include "rtextures/Texture2D.hpp"
 
 namespace zappy::gui::ui::menus {
@@ -45,7 +49,6 @@ constexpr float FoodMax = 126.0F;
 
 constexpr float PrimaryIconSize = 28.0F;
 constexpr float PosIconSize = 20.0F;
-constexpr float HeaderFontSize = 20.0F;
 constexpr float InfoFontSize = 16.0F;
 
 constexpr float BaseYOffset = 60.0F;
@@ -84,6 +87,21 @@ constexpr int MaxHearts = 10;
 constexpr int MaxXp = 8;
 
 constexpr float InvToBtnSpacing = 180.0F;
+
+constexpr float CameraPosX = 0.0F;
+constexpr float CameraPosY = 4.0F;
+constexpr float CameraPosZ = 10.0F;
+constexpr float CameraTargetX = 0.0F;
+constexpr float CameraTargetY = 3.0F;
+constexpr float CameraTargetZ = 0.0F;
+constexpr float CameraUpX = 0.0F;
+constexpr float CameraUpY = 1.0F;
+constexpr float CameraUpZ = 0.0F;
+constexpr float CameraFovY = 45.0F;
+
+constexpr float ModelPosX = 0.0F;
+constexpr float ModelPosY = 0.0F;
+constexpr float ModelPosZ = 0.0F;
 }  // namespace
 
 PlayerInspectorUI::PlayerInspectorUI(float x, float y, float width, std::shared_ptr<events::EventDispatcher> dispatcher,
@@ -91,17 +109,24 @@ PlayerInspectorUI::PlayerInspectorUI(float x, float y, float width, std::shared_
                                      std::function<void(const std::string&)> onSendCommand)
     : AInspectorUI(x, y, width, "Player Inspector", std::move(dispatcher), font, std::move(onSendCommand)),
       _firstPersonBtn(std::make_shared<components::UIButton>(0.0F, 0.0F, FirstPersonBtnWidth, FirstPersonBtnHeight,
-                                                             "First Person", getFont())) {
+                                                             "First Person", getFont())),
+      _previewCamera(raylib::rcore::Camera(raylib::rmath::Vector3{CameraPosX, CameraPosY, CameraPosZ},
+                                           raylib::rmath::Vector3{CameraTargetX, CameraTargetY, CameraTargetZ},
+                                           raylib::rmath::Vector3{CameraUpX, CameraUpY, CameraUpZ}, CameraFovY, 0)),
+      _previewRenderTexture(std::make_shared<raylib::rtextures::RenderTexture2D>(static_cast<int>(AvatarWidth),
+                                                                                 static_cast<int>(AvatarHeight))) {
     buildInfoPanel();
     buildInventoryPanel();
 
-    getPreviewModel() = std::make_shared<raylib::rmodels::Model>("assets/jeffrey/scene.gltf");
+    _previewModel = std::make_shared<raylib::rmodels::Model>("assets/jeffrey/scene.gltf");
 
     _firstPersonBtn->setFontSize(FirstPersonBtnFontSize);
 
     if (getDispatcher()) {
         getEventTokens().push_back(getDispatcher()->subscribe<events::PlayerClicked>(
             [this](const events::PlayerClicked& e) { onPlayerClicked(e); }));
+        getEventTokens().push_back(getDispatcher()->subscribe<events::TileClicked>(
+            [this](const events::TileClicked& /*e*/) { setVisible(false); }));
         getEventTokens().push_back(getDispatcher()->subscribe<shared::protocol::server::Pin>(
             [this](const shared::protocol::server::Pin& cmd) { onPinReceived(cmd); }));
         getEventTokens().push_back(getDispatcher()->subscribe<shared::protocol::server::Plv>(
@@ -155,11 +180,12 @@ void PlayerInspectorUI::onPpoReceived(const shared::protocol::server::Ppo& cmd) 
 }
 
 PlayerInspectorUI::~PlayerInspectorUI() {
-    if (getDispatcher() && getEventTokens().size() >= 4) {
+    if (getDispatcher() && getEventTokens().size() >= 5) {
         getDispatcher()->unsubscribe<events::PlayerClicked>(getEventTokens().at(0));
-        getDispatcher()->unsubscribe<shared::protocol::server::Pin>(getEventTokens().at(1));
-        getDispatcher()->unsubscribe<shared::protocol::server::Plv>(getEventTokens().at(2));
-        getDispatcher()->unsubscribe<shared::protocol::server::Ppo>(getEventTokens().at(3));
+        getDispatcher()->unsubscribe<events::TileClicked>(getEventTokens().at(1));
+        getDispatcher()->unsubscribe<shared::protocol::server::Pin>(getEventTokens().at(2));
+        getDispatcher()->unsubscribe<shared::protocol::server::Plv>(getEventTokens().at(3));
+        getDispatcher()->unsubscribe<shared::protocol::server::Ppo>(getEventTokens().at(4));
     }
 }
 
@@ -175,9 +201,12 @@ void PlayerInspectorUI::buildInfoPanel() {
     _compassIcon = std::make_shared<components::UIImage>("assets/images/ui/compass.png");
     _compassIcon->setSize(PrimaryIconSize, PrimaryIconSize);
 
-    _nameText = std::make_shared<components::UIText>("Player Name", getFont());
-    _nameText->setFontSize(static_cast<int>(HeaderFontSize));
-    _nameText->setColor(raylib::Color::White());
+    _nameBox = std::make_shared<components::UITextbox>(0.0F, 0.0F, 200.0F, NameBoxHeight, getFont(), "Enter Name...");
+    _nameBox->setOnSubmit([this](const std::string& name) {
+        if (getDispatcher() && _targetPlayerId != -1) {
+            getDispatcher()->dispatch(events::PlayerNameChanged{.playerId = _targetPlayerId, .newName = name});
+        }
+    });
 
     _teamText = std::make_shared<components::UIText>("Team: None", getFont());
     _teamText->setFontSize(static_cast<int>(InfoFontSize));
@@ -216,8 +245,8 @@ void PlayerInspectorUI::buildInfoPanel() {
 void PlayerInspectorUI::onPlayerClicked(const events::PlayerClicked& event) {
     _targetPlayerId = event.playerId;
 
-    if (_nameText) {
-        _nameText->setText(event.playerName);
+    if (_nameBox) {
+        _nameBox->setText(event.playerName);
     }
     if (_idText) {
         _idText->setText("ID: " + std::to_string(event.playerId));
@@ -226,15 +255,15 @@ void PlayerInspectorUI::onPlayerClicked(const events::PlayerClicked& event) {
         _teamText->setText("Team: " + event.teamName);
         _teamText->setColor(event.teamColor);
     }
-    if (getPreviewModel()) {
+    if (_previewModel) {
         if (!event.textureId.empty()) {
             auto tex = graphics::AssetManager::getInstance().getTexture(event.textureId);
             if (tex) {
-                getPreviewModel()->setMaterialTexture(0, 0 /* MATERIAL_MAP_ALBEDO */, *tex);
+                _previewModel->setMaterialTexture(0, 0 /* MATERIAL_MAP_ALBEDO */, *tex);
             }
         } else {
-            getPreviewModel()->setMaterialTexture(0, 0 /* MATERIAL_MAP_ALBEDO */,
-                                                  raylib::rtextures::Texture2D{::Texture2D{}, false});
+            _previewModel->setMaterialTexture(0, 0 /* MATERIAL_MAP_ALBEDO */,
+                                              raylib::rtextures::Texture2D{::Texture2D{}, false});
         }
     }
 
@@ -344,6 +373,9 @@ void PlayerInspectorUI::handleEvent(const raylib::rcore::Event& event) {
     if (_firstPersonBtn) {
         _firstPersonBtn->handleEvent(event);
     }
+    if (_nameBox) {
+        _nameBox->handleEvent(event);
+    }
 }
 
 void PlayerInspectorUI::setVisible(bool visible) {
@@ -368,15 +400,17 @@ void PlayerInspectorUI::update() {
     if (_firstPersonBtn) {
         _firstPersonBtn->update();
     }
+    if (_nameBox) {
+        _nameBox->update();
+    }
 }
 
 void PlayerInspectorUI::drawHeader(float& currentY, float startX, float panelW) {
     float const nameW = panelW * NameBoxWidthRatio;
     float const nameX = startX + ((panelW - nameW) / 2.0F);
-    raylib::rshapes::Shapes::drawRectangleRec({.x = nameX, .y = currentY, .width = nameW, .height = NameBoxHeight},
-                                              raylib::Color(50, 50, 50, 255));
-    _nameText->setPosition(nameX + NameBoxXOffset, currentY + NameBoxYOffset);
-    _nameText->draw();
+    _nameBox->setPosition(nameX + NameBoxXOffset, currentY + NameBoxYOffset);
+    _nameBox->setSize(nameW, NameBoxHeight);
+    _nameBox->draw();
     currentY += NameToAvatarSpacing;
 }
 
@@ -386,8 +420,8 @@ void PlayerInspectorUI::drawStatsBlock(float& currentY, float startX, float pane
 
     raylib::rshapes::Shapes::drawRectangleRec(
         {.x = blockX, .y = currentY, .width = AvatarWidth, .height = AvatarHeight}, raylib::Color::LightGray());
-    if (getPreviewRenderTexture()) {
-        getPreviewRenderTexture()->draw({blockX, currentY}, raylib::Color::White());
+    if (_previewRenderTexture) {
+        _previewRenderTexture->draw({blockX, currentY}, raylib::Color::White());
     }
 
     float statsY = currentY + StatsYOffset;
@@ -455,6 +489,19 @@ void PlayerInspectorUI::drawActionButtons(float& currentY, float startX, float p
         float const btnX = startX + ((panelW - FirstPersonBtnWidth) / 2.0F);
         _firstPersonBtn->setPosition(btnX, currentY);
         _firstPersonBtn->draw();
+    }
+}
+
+void PlayerInspectorUI::draw3DPreview() {
+    if (isVisible() && !isConfigMode() && _previewRenderTexture && _previewModel) {
+        _previewRenderTexture->begin();
+        zappy::gui::raylib::rcore::Window::clearBackground({200, 200, 200, 255});
+        _previewCamera.beginMode3D();
+        raylib::rmath::Vector3 const modelPos{ModelPosX + _previewModelOffset.x(), ModelPosY + _previewModelOffset.y(),
+                                              ModelPosZ + _previewModelOffset.z()};
+        _previewModel->drawModel(modelPos, _previewModelScale, raylib::Color::White());
+        zappy::gui::raylib::rcore::Camera::endMode3D();
+        zappy::gui::raylib::rtextures::RenderTexture2D::end();
     }
 }
 

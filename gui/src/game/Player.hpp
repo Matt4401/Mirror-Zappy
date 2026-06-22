@@ -32,6 +32,7 @@ class Player {
     [[nodiscard]] int id() const { return _id; }
     [[nodiscard]] raylib::rmath::Vector3 position() const { return {_position.x(), _position.y(), _position.z()}; }
     [[nodiscard]] const std::string& name() const { return _name; }
+    void setName(const std::string& name) { _name = name; }
     [[nodiscard]] cardinalPoint orientation() const { return _orientation; }
     void setTextureId(const std::string& textureId) { _textureId = textureId; }
     [[nodiscard]] std::string textureId() const { return _textureId; }

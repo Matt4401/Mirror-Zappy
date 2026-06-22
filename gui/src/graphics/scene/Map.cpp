@@ -35,6 +35,20 @@ Map::Map(int width, int height, std::shared_ptr<raylib::rcore::Camera> camera,
     _itemDrawFunctions["Thystame"] = [this](const game::IObject& object) { object.draw(_thystameModel); };
     _itemDrawFunctions["Mendiane"] = [this](const game::IObject& object) { object.draw(_mendianeModel); };
     _itemDrawFunctions["Food"] = [this](const game::IObject& object) { object.draw(_foodModel); };
+
+    if (_dispatcher) {
+        _nameToken = _dispatcher->subscribe<events::PlayerNameChanged>([this](const events::PlayerNameChanged& e) {
+            for (auto& team : _teams) {
+                team.updatePlayerName(e.playerId, e.newName);
+            }
+        });
+    }
+}
+
+Map::~Map() {
+    if (_dispatcher && _nameToken != 0) {
+        _dispatcher->unsubscribe<events::PlayerNameChanged>(_nameToken);
+    }
 }
 
 void Map::resize(int width, int height) {
@@ -47,7 +61,9 @@ void Map::resize(int width, int height) {
         for (int z = ((height / 2) * -1); z < height / 2; z += 1) {
             position.setX(static_cast<float>(static_cast<float>(x) * Tile3D::TILE_SIZE));
             position.setZ(static_cast<float>(static_cast<float>(z) * Tile3D::TILE_SIZE));
-            _tiles.emplace_back(position);
+            int const gridX = x + (width / 2);
+            int const gridY = z + (height / 2);
+            _tiles.emplace_back(gridX, gridY, position);
         }
     }
 }
@@ -75,12 +91,12 @@ void Map::drawItems(const Tile3D& tile) const {
     }
 }
 
-void Map::handleEvent(const raylib::rcore::Event& event) {
+void Map::handleEvent(const raylib::rcore::Event& /*event*/) {
     if (!raylib::rcore::Event::isMouseButtonPressed(MOUSE_LEFT_CLICK) || !_camera) {
         return;
     }
 
-    const auto ray = event.mouseRay(*_camera);
+    const auto ray = raylib::rcore::Event::mouseRay(*_camera);
     std::optional<SelectedPlayer> selected;
     float nearestDistance = std::numeric_limits<float>::max();
 
@@ -96,6 +112,22 @@ void Map::handleEvent(const raylib::rcore::Event& event) {
 
     if (selected.has_value()) {
         dispatchClickedPlayer(selected->first, selected->second);
+        return;
+    }
+
+    const Tile3D* selectedTile = nullptr;
+    nearestDistance = std::numeric_limits<float>::max();
+
+    for (const auto& tile : _tiles) {
+        const auto collision = ray.collision(tile.boundingBox());
+        if (collision.hit && collision.distance < nearestDistance) {
+            nearestDistance = collision.distance;
+            selectedTile = &tile;
+        }
+    }
+
+    if (selectedTile != nullptr) {
+        dispatchClickedTile(*selectedTile);
     }
 }
 
@@ -110,6 +142,16 @@ void Map::dispatchClickedPlayer(const game::Team& team, const game::Player& play
         .position = player.position(),
         .teamColor = team.color(),
         .textureId = player.textureId(),
+    });
+}
+
+void Map::dispatchClickedTile(const Tile3D& tile) const {
+    if (!_dispatcher) {
+        return;
+    }
+    _dispatcher->dispatch(events::TileClicked{
+        .x = tile.gridX(),
+        .y = tile.gridY(),
     });
 }
 }  // namespace zappy::gui::graphics::scene

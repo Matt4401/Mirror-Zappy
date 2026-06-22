@@ -16,11 +16,16 @@
 #include "events/EventDispatcher.hpp"
 #include "events/GuiEvents.hpp"
 #include "protocol/Commands.hpp"
+#include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
+#include "rmath/Vector3.hpp"
+#include "rmodels/Model.hpp"
 #include "rtext/Font.hpp"
+#include "rtextures/RenderTexture2D.hpp"
 #include "ui/components/UIButton.hpp"
 #include "ui/components/UIImage.hpp"
 #include "ui/components/UIText.hpp"
+#include "ui/components/UITextbox.hpp"
 
 namespace zappy::gui::ui::menus {
 
@@ -61,7 +66,7 @@ class PlayerInspectorUI : public AInspectorUI {
 
     int _targetPlayerId{-1};
 
-    std::shared_ptr<components::UIText> _nameText;
+    std::shared_ptr<components::UITextbox> _nameBox;
     std::shared_ptr<components::UIText> _idText;
     std::shared_ptr<components::UIText> _teamText;
     std::shared_ptr<components::UIText> _posText;
@@ -82,6 +87,14 @@ class PlayerInspectorUI : public AInspectorUI {
     float _foodFloat{10.0F};
     int _levelValue{1};
     int _orientationValue{1};
+
+    void draw3DPreview();
+
+    raylib::rcore::Camera _previewCamera;
+    std::shared_ptr<raylib::rmodels::Model> _previewModel;
+    std::shared_ptr<raylib::rtextures::RenderTexture2D> _previewRenderTexture;
+    float _previewModelScale{0.1F};
+    raylib::rmath::Vector3 _previewModelOffset{0.0F, 0.0F, 0.0F};
 };
 
 }  // namespace zappy::gui::ui::menus
