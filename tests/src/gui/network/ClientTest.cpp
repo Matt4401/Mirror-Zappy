@@ -36,6 +36,12 @@ class ClientTest : public ::testing::Test {
         _mockSocketPtr = _mockSocket.get();
     }
 
+  protected:
+    [[nodiscard]] std::shared_ptr<events::EventDispatcher>& getDispatcher() { return _dispatcher; }
+    [[nodiscard]] std::unique_ptr<StrictMock<MockClientSocket>>& getMockSocket() { return _mockSocket; }
+    [[nodiscard]] StrictMock<MockClientSocket>* getMockSocketPtr() const { return _mockSocketPtr; }
+
+  private:
     std::shared_ptr<events::EventDispatcher> _dispatcher;
     std::unique_ptr<StrictMock<MockClientSocket>> _mockSocket;
     StrictMock<MockClientSocket>* _mockSocketPtr{nullptr};
@@ -45,56 +51,64 @@ class ClientTest : public ::testing::Test {
 TEST_F(ClientTest, Constructor_Success) {
     Sequence const s;
 
-    EXPECT_CALL(*_mockSocketPtr, tryPopMessage()).InSequence(s).WillOnce(Return(std::optional<std::string>{"WELCOME"}));
+    EXPECT_CALL(*getMockSocketPtr(), tryPopMessage())
+        .InSequence(s)
+        .WillOnce(Return(std::optional<std::string>{"WELCOME"}));
 
-    EXPECT_CALL(*_mockSocketPtr, send(std::string_view("GRAPHIC\n"))).InSequence(s).WillOnce(Return(8));
+    EXPECT_CALL(*getMockSocketPtr(), send(std::string_view("GRAPHIC\n"))).InSequence(s).WillOnce(Return(8));
 
-    EXPECT_NO_THROW({ Client client(std::move(_mockSocket), _dispatcher); });
+    EXPECT_NO_THROW({ const Client client(std::move(getMockSocket()), getDispatcher()); });
 }
 
 TEST_F(ClientTest, Constructor_Timeout) {
-    EXPECT_CALL(*_mockSocketPtr, tryPopMessage()).WillRepeatedly(Return(std::nullopt));
+    EXPECT_CALL(*getMockSocketPtr(), tryPopMessage()).WillRepeatedly(Return(std::nullopt));
 
-    EXPECT_THROW({ Client client(std::move(_mockSocket), _dispatcher); }, ::network::exception::SocketError);
+    EXPECT_THROW(
+        { const Client client(std::move(getMockSocket()), getDispatcher()); }, ::network::exception::SocketError);
 }
 
 TEST_F(ClientTest, Constructor_BadWelcome) {
-    EXPECT_CALL(*_mockSocketPtr, tryPopMessage()).WillOnce(Return(std::optional<std::string>{"BAD_WELCOME"}));
+    EXPECT_CALL(*getMockSocketPtr(), tryPopMessage()).WillOnce(Return(std::optional<std::string>{"BAD_WELCOME"}));
 
-    EXPECT_THROW({ Client client(std::move(_mockSocket), _dispatcher); }, ::network::exception::SocketError);
+    EXPECT_THROW(
+        { const Client client(std::move(getMockSocket()), getDispatcher()); }, ::network::exception::SocketError);
 }
 
 TEST_F(ClientTest, SendCommand_EventTrigger) {
     Sequence s;
 
-    EXPECT_CALL(*_mockSocketPtr, tryPopMessage()).InSequence(s).WillOnce(Return(std::optional<std::string>{"WELCOME"}));
+    EXPECT_CALL(*getMockSocketPtr(), tryPopMessage())
+        .InSequence(s)
+        .WillOnce(Return(std::optional<std::string>{"WELCOME"}));
 
-    EXPECT_CALL(*_mockSocketPtr, send(std::string_view("GRAPHIC\n"))).InSequence(s).WillOnce(Return(8));
+    EXPECT_CALL(*getMockSocketPtr(), send(std::string_view("GRAPHIC\n"))).InSequence(s).WillOnce(Return(8));
 
-    Client client(std::move(_mockSocket), _dispatcher);
+    const Client client(std::move(getMockSocket()), getDispatcher());
 
-    EXPECT_CALL(*_mockSocketPtr, send(std::string_view("msz\n"))).InSequence(s).WillOnce(Return(4));
+    EXPECT_CALL(*getMockSocketPtr(), send(std::string_view("msz\n"))).InSequence(s).WillOnce(Return(4));
 
-    _dispatcher->dispatch(events::SendCommand{"msz\n"});
+    getDispatcher()->dispatch(events::SendCommand{"msz\n"});
 }
 
 TEST_F(ClientTest, Update_ParsesServerMessage) {
     Sequence s;
 
-    EXPECT_CALL(*_mockSocketPtr, tryPopMessage()).InSequence(s).WillOnce(Return(std::optional<std::string>{"WELCOME"}));
+    EXPECT_CALL(*getMockSocketPtr(), tryPopMessage())
+        .InSequence(s)
+        .WillOnce(Return(std::optional<std::string>{"WELCOME"}));
 
-    EXPECT_CALL(*_mockSocketPtr, send(std::string_view("GRAPHIC\n"))).InSequence(s).WillOnce(Return(8));
+    EXPECT_CALL(*getMockSocketPtr(), send(std::string_view("GRAPHIC\n"))).InSequence(s).WillOnce(Return(8));
 
-    Client client(std::move(_mockSocket), _dispatcher);
+    Client client(std::move(getMockSocket()), getDispatcher());
 
-    EXPECT_CALL(*_mockSocketPtr, tryPopMessage())
+    EXPECT_CALL(*getMockSocketPtr(), tryPopMessage())
         .InSequence(s)
         .WillOnce(Return(std::optional<std::string>{"msz 10 10\n"}))
         .WillOnce(Return(std::nullopt));
 
     bool received = false;
-    auto token =
-        _dispatcher->subscribe<shared::protocol::server::Msz>([&received](const shared::protocol::server::Msz& cmd) {
+    auto token = getDispatcher()->subscribe<shared::protocol::server::Msz>(
+        [&received](const shared::protocol::server::Msz& cmd) {
             EXPECT_EQ(cmd.width, 10);
             EXPECT_EQ(cmd.height, 10);
             received = true;
@@ -103,7 +117,7 @@ TEST_F(ClientTest, Update_ParsesServerMessage) {
     client.update();
 
     EXPECT_TRUE(received);
-    _dispatcher->unsubscribe<shared::protocol::server::Msz>(token);
+    getDispatcher()->unsubscribe<shared::protocol::server::Msz>(token);
 }
 
 }  // namespace zappy::gui::network::tests
