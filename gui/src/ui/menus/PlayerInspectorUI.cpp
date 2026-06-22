@@ -16,30 +16,27 @@
 #include <string>
 #include <utility>
 
+#include "AInspectorUI.hpp"
 #include "Color.hpp"
+#include "components/UIButton.hpp"
+#include "components/UIGamePanel.hpp"
+#include "components/UIImage.hpp"
+#include "components/UIText.hpp"
 #include "events/EventDispatcher.hpp"
 #include "events/GuiEvents.hpp"
 #include "graphics/AssetManager.hpp"
 #include "protocol/Commands.hpp"
 #include "protocol/Emitter.hpp"
-#include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
-#include "rmath/Vector3.hpp"
 #include "rmodels/Model.hpp"
 #include "rshapes/Shapes.hpp"
 #include "rtext/Font.hpp"
-#include "rtextures/RenderTexture2D.hpp"
 #include "rtextures/Texture2D.hpp"
-#include "ui/components/UIButton.hpp"
-#include "ui/components/UIGamePanel.hpp"
-#include "ui/components/UIImage.hpp"
-#include "ui/components/UIText.hpp"
 
 namespace zappy::gui::ui::menus {
 
 namespace {
-constexpr float InspectorInitialHeight = 550.0F;
 constexpr float FirstPersonBtnWidth = 160.0F;
 constexpr float FirstPersonBtnHeight = 40.0F;
 constexpr int FirstPersonBtnFontSize = 16;
@@ -86,56 +83,32 @@ constexpr float HeartsToInventorySpacing = 40.0F;
 constexpr int MaxHearts = 10;
 constexpr int MaxXp = 8;
 
-constexpr float InvGridTotalWidth = 230.0F;
-constexpr float InvTitleToGridSpacing = 30.0F;
-constexpr float InvCellSize = 70.0F;
-constexpr float InvCellSpacing = 80.0F;
-constexpr float InvCellTextOffsetX = 10.0F;
-constexpr float InvCellTextOffsetY = 50.0F;
 constexpr float InvToBtnSpacing = 180.0F;
 }  // namespace
 
 PlayerInspectorUI::PlayerInspectorUI(float x, float y, float width, std::shared_ptr<events::EventDispatcher> dispatcher,
                                      const std::shared_ptr<raylib::rtext::Font>& font,
                                      std::function<void(const std::string&)> onSendCommand)
-    : components::UIGamePanel(x, y, width, InspectorInitialHeight, "Player Inspector"),
-      _dispatcher(std::move(dispatcher)),
-      _font(font),
-      _onSendCommand(std::move(onSendCommand)),
+    : AInspectorUI(x, y, width, "Player Inspector", std::move(dispatcher), font, std::move(onSendCommand)),
       _firstPersonBtn(std::make_shared<components::UIButton>(0.0F, 0.0F, FirstPersonBtnWidth, FirstPersonBtnHeight,
-                                                             "First Person", _font)),
-      _closeBtn(std::make_shared<components::UIButton>(x + width, y, 24.0F, 24.0F, "X", _font)),
-      _avatarCamera(raylib::rcore::Camera(raylib::rmath::Vector3{0.0F, 4.0F, 10.0F},
-                                          raylib::rmath::Vector3{0.0F, 3.0F, 0.0F},
-                                          raylib::rmath::Vector3{0.0F, 1.0F, 0.0F}, 45.0F, 0)),
-      _avatarModel(std::make_shared<raylib::rmodels::Model>("assets/jeffrey/scene.gltf")),
-      _avatarRenderTexture(std::make_shared<raylib::rtextures::RenderTexture2D>(static_cast<int>(AvatarWidth),
-                                                                                static_cast<int>(AvatarHeight))) {
-    setCustomLayout(true);
+                                                             "First Person", getFont())) {
     buildInfoPanel();
     buildInventoryPanel();
-    setVisible(false);
+
+    getPreviewModel() = std::make_shared<raylib::rmodels::Model>("assets/jeffrey/scene.gltf");
 
     _firstPersonBtn->setFontSize(FirstPersonBtnFontSize);
 
-    _closeBtn->setFontSize(16.0F);
-    _closeBtn->setOnClick([this]() { this->setVisible(false); });
-    addHeaderComponent(_closeBtn);
-
-    if (_dispatcher) {
-        _eventTokens.push_back(_dispatcher->subscribe<events::PlayerClicked>(
+    if (getDispatcher()) {
+        getEventTokens().push_back(getDispatcher()->subscribe<events::PlayerClicked>(
             [this](const events::PlayerClicked& e) { onPlayerClicked(e); }));
-        _eventTokens.push_back(_dispatcher->subscribe<shared::protocol::server::Pin>(
+        getEventTokens().push_back(getDispatcher()->subscribe<shared::protocol::server::Pin>(
             [this](const shared::protocol::server::Pin& cmd) { onPinReceived(cmd); }));
-        _eventTokens.push_back(_dispatcher->subscribe<shared::protocol::server::Plv>(
+        getEventTokens().push_back(getDispatcher()->subscribe<shared::protocol::server::Plv>(
             [this](const shared::protocol::server::Plv& cmd) { onPlvReceived(cmd); }));
-        _eventTokens.push_back(_dispatcher->subscribe<shared::protocol::server::Ppo>(
+        getEventTokens().push_back(getDispatcher()->subscribe<shared::protocol::server::Ppo>(
             [this](const shared::protocol::server::Ppo& cmd) { onPpoReceived(cmd); }));
-        _eventTokens.push_back(_dispatcher->subscribe<shared::protocol::server::Sgt>(
-            [this](const shared::protocol::server::Sgt& cmd) { onSgtReceived(cmd); }));
     }
-
-    _targetPlayerId = 1;  // Temporary default player ID for testing
 }
 
 void PlayerInspectorUI::onPinReceived(const shared::protocol::server::Pin& cmd) {
@@ -143,13 +116,13 @@ void PlayerInspectorUI::onPinReceived(const shared::protocol::server::Pin& cmd) 
         _foodFloat = static_cast<float>(cmd.food);
         updateHearts();
 
-        if (_inventoryTexts.size() >= 6) {
-            _inventoryTexts.at(0)->setText(std::to_string(cmd.linemate));
-            _inventoryTexts.at(1)->setText(std::to_string(cmd.deraumere));
-            _inventoryTexts.at(2)->setText(std::to_string(cmd.sibur));
-            _inventoryTexts.at(3)->setText(std::to_string(cmd.mendiane));
-            _inventoryTexts.at(4)->setText(std::to_string(cmd.phiras));
-            _inventoryTexts.at(5)->setText(std::to_string(cmd.thystame));
+        if (getInventoryTexts().size() >= 6) {
+            getInventoryTexts().at(0)->setText(std::to_string(cmd.linemate));
+            getInventoryTexts().at(1)->setText(std::to_string(cmd.deraumere));
+            getInventoryTexts().at(2)->setText(std::to_string(cmd.sibur));
+            getInventoryTexts().at(3)->setText(std::to_string(cmd.mendiane));
+            getInventoryTexts().at(4)->setText(std::to_string(cmd.phiras));
+            getInventoryTexts().at(5)->setText(std::to_string(cmd.thystame));
         }
     }
 }
@@ -181,17 +154,12 @@ void PlayerInspectorUI::onPpoReceived(const shared::protocol::server::Ppo& cmd) 
     }
 }
 
-void PlayerInspectorUI::onSgtReceived(const shared::protocol::server::Sgt& cmd) {
-    _serverFreq = static_cast<float>(cmd.timeUnit);
-}
-
 PlayerInspectorUI::~PlayerInspectorUI() {
-    if (_dispatcher && _eventTokens.size() >= 5) {
-        _dispatcher->unsubscribe<events::PlayerClicked>(_eventTokens.at(0));
-        _dispatcher->unsubscribe<shared::protocol::server::Pin>(_eventTokens.at(1));
-        _dispatcher->unsubscribe<shared::protocol::server::Plv>(_eventTokens.at(2));
-        _dispatcher->unsubscribe<shared::protocol::server::Ppo>(_eventTokens.at(3));
-        _dispatcher->unsubscribe<shared::protocol::server::Sgt>(_eventTokens.at(4));
+    if (getDispatcher() && getEventTokens().size() >= 4) {
+        getDispatcher()->unsubscribe<events::PlayerClicked>(getEventTokens().at(0));
+        getDispatcher()->unsubscribe<shared::protocol::server::Pin>(getEventTokens().at(1));
+        getDispatcher()->unsubscribe<shared::protocol::server::Plv>(getEventTokens().at(2));
+        getDispatcher()->unsubscribe<shared::protocol::server::Ppo>(getEventTokens().at(3));
     }
 }
 
@@ -207,23 +175,23 @@ void PlayerInspectorUI::buildInfoPanel() {
     _compassIcon = std::make_shared<components::UIImage>("assets/images/ui/compass.png");
     _compassIcon->setSize(PrimaryIconSize, PrimaryIconSize);
 
-    _nameText = std::make_shared<components::UIText>("Player Name", _font);
+    _nameText = std::make_shared<components::UIText>("Player Name", getFont());
     _nameText->setFontSize(static_cast<int>(HeaderFontSize));
     _nameText->setColor(raylib::Color::White());
 
-    _teamText = std::make_shared<components::UIText>("Team: None", _font);
+    _teamText = std::make_shared<components::UIText>("Team: None", getFont());
     _teamText->setFontSize(static_cast<int>(InfoFontSize));
     _teamText->setColor(raylib::Color::DarkGray());
 
-    _idText = std::make_shared<components::UIText>("ID: 0", _font);
+    _idText = std::make_shared<components::UIText>("ID: 0", getFont());
     _idText->setFontSize(static_cast<int>(InfoFontSize));
     _idText->setColor(raylib::Color::DarkGray());
 
-    _compassText = std::make_shared<components::UIText>("North", _font);
+    _compassText = std::make_shared<components::UIText>("North", getFont());
     _compassText->setFontSize(static_cast<int>(InfoFontSize));
     _compassText->setColor(raylib::Color::DarkGray());
 
-    _posText = std::make_shared<components::UIText>("(0, 0)", _font);
+    _posText = std::make_shared<components::UIText>("(0, 0)", getFont());
     _posText->setFontSize(static_cast<int>(InfoFontSize));
     _posText->setColor(raylib::Color::DarkGray());
 
@@ -245,23 +213,6 @@ void PlayerInspectorUI::buildInfoPanel() {
     }
 }
 
-void PlayerInspectorUI::buildInventoryPanel() {
-    _inventoryTitleText = std::make_shared<components::UIText>("Inventory", _font);
-    _inventoryTitleText->setFontSize(static_cast<int>(HeaderFontSize));
-    _inventoryTitleText->setColor(raylib::Color::Black());
-
-    for (int i = 0; i < 6; ++i) {
-        auto text = std::make_shared<components::UIText>("0", _font);
-        text->setFontSize(static_cast<int>(InfoFontSize));
-        text->setColor(raylib::Color::White());
-        _inventoryTexts.push_back(text);
-
-        auto img = std::make_shared<components::UIImage>("assets/images/ui/id.png");
-        img->setSize(30.0F, 30.0F);
-        _inventoryImages.push_back(img);
-    }
-}
-
 void PlayerInspectorUI::onPlayerClicked(const events::PlayerClicked& event) {
     _targetPlayerId = event.playerId;
 
@@ -275,15 +226,15 @@ void PlayerInspectorUI::onPlayerClicked(const events::PlayerClicked& event) {
         _teamText->setText("Team: " + event.teamName);
         _teamText->setColor(event.teamColor);
     }
-    if (_avatarModel) {
+    if (getPreviewModel()) {
         if (!event.textureId.empty()) {
             auto tex = graphics::AssetManager::getInstance().getTexture(event.textureId);
             if (tex) {
-                _avatarModel->setMaterialTexture(0, 0 /* MATERIAL_MAP_ALBEDO */, *tex);
+                getPreviewModel()->setMaterialTexture(0, 0 /* MATERIAL_MAP_ALBEDO */, *tex);
             }
         } else {
-            _avatarModel->setMaterialTexture(0, 0 /* MATERIAL_MAP_ALBEDO */,
-                                             raylib::rtextures::Texture2D{::Texture2D{}, false});
+            getPreviewModel()->setMaterialTexture(0, 0 /* MATERIAL_MAP_ALBEDO */,
+                                                  raylib::rtextures::Texture2D{::Texture2D{}, false});
         }
     }
 
@@ -292,10 +243,10 @@ void PlayerInspectorUI::onPlayerClicked(const events::PlayerClicked& event) {
 }
 
 void PlayerInspectorUI::requestPlayerSync() const {
-    if (_onSendCommand) {
-        _onSendCommand(shared::protocol::Emitter::build(shared::protocol::client::Pin{_targetPlayerId}));
-        _onSendCommand(shared::protocol::Emitter::build(shared::protocol::client::Plv{_targetPlayerId}));
-        _onSendCommand(shared::protocol::Emitter::build(shared::protocol::client::Ppo{_targetPlayerId}));
+    if (getOnSendCommand()) {
+        getOnSendCommand()(shared::protocol::Emitter::build(shared::protocol::client::Pin{_targetPlayerId}));
+        getOnSendCommand()(shared::protocol::Emitter::build(shared::protocol::client::Plv{_targetPlayerId}));
+        getOnSendCommand()(shared::protocol::Emitter::build(shared::protocol::client::Ppo{_targetPlayerId}));
     }
 }
 
@@ -385,7 +336,7 @@ void PlayerInspectorUI::updateHearts() {
 }
 
 void PlayerInspectorUI::handleEvent(const raylib::rcore::Event& event) {
-    components::UIGamePanel::handleEvent(event);
+    AInspectorUI::handleEvent(event);
     if (!isVisible()) {
         return;
     }
@@ -393,31 +344,23 @@ void PlayerInspectorUI::handleEvent(const raylib::rcore::Event& event) {
     if (_firstPersonBtn) {
         _firstPersonBtn->handleEvent(event);
     }
-    if (_closeBtn) {
-        _closeBtn->handleEvent(event);
-    }
 }
 
 void PlayerInspectorUI::setVisible(bool visible) {
-    components::UIGamePanel::setVisible(visible);
+    AInspectorUI::setVisible(visible);
     if (!visible) {
         _targetPlayerId = -1;
     }
 }
 
-void PlayerInspectorUI::setPosition(float x, float y) {
-    components::UIGamePanel::setPosition(x, y);
-    if (_closeBtn) {
-        _closeBtn->setPosition(x + getSize().x() - 45.0F, y + 8.0F);
-    }
-}
+void PlayerInspectorUI::setPosition(float x, float y) { AInspectorUI::setPosition(x, y); }
 
 void PlayerInspectorUI::update() {
-    components::UIGamePanel::update();
+    AInspectorUI::update();
 
-    if (_foodFloat > 0.0F && _serverFreq > 0.0F) {
+    if (_foodFloat > 0.0F && getServerFreq() > 0.0F) {
         float const deltaTime = raylib::rcore::Window::frameTime();
-        _foodFloat -= deltaTime * (_serverFreq / FoodMax);
+        _foodFloat -= deltaTime * (getServerFreq() / FoodMax);
         _foodFloat = std::max(_foodFloat, 0.0F);
         updateHearts();
     }
@@ -425,38 +368,9 @@ void PlayerInspectorUI::update() {
     if (_firstPersonBtn) {
         _firstPersonBtn->update();
     }
-    if (_closeBtn) {
-        _closeBtn->update();
-    }
 }
 
-void PlayerInspectorUI::draw() {
-    if (isVisible() && !isConfigMode() && _avatarRenderTexture && _avatarModel) {
-        _avatarRenderTexture->begin();
-        zappy::gui::raylib::rcore::Window::clearBackground({200, 200, 200, 255});
-        _avatarCamera.beginMode3D();
-        _avatarModel->drawModel({0.0F, 0.0F, 0.0F}, 0.1F, raylib::Color::White());
-        zappy::gui::raylib::rcore::Camera::endMode3D();
-        zappy::gui::raylib::rtextures::RenderTexture2D::end();
-    }
-
-    components::UIGamePanel::draw();
-
-    if (!isVisible() || isConfigMode()) {
-        return;
-    }
-
-    float const panelW = this->getSize().x();
-    float const startX = this->getPosition().x();
-
-    float const headerH = components::UIGamePanel::getHeaderHeight();
-    float const currentH = this->getCurrentHeight();
-    raylib::rcore::Window::beginScissorMode(static_cast<int>(startX),
-                                            static_cast<int>(this->getPosition().y() + headerH),
-                                            static_cast<int>(panelW), static_cast<int>(currentH - headerH));
-
-    float currentY = this->getPosition().y() + BaseYOffset;
-
+void PlayerInspectorUI::drawHeader(float& currentY, float startX, float panelW) {
     float const nameW = panelW * NameBoxWidthRatio;
     float const nameX = startX + ((panelW - nameW) / 2.0F);
     raylib::rshapes::Shapes::drawRectangleRec({.x = nameX, .y = currentY, .width = nameW, .height = NameBoxHeight},
@@ -464,14 +378,16 @@ void PlayerInspectorUI::draw() {
     _nameText->setPosition(nameX + NameBoxXOffset, currentY + NameBoxYOffset);
     _nameText->draw();
     currentY += NameToAvatarSpacing;
+}
 
+void PlayerInspectorUI::drawStatsBlock(float& currentY, float startX, float panelW) {
     float const blockW = AvatarWidth + AvatarToStatsSpacing + StatsBlockWidth;
     float const blockX = startX + ((panelW - blockW) / 2.0F);
 
     raylib::rshapes::Shapes::drawRectangleRec(
         {.x = blockX, .y = currentY, .width = AvatarWidth, .height = AvatarHeight}, raylib::Color::LightGray());
-    if (_avatarRenderTexture) {
-        _avatarRenderTexture->draw({blockX, currentY}, raylib::Color::White());
+    if (getPreviewRenderTexture()) {
+        getPreviewRenderTexture()->draw({blockX, currentY}, raylib::Color::White());
     }
 
     float statsY = currentY + StatsYOffset;
@@ -503,7 +419,9 @@ void PlayerInspectorUI::draw() {
     _posText->draw();
 
     currentY += AvatarHeight + AvatarToXpSpacing;
+}
 
+void PlayerInspectorUI::drawXpBar(float& currentY, float startX, float panelW) {
     float const xpW = (XpBaseSegments * XpIconSpacing) + XpBarExtraWidth;
     float xpX = startX + ((panelW - xpW) / 2.0F);
     for (auto& xp : _xpBar) {
@@ -512,7 +430,9 @@ void PlayerInspectorUI::draw() {
         xpX += XpIconSpacing;
     }
     currentY += XpToHeartsSpacing;
+}
 
+void PlayerInspectorUI::drawHealthBar(float& currentY, float startX, float panelW) {
     float const heartW = (HeartBaseSegments * HeartIconSpacing) + HeartBarExtraWidth;
     float heartX = startX + ((panelW - heartW) / 2.0F);
     for (int i = 0; i < MaxHearts; ++i) {
@@ -528,37 +448,42 @@ void PlayerInspectorUI::draw() {
         heartX += HeartIconSpacing;
     }
     currentY += HeartsToInventorySpacing;
+}
 
-    float const titleX = startX + ((panelW - InvGridTotalWidth) / 2.0F);
-    _inventoryTitleText->setPosition(titleX, currentY);
-    _inventoryTitleText->draw();
-    currentY += InvTitleToGridSpacing;
-
-    float const gridX = startX + ((panelW - InvGridTotalWidth) / 2.0F);
-    for (size_t i = 0; i < _inventoryTexts.size(); ++i) {
-        const int row = static_cast<int>(i) / 3;
-        const int col = static_cast<int>(i) % 3;
-        auto& _inventoryText = _inventoryTexts.at(i);
-        float const cellX = gridX + (static_cast<float>(col) * InvCellSpacing);
-        float const cellY = currentY + (static_cast<float>(row) * InvCellSpacing);
-
-        raylib::rshapes::Shapes::drawRectangleRec({.x = cellX, .y = cellY, .width = InvCellSize, .height = InvCellSize},
-                                                  raylib::Color(200, 200, 200, 255));
-
-        _inventoryText->setPosition(cellX + InvCellTextOffsetX, cellY + InvCellTextOffsetY);
-        _inventoryText->draw();
-
-        auto img = _inventoryImages.at(i);
-        img->setPosition(cellX + InvCellTextOffsetX, cellY + InvCellTextOffsetY);
-        img->draw();
-    }
-    currentY += InvToBtnSpacing;
-
+void PlayerInspectorUI::drawActionButtons(float& currentY, float startX, float panelW) {
     if (_firstPersonBtn) {
         float const btnX = startX + ((panelW - FirstPersonBtnWidth) / 2.0F);
         _firstPersonBtn->setPosition(btnX, currentY);
         _firstPersonBtn->draw();
     }
+}
+
+void PlayerInspectorUI::draw() {
+    draw3DPreview();
+    AInspectorUI::draw();
+
+    if (!isVisible() || isConfigMode()) {
+        return;
+    }
+
+    float const panelW = this->getSize().x();
+    float const startX = this->getPosition().x();
+
+    float const headerH = components::UIGamePanel::getHeaderHeight();
+    float const currentH = this->getCurrentHeight();
+    raylib::rcore::Window::beginScissorMode(static_cast<int>(startX),
+                                            static_cast<int>(this->getPosition().y() + headerH),
+                                            static_cast<int>(panelW), static_cast<int>(currentH - headerH));
+
+    float currentY = this->getPosition().y() + BaseYOffset;
+
+    drawHeader(currentY, startX, panelW);
+    drawStatsBlock(currentY, startX, panelW);
+    drawXpBar(currentY, startX, panelW);
+    drawHealthBar(currentY, startX, panelW);
+    drawInventoryPanel(currentY, startX, panelW);
+    currentY += InvToBtnSpacing;
+    drawActionButtons(currentY, startX, panelW);
 
     raylib::rcore::Window::endScissorMode();
 }

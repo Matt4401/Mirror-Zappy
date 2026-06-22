@@ -8,6 +8,7 @@ add_library(zappy_gui_ui
     components/UIImage.cpp
     menus/PauseMenu.cpp
     menus/PlayerInspectorUI.cpp
+    menus/AInspectorUI.cpp
 )
 target_sources(zappy_gui_ui PUBLIC
     FILE_SET HEADERS
@@ -23,6 +24,7 @@ target_sources(zappy_gui_ui PUBLIC
         components/UIImage.hpp
         menus/PauseMenu.hpp
         menus/PlayerInspectorUI.hpp
+        menus/AInspectorUI.hpp
 )
 target_include_directories(zappy_gui_ui PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
