@@ -8,7 +8,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.
 from ai.zappy_ai import main
 
 
-@patch("src.AITeamClass.AIConnection")
+@patch("src.AITeamClass.Connection")
 def test_main(mock_connect_class):
     mock_instance = MagicMock()
     mock_connect_class.return_value = mock_instance
@@ -18,7 +18,7 @@ def test_main(mock_connect_class):
         main()
 
 
-@patch("src.AITeamClass.AIConnection")
+@patch("src.AITeamClass.Connection")
 def test_invalid_main_zero_args(mock_connect):
     mock_connect.return_value = None
     test_wrong_args = ["zappy_ai"]
@@ -29,7 +29,7 @@ def test_invalid_main_zero_args(mock_connect):
         assert excinfo.value.code == 84
 
 
-@patch("src.AITeamClass.AIConnection")
+@patch("src.AITeamClass.Connection")
 def test_invalid_main_zero_args(mock_connect):
     mock_connect.return_value = None
     test_wrong_args = ["zappy_ai", "-p", "4242", "-n", "EquipeTest", "-h"]
