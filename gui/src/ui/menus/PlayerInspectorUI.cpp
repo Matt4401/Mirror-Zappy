@@ -109,15 +109,6 @@ PlayerInspectorUI::PlayerInspectorUI(float x, float y, float width, std::shared_
         getEventTokens().push_back(getDispatcher()->subscribe<shared::protocol::server::Ppo>(
             [this](const shared::protocol::server::Ppo& cmd) { onPpoReceived(cmd); }));
     }
-
-    if (getDispatcher()) {
-        events::PlayerClicked ev;
-        ev.playerId = 999;
-        ev.playerName = "Player 999";
-        ev.teamName = "Red";
-        ev.teamColor = raylib::Color::Red();
-        getDispatcher()->dispatch(ev);
-    }
 }
 
 void PlayerInspectorUI::onPinReceived(const shared::protocol::server::Pin& cmd) {
@@ -187,7 +178,7 @@ void PlayerInspectorUI::buildInfoPanel() {
     _nameBox = std::make_shared<components::UITextbox>(0.0F, 0.0F, 200.0F, NameBoxHeight, getFont(), "Enter Name...");
     _nameBox->setOnSubmit([this](const std::string& name) {
         if (getDispatcher() && _targetPlayerId != -1) {
-            getDispatcher()->dispatch(events::PlayerNameChanged{.playerId = _targetPlayerId, .newName = name});
+            getDispatcher()->dispatch(events::PlayerNameChanged{_targetPlayerId, name});
         }
     });
 
@@ -391,8 +382,6 @@ void PlayerInspectorUI::update() {
 void PlayerInspectorUI::drawHeader(float& currentY, float startX, float panelW) {
     float const nameW = panelW * NameBoxWidthRatio;
     float const nameX = startX + ((panelW - nameW) / 2.0F);
-    raylib::rshapes::Shapes::drawRectangleRec({.x = nameX, .y = currentY, .width = nameW, .height = NameBoxHeight},
-                                              raylib::Color(50, 50, 50, 255));
     _nameBox->setPosition(nameX + NameBoxXOffset, currentY + NameBoxYOffset);
     _nameBox->setSize(nameW, NameBoxHeight);
     _nameBox->draw();
