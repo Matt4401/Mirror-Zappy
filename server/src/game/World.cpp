@@ -126,6 +126,7 @@ std::optional<size_t> World::spawnPlayer(const std::string_view teamName) {
         std::make_unique<Player>(egg.value().id, egg.value().position.x, egg.value().position.y, randomCardinalPoint());
     const auto& newPlayer = _playerList.at(egg.value().id);
     _tiles.at(getTileIndex(newPlayer->position().x, newPlayer->position().y)).players.emplace_back(newPlayer->id());
+    addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Ebo{.eggId = static_cast<int>(_newId)}));
     return newPlayer->id();
 }
 [[nodiscard]] Position World::getTilePosition(const std::size_t position1D) const {
