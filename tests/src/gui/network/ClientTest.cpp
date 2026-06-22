@@ -21,13 +21,13 @@
 #include "network/Client.hpp"
 #include "protocol/Commands.hpp"
 
-using ::testing::_;
 using ::testing::Return;
 using ::testing::Sequence;
 using ::testing::StrictMock;
 
 namespace zappy::gui::network::tests {
 
+namespace {
 class ClientTest : public ::testing::Test {
   protected:
     void SetUp() override {
@@ -40,9 +40,10 @@ class ClientTest : public ::testing::Test {
     std::unique_ptr<StrictMock<MockClientSocket>> _mockSocket;
     StrictMock<MockClientSocket>* _mockSocketPtr{nullptr};
 };
+}  // namespace
 
 TEST_F(ClientTest, Constructor_Success) {
-    Sequence s;
+    Sequence const s;
 
     EXPECT_CALL(*_mockSocketPtr, tryPopMessage()).InSequence(s).WillOnce(Return(std::optional<std::string>{"WELCOME"}));
 
