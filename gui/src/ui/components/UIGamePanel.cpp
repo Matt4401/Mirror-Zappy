@@ -277,4 +277,11 @@ void UIGamePanel::updateChildrenLayout() {
     }
 }
 
+void UIGamePanel::setTitle(const std::string& title) {
+    if (_titleText) {
+        _titleText->setText(title);
+        updateTextPosition();
+    }
+}
+
 }  // namespace zappy::gui::ui::components

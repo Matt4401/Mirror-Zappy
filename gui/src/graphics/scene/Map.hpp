@@ -57,6 +57,7 @@ class Map {
   private:
     void drawItems(const Tile3D& tile) const;
     void dispatchClickedPlayer(const game::Team& team, const game::Player& player) const;
+    void dispatchClickedTile(const Tile3D& tile) const;
 
     std::shared_ptr<raylib::rcore::Camera> _camera;
     std::shared_ptr<events::EventDispatcher> _dispatcher;
