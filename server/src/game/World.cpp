@@ -144,7 +144,7 @@ void World::pushCommandToPlayer(const std::size_t playerId, std::unique_ptr<comm
     const auto& player = _playerList.at(playerId);
 
     player->pushCommand(std::move(command));
-    player->tryStartNextCommand(*this);
+    player->tryStartNextCommand(*this, true);
 }
 
 void World::removePlayerFromTeam(const std::size_t id) const {
@@ -356,5 +356,7 @@ std::unordered_map<cardinalPoint, std::string> World::cardinalPointToStr() {
     };
     return kCardinalPointToStr;
 }
+
+const std::unordered_map<std::size_t, Egg>& World::vecEggs() const { return _vecEggs; }
 
 }  // namespace zappy::server::game
