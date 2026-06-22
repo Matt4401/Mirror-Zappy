@@ -30,7 +30,7 @@ class AInspectorUI : public components::UIGamePanel {
     AInspectorUI(float x, float y, float width, const std::string& title,
                  std::shared_ptr<events::EventDispatcher> dispatcher, const std::shared_ptr<raylib::rtext::Font>& font,
                  std::function<void(const std::string&)> onSendCommand);
-    ~AInspectorUI() override;
+    ~AInspectorUI() override = 0;
 
     AInspectorUI(const AInspectorUI& other) = delete;
     AInspectorUI& operator=(const AInspectorUI& other) = delete;
