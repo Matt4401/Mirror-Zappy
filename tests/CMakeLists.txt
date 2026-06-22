@@ -8,6 +8,7 @@ add_executable(unit_tests
         src/server/parsing/Parser.cpp
         src/gui/parsing/Parser.cpp
         src/gui/events/EventDispatcherTest.cpp
+        src/gui/network/ClientTest.cpp
         src/network/Socket.cpp
         src/network/SessionManager.cpp
         src/server/Core.cpp
@@ -34,6 +35,7 @@ target_link_libraries(unit_tests PRIVATE
         zappy_parser
         zappy_server_objects
         zappy_gui_events
+        zappy_gui_network
         GTest::gtest
         GTest::gmock
         GTest::gmock_main

@@ -7,8 +7,6 @@
 
 #include "UIText.hpp"
 
-#include <raylib.h>
-
 #include <memory>
 #include <string>
 #include <utility>
@@ -16,6 +14,7 @@
 #include "Color.hpp"
 #include "rmath/Vector2.hpp"
 #include "rtext/Font.hpp"
+#include "rtext/Text.hpp"
 
 namespace zappy::gui::ui::components {
 
@@ -30,7 +29,8 @@ void UIText::draw() {
     if (!_isVisible || _text.empty() || !_font || !_font->valid()) {
         return;
     }
-    ::DrawTextEx(_font->font(), _text.c_str(), _position.vector(), _fontSize, _spacing, _color.color());
+    raylib::rtext::Text const textObj(_text, _position);
+    textObj.draw(*_font, _fontSize, _spacing, _color);
 }
 
 void UIText::update() {}

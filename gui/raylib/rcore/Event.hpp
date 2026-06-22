@@ -39,6 +39,7 @@ class Event {
     [[nodiscard]] static rmath::Vector2 getMousePositionStatic() {
         return {GetMousePosition().x, GetMousePosition().y};
     }
+    [[nodiscard]] static float getMouseWheelMoveStatic() { return GetMouseWheelMove(); }
     [[nodiscard]] Ray mouseRay(const Camera& camera) const {
         return Ray(GetMouseRay(_mousePosition.vector(), camera.camera()));
     }

@@ -108,6 +108,8 @@ void Map::dispatchClickedPlayer(const game::Team& team, const game::Player& play
         .teamName = team.name(),
         .playerName = player.name(),
         .position = player.position(),
+        .teamColor = team.color(),
+        .textureId = player.textureId(),
     });
 }
 }  // namespace zappy::gui::graphics::scene

@@ -7,8 +7,6 @@
 
 #include "UIGridManager.hpp"
 
-#include <raylib.h>
-
 #include <algorithm>
 #include <cmath>
 #include <functional>
@@ -17,9 +15,12 @@
 #include <ranges>
 #include <vector>
 
+#include "Color.hpp"
 #include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
+#include "rmath/Rectangle.hpp"
 #include "rmath/Vector2.hpp"
+#include "rshapes/Shapes.hpp"
 #include "ui/components/UIGamePanel.hpp"
 
 namespace zappy::gui::ui::components {
@@ -45,10 +46,11 @@ void UIGridManager::draw() {
             float const cellW = static_cast<float>(raylib::rcore::Window::screenWidth()) / static_cast<float>(GridCols);
             float const cellH =
                 static_cast<float>(raylib::rcore::Window::screenHeight()) / static_cast<float>(GridRows);
-            DrawRectangleLines(static_cast<int>(static_cast<float>(_previewGrid.x) * cellW),
-                               static_cast<int>(static_cast<float>(_previewGrid.y) * cellH),
-                               static_cast<int>(static_cast<float>(_previewGrid.w) * cellW),
-                               static_cast<int>(static_cast<float>(_previewGrid.h) * cellH), GREEN);
+            raylib::rshapes::Shapes::drawRectangleLinesEx({.x = static_cast<float>(_previewGrid.x) * cellW,
+                                                           .y = static_cast<float>(_previewGrid.y) * cellH,
+                                                           .width = static_cast<float>(_previewGrid.w) * cellW,
+                                                           .height = static_cast<float>(_previewGrid.h) * cellH},
+                                                          2.0F, raylib::Color::Green());
         }
     }
 }
@@ -139,12 +141,12 @@ void UIGridManager::handleMousePressed(const raylib::rmath::Vector2& mousePos, f
         raylib::rmath::Vector2 const pos = _panel.panel->getPosition();
         float const w = static_cast<float>(_panel.grid.w) * cellW;
         float const h = static_cast<float>(_panel.grid.h) * cellH;
-        Rectangle const handleRec = {.x = pos.x() + w - ResizeHandleSize,
-                                     .y = pos.y() + h - ResizeHandleSize,
-                                     .width = ResizeHandleSize,
-                                     .height = ResizeHandleSize};
+        raylib::rmath::Rectangle const handleRec = {.x = pos.x() + w - ResizeHandleSize,
+                                                    .y = pos.y() + h - ResizeHandleSize,
+                                                    .width = ResizeHandleSize,
+                                                    .height = ResizeHandleSize};
 
-        if (CheckCollisionPointRec(mousePos.vector(), handleRec)) {
+        if (raylib::rshapes::Shapes::checkCollisionPointRec(mousePos, handleRec)) {
             _resizedPanel = _panel.panel;
             for (auto& data : _panels) {
                 data.originalGrid = data.grid;
@@ -159,9 +161,9 @@ void UIGridManager::handleMousePressed(const raylib::rmath::Vector2& mousePos, f
         raylib::rmath::Vector2 const pos = it.panel->getPosition();
         float const w = static_cast<float>(it.grid.w) * cellW;
         float const h = static_cast<float>(it.grid.h) * cellH;
-        Rectangle const panelRec{.x = pos.x(), .y = pos.y(), .width = w, .height = h};
+        raylib::rmath::Rectangle const panelRec{.x = pos.x(), .y = pos.y(), .width = w, .height = h};
 
-        if (CheckCollisionPointRec(mousePos.vector(), panelRec)) {
+        if (raylib::rshapes::Shapes::checkCollisionPointRec(mousePos, panelRec)) {
             _draggedPanel = it.panel;
             it.originalGrid = it.grid;
             _previewGrid = it.grid;
@@ -304,12 +306,14 @@ void UIGridManager::drawGrid() {
     float const cellH = static_cast<float>(raylib::rcore::Window::screenHeight()) / static_cast<float>(GridRows);
 
     for (int i = 0; i <= GridCols; ++i) {
-        DrawLine(static_cast<int>(static_cast<float>(i) * cellW), 0, static_cast<int>(static_cast<float>(i) * cellW),
-                 raylib::rcore::Window::screenHeight(), ColorAlpha(LIGHTGRAY, 0.5F));
+        raylib::rshapes::Shapes::drawLine(static_cast<int>(static_cast<float>(i) * cellW), 0,
+                                          static_cast<int>(static_cast<float>(i) * cellW),
+                                          raylib::rcore::Window::screenHeight(), raylib::Color(200, 200, 200, 128));
     }
     for (int i = 0; i <= GridRows; ++i) {
-        DrawLine(0, static_cast<int>(static_cast<float>(i) * cellH), raylib::rcore::Window::screenWidth(),
-                 static_cast<int>(static_cast<float>(i) * cellH), ColorAlpha(LIGHTGRAY, 0.5F));
+        raylib::rshapes::Shapes::drawLine(
+            0, static_cast<int>(static_cast<float>(i) * cellH), raylib::rcore::Window::screenWidth(),
+            static_cast<int>(static_cast<float>(i) * cellH), raylib::Color(200, 200, 200, 128));
     }
 }
 
@@ -321,11 +325,11 @@ void UIGridManager::drawResizeHandles() const {
         raylib::rmath::Vector2 const pos = data.panel->getPosition();
         float const w = static_cast<float>(data.grid.w) * cellW;
         float const h = static_cast<float>(data.grid.h) * cellH;
-        Rectangle const handleRec{.x = pos.x() + w - ResizeHandleSize,
-                                  .y = pos.y() + h - ResizeHandleSize,
-                                  .width = ResizeHandleSize,
-                                  .height = ResizeHandleSize};
-        DrawRectangleRec(handleRec, ColorAlpha(RED, 0.8F));
+        raylib::rmath::Rectangle const handleRec{.x = pos.x() + w - ResizeHandleSize,
+                                                 .y = pos.y() + h - ResizeHandleSize,
+                                                 .width = ResizeHandleSize,
+                                                 .height = ResizeHandleSize};
+        raylib::rshapes::Shapes::drawRectangleRec(handleRec, raylib::Color(255, 0, 0, 204));
     }
 }
 
