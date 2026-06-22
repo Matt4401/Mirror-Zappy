@@ -20,19 +20,21 @@ class Image;
 class Texture2D {
   public:
     explicit Texture2D(const std::string& path) : _texture{LoadTexture(path.c_str())} {}
-    explicit Texture2D(::Texture2D texture) : _texture{texture} {}
+    explicit Texture2D(::Texture2D texture, bool owns = true) : _texture{texture}, _ownsTexture{owns} {}
 
     ~Texture2D() { reset(); }
 
     Texture2D(const Texture2D& other) = delete;
     Texture2D& operator=(const Texture2D& other) = delete;
 
-    Texture2D(Texture2D&& other) noexcept : _texture{std::exchange(other._texture, {})} {}
+    Texture2D(Texture2D&& other) noexcept
+        : _texture{std::exchange(other._texture, {})}, _ownsTexture{std::exchange(other._ownsTexture, true)} {}
 
     Texture2D& operator=(Texture2D&& other) noexcept {
         if (this != &other) {
             reset();
             _texture = std::exchange(other._texture, {});
+            _ownsTexture = std::exchange(other._ownsTexture, true);
         }
         return *this;
     }
@@ -61,5 +63,6 @@ class Texture2D {
   private:
     void reset();
     ::Texture2D _texture{};
+    bool _ownsTexture{true};
 };
 }  // namespace zappy::gui::raylib::rtextures

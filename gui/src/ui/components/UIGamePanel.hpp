@@ -43,13 +43,25 @@ class UIGamePanel : public IUIComponent {
     void setVisible(bool visible) override;
 
     void addComponent(const std::shared_ptr<IUIComponent>& component);
+    void addHeaderComponent(const std::shared_ptr<IUIComponent>& component);
     void removeComponent(const std::shared_ptr<IUIComponent>& component);
 
-    void setConfigMode(bool configMode) { _isConfigMode = configMode; }
+    virtual void setConfigMode(bool configMode) {
+        _isConfigMode = configMode;
+        if (_isConfigMode) {
+            setVisible(true);
+            _isCollapsed = false;
+        }
+    }
+    [[nodiscard]] bool isConfigMode() const { return _isConfigMode; }
+    void setCustomLayout(bool customLayout) { _customLayout = customLayout; }
     void updateChildrenLayout();
 
     void setNextPanel(const std::shared_ptr<UIGamePanel>& panel, float gapPixels = 0.0F);
     [[nodiscard]] raylib::rmath::Vector2 getPosition() const { return _position; }
+    [[nodiscard]] raylib::rmath::Vector2 getSize() const { return _size; }
+    [[nodiscard]] float getCurrentHeight() const { return _currentHeight; }
+    [[nodiscard]] static constexpr float getHeaderHeight() { return DefaultHeaderHeight; }
 
   private:
     void updateTextPosition();
@@ -68,6 +80,7 @@ class UIGamePanel : public IUIComponent {
 
     bool _isCollapsed{false};
     bool _isConfigMode{false};
+    bool _customLayout{false};
     float _expandedHeight;
     float _currentHeight;
 

@@ -8,18 +8,18 @@
 #pragma once
 
 #include <cstddef>
+#include <cstdint>
 #include <string>
 #include <utility>
 
 #include "ItemBag.hpp"
 #include "rcore/BoundingBox.hpp"
 #include "rmath/Vector3.hpp"
-#include "server/src/game/Player.hpp"
 
 namespace zappy::gui::game {
 class Player {
   public:
-    using cardinalPoint = server::game::cardinalPoint;
+    enum class cardinalPoint : std::uint8_t { NORTH = 1, EAST = 2, SOUTH = 3, WEST = 4 };
 
     Player(int id, raylib::rmath::Vector3 position, std::string name, cardinalPoint orientation)
         : _id(id), _position(position), _name(std::move(name)), _orientation(orientation) {}
@@ -33,6 +33,8 @@ class Player {
     [[nodiscard]] raylib::rmath::Vector3 position() const { return {_position.x(), _position.y(), _position.z()}; }
     [[nodiscard]] const std::string& name() const { return _name; }
     [[nodiscard]] cardinalPoint orientation() const { return _orientation; }
+    void setTextureId(const std::string& textureId) { _textureId = textureId; }
+    [[nodiscard]] std::string textureId() const { return _textureId; }
     [[nodiscard]] raylib::rcore::BoundingBox boundingBox() const;
 
   protected:
@@ -44,5 +46,6 @@ class Player {
     cardinalPoint _orientation{cardinalPoint::NORTH};
     std::size_t _level{1};
     std::size_t _life{10};
+    std::string _textureId;
 };
 }  // namespace zappy::gui::game
