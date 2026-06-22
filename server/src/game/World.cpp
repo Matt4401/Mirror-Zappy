@@ -56,7 +56,7 @@ void World::addItemToMap() {
     const std::size_t totalTiles = _heightMap * _widthMap;
     std::uniform_int_distribution<std::size_t> dist{0, totalTiles - 1};
 
-    for (const auto& [itemType, density] : kDensityItem) {
+    for (const auto& [itemType, density] : densityItem()) {
         const auto quantity = static_cast<std::size_t>(static_cast<double>(totalTiles) * density);
 
         for (std::size_t i = 0; i < quantity; ++i) {
@@ -247,7 +247,7 @@ void World::eject(const std::size_t id) {
         pushedPlayer->moveWithOrientation(Position{.x = limitX, .y = limitY}, orientation);
         const auto [newX, newY] = pushedPlayer->position();
         updatePositionOnMap(pushedPlayer->id(), {.x = oldX, .y = oldY}, {.x = newX, .y = newY});
-        pushedPlayer->addResponse("eject: " + kCardinalPointToStr.at(orientation) + "\n");
+        pushedPlayer->addResponse("eject: " + cardinalPointToStr().at(orientation) + "\n");
     }
     for (const auto idEgg : vecEggPush) {
         _vecEggs.erase(idEgg);
@@ -336,5 +336,23 @@ void World::layEgg(const Player& player) {
 }
 
 void World::addGuiEvent(const std::string& event) { _guiEvents.push_back(event); }
+
+std::unordered_map<ItemType, double> World::densityItem() {
+    static const std::unordered_map<ItemType, double> kDensityItem = {
+        {ItemType::Food, 0.5},     {ItemType::Linemate, 0.3}, {ItemType::Deraumere, 0.15}, {ItemType::Sibur, 0.1},
+        {ItemType::Mendiane, 0.1}, {ItemType::Phiras, 0.08},  {ItemType::Thystame, 0.05},
+    };
+    return kDensityItem;
+}
+
+std::unordered_map<cardinalPoint, std::string> World::cardinalPointToStr() {
+    static const std::unordered_map<cardinalPoint, std::string> kCardinalPointToStr = {
+        {cardinalPoint::NORTH, "north"},
+        {cardinalPoint::EAST, "east"},
+        {cardinalPoint::SOUTH, "south"},
+        {cardinalPoint::WEST, "west"},
+    };
+    return kCardinalPointToStr;
+}
 
 }  // namespace zappy::server::game

@@ -36,20 +36,6 @@ struct Tile {
     std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> resources;
 };
 
-// NOLINTNEXTLINE
-const std::unordered_map<cardinalPoint, std::string> kCardinalPointToStr = {
-    {cardinalPoint::NORTH, "north"},
-    {cardinalPoint::EAST, "east"},
-    {cardinalPoint::SOUTH, "south"},
-    {cardinalPoint::WEST, "west"},
-};
-
-// NOLINTNEXTLINE
-const std::unordered_map<ItemType, double> kDensityItem = {
-    {ItemType::Food, 0.5},     {ItemType::Linemate, 0.3}, {ItemType::Deraumere, 0.15}, {ItemType::Sibur, 0.1},
-    {ItemType::Mendiane, 0.1}, {ItemType::Phiras, 0.08},  {ItemType::Thystame, 0.05},
-};
-
 class World {
   public:
     explicit World(const parser::ServerConfig& config);
@@ -109,5 +95,7 @@ class World {
     void eraseEggFromTile(std::size_t position1dVec, std::size_t id);
     std::optional<Egg> getTeamEgg(const std::string_view& teamName);
     void removeFromMap(std::size_t id);
+    [[nodiscard]] static std::unordered_map<ItemType, double> densityItem();
+    [[nodiscard]] static std::unordered_map<cardinalPoint, std::string> cardinalPointToStr();
 };
 }  // namespace zappy::server::game
