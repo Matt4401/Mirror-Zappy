@@ -41,8 +41,8 @@ class Event {
         return {GetMousePosition().x, GetMousePosition().y};
     }
     [[nodiscard]] static float getMouseWheelMoveStatic() { return GetMouseWheelMove(); }
-    [[nodiscard]] Ray mouseRay(const Camera& camera) const {
-        return Ray(GetMouseRay(_mousePosition.vector(), camera.camera()));
+    [[nodiscard]] static Ray mouseRay(const Camera& camera) {
+        return Ray(GetScreenToWorldRay(GetMousePosition(), camera.camera()));
     }
 
   protected:
