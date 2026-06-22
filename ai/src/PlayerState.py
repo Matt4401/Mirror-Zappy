@@ -1,5 +1,5 @@
+from ai.src.InventoryClass import Inventory
 import random
-from src.InventoryClass import Inventory
 
 
 class PlayerState:
