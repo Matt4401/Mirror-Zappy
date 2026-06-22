@@ -35,9 +35,6 @@ Map::Map(int width, int height, std::shared_ptr<raylib::rcore::Camera> camera,
     _itemDrawFunctions["Thystame"] = [this](const game::IObject& object) { object.draw(_thystameModel); };
     _itemDrawFunctions["Mendiane"] = [this](const game::IObject& object) { object.draw(_mendianeModel); };
     _itemDrawFunctions["Food"] = [this](const game::IObject& object) { object.draw(_foodModel); };
-    // std::string teamName = "Team1";                                      // TEMPORARY TEAM NAME, JUST FOR TESTING
-    // _teams.emplace_back(game::Team(teamName, 5));                        // TEMPORARY TEAM, JUST FOR TESTING
-    // _teams[0].addPlayer({10.0F, scene::Tile3D::TILE_SIZE * 1.4, 0.0F});  // TEMPORARY PLAYER, JUST FOR TESTING
 }
 
 void Map::resize(int width, int height) {
@@ -52,14 +49,6 @@ void Map::resize(int width, int height) {
             position.setZ(static_cast<float>(static_cast<float>(z) * Tile3D::TILE_SIZE));
             _tiles.emplace_back(position);
         }
-        // TEMPORARY : Add a Deraumere item to the tile for testing
-        //  _tiles.back().itemBag().addItem(std::make_unique<game::Deraumere>(position));
-        // _tiles.back().itemBag().addItem(std::make_unique<game::Linemate>(position));
-        // _tiles.back().itemBag().addItem(std::make_unique<game::Sibur>(position));
-        // _tiles.back().itemBag().addItem(std::make_unique<game::Phiras>(position));
-        // _tiles.back().itemBag().addItem(std::make_unique<game::Thystame>(position));
-        // _tiles.back().itemBag().addItem(std::make_unique<game::Mendiane>(position));
-        // _tiles.back().itemBag().addItem(std::make_unique<game::Food>(position));
     }
 }
 

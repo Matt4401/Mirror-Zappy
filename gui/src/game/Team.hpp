@@ -27,11 +27,6 @@ class Team {
 
     void draw(const GameModel& gameModel) const;
 
-    void addPlayer(raylib::rmath::Vector3 position = {10.0F, 12.0F, 0.0F}) {
-        const auto id = static_cast<int>(_players.size());
-        _players.emplace_back(id, position, _name + std::to_string(id), Player::cardinalPoint::NORTH);
-    }  // TEMPORARY FUNCTION, JUST FOR TESTING
-
     void addPlayer(int id, raylib::rmath::Vector3 position, Player::cardinalPoint orientation) {
         _players.emplace_back(id, position, _name + std::to_string(id), orientation);
     }
