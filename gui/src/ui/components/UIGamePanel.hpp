@@ -63,6 +63,8 @@ class UIGamePanel : public IUIComponent {
     void setCustomLayout(bool customLayout) { _customLayout = customLayout; }
     void updateChildrenLayout();
 
+    void setTitle(const std::string& title);
+
     void setNextPanel(const std::shared_ptr<UIGamePanel>& panel, float gapPixels = 0.0F);
     [[nodiscard]] raylib::rmath::Vector2 getPosition() const { return _position; }
     [[nodiscard]] raylib::rmath::Vector2 getSize() const { return _size; }
