@@ -9,6 +9,7 @@ add_library(zappy_gui_ui
     menus/PauseMenu.cpp
     menus/PlayerInspectorUI.cpp
     menus/AInspectorUI.cpp
+    menus/TileInspectorUI.cpp
 )
 target_sources(zappy_gui_ui PUBLIC
     FILE_SET HEADERS
@@ -25,6 +26,7 @@ target_sources(zappy_gui_ui PUBLIC
         menus/PauseMenu.hpp
         menus/PlayerInspectorUI.hpp
         menus/AInspectorUI.hpp
+        menus/TileInspectorUI.hpp
 )
 target_include_directories(zappy_gui_ui PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
