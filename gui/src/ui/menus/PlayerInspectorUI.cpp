@@ -27,11 +27,14 @@
 #include "graphics/AssetManager.hpp"
 #include "protocol/Commands.hpp"
 #include "protocol/Emitter.hpp"
+#include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
+#include "rmath/Vector3.hpp"
 #include "rmodels/Model.hpp"
 #include "rshapes/Shapes.hpp"
 #include "rtext/Font.hpp"
+#include "rtextures/RenderTexture2D.hpp"
 #include "rtextures/Texture2D.hpp"
 
 namespace zappy::gui::ui::menus {
@@ -84,6 +87,21 @@ constexpr int MaxHearts = 10;
 constexpr int MaxXp = 8;
 
 constexpr float InvToBtnSpacing = 180.0F;
+
+constexpr float CameraPosX = 0.0F;
+constexpr float CameraPosY = 4.0F;
+constexpr float CameraPosZ = 10.0F;
+constexpr float CameraTargetX = 0.0F;
+constexpr float CameraTargetY = 3.0F;
+constexpr float CameraTargetZ = 0.0F;
+constexpr float CameraUpX = 0.0F;
+constexpr float CameraUpY = 1.0F;
+constexpr float CameraUpZ = 0.0F;
+constexpr float CameraFovY = 45.0F;
+
+constexpr float ModelPosX = 0.0F;
+constexpr float ModelPosY = 0.0F;
+constexpr float ModelPosZ = 0.0F;
 }  // namespace
 
 PlayerInspectorUI::PlayerInspectorUI(float x, float y, float width, std::shared_ptr<events::EventDispatcher> dispatcher,
@@ -91,11 +109,16 @@ PlayerInspectorUI::PlayerInspectorUI(float x, float y, float width, std::shared_
                                      std::function<void(const std::string&)> onSendCommand)
     : AInspectorUI(x, y, width, "Player Inspector", std::move(dispatcher), font, std::move(onSendCommand)),
       _firstPersonBtn(std::make_shared<components::UIButton>(0.0F, 0.0F, FirstPersonBtnWidth, FirstPersonBtnHeight,
-                                                             "First Person", getFont())) {
+                                                             "First Person", getFont())),
+      _previewCamera(raylib::rcore::Camera(raylib::rmath::Vector3{CameraPosX, CameraPosY, CameraPosZ},
+                                           raylib::rmath::Vector3{CameraTargetX, CameraTargetY, CameraTargetZ},
+                                           raylib::rmath::Vector3{CameraUpX, CameraUpY, CameraUpZ}, CameraFovY, 0)),
+      _previewRenderTexture(std::make_shared<raylib::rtextures::RenderTexture2D>(static_cast<int>(AvatarWidth),
+                                                                                 static_cast<int>(AvatarHeight))) {
     buildInfoPanel();
     buildInventoryPanel();
 
-    getPreviewModel() = std::make_shared<raylib::rmodels::Model>("assets/jeffrey/scene.gltf");
+    _previewModel = std::make_shared<raylib::rmodels::Model>("assets/jeffrey/scene.gltf");
 
     _firstPersonBtn->setFontSize(FirstPersonBtnFontSize);
 
@@ -229,15 +252,15 @@ void PlayerInspectorUI::onPlayerClicked(const events::PlayerClicked& event) {
         _teamText->setText("Team: " + event.teamName);
         _teamText->setColor(event.teamColor);
     }
-    if (getPreviewModel()) {
+    if (_previewModel) {
         if (!event.textureId.empty()) {
             auto tex = graphics::AssetManager::getInstance().getTexture(event.textureId);
             if (tex) {
-                getPreviewModel()->setMaterialTexture(0, 0 /* MATERIAL_MAP_ALBEDO */, *tex);
+                _previewModel->setMaterialTexture(0, 0 /* MATERIAL_MAP_ALBEDO */, *tex);
             }
         } else {
-            getPreviewModel()->setMaterialTexture(0, 0 /* MATERIAL_MAP_ALBEDO */,
-                                                  raylib::rtextures::Texture2D{::Texture2D{}, false});
+            _previewModel->setMaterialTexture(0, 0 /* MATERIAL_MAP_ALBEDO */,
+                                              raylib::rtextures::Texture2D{::Texture2D{}, false});
         }
     }
 
@@ -389,8 +412,8 @@ void PlayerInspectorUI::drawStatsBlock(float& currentY, float startX, float pane
 
     raylib::rshapes::Shapes::drawRectangleRec(
         {.x = blockX, .y = currentY, .width = AvatarWidth, .height = AvatarHeight}, raylib::Color::LightGray());
-    if (getPreviewRenderTexture()) {
-        getPreviewRenderTexture()->draw({blockX, currentY}, raylib::Color::White());
+    if (_previewRenderTexture) {
+        _previewRenderTexture->draw({blockX, currentY}, raylib::Color::White());
     }
 
     float statsY = currentY + StatsYOffset;
@@ -458,6 +481,19 @@ void PlayerInspectorUI::drawActionButtons(float& currentY, float startX, float p
         float const btnX = startX + ((panelW - FirstPersonBtnWidth) / 2.0F);
         _firstPersonBtn->setPosition(btnX, currentY);
         _firstPersonBtn->draw();
+    }
+}
+
+void PlayerInspectorUI::draw3DPreview() {
+    if (isVisible() && !isConfigMode() && _previewRenderTexture && _previewModel) {
+        _previewRenderTexture->begin();
+        zappy::gui::raylib::rcore::Window::clearBackground({200, 200, 200, 255});
+        _previewCamera.beginMode3D();
+        raylib::rmath::Vector3 const modelPos{ModelPosX + _previewModelOffset.x(), ModelPosY + _previewModelOffset.y(),
+                                              ModelPosZ + _previewModelOffset.z()};
+        _previewModel->drawModel(modelPos, _previewModelScale, raylib::Color::White());
+        zappy::gui::raylib::rcore::Camera::endMode3D();
+        zappy::gui::raylib::rtextures::RenderTexture2D::end();
     }
 }
 

@@ -20,21 +20,14 @@
 #include "components/UIImage.hpp"
 #include "components/UIText.hpp"
 #include "protocol/Commands.hpp"
-#include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
-#include "rcore/Window.hpp"
-#include "rmath/Vector3.hpp"
 #include "rshapes/Shapes.hpp"
 #include "rtext/Font.hpp"
-#include "rtextures/RenderTexture2D.hpp"
 
 namespace zappy::gui::ui::menus {
 
 namespace {
 constexpr float InspectorInitialHeight = 550.0F;
-
-constexpr float AvatarWidth = 100.0F;
-constexpr float AvatarHeight = 140.0F;
 
 constexpr float InvGridTotalWidth = 230.0F;
 constexpr float InvTitleToGridSpacing = 30.0F;
@@ -50,22 +43,6 @@ constexpr float CloseBtnFontSize = 16.0F;
 constexpr float CloseBtnXOffset = 45.0F;
 constexpr float CloseBtnYOffset = 8.0F;
 
-constexpr float CameraPosX = 0.0F;
-constexpr float CameraPosY = 4.0F;
-constexpr float CameraPosZ = 10.0F;
-constexpr float CameraTargetX = 0.0F;
-constexpr float CameraTargetY = 3.0F;
-constexpr float CameraTargetZ = 0.0F;
-constexpr float CameraUpX = 0.0F;
-constexpr float CameraUpY = 1.0F;
-constexpr float CameraUpZ = 0.0F;
-constexpr float CameraFovY = 45.0F;
-
-constexpr float ModelPosX = 0.0F;
-constexpr float ModelPosY = 0.0F;
-constexpr float ModelPosZ = 0.0F;
-constexpr float ModelScale = 0.1F;
-
 constexpr float InvIconSize = 30.0F;
 
 constexpr int ElementCount = 7;
@@ -79,12 +56,7 @@ AInspectorUI::AInspectorUI(float x, float y, float width, const std::string& tit
       _dispatcher(std::move(dispatcher)),
       _font(font),
       _onSendCommand(std::move(onSendCommand)),
-      _closeBtn(std::make_shared<components::UIButton>(x + width, y, CloseBtnSize, CloseBtnSize, "X", _font)),
-      _previewCamera(raylib::rcore::Camera(raylib::rmath::Vector3{CameraPosX, CameraPosY, CameraPosZ},
-                                           raylib::rmath::Vector3{CameraTargetX, CameraTargetY, CameraTargetZ},
-                                           raylib::rmath::Vector3{CameraUpX, CameraUpY, CameraUpZ}, CameraFovY, 0)),
-      _previewRenderTexture(std::make_shared<raylib::rtextures::RenderTexture2D>(static_cast<int>(AvatarWidth),
-                                                                                 static_cast<int>(AvatarHeight))) {
+      _closeBtn(std::make_shared<components::UIButton>(x + width, y, CloseBtnSize, CloseBtnSize, "X", _font)) {
     setCustomLayout(true);
     setVisible(false);
 
@@ -147,17 +119,6 @@ void AInspectorUI::drawInventoryPanel(float& currentY, float startX, float panel
         img->draw();
     }
     currentY += InvCellSpacing * 3.0F;
-}
-
-void AInspectorUI::draw3DPreview() {
-    if (isVisible() && !isConfigMode() && _previewRenderTexture && _previewModel) {
-        _previewRenderTexture->begin();
-        zappy::gui::raylib::rcore::Window::clearBackground({200, 200, 200, 255});
-        _previewCamera.beginMode3D();
-        _previewModel->drawModel({ModelPosX, ModelPosY, ModelPosZ}, ModelScale, raylib::Color::White());
-        zappy::gui::raylib::rcore::Camera::endMode3D();
-        zappy::gui::raylib::rtextures::RenderTexture2D::end();
-    }
 }
 
 void AInspectorUI::draw() { components::UIGamePanel::draw(); }
