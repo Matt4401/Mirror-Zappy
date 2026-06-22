@@ -18,8 +18,6 @@ namespace zappy::server::guiCommand {
 Sst::Sst(int timeUnit) : _timeUnit(timeUnit) {}
 
 std::string Sst::execute(Core& core) {
-    const auto timeUnit = core.config().freq;
-
     core.config().freq = _timeUnit;
     return shared::protocol::Emitter::build(shared::protocol::server::Sst{.timeUnit = _timeUnit});
 }
