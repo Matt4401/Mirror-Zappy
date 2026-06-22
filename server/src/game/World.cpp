@@ -144,7 +144,7 @@ void World::pushCommandToPlayer(const std::size_t playerId, std::unique_ptr<comm
     const auto& player = _playerList.at(playerId);
 
     player->pushCommand(std::move(command));
-    player->tryStartNextCommand(*this);
+    player->tryStartNextCommand(*this, true);
 }
 
 void World::removePlayerFromTeam(const std::size_t id) const {
