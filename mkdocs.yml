@@ -1,7 +1,7 @@
 site_name: Zappy documentation
 nav:
   - Home: index.md
-  - Server: server/architecture.md
+  - Server: server/index.md
 theme:
   name: readthedocs
 plugins:
