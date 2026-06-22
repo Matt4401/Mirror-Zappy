@@ -23,5 +23,4 @@ int main(int ac, char** av) {
         std::cerr << "Error: " << e.what() << std::endl;
         return zappy::parser::kExitFailure;
     }
-    return zappy::server::Core(args).run();
 }
