@@ -21,6 +21,7 @@
 #include "game/Player.hpp"
 #include "graphics/AssetManager.hpp"
 #include "protocol/Commands.hpp"
+#include "protocol/Emitter.hpp"
 #include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
@@ -287,9 +288,9 @@ void PlayerInspectorUI::setTargetPlayer(int playerId, const game::Player& initia
 
 void PlayerInspectorUI::requestPlayerSync() const {
     if (_onSendCommand) {
-        _onSendCommand("pin " + std::to_string(_targetPlayerId) + "\n");
-        _onSendCommand("plv " + std::to_string(_targetPlayerId) + "\n");
-        _onSendCommand("ppo " + std::to_string(_targetPlayerId) + "\n");
+        _onSendCommand(shared::protocol::Emitter::build(shared::protocol::client::Pin{_targetPlayerId}));
+        _onSendCommand(shared::protocol::Emitter::build(shared::protocol::client::Plv{_targetPlayerId}));
+        _onSendCommand(shared::protocol::Emitter::build(shared::protocol::client::Ppo{_targetPlayerId}));
     }
 }
 
