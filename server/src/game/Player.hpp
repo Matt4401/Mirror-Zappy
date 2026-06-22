@@ -88,7 +88,7 @@ class Player {
     [[nodiscard]] int cmdTick() const;
 
     [[nodiscard]] bool hasCommands() const;
-    void tryStartNextCommand(World& world);
+    void tryStartNextCommand(World& world, bool isMidTick = false);
 
   private:
     std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> _inventory{};
@@ -101,5 +101,6 @@ class Player {
     std::vector<std::string> _buffersResponses;
     bool _isDead{false};
     std::size_t _id;
+    bool _isNewCommand{false};
 };
 }  // namespace zappy::server::game
