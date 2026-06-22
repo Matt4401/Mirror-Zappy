@@ -21,6 +21,7 @@
 #include "ui/components/UIButton.hpp"
 #include "ui/components/UIImage.hpp"
 #include "ui/components/UIText.hpp"
+#include "ui/components/UITextbox.hpp"
 
 namespace zappy::gui::ui::menus {
 
@@ -61,7 +62,7 @@ class PlayerInspectorUI : public AInspectorUI {
 
     int _targetPlayerId{-1};
 
-    std::shared_ptr<components::UIText> _nameText;
+    std::shared_ptr<components::UITextbox> _nameBox;
     std::shared_ptr<components::UIText> _idText;
     std::shared_ptr<components::UIText> _teamText;
     std::shared_ptr<components::UIText> _posText;
