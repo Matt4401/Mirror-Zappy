@@ -86,6 +86,7 @@ class Player {
     [[nodiscard]] int cmdTick() const;
 
     [[nodiscard]] bool hasCommands() const;
+    void tryStartNextCommand(World& world);
 
   private:
     std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> _inventory{};

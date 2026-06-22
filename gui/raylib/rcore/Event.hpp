@@ -8,18 +8,15 @@
 #pragma once
 #include <raylib.h>
 
-#include <functional>
-#include <map>
 #include <vector>
 
-#include "context/EventContext.hpp"
+#include "rcore/Camera.hpp"
+#include "rcore/Ray.hpp"
 #include "rmath/Vector2.hpp"
 
 namespace zappy::gui::raylib::rcore {
 class Event {
   public:
-    using EventFunc = std::function<void(EventContext&)>;
-
     Event();
     ~Event() = default;
     Event(const Event& other) = delete;
@@ -28,8 +25,6 @@ class Event {
     Event& operator=(Event&& other) = delete;
 
     void update();
-
-    void handleEvent(EventContext& context);
 
     [[nodiscard]] static bool isKeyPressed(int key) { return IsKeyPressed(key); }
     [[nodiscard]] static bool isKeyDown(int key) { return IsKeyDown(key); }
@@ -45,10 +40,12 @@ class Event {
         return {GetMousePosition().x, GetMousePosition().y};
     }
     [[nodiscard]] static float getMouseWheelMoveStatic() { return GetMouseWheelMove(); }
+    [[nodiscard]] Ray mouseRay(const Camera& camera) const {
+        return Ray(GetMouseRay(_mousePosition.vector(), camera.camera()));
+    }
 
   protected:
   private:
-    std::map<int, EventFunc> _keyEvents;
     std::vector<int> _pressedKeys;
     rmath::Vector2 _mousePosition;
     float _mouseWheelMove = 0.0F;

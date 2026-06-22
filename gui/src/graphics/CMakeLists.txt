@@ -17,7 +17,6 @@ target_include_directories(zappy_gui_graphics PUBLIC
 target_link_libraries(zappy_gui_graphics PUBLIC
         zappy_shared
         zappy_gui_raylib
-        zappy_gui_context
         zappy_gui_graphics_scene
         zappy_gui_events
 )

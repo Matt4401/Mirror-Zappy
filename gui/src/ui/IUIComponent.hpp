@@ -23,7 +23,7 @@ class IUIComponent {
 
     virtual void draw() = 0;
     virtual void update() = 0;
-    virtual void handleEvent(const raylib::rcore::Event& event) = 0;
+    virtual void handleEvent(const raylib::rcore::Event& event) { (void)event; }
 
     virtual void setPosition(float x, float y) = 0;
     virtual void setSize(float width, float height) = 0;
