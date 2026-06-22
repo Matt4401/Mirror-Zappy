@@ -288,4 +288,15 @@ std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> World::getResourc
     return _tiles.at(tileIndex).resources;
 }
 
+// std::string
+//
+//     std::string
+//     World::jsp(const std::vector<Position>& Positions) {
+//     std::string jsp = "[";
+//     for (const auto& position : Positions) {
+//         const auto tile = _tiles.at(getTileIndex(position));
+//         tile.
+//     }
+// }
+
 }  // namespace zappy::server::game
