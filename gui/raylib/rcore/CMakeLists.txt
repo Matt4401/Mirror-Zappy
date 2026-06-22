@@ -8,7 +8,9 @@ target_sources(zappy_gui_raylib_rcore PUBLIC
         BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/..
         FILES   Window.hpp
                 Camera.hpp
+                BoundingBox.hpp
                 Event.hpp
+                Ray.hpp
                 Matrix.hpp
                 Rlgl.hpp
 )

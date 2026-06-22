@@ -27,9 +27,12 @@ class Team {
 
     void draw(const GameModel& gameModel) const;
 
-    void addPlayer(raylib::rmath::Vector3 position = {10.0F, 12.0F, 0.0F}) {
-        _players.emplace_back(position, _name + std::to_string(_players.size()), Player::cardinalPoint::NORTH);
-    }  // TEMPORARY FUNCTION, JUST FOR TESTING
+    void addPlayer(int id, raylib::rmath::Vector3 position, Player::cardinalPoint orientation) {
+        _players.emplace_back(id, position, _name + std::to_string(id), orientation);
+    }
+
+    [[nodiscard]] const std::string& name() const { return _name; }
+    [[nodiscard]] const std::vector<Player>& players() const { return _players; }
 
   protected:
   private:
