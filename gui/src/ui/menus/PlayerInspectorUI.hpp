@@ -13,7 +13,7 @@
 #include <vector>
 
 #include "events/EventDispatcher.hpp"
-#include "game/Player.hpp"
+#include "events/GuiEvents.hpp"
 #include "protocol/Commands.hpp"
 #include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
@@ -43,7 +43,7 @@ class PlayerInspectorUI : public components::UIGamePanel {
     void update() override;
     void handleEvent(const raylib::rcore::Event& event) override;
 
-    void setTargetPlayer(int playerId, const game::Player& initialData);
+    void onPlayerClicked(const events::PlayerClicked& event);
     void setVisible(bool visible) override;
     void setPosition(float x, float y) override;
 

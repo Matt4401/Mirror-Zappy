@@ -18,7 +18,7 @@
 
 #include "Color.hpp"
 #include "events/EventDispatcher.hpp"
-#include "game/Player.hpp"
+#include "events/GuiEvents.hpp"
 #include "graphics/AssetManager.hpp"
 #include "protocol/Commands.hpp"
 #include "protocol/Emitter.hpp"
@@ -114,6 +114,7 @@ PlayerInspectorUI::PlayerInspectorUI(float x, float y, float width, std::shared_
     setCustomLayout(true);
     buildInfoPanel();
     buildInventoryPanel();
+    setVisible(false);
 
     _firstPersonBtn->setFontSize(FirstPersonBtnFontSize);
 
@@ -122,6 +123,8 @@ PlayerInspectorUI::PlayerInspectorUI(float x, float y, float width, std::shared_
     addHeaderComponent(_closeBtn);
 
     if (_dispatcher) {
+        _eventTokens.push_back(_dispatcher->subscribe<events::PlayerClicked>(
+            [this](const events::PlayerClicked& e) { onPlayerClicked(e); }));
         _eventTokens.push_back(_dispatcher->subscribe<shared::protocol::server::Pin>(
             [this](const shared::protocol::server::Pin& cmd) { onPinReceived(cmd); }));
         _eventTokens.push_back(_dispatcher->subscribe<shared::protocol::server::Plv>(
@@ -183,11 +186,12 @@ void PlayerInspectorUI::onSgtReceived(const shared::protocol::server::Sgt& cmd) 
 }
 
 PlayerInspectorUI::~PlayerInspectorUI() {
-    if (_dispatcher && _eventTokens.size() >= 4) {
-        _dispatcher->unsubscribe<shared::protocol::server::Pin>(_eventTokens.at(0));
-        _dispatcher->unsubscribe<shared::protocol::server::Plv>(_eventTokens.at(1));
-        _dispatcher->unsubscribe<shared::protocol::server::Ppo>(_eventTokens.at(2));
-        _dispatcher->unsubscribe<shared::protocol::server::Sgt>(_eventTokens.at(3));
+    if (_dispatcher && _eventTokens.size() >= 5) {
+        _dispatcher->unsubscribe<events::PlayerClicked>(_eventTokens.at(0));
+        _dispatcher->unsubscribe<shared::protocol::server::Pin>(_eventTokens.at(1));
+        _dispatcher->unsubscribe<shared::protocol::server::Plv>(_eventTokens.at(2));
+        _dispatcher->unsubscribe<shared::protocol::server::Ppo>(_eventTokens.at(3));
+        _dispatcher->unsubscribe<shared::protocol::server::Sgt>(_eventTokens.at(4));
     }
 }
 
@@ -258,22 +262,22 @@ void PlayerInspectorUI::buildInventoryPanel() {
     }
 }
 
-void PlayerInspectorUI::setTargetPlayer(int playerId, const game::Player& initialData) {
-    _targetPlayerId = playerId;
+void PlayerInspectorUI::onPlayerClicked(const events::PlayerClicked& event) {
+    _targetPlayerId = event.playerId;
 
     if (_nameText) {
-        _nameText->setText(initialData.name());
+        _nameText->setText(event.playerName);
     }
     if (_idText) {
-        _idText->setText("ID: " + std::to_string(playerId));
+        _idText->setText("ID: " + std::to_string(event.playerId));
     }
     if (_teamText) {
-        _teamText->setText("Team: " + initialData.teamName());
-        _teamText->setColor(initialData.teamColor());
+        _teamText->setText("Team: " + event.teamName);
+        _teamText->setColor(event.teamColor);
     }
     if (_avatarModel) {
-        if (!initialData.textureId().empty()) {
-            auto tex = graphics::AssetManager::getInstance().getTexture(initialData.textureId());
+        if (!event.textureId.empty()) {
+            auto tex = graphics::AssetManager::getInstance().getTexture(event.textureId);
             if (tex) {
                 _avatarModel->setMaterialTexture(0, 0 /* MATERIAL_MAP_ALBEDO */, *tex);
             }
@@ -283,6 +287,7 @@ void PlayerInspectorUI::setTargetPlayer(int playerId, const game::Player& initia
         }
     }
 
+    setVisible(true);
     requestPlayerSync();
 }
 
