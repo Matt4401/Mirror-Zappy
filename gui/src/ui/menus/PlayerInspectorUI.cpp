@@ -22,6 +22,7 @@
 #include "components/UIGamePanel.hpp"
 #include "components/UIImage.hpp"
 #include "components/UIText.hpp"
+#include "components/UITextbox.hpp"
 #include "events/EventDispatcher.hpp"
 #include "events/GuiEvents.hpp"
 #include "graphics/AssetManager.hpp"
@@ -48,7 +49,6 @@ constexpr float FoodMax = 126.0F;
 
 constexpr float PrimaryIconSize = 28.0F;
 constexpr float PosIconSize = 20.0F;
-constexpr float HeaderFontSize = 20.0F;
 constexpr float InfoFontSize = 16.0F;
 
 constexpr float BaseYOffset = 60.0F;
@@ -201,9 +201,12 @@ void PlayerInspectorUI::buildInfoPanel() {
     _compassIcon = std::make_shared<components::UIImage>("assets/images/ui/compass.png");
     _compassIcon->setSize(PrimaryIconSize, PrimaryIconSize);
 
-    _nameText = std::make_shared<components::UIText>("Player Name", getFont());
-    _nameText->setFontSize(static_cast<int>(HeaderFontSize));
-    _nameText->setColor(raylib::Color::White());
+    _nameBox = std::make_shared<components::UITextbox>(0.0F, 0.0F, 200.0F, NameBoxHeight, getFont(), "Enter Name...");
+    _nameBox->setOnSubmit([this](const std::string& name) {
+        if (getDispatcher() && _targetPlayerId != -1) {
+            getDispatcher()->dispatch(events::PlayerNameChanged{.playerId = _targetPlayerId, .newName = name});
+        }
+    });
 
     _teamText = std::make_shared<components::UIText>("Team: None", getFont());
     _teamText->setFontSize(static_cast<int>(InfoFontSize));
@@ -242,8 +245,8 @@ void PlayerInspectorUI::buildInfoPanel() {
 void PlayerInspectorUI::onPlayerClicked(const events::PlayerClicked& event) {
     _targetPlayerId = event.playerId;
 
-    if (_nameText) {
-        _nameText->setText(event.playerName);
+    if (_nameBox) {
+        _nameBox->setText(event.playerName);
     }
     if (_idText) {
         _idText->setText("ID: " + std::to_string(event.playerId));
@@ -370,6 +373,9 @@ void PlayerInspectorUI::handleEvent(const raylib::rcore::Event& event) {
     if (_firstPersonBtn) {
         _firstPersonBtn->handleEvent(event);
     }
+    if (_nameBox) {
+        _nameBox->handleEvent(event);
+    }
 }
 
 void PlayerInspectorUI::setVisible(bool visible) {
@@ -394,15 +400,17 @@ void PlayerInspectorUI::update() {
     if (_firstPersonBtn) {
         _firstPersonBtn->update();
     }
+    if (_nameBox) {
+        _nameBox->update();
+    }
 }
 
 void PlayerInspectorUI::drawHeader(float& currentY, float startX, float panelW) {
     float const nameW = panelW * NameBoxWidthRatio;
     float const nameX = startX + ((panelW - nameW) / 2.0F);
-    raylib::rshapes::Shapes::drawRectangleRec({.x = nameX, .y = currentY, .width = nameW, .height = NameBoxHeight},
-                                              raylib::Color(50, 50, 50, 255));
-    _nameText->setPosition(nameX + NameBoxXOffset, currentY + NameBoxYOffset);
-    _nameText->draw();
+    _nameBox->setPosition(nameX + NameBoxXOffset, currentY + NameBoxYOffset);
+    _nameBox->setSize(nameW, NameBoxHeight);
+    _nameBox->draw();
     currentY += NameToAvatarSpacing;
 }
 
