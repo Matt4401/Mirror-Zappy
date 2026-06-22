@@ -1,7 +1,7 @@
 # Zappy Server Documentation
 
 ## Overview
-Zappy is a network game where several teams confront each other on a geographically flat tile map containing resources. The ultimate goal for each team is to have at least 6 players reach the maximum elevation (Level 8) through a specific incantation ritual.
+Zappy is a network game where several teams confront each other on a toroidal tile map containing resources. The ultimate goal for each team is to have at least 6 players reach the maximum elevation (Level 8) through a specific incantation ritual.
 
 The server acts as the authoritative game engine, managing the world state, enforcing rules, and broadcasting events to both AI clients (players) and GUI clients (spectators).
 
@@ -15,7 +15,7 @@ This server is built to adhere to strict performance and architectural constrain
 * **Time Management:** All game actions are bound to a strict frequency (`freq`), where 1 time unit equals `1.0 / freq` seconds.
 
 ## Documentation Structure
-This documentation breaks down the server into its three primary layers:
+This documentation breaks down the server into its four primary layers:
 
 1.  **[Architecture](architecture.md):** The high-level design patterns.
 2.  **[Network Layer](../network.md):** TCP socket management and message extraction.
