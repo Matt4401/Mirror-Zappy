@@ -1,0 +1,9 @@
+site_name: Zappy documentation
+nav:
+  - Home: index.md
+  - Server: server/architecture.md
+theme:
+  name: readthedocs
+plugins:
+  - search
+  - mermaid2
