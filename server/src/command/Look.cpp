@@ -19,6 +19,7 @@ Look::Look() : ACommand(kTimeLimit) {}
 void Look::execute(game::World& world, game::Player& player) {
     std::string responses{};
     auto diagPos = player.getLookPos(world.sizeMap());
-    responses = world.jsp(diagPos);
+    responses = world.visionOfPlayer(diagPos);
+    player.addResponse(responses);
 }
 }  // namespace zappy::server::command

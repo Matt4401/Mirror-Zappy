@@ -288,15 +288,47 @@ std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> World::getResourc
     return _tiles.at(tileIndex).resources;
 }
 
-// std::string
-//
-//     std::string
-//     World::jsp(const std::vector<Position>& Positions) {
-//     std::string jsp = "[";
-//     for (const auto& position : Positions) {
-//         const auto tile = _tiles.at(getTileIndex(position));
-//         tile.
-//     }
-// }
+std::string World::resourcesName(const ItemType item) {
+    for (const auto& [itemString, type] : kMapItemString) {
+        if (type == item) {
+            return itemString;
+        }
+    }
+    return "";
+}
+std::string World::transformResourcesToStr(const Tile& tile) {
+    std::string str{};
 
+    for (int i = 0; i < tile.eggs.size(); i++) {
+        str += " egg";
+    }
+    for (int i = 0; i < tile.players.size(); i++) {
+        str += " player";
+    }
+    for (int i = 0; i < static_cast<int>(ItemType::COUNT); i++) {
+        const auto name = resourcesName(static_cast<ItemType>(i));
+        if (name.empty()) {
+            continue;
+        }
+        for (int j = 0; std::cmp_less(j, tile.resources.at(i)); j++) {
+            str += name;
+        }
+    }
+    return str;
+}
+
+std::string World::visionOfPlayer(const std::vector<Position>& Positions) const {
+    std::string str{"["};
+    for (const auto& position : Positions) {
+        const auto tile = _tiles.at(getTileIndex(position));
+        auto tmpStr = transformResourcesToStr(tile);
+        if (tmpStr.empty()) {
+            str += ',';
+        } else {
+            str += tmpStr;
+        }
+    }
+    str += ']';
+    return str;
+}
 }  // namespace zappy::server::game
