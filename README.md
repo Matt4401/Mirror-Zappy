@@ -86,7 +86,6 @@ make fclean
 
 * `-p port`: Port number.
 * `-h machine`: Hostname of the server.
-
 ### 3. Deploying AI Agents
 
 ```bash
@@ -160,6 +159,13 @@ your global Python environment.*
         <sub><b>eliottraguin</b></sub>
       </a>
     </td>
+  <td align="center">
+      <a href="https://github.com/TristanFragnaud">
+        <img src="https://github.com/TristanFragnaud.png?size=100" width="100px;" alt="TristanFragnaud"/>
+        <br />
+        <sub><b>TristanFragnaud</b></sub>
+      </a>
+    </td>
   </tr>
 </table>
 
@@ -169,3 +175,16 @@ your global Python environment.*
 
 Please refer to [CONTRIBUTING.md](docs/CONTRIBUTING.md) for guidelines regarding our strict Conventional Commits policy,
 pre-commit configuration hooks, and code review workflows.
+
+## Documentation
+
+The full technical documentation is available online at **[INSERT_LINK_WHEN_AVAILABLE]**.
+
+Architecture diagrams and source files are also located in the `docs/` folder. To serve the documentation locally:
+
+```bash
+python3 -m venv docs/.venv
+source docs/.venv/bin/activate
+pip install -r docs/requirements.txt
+mkdocs serve
+```
