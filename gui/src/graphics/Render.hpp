@@ -21,7 +21,6 @@
 #include "ui/UIManager.hpp"
 #include "ui/components/UIGamePanel.hpp"
 #include "ui/components/UIGridManager.hpp"
-#include "ui/components/UIText.hpp"
 #include "ui/menus/PauseMenu.hpp"
 
 namespace zappy::gui::graphics {
@@ -67,7 +66,6 @@ class Render {
     ui::UIManager _uiManager;
     std::shared_ptr<ui::menus::PauseMenu> _pauseMenu;
     std::shared_ptr<ui::components::UIGamePanel> _demoPanel;
-    std::shared_ptr<ui::components::UIText> _selectedPlayerText;
     std::shared_ptr<ui::components::UIGridManager> _gridManager;
     bool _isExiting{false};
     bool _uiMode{false};

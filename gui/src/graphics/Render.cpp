@@ -9,6 +9,7 @@
 
 #include <raylib.h>
 
+#include <iostream>
 #include <memory>
 #include <string>
 #include <utility>
@@ -36,7 +37,8 @@ Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher)
         _sgtToken = _dispatcher->subscribe<shared::protocol::server::Sgt>(
             [this](const shared::protocol::server::Sgt& cmd) { _serverFrequency = static_cast<float>(cmd.timeUnit); });
         _playerClickedToken = _dispatcher->subscribe<events::PlayerClicked>([this](const events::PlayerClicked& event) {
-            _selectedPlayerText->setText("Player #" + std::to_string(event.playerId) + " - " + event.teamName);
+            std::cout << "Player clicked: " << event.playerName << " from team " << event.teamName << " at position ("
+                      << event.position.x() << ", " << event.position.y() << ", " << event.position.z() << ")\n";
         });
     }
     _window.setTargetFPS(DefaultFps);
@@ -51,10 +53,7 @@ Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher)
     _demoPanel = std::make_shared<ui::components::UIGamePanel>(0, 0, 0, 0, "Player Info");
     auto font = AssetManager::getInstance().getFont(DefaultFontName);
     auto btn = std::make_shared<ui::components::UIButton>(100.0F, 120.0F, 200.0F, 40.0F, "Click me!", font);
-    _selectedPlayerText = std::make_shared<ui::components::UIText>("No player selected", font);
-    _selectedPlayerText->setPosition(40.0F, 200.0F);
     _demoPanel->addComponent(btn);
-    _demoPanel->addComponent(_selectedPlayerText);
 
     auto _demoPanel2 = std::make_shared<ui::components::UIGamePanel>(0, 0, 0, 0, "Inventory");
     auto text2 = std::make_shared<ui::components::UIText>("Empty", font);

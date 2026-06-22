@@ -7,6 +7,7 @@
 
 #include "Map.hpp"
 
+#include <functional>
 #include <limits>
 #include <memory>
 #include <optional>
@@ -91,7 +92,7 @@ void Map::handleEvent(const raylib::rcore::Event& event) {
     }
 
     const auto ray = event.mouseRay(*_camera);
-    std::optional<std::pair<const game::Team*, const game::Player*>> selected;
+    std::optional<SelectedPlayer> selected;
     float nearestDistance = std::numeric_limits<float>::max();
 
     for (const auto& team : _teams) {
@@ -99,13 +100,13 @@ void Map::handleEvent(const raylib::rcore::Event& event) {
             const auto collision = ray.collision(player.boundingBox());
             if (collision.hit && collision.distance < nearestDistance) {
                 nearestDistance = collision.distance;
-                selected = std::make_pair(&team, &player);
+                selected = std::make_pair(std::cref(team), std::cref(player));
             }
         }
     }
 
     if (selected.has_value()) {
-        dispatchClickedPlayer(*selected->first, *selected->second);
+        dispatchClickedPlayer(selected->first, selected->second);
     }
 }
 

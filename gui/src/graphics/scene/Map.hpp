@@ -10,6 +10,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "Tile3D.hpp"
@@ -26,6 +27,8 @@ namespace zappy::gui::graphics::scene {
 class Map {
   public:
     using ItemFunc = std::function<void(const game::IObject& object)>;
+    using SelectedPlayer =
+        std::pair<std::reference_wrapper<const game::Team>, std::reference_wrapper<const game::Player>>;
 
     static constexpr const char* TILE_MODEL_RESOURCE = "assets/minecraft-grass-block/source/Grass_Block.obj";
 
