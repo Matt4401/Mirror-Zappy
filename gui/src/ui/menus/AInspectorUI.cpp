@@ -7,8 +7,6 @@
 
 #include "AInspectorUI.hpp"
 
-#include <raylib.h>
-
 #include <cstddef>
 #include <functional>
 #include <memory>
@@ -16,9 +14,19 @@
 #include <utility>
 
 #include "Color.hpp"
+#include "EventDispatcher.hpp"
+#include "components/UIButton.hpp"
+#include "components/UIGamePanel.hpp"
+#include "components/UIImage.hpp"
+#include "components/UIText.hpp"
 #include "protocol/Commands.hpp"
+#include "rcore/Camera.hpp"
+#include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
+#include "rmath/Vector3.hpp"
 #include "rshapes/Shapes.hpp"
+#include "rtext/Font.hpp"
+#include "rtextures/RenderTexture2D.hpp"
 
 namespace zappy::gui::ui::menus {
 
