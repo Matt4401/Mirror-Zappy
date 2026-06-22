@@ -35,31 +35,31 @@ std::string Emitter::build(const ServerCommand& cmd) {
                    },
                    [](const server::Tna& c) { return "tna " + c.teamName + "\n"; },
                    [](const server::Pnw& c) {
-                       return "pnw " + std::to_string(c.playerId) + " " + std::to_string(c.x) + " " +
+                       return "pnw #" + std::to_string(c.playerId) + " " + std::to_string(c.x) + " " +
                               std::to_string(c.y) + " " + std::to_string(c.orientation) + " " +
                               std::to_string(c.level) + " " + c.teamName + "\n";
                    },
                    [](const server::Ppo& c) {
-                       return "ppo " + std::to_string(c.playerId) + " " + std::to_string(c.x) + " " +
+                       return "ppo #" + std::to_string(c.playerId) + " " + std::to_string(c.x) + " " +
                               std::to_string(c.y) + " " + std::to_string(c.orientation) + "\n";
                    },
                    [](const server::Plv& c) {
-                       return "plv " + std::to_string(c.playerId) + " " + std::to_string(c.level) + "\n";
+                       return "plv #" + std::to_string(c.playerId) + " " + std::to_string(c.level) + "\n";
                    },
                    [](const server::Pin& c) {
-                       return "pin " + std::to_string(c.playerId) + " " + std::to_string(c.x) + " " +
+                       return "pin #" + std::to_string(c.playerId) + " " + std::to_string(c.x) + " " +
                               std::to_string(c.y) + " " + std::to_string(c.food) + " " + std::to_string(c.linemate) +
                               " " + std::to_string(c.deraumere) + " " + std::to_string(c.sibur) + " " +
                               std::to_string(c.mendiane) + " " + std::to_string(c.phiras) + " " +
                               std::to_string(c.thystame) + "\n";
                    },
-                   [](const server::Pex& c) { return "pex " + std::to_string(c.playerId) + "\n"; },
-                   [](const server::Pbc& c) { return "pbc " + std::to_string(c.playerId) + " " + c.message + "\n"; },
+                   [](const server::Pex& c) { return "pex #" + std::to_string(c.playerId) + "\n"; },
+                   [](const server::Pbc& c) { return "pbc #" + std::to_string(c.playerId) + " " + c.message + "\n"; },
                    [](const server::Pic& c) {
                        std::string s =
                            "pic " + std::to_string(c.x) + " " + std::to_string(c.y) + " " + std::to_string(c.level);
                        for (int const p : c.playerIds) {
-                           s += " " + std::to_string(p);
+                           s += " #" + std::to_string(p);
                        }
                        return s + "\n";
                    },
@@ -67,20 +67,20 @@ std::string Emitter::build(const ServerCommand& cmd) {
                        return "pie " + std::to_string(c.x) + " " + std::to_string(c.y) + " " +
                               std::to_string(c.incantationResult) + "\n";
                    },
-                   [](const server::Pfk& c) { return "pfk " + std::to_string(c.playerId) + "\n"; },
+                   [](const server::Pfk& c) { return "pfk #" + std::to_string(c.playerId) + "\n"; },
                    [](const server::Pdr& c) {
-                       return "pdr " + std::to_string(c.playerId) + " " + std::to_string(c.resourceId) + "\n";
+                       return "pdr #" + std::to_string(c.playerId) + " " + std::to_string(c.resourceId) + "\n";
                    },
                    [](const server::Pgt& c) {
-                       return "pgt " + std::to_string(c.playerId) + " " + std::to_string(c.resourceId) + "\n";
+                       return "pgt #" + std::to_string(c.playerId) + " " + std::to_string(c.resourceId) + "\n";
                    },
-                   [](const server::Pdi& c) { return "pdi " + std::to_string(c.playerId) + "\n"; },
+                   [](const server::Pdi& c) { return "pdi #" + std::to_string(c.playerId) + "\n"; },
                    [](const server::Enw& c) {
-                       return "enw " + std::to_string(c.eggId) + " " + std::to_string(c.playerId) + " " +
+                       return "enw #" + std::to_string(c.eggId) + " #" + std::to_string(c.playerId) + " " +
                               std::to_string(c.x) + " " + std::to_string(c.y) + "\n";
                    },
-                   [](const server::Ebo& c) { return "ebo " + std::to_string(c.eggId) + "\n"; },
-                   [](const server::Edi& c) { return "edi " + std::to_string(c.eggId) + "\n"; },
+                   [](const server::Ebo& c) { return "ebo #" + std::to_string(c.eggId) + "\n"; },
+                   [](const server::Edi& c) { return "edi #" + std::to_string(c.eggId) + "\n"; },
                    [](const server::Sgt& c) { return "sgt " + std::to_string(c.timeUnit) + "\n"; },
                    [](const server::Sst& c) { return "sst " + std::to_string(c.timeUnit) + "\n"; },
                    [](const server::Seg& c) { return "seg " + c.teamName + "\n"; },
@@ -97,9 +97,9 @@ std::string Emitter::build(const ClientCommand& cmd) {
                    [](const client::Bct& c) { return "bct " + std::to_string(c.x) + " " + std::to_string(c.y) + "\n"; },
                    [](const client::Mct&) { return std::string("mct\n"); },
                    [](const client::Tna&) { return std::string("tna\n"); },
-                   [](const client::Ppo& c) { return "ppo " + std::to_string(c.playerId) + "\n"; },
-                   [](const client::Plv& c) { return "plv " + std::to_string(c.playerId) + "\n"; },
-                   [](const client::Pin& c) { return "pin " + std::to_string(c.playerId) + "\n"; },
+                   [](const client::Ppo& c) { return "ppo #" + std::to_string(c.playerId) + "\n"; },
+                   [](const client::Plv& c) { return "plv #" + std::to_string(c.playerId) + "\n"; },
+                   [](const client::Pin& c) { return "pin #" + std::to_string(c.playerId) + "\n"; },
                    [](const client::Sgt&) { return std::string("sgt\n"); },
                    [](const client::Sst& c) { return "sst " + std::to_string(c.timeUnit) + "\n"; },
                    [](const UnknownCommand&) { return std::string("suc\n"); }},
