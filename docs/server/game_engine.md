@@ -27,7 +27,7 @@ According to Zappy protocol rules, **a player can only queue a maximum of 10 com
 
 ### The Tick Cycle (`_cmdTick`)
 Each player tracks their current action using `_cmdTick`. 
-1. When `World::update()` fires, it calls `Player::update()`, which decrements `_cmdTick`.
+1. When `World::update()` is called, it calls `Player::update()`, which decrements `_cmdTick`.
 2. If `_cmdTick` reaches `0`, the current command completes. `ICommand::execute()` is triggered, applying the final effects (like moving the player or updating their inventory) and generating an `ok\n` response.
 
 ## Zero-Tick Failures & Instant Execution
@@ -36,7 +36,7 @@ To eliminate "active waiting" and guarantee instant GUI feedback, the engine uti
 
 When a player is idle and a command arrives, or when an executing command finishes, `tryStartNextCommand()` attempts to pull the next action from the queue.
 
-* **Valid Commands:** The command's `start()` method is called. This instantly fires any necessary GUI events (like `pfk` for Fork or `pic` for Incantation) into the network buffer and sets `_cmdTick` to the required duration (e.g., 42 ticks).
+* **Valid Commands:** The command's `start()` method is called. This instantly starts any necessary GUI events (like `pfk` for Fork or `pic` for Incantation) into the network buffer and sets `_cmdTick` to the required duration (e.g., 42 ticks).
 * **Invalid Commands:** If the client sends an unknown command, or tries to execute an impossible action, `start()` returns `false`. The engine instantly generates a `ko\n` response and consumes **0 ticks**, looping immediately to the next command in the queue. 
 
 This architecture guarantees that failing commands do not penalize the player's execution time, maintaining perfect alignment with the official Zappy specifications.

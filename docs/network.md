@@ -28,3 +28,23 @@ The `SessionManager` communicates with the main server loop via an internal `_ev
 * `MESSAGE_RECEIVED`
 
 This queue creates a perfect abstraction barrier. The rest of the server never interacts with file descriptors; it only processes events.
+
+## System Diagram
+
+The following diagram illustrates the flow of data through the `SessionManager`:
+
+```mermaid
+graph TD
+    A[TCP Socket Activity] --> B{Event Type}
+    
+    B -- New Connection --> C[Accept and wrap in ClientSocket]
+    C --> D[Push CLIENT_CONNECTED to Queue]
+    
+    B -- Data Received --> E[Read bytes into Client Buffer]
+    E --> F{Buffer > 42000 bytes?}
+    
+    F -- Yes --> G[Force Disconnect to prevent flood]
+    F -- No --> H[Extract complete newline messages]
+    H --> I[Push MESSAGE_RECEIVED to Queue]
+
+```

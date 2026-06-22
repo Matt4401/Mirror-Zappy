@@ -27,3 +27,23 @@ When a client connects, the `SessionManager` only knows their integer ID (the fi
 To keep the game engine clean, the `World` does not parse text. `Core` utilizes a `CommandFactory` to translate raw strings (e.g., `"Forward\n"`) into polymorphic `std::unique_ptr<ICommand>` objects.
 
 **Zero-Tick Failures:** If a client sends an invalid or unknown command, the factory returns a generic `Unknown` command object. This ensures that malformed commands still enter the player's queue and wait their chronological turn before instantly failing and returning `ko\n`.
+
+## System Diagram
+
+The following diagram illustrates the flow of data through the `Core` orchestrator:
+
+```mermaid
+graph TD
+    Start((Start Loop Iteration)) --> Calc[Calculate Time to Next Game Tick]
+    
+    Calc --> Poll[SessionManager::pollNetwork using timeout]
+    Poll --> ProcessNet[Parse Network Events and Route Commands]
+    
+    ProcessNet --> Tick{Is it time for a Game Tick?}
+    
+    Tick -- Yes --> Update[World::update and burn _cmdTick]
+    Tick -- No --> Flush[Flush Player and GUI Responses]
+    
+    Update --> Flush
+    Flush --> Start
+```
