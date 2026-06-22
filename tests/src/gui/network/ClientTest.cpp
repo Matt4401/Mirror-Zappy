@@ -35,8 +35,6 @@ class ClientTest : public ::testing::Test {
         _mockSocket = std::make_unique<StrictMock<MockClientSocket>>();
         _mockSocketPtr = _mockSocket.get();
     }
-
-  protected:
     [[nodiscard]] std::shared_ptr<events::EventDispatcher>& getDispatcher() { return _dispatcher; }
     [[nodiscard]] std::unique_ptr<StrictMock<MockClientSocket>>& getMockSocket() { return _mockSocket; }
     [[nodiscard]] StrictMock<MockClientSocket>* getMockSocketPtr() const { return _mockSocketPtr; }
