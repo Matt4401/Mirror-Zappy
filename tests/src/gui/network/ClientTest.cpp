@@ -13,13 +13,13 @@
 #include <string_view>
 #include <utility>
 
-#include "Commands.hpp"
 #include "EventDispatcher.hpp"
 #include "MockClientSocket.hpp"
 #include "events/GuiEvents.hpp"
 #include "exception/SocketError.hpp"
 #include "gmock/gmock.h"
 #include "network/Client.hpp"
+#include "protocol/Commands.hpp"
 
 using ::testing::_;
 using ::testing::Return;
