@@ -7,8 +7,6 @@
 
 #include "TileInspectorUI.hpp"
 
-#include <raylib.h>
-
 #include <cstddef>
 #include <functional>
 #include <memory>
