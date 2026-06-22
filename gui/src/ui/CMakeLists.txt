@@ -6,6 +6,8 @@ add_library(zappy_gui_ui
     components/UIGridManager.cpp
     components/UIButton.cpp
     components/UIImage.cpp
+    components/UISlider.cpp
+    components/UITextbox.cpp
     menus/PauseMenu.cpp
     menus/PlayerInspectorUI.cpp
     menus/AInspectorUI.cpp
@@ -22,6 +24,8 @@ target_sources(zappy_gui_ui PUBLIC
         components/UIGridManager.hpp
         components/UIButton.hpp
         components/UIImage.hpp
+        components/UISlider.hpp
+        components/UITextbox.hpp
         menus/PauseMenu.hpp
         menus/PlayerInspectorUI.hpp
         menus/AInspectorUI.hpp
