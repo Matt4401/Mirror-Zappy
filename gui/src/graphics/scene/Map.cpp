@@ -13,6 +13,7 @@
 #include <optional>
 #include <utility>
 
+#include "Color.hpp"
 #include "Tile3D.hpp"
 #include "events/EventDispatcher.hpp"
 #include "events/GuiEvents.hpp"
@@ -22,6 +23,7 @@
 #include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
 #include "rmath/Vector3.hpp"
+#include "rshapes/Shapes.hpp"
 
 namespace zappy::gui::graphics::scene {
 Map::Map(int width, int height, std::shared_ptr<raylib::rcore::Camera> camera,
@@ -52,6 +54,7 @@ Map::~Map() {
 }
 
 void Map::resize(int width, int height) {
+    _hoveredTile = nullptr;
     _width = width;
     _height = height;
     _tiles.clear();
@@ -80,6 +83,10 @@ void Map::draw() const {
     for (const auto& team : _teams) {
         team.draw(_gameModel);
     }
+    if (_hoveredTile != nullptr) {
+        raylib::rshapes::Shapes::drawThickBoundingBox(_hoveredTile->boundingBox(_tileModel.getBoundingBox()),
+                                                      raylib::Color::White(), 0.05F);
+    }
 }
 
 void Map::drawItems(const Tile3D& tile) const {
@@ -92,13 +99,31 @@ void Map::drawItems(const Tile3D& tile) const {
 }
 
 void Map::handleEvent() {
-    if (!raylib::rcore::Event::isMouseButtonPressed(MOUSE_LEFT_CLICK) || !_camera) {
+    _hoveredTile = nullptr;
+    if (!_camera) {
         return;
     }
 
     const auto ray = raylib::rcore::Event::mouseRay(*_camera);
-    std::optional<SelectedPlayer> selected;
     float nearestDistance = std::numeric_limits<float>::max();
+
+    for (const auto& tile : _tiles) {
+        if (!_camera->isVisibleFromCamera(tile.position())) {
+            continue;
+        }
+        const auto collision = ray.collision(tile.boundingBox(_tileModel.getBoundingBox()));
+        if (collision.hit && collision.distance < nearestDistance) {
+            nearestDistance = collision.distance;
+            _hoveredTile = &tile;
+        }
+    }
+
+    if (!raylib::rcore::Event::isMouseButtonPressed(MOUSE_LEFT_CLICK)) {
+        return;
+    }
+
+    std::optional<SelectedPlayer> selected;
+    nearestDistance = std::numeric_limits<float>::max();
 
     for (const auto& team : _teams) {
         for (const auto& player : team.players()) {
@@ -118,22 +143,8 @@ void Map::handleEvent() {
         return;
     }
 
-    const Tile3D* selectedTile = nullptr;
-    nearestDistance = std::numeric_limits<float>::max();
-
-    for (const auto& tile : _tiles) {
-        if (!_camera->isVisibleFromCamera(tile.position())) {
-            continue;
-        }
-        const auto collision = ray.collision(tile.boundingBox());
-        if (collision.hit && collision.distance < nearestDistance) {
-            nearestDistance = collision.distance;
-            selectedTile = &tile;
-        }
-    }
-
-    if (selectedTile != nullptr) {
-        dispatchClickedTile(*selectedTile);
+    if (_hoveredTile != nullptr) {
+        dispatchClickedTile(*_hoveredTile);
     }
 }
 

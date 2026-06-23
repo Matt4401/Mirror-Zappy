@@ -30,7 +30,7 @@ class Tile3D {
     [[nodiscard]] raylib::rmath::Vector3 position() const { return _position; }
     [[nodiscard]] int gridX() const { return _gridX; }
     [[nodiscard]] int gridY() const { return _gridY; }
-    [[nodiscard]] raylib::rcore::BoundingBox boundingBox() const;
+    [[nodiscard]] raylib::rcore::BoundingBox boundingBox(const raylib::rcore::BoundingBox& modelBB) const;
     [[nodiscard]] const game::ItemBag& itemBag() const { return _itemBag; }
     [[nodiscard]] game::ItemBag& itemBag() { return _itemBag; }
 
