@@ -8,12 +8,13 @@
 #pragma once
 
 #include "guiCommand/IGuiCommand.hpp"
+#include "protocol/Commands.hpp"
 
 namespace zappy::server::guiCommand {
 
 class Sst : public IGuiCommand {
   public:
-    Sst(int timeUnit);
+    Sst(shared::protocol::client::Sst cmd);
     Sst() = delete;
     Sst(const Sst& other) = delete;
     Sst& operator=(const Sst& other) = delete;

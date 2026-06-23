@@ -30,7 +30,7 @@ namespace zappy::gui::ui::menus {
 
 class PlayerInspectorUI : public AInspectorUI {
   public:
-    PlayerInspectorUI(float x, float y, float width, std::shared_ptr<events::EventDispatcher> dispatcher,
+    PlayerInspectorUI(float x, float y, float width, events::EventDispatcher& dispatcher,
                       const std::shared_ptr<raylib::rtext::Font>& font,
                       std::function<void(const std::string&)> onSendCommand = nullptr);
     ~PlayerInspectorUI() override;

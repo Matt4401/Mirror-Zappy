@@ -2,12 +2,11 @@ add_subdirectory(scene)
 
 add_library(zappy_gui_graphics
         Render.cpp
-        AssetManager.cpp
 )
 target_sources(zappy_gui_graphics PUBLIC
         FILE_SET HEADERS
         BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
-        FILES Render.hpp AssetManager.hpp
+        FILES Render.hpp
 )
 target_include_directories(zappy_gui_graphics PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
@@ -19,4 +18,7 @@ target_link_libraries(zappy_gui_graphics PUBLIC
         zappy_gui_raylib
         zappy_gui_graphics_scene
         zappy_gui_events
+)
+target_link_libraries(zappy_gui_graphics PRIVATE
+        zappy_gui_assets
 )

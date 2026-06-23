@@ -11,6 +11,7 @@
 
 #include <memory>
 
+#include "command/Broadcast.hpp"
 #include "command/Forward.hpp"
 #include "guiCommand/IGuiCommand.hpp"
 
@@ -34,6 +35,28 @@ TEST(CommandFactoryTest, CreateCommandIgnoresExtraArguments) {
     auto command = factory.createCommand("Forward\n");
     EXPECT_NE(command, nullptr);
     EXPECT_TRUE(dynamic_cast<Forward*>(command.get()) != nullptr);
+}
+
+TEST(CommandFactoryTest, CreateCommandBroadcastReturnsValidCommand) {
+    const CommandFactory factory;
+    auto command = factory.createCommand("Broadcast Hello World");
+    EXPECT_NE(command, nullptr);
+    EXPECT_TRUE(dynamic_cast<Broadcast*>(command.get()) != nullptr);
+}
+
+TEST(CommandFactoryTest, CreateCommandBroadcastIgnoresExtraArguments) {
+    const CommandFactory factory;
+    auto command = factory.createCommand("Broadcast Hello World\n");
+    EXPECT_NE(command, nullptr);
+    EXPECT_TRUE(dynamic_cast<Broadcast*>(command.get()) != nullptr);
+}
+
+TEST(CommandFactoryTest, CreateGuiCommandReturnsNullptrForEmptyString) {
+    const zappy::server::command::CommandFactory factory{};
+
+    const std::unique_ptr<zappy::server::guiCommand::IGuiCommand> command = factory.createGuiCommand("");
+
+    EXPECT_EQ(command, nullptr);
 }
 
 TEST(CommandFactoryTest, CreateGuiCommandReturnsMszCommand) {

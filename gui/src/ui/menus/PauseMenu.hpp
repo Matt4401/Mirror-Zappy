@@ -21,7 +21,7 @@ namespace zappy::gui::ui::menus {
 
 class PauseMenu : public IUIComponent {
   public:
-    PauseMenu(std::shared_ptr<events::EventDispatcher> dispatcher, const std::shared_ptr<raylib::rtext::Font>& font);
+    PauseMenu(events::EventDispatcher& dispatcher, const std::shared_ptr<raylib::rtext::Font>& font);
     ~PauseMenu() override = default;
 
     PauseMenu(const PauseMenu& other) = delete;
@@ -43,7 +43,7 @@ class PauseMenu : public IUIComponent {
     void setOnUIConfig(std::function<void()> callback);
 
   private:
-    std::shared_ptr<events::EventDispatcher> _dispatcher;
+    std::reference_wrapper<events::EventDispatcher> _dispatcher;
     std::unique_ptr<components::UIPanel> _backgroundPanel;
     std::unique_ptr<components::UIButton> _resumeBtn;
     std::unique_ptr<components::UIButton> _exitBtn;

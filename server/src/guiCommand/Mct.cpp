@@ -13,6 +13,7 @@
 #include "Core.hpp"
 #include "guiCommand/Bct.hpp"
 #include "guiCommand/IGuiCommand.hpp"
+#include "protocol/Commands.hpp"
 
 namespace zappy::server::guiCommand {
 
@@ -22,7 +23,7 @@ GuiResponse Mct::execute(Core& core) {
 
     for (std::size_t x = 0; x < worldSize.x; x++) {
         for (std::size_t y = 0; y < worldSize.y; y++) {
-            Bct bctCommand(static_cast<int>(x), static_cast<int>(y));
+            Bct bctCommand(shared::protocol::client::Bct{.x = static_cast<int>(x), .y = static_cast<int>(y)});
             payload.append(bctCommand.execute(core).message);
         }
     }
