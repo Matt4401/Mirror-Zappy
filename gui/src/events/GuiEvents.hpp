@@ -26,6 +26,11 @@ struct SendCommand {
     std::string payload;
 };
 
+struct PlayerNameChanged {
+    int playerId;
+    std::string newName;
+};
+
 struct TileClicked {
     int x{0};
     int y{0};

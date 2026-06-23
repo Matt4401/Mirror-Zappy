@@ -1,5 +1,5 @@
-import random
 from src.InventoryClass import Inventory
+import random
 
 
 class PlayerState:
