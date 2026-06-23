@@ -4,7 +4,7 @@ from src.SendCommand import SendCommand
 import threading
 
 
-class AITeam:
+class Trantorian:
     def __init__(self, trantorian, port, host, team_name):
         self.trantorian = trantorian
         self.thread = threading.Lock()
@@ -17,3 +17,18 @@ class AITeam:
 
     def run(self):
         pass
+
+    def move_to_tile(self, index):
+        if index == 0:
+            return
+        n = int(math.sqrt(index))
+        start_of_level = n * n
+        dx = index - (start_of_level + n)
+        for _ in range(n):
+            self.send_command.forward()
+        if dx < 0:
+            for _ in range(abs(dx)):
+                self.send_command.left()
+        elif dx > 0:
+            for _ in range(dx):
+                self.send_command.right()
