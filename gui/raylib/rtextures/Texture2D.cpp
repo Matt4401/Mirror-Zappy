@@ -38,8 +38,10 @@ void Texture2D::drawCoverPanned(int width, int height, float horizontalPan, zapp
         .x = 0.0F, .y = 0.0F, .width = static_cast<float>(width), .height = static_cast<float>(height)};
     rmath::Vector2 const origin{0.0F, 0.0F};
 
-    ::DrawTexturePro(_texture, ::Rectangle{source.x, source.y, source.width, source.height},
-                     ::Rectangle{dest.x, dest.y, dest.width, dest.height}, origin.vector(), 0.0F, tint.color());
+    ::DrawTexturePro(_texture,
+                     ::Rectangle{.x = source.x, .y = source.y, .width = source.width, .height = source.height},
+                     ::Rectangle{.x = dest.x, .y = dest.y, .width = dest.width, .height = dest.height}, origin.vector(),
+                     0.0F, tint.color());
 }
 
 void Texture2D::reset() {
