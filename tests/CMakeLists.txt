@@ -27,6 +27,7 @@ add_executable(unit_tests
         src/server/command/Take.cpp
         src/server/command/Set.cpp
         src/server/command/Inventory.cpp
+        src/server/command/Look.cpp
 )
 target_include_directories(unit_tests PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
