@@ -5,7 +5,7 @@
 ** SST
 */
 
-#include <string>
+#pragma once
 
 #include "guiCommand/IGuiCommand.hpp"
 
@@ -21,7 +21,7 @@ class Sst : public IGuiCommand {
     Sst& operator=(Sst&& other) = delete;
     ~Sst() override = default;
 
-    std::string execute(Core& core) override;
+    GuiResponse execute(Core& core) override;
 
   private:
     int _timeUnit;

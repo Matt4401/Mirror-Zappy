@@ -7,19 +7,18 @@
 
 #include "Tna.hpp"
 
-#include <string>
-
 #include "Core.hpp"
+#include "guiCommand/IGuiCommand.hpp"
 #include "protocol/Commands.hpp"
 #include "protocol/Emitter.hpp"
 
 namespace zappy::server::guiCommand {
 
-std::string Tna::execute(Core& core) {
-    std::string response{};
+GuiResponse Tna::execute(Core& core) {
+    GuiResponse response{};
 
     for (const auto& teamName : core.config().teamNames) {
-        response.append(shared::protocol::Emitter::build(shared::protocol::server::Tna{.teamName = teamName}));
+        response.message.append(shared::protocol::Emitter::build(shared::protocol::server::Tna{.teamName = teamName}));
     }
     return response;
 }
