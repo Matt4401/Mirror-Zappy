@@ -13,7 +13,6 @@
 
 #include "Color.hpp"
 #include "EventDispatcher.hpp"
-#include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
 #include "rtext/Font.hpp"
 #include "ui/components/UIButton.hpp"
@@ -21,9 +20,8 @@
 
 namespace zappy::gui::ui::menus {
 
-PauseMenu::PauseMenu(std::shared_ptr<events::EventDispatcher> dispatcher,
-                     const std::shared_ptr<raylib::rtext::Font>& font)
-    : _dispatcher(std::move(dispatcher)) {
+PauseMenu::PauseMenu(events::EventDispatcher& dispatcher, const std::shared_ptr<raylib::rtext::Font>& font)
+    : _dispatcher(dispatcher) {
     int const screenWidth = raylib::rcore::Window::screenWidth();
     int const screenHeight = raylib::rcore::Window::screenHeight();
 
@@ -82,14 +80,14 @@ void PauseMenu::update() {
     _settingsBtn->update();
 }
 
-void PauseMenu::handleEvent(const raylib::rcore::Event& event) {
+void PauseMenu::handleEvent() {
     if (!_isVisible) {
         return;
     }
-    _resumeBtn->handleEvent(event);
-    _exitBtn->handleEvent(event);
-    _uiConfigBtn->handleEvent(event);
-    _settingsBtn->handleEvent(event);
+    _resumeBtn->handleEvent();
+    _exitBtn->handleEvent();
+    _uiConfigBtn->handleEvent();
+    _settingsBtn->handleEvent();
 }
 
 void PauseMenu::setPosition(float /*x*/, float /*y*/) {}
@@ -97,6 +95,15 @@ void PauseMenu::setSize(float /*width*/, float /*height*/) {}
 
 bool PauseMenu::isVisible() const { return _isVisible; }
 void PauseMenu::setVisible(bool visible) { _isVisible = visible; }
+
+bool PauseMenu::isHovered() const {
+    if (!_isVisible) {
+        return false;
+    }
+    return (_backgroundPanel && _backgroundPanel->isHovered()) || (_resumeBtn && _resumeBtn->isHovered()) ||
+           (_exitBtn && _exitBtn->isHovered()) || (_uiConfigBtn && _uiConfigBtn->isHovered()) ||
+           (_settingsBtn && _settingsBtn->isHovered());
+}
 
 void PauseMenu::setOnExit(std::function<void()> callback) { _onExit = std::move(callback); }
 void PauseMenu::setOnUIConfig(std::function<void()> callback) { _onUIConfig = std::move(callback); }

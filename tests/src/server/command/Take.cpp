@@ -113,4 +113,23 @@ TEST(TakeTest, CheckExecuteMovementAndInventory) {
     ASSERT_EQ(player.inventory().at(static_cast<std::uint8_t>(game::ItemType::Food)), 11);
 }
 
+TEST(TakeTest, FailedExecute) {
+    const auto config = parser::ServerConfig{
+        .port = 80,
+        .width = 16,
+        .height = 16,
+        .teamNames = {"test"},
+        .clientLimit = 1,
+        .freq = 100,
+    };
+    game::World world{config};
+    game::Player player{0, 5, 5, game::cardinalPoint::NORTH};
+
+    world.clearAllResourcesAndEggs();
+    Take take{"deraumere"};
+    take.execute(world, player);
+    ASSERT_EQ(player.responses().front(), "ko\n");
+    ASSERT_EQ(player.inventory().at(static_cast<std::uint8_t>(game::ItemType::Deraumere)), 0);
+}
+
 }  // namespace zappy::server::command

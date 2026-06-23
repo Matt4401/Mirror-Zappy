@@ -31,16 +31,15 @@ namespace {
 class ClientTest : public ::testing::Test {
   protected:
     void SetUp() override {
-        _dispatcher = std::make_shared<events::EventDispatcher>();
         _mockSocket = std::make_unique<StrictMock<MockClientSocket>>();
         _mockSocketPtr = _mockSocket.get();
     }
-    [[nodiscard]] std::shared_ptr<events::EventDispatcher>& getDispatcher() { return _dispatcher; }
+    [[nodiscard]] events::EventDispatcher& getDispatcher() { return _dispatcher; }
     [[nodiscard]] std::unique_ptr<StrictMock<MockClientSocket>>& getMockSocket() { return _mockSocket; }
     [[nodiscard]] StrictMock<MockClientSocket>* getMockSocketPtr() const { return _mockSocketPtr; }
 
   private:
-    std::shared_ptr<events::EventDispatcher> _dispatcher;
+    events::EventDispatcher _dispatcher;
     std::unique_ptr<StrictMock<MockClientSocket>> _mockSocket;
     StrictMock<MockClientSocket>* _mockSocketPtr{nullptr};
 };
@@ -85,7 +84,7 @@ TEST_F(ClientTest, SendCommand_EventTrigger) {
 
     EXPECT_CALL(*getMockSocketPtr(), send(std::string_view("msz\n"))).InSequence(s).WillOnce(Return(4));
 
-    getDispatcher()->dispatch(events::SendCommand{"msz\n"});
+    getDispatcher().dispatch(events::SendCommand{"msz\n"});
 }
 
 TEST_F(ClientTest, Update_ParsesServerMessage) {
@@ -105,8 +104,8 @@ TEST_F(ClientTest, Update_ParsesServerMessage) {
         .WillOnce(Return(std::nullopt));
 
     bool received = false;
-    auto token = getDispatcher()->subscribe<shared::protocol::server::Msz>(
-        [&received](const shared::protocol::server::Msz& cmd) {
+    auto token =
+        getDispatcher().subscribe<shared::protocol::server::Msz>([&received](const shared::protocol::server::Msz& cmd) {
             EXPECT_EQ(cmd.width, 10);
             EXPECT_EQ(cmd.height, 10);
             received = true;
@@ -115,7 +114,7 @@ TEST_F(ClientTest, Update_ParsesServerMessage) {
     client.update();
 
     EXPECT_TRUE(received);
-    getDispatcher()->unsubscribe<shared::protocol::server::Msz>(token);
+    getDispatcher().unsubscribe<shared::protocol::server::Msz>(token);
 }
 
 }  // namespace zappy::gui::network::tests

@@ -1,5 +1,6 @@
 add_library(zappy_gui_ui
         UIManager.cpp
+        components/UIDropdown.cpp
         components/UIText.cpp
         components/UIPanel.cpp
         components/UIGamePanel.cpp
@@ -12,6 +13,7 @@ add_library(zappy_gui_ui
         menus/PlayerInspectorUI.cpp
         menus/AInspectorUI.cpp
         menus/TileInspectorUI.cpp
+        menus/WorldControlUI.cpp
         hud/GameHUD.cpp
 )
 target_sources(zappy_gui_ui PUBLIC
@@ -20,6 +22,7 @@ target_sources(zappy_gui_ui PUBLIC
         FILES
         IUIComponent.hpp
         UIManager.hpp
+        components/UIDropdown.hpp
         components/UIText.hpp
         components/UIPanel.hpp
         components/UIGamePanel.hpp
@@ -32,6 +35,7 @@ target_sources(zappy_gui_ui PUBLIC
         menus/PlayerInspectorUI.hpp
         menus/AInspectorUI.hpp
         menus/TileInspectorUI.hpp
+        menus/WorldControlUI.hpp
         hud/GameHUD.hpp
 )
 target_include_directories(zappy_gui_ui PUBLIC
@@ -43,4 +47,7 @@ target_link_libraries(zappy_gui_ui PUBLIC
         zappy_gui_raylib
         zappy_shared
         zappy_gui_events
+)
+target_link_libraries(zappy_gui_ui PRIVATE
+        zappy_gui_assets
 )

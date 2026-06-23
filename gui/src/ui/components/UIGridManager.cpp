@@ -70,7 +70,7 @@ void UIGridManager::update() {
             data.panel->setSize(static_cast<float>(data.grid.w) * cellW, static_cast<float>(data.grid.h) * cellH);
             bool isRoot = true;
             for (const auto& other : _panels) {
-                if (other.panel != data.panel) {
+                if (other.panel != data.panel && other.panel->isVisible()) {
                     int const gap = data.grid.y - (other.grid.y + other.grid.h);
                     if (other.grid.x == data.grid.x && (gap == 0 || gap == 1)) {
                         isRoot = false;
@@ -87,14 +87,14 @@ void UIGridManager::update() {
     }
 }
 
-void UIGridManager::handleEvent(const raylib::rcore::Event& event) {
+void UIGridManager::handleEvent() {
     if (!_isVisible) {
         return;
     }
 
     if (!_isConfigMode) {
         for (auto& _panel : std::ranges::reverse_view(_panels)) {
-            _panel.panel->handleEvent(event);
+            _panel.panel->handleEvent();
         }
         return;
     }
@@ -146,7 +146,7 @@ void UIGridManager::handleMousePressed(const raylib::rmath::Vector2& mousePos, f
                                                     .width = ResizeHandleSize,
                                                     .height = ResizeHandleSize};
 
-        if (raylib::rshapes::Shapes::checkCollisionPointRec(mousePos, handleRec)) {
+        if (_panel.panel->isResizable() && raylib::rshapes::Shapes::checkCollisionPointRec(mousePos, handleRec)) {
             _resizedPanel = _panel.panel;
             for (auto& data : _panels) {
                 data.originalGrid = data.grid;
@@ -165,6 +165,7 @@ void UIGridManager::handleMousePressed(const raylib::rmath::Vector2& mousePos, f
 
         if (raylib::rshapes::Shapes::checkCollisionPointRec(mousePos, panelRec)) {
             _draggedPanel = it.panel;
+            _draggedPanel->setDragged(true);
             it.originalGrid = it.grid;
             _previewGrid = it.grid;
             _dragOffset = raylib::rmath::Vector2(mousePos.x() - pos.x(), mousePos.y() - pos.y());
@@ -183,6 +184,7 @@ void UIGridManager::handleMouseReleased() {
                 it->grid = it->originalGrid;
             }
         }
+        _draggedPanel->setDragged(false);
         _draggedPanel.reset();
     }
     if (_resizedPanel) {
@@ -329,7 +331,9 @@ void UIGridManager::drawResizeHandles() const {
                                                  .y = pos.y() + h - ResizeHandleSize,
                                                  .width = ResizeHandleSize,
                                                  .height = ResizeHandleSize};
-        raylib::rshapes::Shapes::drawRectangleRec(handleRec, raylib::Color(255, 0, 0, 204));
+        if (data.panel->isResizable()) {
+            raylib::rshapes::Shapes::drawRectangleRec(handleRec, raylib::Color(255, 0, 0, 204));
+        }
     }
 }
 
@@ -357,6 +361,9 @@ void UIGridManager::autoLinkPanels() {
             if (topData.panel == _draggedPanel || bottomData.panel == _draggedPanel) {
                 continue;
             }
+            if (!topData.panel->isVisible() || !bottomData.panel->isVisible()) {
+                continue;
+            }
             int const gap = bottomData.grid.y - (topData.grid.y + topData.grid.h);
             if (topData.grid.x == bottomData.grid.x && (gap == 0 || gap == 1)) {
                 float const cellH = static_cast<float>(raylib::rcore::Window::screenHeight()) / GridRows;
@@ -368,6 +375,11 @@ void UIGridManager::autoLinkPanels() {
 
 void UIGridManager::setPosition(float /*x*/, float /*y*/) {}
 void UIGridManager::setSize(float /*width*/, float /*height*/) {}
+
+bool UIGridManager::isHovered() const {
+    return std::ranges::any_of(_panels,
+                               [](const auto& data) { return data.panel->isVisible() && data.panel->isHovered(); });
+}
 bool UIGridManager::isVisible() const { return _isVisible; }
 void UIGridManager::setVisible(bool visible) { _isVisible = visible; }
 

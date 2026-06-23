@@ -20,6 +20,7 @@
 #include "guiCommand/Msz.hpp"
 #include "guiCommand/Sgt.hpp"
 #include "guiCommand/Tna.hpp"
+#include "protocol/Commands.hpp"
 
 // NOLINTBEGIN
 const auto createDummyArgs = []() {
@@ -47,7 +48,7 @@ TEST(MszCommandTest, ExecuteReturnsCorrectDimensions) {
     zappy::server::Core core{std::span<char*>(args)};
 
     zappy::server::guiCommand::Msz command{};
-    const std::string response = command.execute(core);
+    const std::string response = command.execute(core).message;
 
     EXPECT_EQ(response, "msz 10 20\n");
 }
@@ -57,7 +58,7 @@ TEST(SgtCommandTest, ExecuteReturnsCorrectFrequency) {
     zappy::server::Core core{std::span<char*>(args)};
 
     zappy::server::guiCommand::Sgt command{};
-    const std::string response = command.execute(core);
+    const std::string response = command.execute(core).message;
 
     EXPECT_EQ(response, "sgt 50\n");
 }
@@ -66,8 +67,8 @@ TEST(BctCommandTest, ExecuteReturnsProperlyFormattedTileContent) {
     auto args = createDummyArgs();
     zappy::server::Core core{std::span(args)};
 
-    zappy::server::guiCommand::Bct command{5, 5};
-    const std::string response = command.execute(core);
+    zappy::server::guiCommand::Bct command{zappy::shared::protocol::client::Bct{.x = 5, .y = 5}};
+    const std::string response = command.execute(core).message;
 
     auto resources = core.world().resourcesAt(zappy::server::game::Position{.x = 5, .y = 5});
 
@@ -87,8 +88,8 @@ TEST(BctCommandTest, ExecuteFailsSafelyOnOutOfBounds) {
     auto args = createDummyArgs();
     zappy::server::Core core{std::span(args)};
 
-    zappy::server::guiCommand::Bct command{999, 999};
-    const std::string response = command.execute(core);
+    zappy::server::guiCommand::Bct command{zappy::shared::protocol::client::Bct{.x = 100, .y = 100}};
+    const std::string response = command.execute(core).message;
 
     EXPECT_TRUE(response == "sbp\n");
 }
@@ -98,7 +99,7 @@ TEST(MctCommandTest, ExecuteReturnsAllTileContents) {
     zappy::server::Core core{std::span(args)};
 
     zappy::server::guiCommand::Mct command{};
-    const std::string response = command.execute(core);
+    const std::string response = command.execute(core).message;
     const auto mapSize = core.world().sizeMap();
     std::string expectedResponse;
 
@@ -125,7 +126,7 @@ TEST(TnaCommandTest, ExecuteReturnsTeamNames) {
     zappy::server::Core core{std::span<char*>(args)};
 
     zappy::server::guiCommand::Tna command{};
-    const std::string response = command.execute(core);
+    const std::string response = command.execute(core).message;
 
     EXPECT_EQ(response, "tna teamA\ntna teamB\n");
 }

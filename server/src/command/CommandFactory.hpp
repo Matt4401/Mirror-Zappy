@@ -35,6 +35,11 @@ class CommandFactory {
     using CommandCreator = std::move_only_function<std::unique_ptr<ICommand>(std::string_view) const>;
     using GuiCommandCreator = std::move_only_function<std::unique_ptr<guiCommand::IGuiCommand>(std::string_view) const>;
 
+    void registerCommands();
+    void registerGuiCommands();
+    template <typename ParsedCommandType, typename GuiCommandType>
+    static std::unique_ptr<guiCommand::IGuiCommand> parseAndCreateGuiCommand(std::string_view rawCommand);
+
     std::unordered_map<std::string, CommandCreator> _creators;
     std::unordered_map<std::string, GuiCommandCreator> _guiCreators;
 

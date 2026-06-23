@@ -17,7 +17,6 @@
 #include "events/GuiEvents.hpp"
 #include "protocol/Commands.hpp"
 #include "rcore/Camera.hpp"
-#include "rcore/Event.hpp"
 #include "rmath/Vector3.hpp"
 #include "rmodels/Model.hpp"
 #include "rtext/Font.hpp"
@@ -31,7 +30,7 @@ namespace zappy::gui::ui::menus {
 
 class PlayerInspectorUI : public AInspectorUI {
   public:
-    PlayerInspectorUI(float x, float y, float width, std::shared_ptr<events::EventDispatcher> dispatcher,
+    PlayerInspectorUI(float x, float y, float width, events::EventDispatcher& dispatcher,
                       const std::shared_ptr<raylib::rtext::Font>& font,
                       std::function<void(const std::string&)> onSendCommand = nullptr);
     ~PlayerInspectorUI() override;
@@ -43,7 +42,7 @@ class PlayerInspectorUI : public AInspectorUI {
 
     void draw() override;
     void update() override;
-    void handleEvent(const raylib::rcore::Event& event) override;
+    void handleEvent() override;
 
     void onPlayerClicked(const events::PlayerClicked& event);
     void setVisible(bool visible) override;

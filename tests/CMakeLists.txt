@@ -8,6 +8,7 @@ add_executable(unit_tests
         src/server/parsing/Parser.cpp
         src/gui/parsing/Parser.cpp
         src/gui/events/EventDispatcherTest.cpp
+        src/gui/world/WorldManagerTest.cpp
         src/gui/network/ClientTest.cpp
         src/network/Socket.cpp
         src/network/SessionManager.cpp
@@ -21,6 +22,7 @@ add_executable(unit_tests
         src/server/guiCommand/guiCommandFactory.cpp
         src/server/World.cpp
         src/protocol/ProtocolTest.cpp
+        src/server/command/Broadcast.cpp
         src/server/command/Eject.cpp
         src/server/command/Fork.cpp
         src/server/command/Take.cpp
@@ -30,6 +32,7 @@ add_executable(unit_tests
 )
 target_include_directories(unit_tests PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_SOURCE_DIR}
 )
 target_link_libraries(unit_tests PRIVATE
         zappy_shared
@@ -37,6 +40,7 @@ target_link_libraries(unit_tests PRIVATE
         zappy_server_objects
         zappy_gui_events
         zappy_gui_network
+        zappy_gui_graphics_scene
         GTest::gtest
         GTest::gmock
         GTest::gmock_main

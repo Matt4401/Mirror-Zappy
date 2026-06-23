@@ -7,15 +7,14 @@
 
 #pragma once
 
-#include <string>
-
 #include "guiCommand/IGuiCommand.hpp"
+#include "protocol/Commands.hpp"
 
 namespace zappy::server::guiCommand {
 
 class Bct : public IGuiCommand {
   public:
-    Bct(int x, int y);
+    explicit Bct(shared::protocol::client::Bct cmd);
     Bct() = delete;
     Bct(const Bct& other) = delete;
     Bct& operator=(const Bct& other) = delete;
@@ -23,7 +22,7 @@ class Bct : public IGuiCommand {
     Bct& operator=(Bct&& other) = delete;
     ~Bct() override = default;
 
-    std::string execute(Core& core) override;
+    GuiResponse execute(Core& core) override;
 
   private:
     int _x;

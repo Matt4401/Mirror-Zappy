@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <string>
 
 #include "Color.hpp"
@@ -35,4 +36,11 @@ struct TileClicked {
     int x{0};
     int y{0};
 };
+
+enum class TimeMode : std::uint8_t { MORNING, AFTERNOON, EVENING, NIGHT, CYCLE };
+
+struct TimeOfDayChanged {
+    TimeMode mode;
+};
+
 }  // namespace zappy::gui::events

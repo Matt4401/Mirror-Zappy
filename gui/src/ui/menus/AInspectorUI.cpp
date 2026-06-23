@@ -20,7 +20,6 @@
 #include "components/UIImage.hpp"
 #include "components/UIText.hpp"
 #include "protocol/Commands.hpp"
-#include "rcore/Event.hpp"
 #include "rshapes/Shapes.hpp"
 #include "rtext/Font.hpp"
 
@@ -48,12 +47,11 @@ constexpr float InvIconSize = 30.0F;
 constexpr int ElementCount = 7;
 }  // namespace
 
-AInspectorUI::AInspectorUI(float x, float y, float width, const std::string& title,
-                           std::shared_ptr<events::EventDispatcher> dispatcher,
+AInspectorUI::AInspectorUI(float x, float y, float width, const std::string& title, events::EventDispatcher& dispatcher,
                            const std::shared_ptr<raylib::rtext::Font>& font,
                            std::function<void(const std::string&)> onSendCommand)
     : components::UIGamePanel(x, y, width, InspectorInitialHeight, title),
-      _dispatcher(std::move(dispatcher)),
+      _dispatcher(dispatcher),
       _font(font),
       _onSendCommand(std::move(onSendCommand)),
       _closeBtn(std::make_shared<components::UIButton>(x + width, y, CloseBtnSize, CloseBtnSize, "X", _font)) {
@@ -64,15 +62,13 @@ AInspectorUI::AInspectorUI(float x, float y, float width, const std::string& tit
     _closeBtn->setOnClick([this]() { this->setVisible(false); });
     addHeaderComponent(_closeBtn);
 
-    if (_dispatcher) {
-        _eventTokens.push_back(_dispatcher->subscribe<shared::protocol::server::Sgt>(
-            [this](const shared::protocol::server::Sgt& cmd) { _serverFreq = static_cast<float>(cmd.timeUnit); }));
-    }
+    _serverFrequencyToken = _dispatcher.get().subscribe<shared::protocol::server::Sgt>(
+        [this](const shared::protocol::server::Sgt& cmd) { _serverFreq = static_cast<float>(cmd.timeUnit); });
 }
 
 AInspectorUI::~AInspectorUI() {
-    if (_dispatcher && !_eventTokens.empty()) {
-        _dispatcher->unsubscribe<shared::protocol::server::Sgt>(_eventTokens.front());
+    if (_serverFrequencyToken != 0) {
+        _dispatcher.get().unsubscribe<shared::protocol::server::Sgt>(_serverFrequencyToken);
     }
 }
 
@@ -130,13 +126,13 @@ void AInspectorUI::update() {
     }
 }
 
-void AInspectorUI::handleEvent(const raylib::rcore::Event& event) {
-    components::UIGamePanel::handleEvent(event);
+void AInspectorUI::handleEvent() {
+    components::UIGamePanel::handleEvent();
     if (!isVisible()) {
         return;
     }
     if (_closeBtn) {
-        _closeBtn->handleEvent(event);
+        _closeBtn->handleEvent();
     }
 }
 

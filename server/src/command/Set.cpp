@@ -14,6 +14,8 @@
 #include "command/ACommand.hpp"
 #include "game/Player.hpp"
 #include "game/World.hpp"
+#include "protocol/Commands.hpp"
+#include "protocol/Emitter.hpp"
 
 namespace zappy::server::command {
 
@@ -26,12 +28,19 @@ bool Set::start(game::World& /*world*/, game::Player& player) {
         return false;
     }
     const auto inventory = player.inventory();
-
     return inventory.at(static_cast<std::uint8_t>(it->second)) > 0;
 }
 void Set::execute(game::World& world, game::Player& player) {
     const game::ItemType item = game::mapItemString().at(_arg);
-    player.subItem(item);
+    if (!player.subItem(item)) {
+        player.addResponse("ko\n");
+        return;
+    }
     world.addItemOnGround(item, player.position());
+    world.addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pdr{
+        .playerId = static_cast<int>(player.id()),
+        .resourceId = static_cast<int>(item),
+    }));
+    player.addResponse("ok\n");
 }
 }  // namespace zappy::server::command

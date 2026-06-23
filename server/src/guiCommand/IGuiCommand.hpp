@@ -15,6 +15,13 @@ class Core;
 
 namespace zappy::server::guiCommand {
 
+struct GuiResponse {
+    std::string message;
+    bool isArgumentError{false};
+    bool isCommandError{false};
+    bool sendToEveryone{false};
+};
+
 class IGuiCommand {
   public:
     IGuiCommand() = default;
@@ -24,7 +31,7 @@ class IGuiCommand {
     IGuiCommand& operator=(IGuiCommand&& other) = delete;
     virtual ~IGuiCommand() = default;
 
-    virtual std::string execute(Core& core) = 0;
+    virtual GuiResponse execute(Core& core) = 0;
 };
 
 }  // namespace zappy::server::guiCommand

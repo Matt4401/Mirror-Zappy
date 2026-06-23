@@ -29,7 +29,6 @@
 #include "protocol/Commands.hpp"
 #include "protocol/Emitter.hpp"
 #include "rcore/Camera.hpp"
-#include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
 #include "rmath/Vector3.hpp"
 #include "rmodels/Model.hpp"
@@ -104,10 +103,10 @@ constexpr float ModelPosY = 0.0F;
 constexpr float ModelPosZ = 0.0F;
 }  // namespace
 
-PlayerInspectorUI::PlayerInspectorUI(float x, float y, float width, std::shared_ptr<events::EventDispatcher> dispatcher,
+PlayerInspectorUI::PlayerInspectorUI(float x, float y, float width, events::EventDispatcher& dispatcher,
                                      const std::shared_ptr<raylib::rtext::Font>& font,
                                      std::function<void(const std::string&)> onSendCommand)
-    : AInspectorUI(x, y, width, "Player Inspector", std::move(dispatcher), font, std::move(onSendCommand)),
+    : AInspectorUI(x, y, width, "Player Inspector", dispatcher, font, std::move(onSendCommand)),
       _firstPersonBtn(std::make_shared<components::UIButton>(0.0F, 0.0F, FirstPersonBtnWidth, FirstPersonBtnHeight,
                                                              "First Person", getFont())),
       _previewCamera(raylib::rcore::Camera(raylib::rmath::Vector3{CameraPosX, CameraPosY, CameraPosZ},
@@ -122,18 +121,16 @@ PlayerInspectorUI::PlayerInspectorUI(float x, float y, float width, std::shared_
 
     _firstPersonBtn->setFontSize(FirstPersonBtnFontSize);
 
-    if (getDispatcher()) {
-        getEventTokens().push_back(getDispatcher()->subscribe<events::PlayerClicked>(
-            [this](const events::PlayerClicked& e) { onPlayerClicked(e); }));
-        getEventTokens().push_back(getDispatcher()->subscribe<events::TileClicked>(
-            [this](const events::TileClicked& /*e*/) { setVisible(false); }));
-        getEventTokens().push_back(getDispatcher()->subscribe<shared::protocol::server::Pin>(
-            [this](const shared::protocol::server::Pin& cmd) { onPinReceived(cmd); }));
-        getEventTokens().push_back(getDispatcher()->subscribe<shared::protocol::server::Plv>(
-            [this](const shared::protocol::server::Plv& cmd) { onPlvReceived(cmd); }));
-        getEventTokens().push_back(getDispatcher()->subscribe<shared::protocol::server::Ppo>(
-            [this](const shared::protocol::server::Ppo& cmd) { onPpoReceived(cmd); }));
-    }
+    getEventTokens().push_back(getDispatcher().subscribe<events::PlayerClicked>(
+        [this](const events::PlayerClicked& e) { onPlayerClicked(e); }));
+    getEventTokens().push_back(getDispatcher().subscribe<events::TileClicked>(
+        [this](const events::TileClicked& /*e*/) { setVisible(false); }));
+    getEventTokens().push_back(getDispatcher().subscribe<shared::protocol::server::Pin>(
+        [this](const shared::protocol::server::Pin& cmd) { onPinReceived(cmd); }));
+    getEventTokens().push_back(getDispatcher().subscribe<shared::protocol::server::Plv>(
+        [this](const shared::protocol::server::Plv& cmd) { onPlvReceived(cmd); }));
+    getEventTokens().push_back(getDispatcher().subscribe<shared::protocol::server::Ppo>(
+        [this](const shared::protocol::server::Ppo& cmd) { onPpoReceived(cmd); }));
 }
 
 void PlayerInspectorUI::onPinReceived(const shared::protocol::server::Pin& cmd) {
@@ -180,12 +177,12 @@ void PlayerInspectorUI::onPpoReceived(const shared::protocol::server::Ppo& cmd) 
 }
 
 PlayerInspectorUI::~PlayerInspectorUI() {
-    if (getDispatcher() && getEventTokens().size() >= 5) {
-        getDispatcher()->unsubscribe<events::PlayerClicked>(getEventTokens().at(0));
-        getDispatcher()->unsubscribe<events::TileClicked>(getEventTokens().at(1));
-        getDispatcher()->unsubscribe<shared::protocol::server::Pin>(getEventTokens().at(2));
-        getDispatcher()->unsubscribe<shared::protocol::server::Plv>(getEventTokens().at(3));
-        getDispatcher()->unsubscribe<shared::protocol::server::Ppo>(getEventTokens().at(4));
+    if (getEventTokens().size() >= 5) {
+        getDispatcher().unsubscribe<events::PlayerClicked>(getEventTokens().at(0));
+        getDispatcher().unsubscribe<events::TileClicked>(getEventTokens().at(1));
+        getDispatcher().unsubscribe<shared::protocol::server::Pin>(getEventTokens().at(2));
+        getDispatcher().unsubscribe<shared::protocol::server::Plv>(getEventTokens().at(3));
+        getDispatcher().unsubscribe<shared::protocol::server::Ppo>(getEventTokens().at(4));
     }
 }
 
@@ -203,8 +200,8 @@ void PlayerInspectorUI::buildInfoPanel() {
 
     _nameBox = std::make_shared<components::UITextbox>(0.0F, 0.0F, 200.0F, NameBoxHeight, getFont(), "Enter Name...");
     _nameBox->setOnSubmit([this](const std::string& name) {
-        if (getDispatcher() && _targetPlayerId != -1) {
-            getDispatcher()->dispatch(events::PlayerNameChanged{.playerId = _targetPlayerId, .newName = name});
+        if (_targetPlayerId != -1) {
+            getDispatcher().dispatch(events::PlayerNameChanged{.playerId = _targetPlayerId, .newName = name});
         }
     });
 
@@ -364,17 +361,17 @@ void PlayerInspectorUI::updateHearts() {
     }
 }
 
-void PlayerInspectorUI::handleEvent(const raylib::rcore::Event& event) {
-    AInspectorUI::handleEvent(event);
+void PlayerInspectorUI::handleEvent() {
+    AInspectorUI::handleEvent();
     if (!isVisible()) {
         return;
     }
 
     if (_firstPersonBtn) {
-        _firstPersonBtn->handleEvent(event);
+        _firstPersonBtn->handleEvent();
     }
     if (_nameBox) {
-        _nameBox->handleEvent(event);
+        _nameBox->handleEvent();
     }
 }
 

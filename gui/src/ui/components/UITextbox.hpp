@@ -12,7 +12,6 @@
 #include <string>
 
 #include "Color.hpp"
-#include "rcore/Event.hpp"
 #include "rmath/Vector2.hpp"
 #include "rtext/Font.hpp"
 #include "ui/IUIComponent.hpp"
@@ -33,12 +32,13 @@ class UITextbox : public IUIComponent {
 
     void draw() override;
     void update() override;
-    void handleEvent(const raylib::rcore::Event& event) override;
+    void handleEvent() override;
 
     void setPosition(float x, float y) override;
     void setSize(float width, float height) override;
     [[nodiscard]] bool isVisible() const override;
     void setVisible(bool visible) override;
+    [[nodiscard]] bool isHovered() const override { return _isHovered; }
 
     [[nodiscard]] std::string getText() const;
     void setText(const std::string& text);
