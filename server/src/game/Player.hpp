@@ -27,6 +27,8 @@ struct Position {
     std::size_t y;
 };
 
+using CoordinateMove = std::pair<int, int>;
+
 enum class ItemType : uint8_t { Food, Linemate, Deraumere, Sibur, Mendiane, Phiras, Thystame, COUNT };
 
 constexpr std::array<std::string, static_cast<std::size_t>(ItemType::COUNT)> kInventoryOrder = {
@@ -34,7 +36,11 @@ constexpr std::array<std::string, static_cast<std::size_t>(ItemType::COUNT)> kIn
 
 enum class cardinalPoint : uint8_t { NORTH, EAST, SOUTH, WEST, COUNT };
 
-constexpr std::array<std::pair<int, int>, 4> playerMove = {{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}};
+constexpr std::array<CoordinateMove, 4> playerMove = {{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}};
+
+constexpr std::array<CoordinateMove, 4> diagonalLeftMove = {{{-1, 1}, {1, 1}, {1, -1}, {-1, -1}}};
+
+constexpr std::array<CoordinateMove, 4> leftTile = {{{1, 0}, {0, -1}, {-1, 0}, {0, 1}}};
 
 static constexpr std::size_t kNbLifeTickFood = 126;
 static constexpr std::size_t kNbStartFood = 10;
@@ -73,6 +79,7 @@ class Player {
     std::vector<std::string> responses();
     [[nodiscard]] Position position() const;
     [[nodiscard]] std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> inventory() const;
+    std::vector<Position> getLookPos(Position mapLimit);
 
     void setOrientation(cardinalPoint orient);
     [[nodiscard]] cardinalPoint orientation() const;
@@ -102,5 +109,9 @@ class Player {
     bool _isDead{false};
     std::size_t _id;
     bool _isNewCommand{false};
+    std::uint8_t _level{1};
+
+    Position getNthDiagonalLeftPosition(std::size_t n, Position mapLimit);
+    Position getLeftTile(Position ogPos, const Position& mapLimit);
 };
 }  // namespace zappy::server::game

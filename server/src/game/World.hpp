@@ -79,6 +79,8 @@ class World {
     [[nodiscard]] std::string getPlayerTeam(std::size_t id) const;
 
     void addGuiEvent(const std::string& event);
+    std::string visionOfPlayer(const std::vector<Position>& Positions) const;
+    void clearAllResourcesAndEggs();
 
     void layEgg(const Player& player);
     const std::unordered_map<std::size_t, Egg>& vecEggs() const;
@@ -103,6 +105,9 @@ class World {
     void removeFromMap(std::size_t id);
     [[nodiscard]] static std::unordered_map<ItemType, double> densityItem();
     [[nodiscard]] static std::unordered_map<cardinalPoint, std::string> cardinalPointToStr();
+
+    static std::string resourcesName(ItemType item);
+    static std::string transformResourcesToStr(const Tile& tile);
 
     static constexpr std::size_t kNbTicksToRespawn = 20;
 };
