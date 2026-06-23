@@ -122,7 +122,7 @@ void UIDropdown::handleEvent(const raylib::rcore::Event& event) {
         return;
     }
 
-    if (raylib::rcore::Event::isMouseButtonPressed(MouseLeftButton)) {
+    if (raylib::rcore::Event::isMouseButtonReleased(MouseLeftButton)) {
         if (_isOpen) {
             if (_hoveredIndex != -1) {
                 _selectedIndex = static_cast<size_t>(_hoveredIndex);
