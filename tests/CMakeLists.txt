@@ -46,7 +46,7 @@ target_compile_definitions(unit_tests
 )
 
 add_test(NAME python_tests
-        COMMAND ${Python3_EXECUTABLE} -m pytest ${CMAKE_SOURCE_DIR}/tests/src/ai/test_main.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_Connection.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_inventory_class.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_VisionManager.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_Logger.py
+        COMMAND ${Python3_EXECUTABLE} -m pytest ${CMAKE_SOURCE_DIR}/tests/src/ai/test_main.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_Connection.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_inventory_class.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_VisionManager.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_Logger.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_TickManager.py
 )
 
 set_tests_properties(python_tests PROPERTIES
