@@ -55,4 +55,9 @@ void UIManager::handleEvent(const raylib::rcore::Event& event) {
     }
 }
 
+bool UIManager::isHovered() const {
+    return std::ranges::any_of(_components,
+                               [](const auto& component) { return component->isVisible() && component->isHovered(); });
+}
+
 }  // namespace zappy::gui::ui

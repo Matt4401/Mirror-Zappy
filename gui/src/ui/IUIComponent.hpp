@@ -29,6 +29,7 @@ class IUIComponent {
     virtual void setSize(float width, float height) = 0;
     [[nodiscard]] virtual bool isVisible() const = 0;
     virtual void setVisible(bool visible) = 0;
+    [[nodiscard]] virtual bool isHovered() const = 0;
 };
 
 }  // namespace zappy::gui::ui

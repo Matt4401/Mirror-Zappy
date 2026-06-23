@@ -33,6 +33,8 @@ class UIManager {
     void draw();
     void handleEvent(const raylib::rcore::Event& event);
 
+    [[nodiscard]] bool isHovered() const;
+
   private:
     std::vector<std::shared_ptr<IUIComponent>> _components;
 };
