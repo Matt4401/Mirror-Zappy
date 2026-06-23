@@ -22,6 +22,7 @@ add_executable(unit_tests
         src/server/guiCommand/guiCommandFactory.cpp
         src/server/World.cpp
         src/protocol/ProtocolTest.cpp
+        src/server/command/Broadcast.cpp
         src/server/command/Eject.cpp
         src/server/command/Fork.cpp
         src/server/command/Take.cpp
