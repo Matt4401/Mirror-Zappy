@@ -10,12 +10,17 @@ class GatherState(AState):
         if not needed_stones:
             return
 
-        visible = self.trantorian.player_state.vision.find_any(needed_stones)
+        visible = None
+        for stone in needed_stones:
+            tile_index = self.trantorian.player_state.vision.get_tile_index_of(stone)
+            if tile_index is not None:
+                visible = (stone, tile_index)
+                break
 
         if not visible:
             self.trantorian.send_command.forward()
         else:
-            stone, tile_index = visible[0]
+            stone, tile_index = visible
 
             if tile_index == 0:
                 self.trantorian.send_command.take_object(stone)
