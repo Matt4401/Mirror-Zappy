@@ -18,6 +18,7 @@
 #include "Inventory.hpp"
 #include "Set.hpp"
 #include "Take.hpp"
+#include "command/Broadcast.hpp"
 #include "command/Fork.hpp"
 #include "command/Forward.hpp"
 #include "command/ICommand.hpp"
@@ -42,12 +43,19 @@ CommandFactory::CommandFactory() {
 }
 
 void CommandFactory::registerCommands() {
+    _creators.emplace("Broadcast", [](const std::string_view rawCommand) -> std::unique_ptr<ICommand> {
+        const auto& parseCmd = extractAllCmd(rawCommand);
+
+        if (parseCmd.size() >= 2) {
+            return std::make_unique<Broadcast>(std::string(parseCmd.at(1)));
+        }
+        return nullptr;
+    });
     _creators.emplace("Forward", [](std::string_view) { return std::make_unique<Forward>(); });
     _creators.emplace("Left", [](std::string_view) { return std::make_unique<Left>(); });
     _creators.emplace("Right", [](std::string_view) { return std::make_unique<Right>(); });
     _creators.emplace("Eject", [](std::string_view) { return std::make_unique<Eject>(); });
     _creators.emplace("Inventory", [](std::string_view) { return std::make_unique<Inventory>(); });
-
     _creators.emplace("Take", [](const std::string_view rawCommand) -> std::unique_ptr<ICommand> {
         const auto& parseCmd = extractAllCmd(rawCommand);
 
