@@ -225,7 +225,13 @@ ServerCommand parseServerSmg(std::istringstream& iss) {
 ServerCommand parseServerSuc(std::istringstream& /*unused*/) { return server::Suc{}; }
 ServerCommand parseServerSbp(std::istringstream& /*unused*/) { return server::Sbp{}; }
 
-ClientCommand parseClientMsz(std::istringstream& /*unused*/) { return client::Msz{}; }
+ClientCommand parseClientMsz(std::istringstream& iss) {
+    client::Msz cmd{};
+    if (iss.eof()) {
+        return cmd;
+    }
+    return UnknownCommand{};
+}
 
 ClientCommand parseClientBct(std::istringstream& iss) {
     client::Bct cmd{};
@@ -235,8 +241,20 @@ ClientCommand parseClientBct(std::istringstream& iss) {
     return UnknownCommand{};
 }
 
-ClientCommand parseClientMct(std::istringstream& /*unused*/) { return client::Mct{}; }
-ClientCommand parseClientTna(std::istringstream& /*unused*/) { return client::Tna{}; }
+ClientCommand parseClientMct(std::istringstream& iss) {
+    client::Mct cmd{};
+    if (iss.eof()) {
+        return cmd;
+    }
+    return UnknownCommand{};
+}
+ClientCommand parseClientTna(std::istringstream& iss) {
+    client::Tna cmd{};
+    if (iss.eof()) {
+        return cmd;
+    }
+    return UnknownCommand{};
+}
 
 ClientCommand parseClientPpo(std::istringstream& iss) {
     client::Ppo cmd{};
@@ -262,7 +280,13 @@ ClientCommand parseClientPin(std::istringstream& iss) {
     return UnknownCommand{};
 }
 
-ClientCommand parseClientSgt(std::istringstream& /*unused*/) { return client::Sgt{}; }
+ClientCommand parseClientSgt(std::istringstream& iss) {
+    client::Sgt cmd{};
+    if (iss.eof()) {
+        return cmd;
+    }
+    return UnknownCommand{};
+}
 
 ClientCommand parseClientSst(std::istringstream& iss) {
     client::Sst cmd{};
