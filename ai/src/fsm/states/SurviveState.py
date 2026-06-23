@@ -1,5 +1,5 @@
 from ..AState import AState
-from ...util.VisionManager import VisionManager
+
 
 class SurviveState(AState):
     def execute(self):
