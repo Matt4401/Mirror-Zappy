@@ -126,6 +126,8 @@ std::optional<size_t> World::spawnPlayer(const std::string_view teamName) {
         std::make_unique<Player>(egg.value().id, egg.value().position.x, egg.value().position.y, randomCardinalPoint());
     const auto& newPlayer = _playerList.at(egg.value().id);
     _tiles.at(getTileIndex(newPlayer->position().x, newPlayer->position().y)).players.emplace_back(newPlayer->id());
+    addGuiEvent(
+        shared::protocol::Emitter::build(shared::protocol::server::Ebo{.eggId = static_cast<int>(newPlayer->id())}));
     return newPlayer->id();
 }
 [[nodiscard]] Position World::getTilePosition(const std::size_t position1D) const {
@@ -357,6 +359,55 @@ std::unordered_map<cardinalPoint, std::string> World::cardinalPointToStr() {
     return kCardinalPointToStr;
 }
 
+std::string World::resourcesName(const ItemType item) {
+    for (const auto& [itemString, type] : mapItemString()) {
+        if (type == item) {
+            return itemString;
+        }
+    }
+    return "";
+}
+std::string World::transformResourcesToStr(const Tile& tile) {
+    std::string str{};
+
+    for (int i = 0; i < tile.eggs.size(); i++) {
+        str += " egg";
+    }
+    for (int i = 0; i < tile.players.size(); i++) {
+        str += " player";
+    }
+    for (int i = 0; i < static_cast<int>(ItemType::COUNT); i++) {
+        const auto name = resourcesName(static_cast<ItemType>(i));
+        if (name.empty()) {
+            continue;
+        }
+        for (int j = 0; std::cmp_less(j, tile.resources.at(i)); j++) {
+            str += " " + name;
+        }
+    }
+    return str;
+}
+
+std::string World::visionOfPlayer(const std::vector<Position>& Positions) const {
+    std::string str{"["};
+    for (std::size_t i = 0; i < Positions.size(); ++i) {
+        if (i > 0) {
+            str += ',';
+        }
+        const auto& tile = _tiles.at(getTileIndex(Positions.at(i)));
+        str += transformResourcesToStr(tile);
+    }
+    str += "]\n";
+    return str;
+}
+
+void World::clearAllResourcesAndEggs() {
+    _vecEggs.clear();
+    for (auto& tile : _tiles) {
+        tile.resources.fill(0);
+        tile.eggs.clear();
+    }
+}
 const std::unordered_map<std::size_t, Egg>& World::vecEggs() const { return _vecEggs; }
 
 }  // namespace zappy::server::game
