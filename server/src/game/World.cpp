@@ -415,12 +415,12 @@ void World::clearAllResourcesAndEggs() {
 }
 const std::unordered_map<std::size_t, Egg>& World::vecEggs() const { return _vecEggs; }
 
-std::vector<int> World::playersWithSameLevelOnTile(const Position position, const int level) const {
+std::vector<std::size_t> World::playersWithSameLevelOnTile(const Position position, const int level) const {
     const auto playerIds = _tiles.at(getTileIndex(position)).players;
-    std::vector<int> vecPlayerId{};
+    std::vector<std::size_t> vecPlayerId{};
     for (const auto& playerId : playerIds) {
         if (_playerList.find(playerId)->second->level() == level) {
-            vecPlayerId.push_back(static_cast<int>(playerId));
+            vecPlayerId.push_back(playerId);
         }
     }
     return vecPlayerId;

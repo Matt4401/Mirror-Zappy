@@ -89,7 +89,7 @@ class World {
 
     void layEgg(const Player& player);
     const std::unordered_map<std::size_t, Egg>& vecEggs() const;
-    std::vector<int> playersWithSameLevelOnTile(Position position, int level) const;
+    std::vector<std::size_t> playersWithSameLevelOnTile(Position position, int level) const;
 
   private:
     std::unordered_map<std::string, std::unique_ptr<Team>> _teamList;
