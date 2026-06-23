@@ -2,6 +2,8 @@ add_library(zappy_gui_graphics_scene
         Map.cpp
         Skybox3D.cpp
         Tile3D.cpp
+        TileManager.cpp
+        PlayerManager.cpp
         WorldManager.cpp
 )
 target_sources(zappy_gui_graphics_scene PUBLIC
@@ -10,6 +12,8 @@ target_sources(zappy_gui_graphics_scene PUBLIC
         FILES Map.hpp
         Skybox3D.hpp
         Tile3D.hpp
+        TileManager.hpp
+        PlayerManager.hpp
         WorldManager.hpp
 )
 target_include_directories(zappy_gui_graphics_scene PUBLIC
