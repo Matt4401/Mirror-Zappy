@@ -34,9 +34,14 @@ void Incantation::execute(game::World& world, game::Player& player) {
 
     if (player.checkCondition(world.resourcesAt(player.position()), vecPlayerIds.size())) {
         player.addResponse("ok\n");
-        auto [nbPlayer, resources] = getCondition().at(player.level());
+        auto [nbPlayer, resources] = getCondition().at(player.level() - 1);
         for (int i = 0; i < static_cast<int>(game::ItemType::COUNT); ++i) {
-            player.subItem(static_cast<game::ItemType>(i), resources.at(i));
+            const auto item = static_cast<game::ItemType>(i);
+            const std::size_t countNeeded = resources.at(i);
+
+            if (countNeeded > 0) {
+                world.removeItemOnGround(item, player.position(), countNeeded);
+            }
         }
         player.levelUp();
         isSuccess = true;

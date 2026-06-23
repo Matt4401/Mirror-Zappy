@@ -29,24 +29,24 @@ Player::Player(const std::size_t id, const std::size_t x, const std::size_t y, c
 }
 
 void Player::addItem(ItemType item, const std::size_t quantity) {
-    _inventory.at(static_cast<uint8_t>(item)) += quantity;
+    _inventory.at(static_cast<std::uint8_t>(item)) += quantity;
     if (item == ItemType::Food) {
         _lifeTick += kNbLifeTickFood * quantity;
     }
 }
 
 bool Player::subItem(ItemType item, const std::size_t quantity) {
-    const auto& nbInventory = _inventory.at(static_cast<uint8_t>(item));
-    if (nbInventory <= quantity) {
+    auto& nbInventory = _inventory.at(static_cast<std::uint8_t>(item));
+    if (nbInventory < quantity) {
         return false;
     }
-    _inventory.at(static_cast<uint8_t>(item)) -= quantity;
+    nbInventory -= quantity;
     return true;
 }
 
-std::size_t Player::getItem(ItemType item) const { return _inventory.at(static_cast<uint8_t>(item)); }
+std::size_t Player::getItem(ItemType item) const { return _inventory.at(static_cast<std::uint8_t>(item)); }
 
-void Player::setItem(ItemType item, const size_t amount) { _inventory.at(static_cast<size_t>(item)) = amount; }
+void Player::setItem(ItemType item, const size_t amount) { _inventory.at(static_cast<std::size_t>(item)) = amount; }
 
 void Player::pushCommand(std::unique_ptr<command::ICommand> command) {
     if (_commands.size() + (_currentCommand != nullptr ? 1 : 0) >= kMaxNbCmd) {
@@ -93,7 +93,7 @@ void Player::tryStartNextCommand(World& world, bool isMidTick) {
 }
 
 void Player::moveForward(const Position& limit) {
-    auto [fst, snd] = playerMove.at(static_cast<uint8_t>(_orientation));
+    auto [fst, snd] = playerMove.at(static_cast<std::uint8_t>(_orientation));
     const int width = static_cast<int>(limit.x);
     const int height = static_cast<int>(limit.y);
     const int newX = (static_cast<int>(_pos.x) + fst + width) % width;
@@ -127,7 +127,7 @@ void Player::kill() {
 }
 
 void Player::moveWithOrientation(const Position& limit, cardinalPoint orientation) {
-    auto [fst, snd] = playerMove.at(static_cast<uint8_t>(orientation));
+    auto [fst, snd] = playerMove.at(static_cast<std::uint8_t>(orientation));
     const std::size_t width = limit.x;
     const std::size_t height = limit.y;
 
@@ -196,9 +196,9 @@ int Player::level() const { return _level; }
 
 void Player::levelUp() { _level++; }
 
-constexpr bool hasEnoughResources(const command::InventoryArray& playerInv, const command::InventoryArray& required) {
-    for (std::size_t i = 0; i < playerInv.size(); ++i) {
-        if (playerInv.at(i) < required.at(i)) {
+constexpr bool hasEnoughResources(const command::InventoryArray& groundInv, const command::InventoryArray& required) {
+    for (std::size_t i = 0; i < groundInv.size(); ++i) {
+        if (groundInv.at(i) < required.at(i)) {
             return false;
         }
     }

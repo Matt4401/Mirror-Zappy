@@ -76,8 +76,8 @@ class World {
     bool isEggOnTile(const Position& position) const;
 
     const std::unordered_map<std::size_t, std::unique_ptr<Player>>& playerList() const;
-    void addItemOnGround(ItemType item, Position pos);
-    bool removeItemOnGround(ItemType item, Position pos);
+    void addItemOnGround(ItemType item, Position pos, std::size_t nbItem = 1);
+    bool removeItemOnGround(ItemType item, Position pos, std::size_t nbItem = 1);
 
     [[nodiscard]] int getNextExecutionTick() const;
     [[nodiscard]] std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> resourcesAt(Position pos) const;
