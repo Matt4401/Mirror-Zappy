@@ -17,12 +17,12 @@
 #include "events/EventDispatcher.hpp"
 #include "graphics/scene/Tile3D.hpp"
 #include "graphics/scene/WorldManager.hpp"
+#include "gui/src/game/ItemBag.hpp"
 #include "gui/src/game/Player.hpp"
 #include "protocol/Commands.hpp"
-#include "gui/src/game/ItemBag.hpp"
 
 namespace zappy::gui::graphics::scene {
-//NOLINTNEXTLINE(cppcoreguidelines-special-member-functions)
+namespace {
 class WorldManagerTest : public testing::Test {
   protected:
     void createPlayer(int id = 42, int x = 1, int y = 1, std::string teamName = "blue") {
@@ -262,4 +262,5 @@ TEST_F(WorldManagerTest, GlobalWorldStateTracksTimeWinnerAndServerMessage) {
     EXPECT_EQ(world.winningTeam(), std::optional<std::string>{"blue"});
     EXPECT_EQ(world.lastServerMessage(), "game over");
 }
+}  // namespace
 }  // namespace zappy::gui::graphics::scene
