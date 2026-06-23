@@ -57,3 +57,18 @@ class Trantorian:
                 return False
 
         return True
+
+    def get_missing_resources_for(self, target_level: int) -> dict:
+        missing = {}
+        if target_level not in ELEVATION_REQUIREMENTS:
+            return missing
+
+        requirements = ELEVATION_REQUIREMENTS[target_level]
+        for resource, required_amount in requirements.items():
+            if resource == "player":
+                continue
+            current_amount = self.player_state.inventory.get(resource, 0)
+            if current_amount < required_amount:
+                missing[resource] = required_amount - current_amount
+
+        return missing
