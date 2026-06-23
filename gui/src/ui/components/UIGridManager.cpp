@@ -368,6 +368,11 @@ void UIGridManager::autoLinkPanels() {
 
 void UIGridManager::setPosition(float /*x*/, float /*y*/) {}
 void UIGridManager::setSize(float /*width*/, float /*height*/) {}
+
+bool UIGridManager::isHovered() const {
+    return std::ranges::any_of(_panels,
+                               [](const auto& data) { return data.panel->isVisible() && data.panel->isHovered(); });
+}
 bool UIGridManager::isVisible() const { return _isVisible; }
 void UIGridManager::setVisible(bool visible) { _isVisible = visible; }
 

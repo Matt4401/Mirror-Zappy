@@ -43,10 +43,14 @@ class UIGridManager : public IUIComponent {
     void setSize(float width, float height) override;
     [[nodiscard]] bool isVisible() const override;
     void setVisible(bool visible) override;
+    [[nodiscard]] bool isHovered() const override;
 
     void addPanel(const std::shared_ptr<UIGamePanel>& panel, int gridX, int gridY, int gridW, int gridH);
     void setConfigMode(bool configMode);
     [[nodiscard]] bool isConfigMode() const { return _isConfigMode; }
+
+    static constexpr int GridCols = 64;
+    static constexpr int GridRows = 36;
 
   private:
     void updateLayout();
@@ -73,8 +77,6 @@ class UIGridManager : public IUIComponent {
     bool _isVisible{true};
     bool _isConfigMode{false};
 
-    static constexpr int GridCols = 64;
-    static constexpr int GridRows = 36;
     static constexpr float ResizeHandleSize = 15.0F;
 
     std::shared_ptr<UIGamePanel> _draggedPanel;
