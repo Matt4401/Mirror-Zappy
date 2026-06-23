@@ -14,8 +14,8 @@ class Vector3 {
   public:
     constexpr Vector3() = default;
     constexpr Vector3(int x, int y, int z)
-        : _vector{static_cast<float>(x), static_cast<float>(y), static_cast<float>(z)} {}
-    constexpr Vector3(float x, float y, float z) : _vector{x, y, z} {}
+        : _vector{.x = static_cast<float>(x), .y = static_cast<float>(y), .z = static_cast<float>(z)} {}
+    constexpr Vector3(float x, float y, float z) : _vector{.x = x, .y = y, .z = z} {}
     constexpr Vector3(::Vector3 vector) : _vector{vector} {}
 
     [[nodiscard]] constexpr float x() const { return _vector.x; }
@@ -72,7 +72,7 @@ class Vector3 {
         if (scalar != 0.0F) {
             _vector = Vector3Scale(_vector, 1.0F / scalar);
         } else {
-            _vector = ::Vector3{0.0F, 0.0F, 0.0F};
+            _vector = ::Vector3{.x = 0.0F, .y = 0.0F, .z = 0.0F};
         }
         return *this;
     }
