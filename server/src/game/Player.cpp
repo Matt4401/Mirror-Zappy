@@ -68,7 +68,14 @@ void Player::pushCommand(std::unique_ptr<command::ICommand> command) {
 
 void Player::update(World& world) {
     _lifeTick--;
-
+    if (_lifeTick <= 0) {
+        if (_inventory.at(static_cast<std::uint8_t>(ItemType::Food)) > 0) {
+            _lifeTick = kNbLifeTickFood;
+            _inventory.at(static_cast<std::uint8_t>(ItemType::Food))--;
+        } else {
+            world.removePlayer(_id);
+        }
+    }
     if (_isNewCommand) {
         _isNewCommand = false;
     } else if (_cmdTick > 0) {

@@ -16,6 +16,7 @@
 
 #include "Eject.hpp"
 #include "Inventory.hpp"
+#include "Look.hpp"
 #include "Set.hpp"
 #include "Take.hpp"
 #include "command/Fork.hpp"
@@ -27,6 +28,7 @@
 #include "guiCommand/IGuiCommand.hpp"
 #include "guiCommand/Mct.hpp"
 #include "guiCommand/Msz.hpp"
+#include "guiCommand/Pin.hpp"
 #include "guiCommand/Sbp.hpp"
 #include "guiCommand/Sgt.hpp"
 #include "guiCommand/Sst.hpp"
@@ -65,6 +67,7 @@ void CommandFactory::registerCommands() {
         return nullptr;
     });
     _creators.emplace("Fork", [](std::string_view) { return std::make_unique<Fork>(); });
+    _creators.emplace("Look", [](std::string_view) { return std::make_unique<Look>(); });
 }
 
 void CommandFactory::registerGuiCommands() {
@@ -85,6 +88,14 @@ void CommandFactory::registerGuiCommands() {
 
         if (const auto* sstParams = std::get_if<shared::protocol::client::Sst>(&parsedCmd)) {
             return std::make_unique<guiCommand::Sst>(sstParams->timeUnit);
+        }
+        return std::make_unique<guiCommand::Sbp>();
+    });
+    _guiCreators.emplace("pin", [](std::string_view rawCommand) -> std::unique_ptr<guiCommand::IGuiCommand> {
+        auto parsedCmd = shared::protocol::Parser::parseClientCommand(rawCommand);
+
+        if (const auto* pinParams = std::get_if<shared::protocol::client::Pin>(&parsedCmd)) {
+            return std::make_unique<guiCommand::Pin>(pinParams->playerId);
         }
         return std::make_unique<guiCommand::Sbp>();
     });
