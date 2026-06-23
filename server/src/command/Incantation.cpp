@@ -16,7 +16,7 @@ namespace zappy::server::command {
 
 Incantation::Incantation() : ACommand(kTimeLimit) {}
 
-bool start(game::World& world, game::Player& player) {
+bool Incantation::start(game::World& world, game::Player& player) {
     auto vecPlayerIds = world.playersWithSameLevelOnTile(player.position(), player.level());
 
     if (player.checkCondition(world.resourcesAt(player.position()), vecPlayerIds.size())) {
@@ -29,11 +29,16 @@ bool start(game::World& world, game::Player& player) {
 }
 
 void Incantation::execute(game::World& world, game::Player& player) {
-    auto vecPlayerIds = world.playersWithSameLevelOnTile(player.position(), player.level());
-    bool isSuccess;
+    const auto vecPlayerIds = world.playersWithSameLevelOnTile(player.position(), player.level());
+    bool isSuccess = false;
 
     if (player.checkCondition(world.resourcesAt(player.position()), vecPlayerIds.size())) {
         player.addResponse("ok\n");
+        auto [nbPlayer, resources] = getCondition().at(player.level());
+        for (int i = 0; i < static_cast<int>(game::ItemType::COUNT); ++i) {
+            player.subItem(static_cast<game::ItemType>(i), resources.at(i));
+        }
+        player.levelUp();
         isSuccess = true;
     } else {
         player.addResponse("ko\n");
