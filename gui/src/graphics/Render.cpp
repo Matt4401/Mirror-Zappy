@@ -15,22 +15,16 @@
 
 #include "AssetManager.hpp"
 #include "events/EventDispatcher.hpp"
-#include "protocol/Commands.hpp"
 #include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
 #include "scene/Tile3D.hpp"
+#include "scene/WorldManager.hpp"
 #include "ui/hud/GameHUD.hpp"
 
 namespace zappy::gui::graphics {
 Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher)
-    : _dispatcher(std::move(dispatcher)), _map(2, 2, _camera, _dispatcher) {
-    if (_dispatcher) {
-        _mszToken = _dispatcher->subscribe<shared::protocol::server::Msz>(
-            [this](const shared::protocol::server::Msz& cmd) { _map.resize(cmd.width, cmd.height); });
-        _sgtToken = _dispatcher->subscribe<shared::protocol::server::Sgt>(
-            [this](const shared::protocol::server::Sgt& cmd) { _serverFrequency = static_cast<float>(cmd.timeUnit); });
-    }
+    : _dispatcher(std::move(dispatcher)), _worldManager(_dispatcher), _map(_camera, _worldManager, _dispatcher) {
     _window.setTargetFPS(DefaultFps);
     raylib::rcore::Window::setExitKey(0);
 
@@ -52,14 +46,6 @@ Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher)
 }
 
 Render::~Render() {
-    if (_dispatcher) {
-        if (_mszToken != 0) {
-            _dispatcher->unsubscribe<shared::protocol::server::Msz>(_mszToken);
-        }
-        if (_sgtToken != 0) {
-            _dispatcher->unsubscribe<shared::protocol::server::Sgt>(_sgtToken);
-        }
-    }
     _gameHUD.reset();
     _uiManager.clear();
     AssetManager::getInstance().clear();
@@ -131,7 +117,7 @@ void Render::update() {
         _map.handleEvent(_event);
     }
 
-    _skybox.update(raylib::rcore::Window::frameTime(), _serverFrequency);
+    _skybox.update(raylib::rcore::Window::frameTime(), static_cast<float>(_worldManager.timeUnit()));
 }
 
 void Render::render2D() {}

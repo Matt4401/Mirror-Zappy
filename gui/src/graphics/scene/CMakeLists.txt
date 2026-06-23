@@ -2,6 +2,7 @@ add_library(zappy_gui_graphics_scene
         Map.cpp
         Skybox3D.cpp
         Tile3D.cpp
+        WorldManager.cpp
 )
 target_sources(zappy_gui_graphics_scene PUBLIC
         FILE_SET HEADERS
@@ -9,6 +10,7 @@ target_sources(zappy_gui_graphics_scene PUBLIC
         FILES Map.hpp
         Skybox3D.hpp
         Tile3D.hpp
+        WorldManager.hpp
 )
 target_include_directories(zappy_gui_graphics_scene PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}

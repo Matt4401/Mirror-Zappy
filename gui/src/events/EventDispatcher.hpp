@@ -35,9 +35,9 @@ class EventDispatcher {
      * @brief Subscribe to a specific command type with a callback function.
      */
     template <typename CommandType>
-    [[nodiscard]] EventToken subscribe(std::function<void(const CommandType&)> callback) {
+    [[nodiscard]] EventToken subscribe(const std::function<void(const CommandType&)>& callback) {
         auto type = std::type_index(typeid(CommandType));
-        EventToken token = ++_nextToken;
+        const EventToken token = _nextToken++;
 
         _listeners[type].emplace_back(token, std::make_any<std::function<void(const CommandType&)>>(callback));
         return token;

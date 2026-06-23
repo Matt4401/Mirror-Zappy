@@ -14,6 +14,7 @@
 #include <utility>
 
 #include "Tile3D.hpp"
+#include "WorldManager.hpp"
 #include "events/EventDispatcher.hpp"
 #include "events/GuiEvents.hpp"
 #include "game/Player.hpp"
@@ -21,13 +22,11 @@
 #include "game/components/IObject.hpp"
 #include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
-#include "rmath/Vector3.hpp"
 
 namespace zappy::gui::graphics::scene {
-Map::Map(int width, int height, std::shared_ptr<raylib::rcore::Camera> camera,
+Map::Map(std::shared_ptr<raylib::rcore::Camera> camera, std::reference_wrapper<WorldManager> worldManager,
          std::shared_ptr<events::EventDispatcher> dispatcher)
-    : _camera(std::move(camera)), _dispatcher(std::move(dispatcher)), _gameModel(_camera) {
-    resize(width, height);
+    : _camera(std::move(camera)), _dispatcher(std::move(dispatcher)), _worldManager(worldManager), _gameModel(_camera) {
     _itemDrawFunctions["Deraumere"] = [this](const game::IObject& object) { object.draw(_deraumereModel); };
     _itemDrawFunctions["Linemate"] = [this](const game::IObject& object) { object.draw(_linemateModel); };
     _itemDrawFunctions["Sibur"] = [this](const game::IObject& object) { object.draw(_siburModel); };
@@ -38,9 +37,7 @@ Map::Map(int width, int height, std::shared_ptr<raylib::rcore::Camera> camera,
 
     if (_dispatcher) {
         _nameToken = _dispatcher->subscribe<events::PlayerNameChanged>([this](const events::PlayerNameChanged& e) {
-            for (auto& team : _teams) {
-                team.updatePlayerName(e.playerId, e.newName);
-            }
+            _worldManager.get().updatePlayerName(e.playerId, e.newName);
         });
     }
 }
@@ -51,25 +48,8 @@ Map::~Map() {
     }
 }
 
-void Map::resize(int width, int height) {
-    _width = width;
-    _height = height;
-    _tiles.clear();
-    raylib::rmath::Vector3 position{0.0F, 0.0F, 0.0F};
-
-    for (int x = ((width / 2) * -1); x < width / 2; x += 1) {
-        for (int z = ((height / 2) * -1); z < height / 2; z += 1) {
-            position.setX(static_cast<float>(static_cast<float>(x) * Tile3D::TILE_SIZE));
-            position.setZ(static_cast<float>(static_cast<float>(z) * Tile3D::TILE_SIZE));
-            int const gridX = x + (width / 2);
-            int const gridY = z + (height / 2);
-            _tiles.emplace_back(gridX, gridY, position);
-        }
-    }
-}
-
 void Map::draw() const {
-    for (const auto& tile : _tiles) {
+    for (const auto& tile : _worldManager.get().tiles()) {
         if (_camera->isVisibleFromCamera(tile.position())) {
             tile.draw(_tileModel);
             if (tile.itemBag().hasItems()) {
@@ -77,7 +57,7 @@ void Map::draw() const {
             }
         }
     }
-    for (const auto& team : _teams) {
+    for (const auto& team : _worldManager.get().teams()) {
         team.draw(_gameModel);
     }
 }
@@ -100,7 +80,7 @@ void Map::handleEvent(const raylib::rcore::Event& /*event*/) {
     std::optional<SelectedPlayer> selected;
     float nearestDistance = std::numeric_limits<float>::max();
 
-    for (const auto& team : _teams) {
+    for (const auto& team : _worldManager.get().teams()) {
         for (const auto& player : team.players()) {
             if (!_camera->isVisibleFromCamera(player.position())) {
                 continue;
@@ -121,7 +101,7 @@ void Map::handleEvent(const raylib::rcore::Event& /*event*/) {
     const Tile3D* selectedTile = nullptr;
     nearestDistance = std::numeric_limits<float>::max();
 
-    for (const auto& tile : _tiles) {
+    for (const auto& tile : _worldManager.get().tiles()) {
         if (!_camera->isVisibleFromCamera(tile.position())) {
             continue;
         }

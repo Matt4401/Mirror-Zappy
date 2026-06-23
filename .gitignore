@@ -7,6 +7,7 @@
 /zappy_ai
 /zappy_gui
 /zappy_server
+/zappy_server_debug
 compile_flags.txt
 *.pdf
 test_binaries/
@@ -17,3 +18,4 @@ test_binaries/
 binary_ref/
 logs/
 *.log
+*.txt
