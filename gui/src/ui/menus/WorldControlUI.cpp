@@ -55,6 +55,7 @@ WorldControlUI::WorldControlUI(float x, float width, std::shared_ptr<events::Eve
     initEventSubscriptions();
 
     updateChildrenPositions();
+    setResizable(false);
 }
 
 void WorldControlUI::initSpeedControls() {
@@ -212,9 +213,11 @@ void WorldControlUI::update() {
         _currentHeight = targetHeight;
     }
 
-    auto const screenHeight = static_cast<float>(raylib::rcore::Window::screenHeight());
-    float const lockedY = screenHeight - (_currentHeight + FoldBtnHeight);
-    setPosition(getPosition().x(), lockedY);
+    if (!isDragged()) {
+        auto const screenHeight = static_cast<float>(raylib::rcore::Window::screenHeight());
+        float const lockedY = screenHeight - (_currentHeight + FoldBtnHeight);
+        setPosition(getPosition().x(), lockedY);
+    }
 
     if (_foldBtn) {
         _foldBtn->setText(_isFolded ? "^" : "v");

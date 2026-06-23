@@ -61,7 +61,13 @@ class UIGamePanel : public IUIComponent {
         }
     }
     [[nodiscard]] bool isConfigMode() const { return _isConfigMode; }
-    void setCustomLayout(bool customLayout) { _customLayout = customLayout; }
+    void setCustomLayout(bool custom) { _customLayout = custom; }
+    void setDragged(bool dragged) { _isDragged = dragged; }
+    [[nodiscard]] bool isDragged() const { return _isDragged; }
+
+    void setResizable(bool resizable) { _isResizable = resizable; }
+    [[nodiscard]] bool isResizable() const { return _isResizable; }
+
     void updateChildrenLayout();
 
     [[nodiscard]] bool isCollapsed() const { return _isCollapsed; }
@@ -102,7 +108,9 @@ class UIGamePanel : public IUIComponent {
 
     bool _isCollapsed{false};
     bool _isConfigMode{false};
-    bool _customLayout{false};
+    bool _customLayout = false;
+    bool _isDragged = false;
+    bool _isResizable = true;
     bool _wasVisibleBeforeConfig{true};
     float _expandedHeight;
     float _currentHeight;

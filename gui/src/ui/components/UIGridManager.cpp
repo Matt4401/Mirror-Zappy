@@ -146,7 +146,7 @@ void UIGridManager::handleMousePressed(const raylib::rmath::Vector2& mousePos, f
                                                     .width = ResizeHandleSize,
                                                     .height = ResizeHandleSize};
 
-        if (raylib::rshapes::Shapes::checkCollisionPointRec(mousePos, handleRec)) {
+        if (_panel.panel->isResizable() && raylib::rshapes::Shapes::checkCollisionPointRec(mousePos, handleRec)) {
             _resizedPanel = _panel.panel;
             for (auto& data : _panels) {
                 data.originalGrid = data.grid;
@@ -165,6 +165,7 @@ void UIGridManager::handleMousePressed(const raylib::rmath::Vector2& mousePos, f
 
         if (raylib::rshapes::Shapes::checkCollisionPointRec(mousePos, panelRec)) {
             _draggedPanel = it.panel;
+            _draggedPanel->setDragged(true);
             it.originalGrid = it.grid;
             _previewGrid = it.grid;
             _dragOffset = raylib::rmath::Vector2(mousePos.x() - pos.x(), mousePos.y() - pos.y());
@@ -183,6 +184,7 @@ void UIGridManager::handleMouseReleased() {
                 it->grid = it->originalGrid;
             }
         }
+        _draggedPanel->setDragged(false);
         _draggedPanel.reset();
     }
     if (_resizedPanel) {
@@ -329,7 +331,9 @@ void UIGridManager::drawResizeHandles() const {
                                                  .y = pos.y() + h - ResizeHandleSize,
                                                  .width = ResizeHandleSize,
                                                  .height = ResizeHandleSize};
-        raylib::rshapes::Shapes::drawRectangleRec(handleRec, raylib::Color(255, 0, 0, 204));
+        if (data.panel->isResizable()) {
+            raylib::rshapes::Shapes::drawRectangleRec(handleRec, raylib::Color(255, 0, 0, 204));
+        }
     }
 }
 
