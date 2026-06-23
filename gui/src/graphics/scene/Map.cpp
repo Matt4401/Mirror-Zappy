@@ -102,6 +102,9 @@ void Map::handleEvent(const raylib::rcore::Event& /*event*/) {
 
     for (const auto& team : _teams) {
         for (const auto& player : team.players()) {
+            if (!_camera->isVisibleFromCamera(player.position())) {
+                continue;
+            }
             const auto collision = ray.collision(player.boundingBox());
             if (collision.hit && collision.distance < nearestDistance) {
                 nearestDistance = collision.distance;
@@ -119,6 +122,9 @@ void Map::handleEvent(const raylib::rcore::Event& /*event*/) {
     nearestDistance = std::numeric_limits<float>::max();
 
     for (const auto& tile : _tiles) {
+        if (!_camera->isVisibleFromCamera(tile.position())) {
+            continue;
+        }
         const auto collision = ray.collision(tile.boundingBox());
         if (collision.hit && collision.distance < nearestDistance) {
             nearestDistance = collision.distance;
