@@ -26,7 +26,6 @@ static constexpr bool hasEnoughResources(const zappy::server::command::Inventory
         if (groundInv.at(i) < required.at(i)) {
             return false;
         }
-        ²
     }
     return true;
 }
