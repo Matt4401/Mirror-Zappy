@@ -54,6 +54,7 @@ void checkBroadcastMessage(const game::Position& receiverPos, const std::string&
 
     sender.setPosition(game::Position{.x = 5, .y = 5});
     receiver.setPosition(receiverPos);
+    receiver.setOrientation(game::cardinalPoint::NORTH);
 
     world.updatePositionOnMap(senderId, oldSenderPos, game::Position{.x = 5, .y = 5});
     world.updatePositionOnMap(receiverId, oldReceiverPos, receiverPos);
@@ -78,22 +79,21 @@ TEST(BroadcastTest, CheckRequiredTicks) {
     ASSERT_EQ(broadcast.requiredTicks(), 7);
 }
 
-TEST(BroadcastTest, ExecuteNorth) { checkBroadcastMessage({.x = 5, .y = 4}, "message 1, hello world\n"); }
+TEST(BroadcastTest, ExecuteNorth) { checkBroadcastMessage({.x = 5, .y = 4}, "message 5, hello world\n"); }
 
-TEST(BroadcastTest, ExecuteNorthWest) { checkBroadcastMessage({.x = 4, .y = 4}, "message 2, hello world\n"); }
+TEST(BroadcastTest, ExecuteNorthWest) { checkBroadcastMessage({.x = 4, .y = 4}, "message 6, hello world\n"); }
 
-TEST(BroadcastTest, ExecuteWest) { checkBroadcastMessage({.x = 4, .y = 5}, "message 3, hello world\n"); }
+TEST(BroadcastTest, ExecuteWest) { checkBroadcastMessage({.x = 4, .y = 5}, "message 7, hello world\n"); }
 
-TEST(BroadcastTest, ExecuteSouthWest) { checkBroadcastMessage({.x = 4, .y = 6}, "message 4, hello world\n"); }
+TEST(BroadcastTest, ExecuteSouthWest) { checkBroadcastMessage({.x = 4, .y = 6}, "message 8, hello world\n"); }
 
-TEST(BroadcastTest, ExecuteSouth) { checkBroadcastMessage({.x = 5, .y = 6}, "message 5, hello world\n"); }
+TEST(BroadcastTest, ExecuteSouth) { checkBroadcastMessage({.x = 5, .y = 6}, "message 1, hello world\n"); }
 
-TEST(BroadcastTest, ExecuteSouthEast) { checkBroadcastMessage({.x = 6, .y = 6}, "message 6, hello world\n"); }
+TEST(BroadcastTest, ExecuteSouthEast) { checkBroadcastMessage({.x = 6, .y = 6}, "message 2, hello world\n"); }
 
-TEST(BroadcastTest, ExecuteEast) { checkBroadcastMessage({.x = 6, .y = 5}, "message 7, hello world\n"); }
+TEST(BroadcastTest, ExecuteEast) { checkBroadcastMessage({.x = 6, .y = 5}, "message 3, hello world\n"); }
 
-TEST(BroadcastTest, ExecuteNorthEast) { checkBroadcastMessage({.x = 6, .y = 4}, "message 8, hello world\n"); }
+TEST(BroadcastTest, ExecuteNorthEast) { checkBroadcastMessage({.x = 6, .y = 4}, "message 4, hello world\n"); }
 
 TEST(BroadcastTest, ExecuteSame) { checkBroadcastMessage({.x = 5, .y = 5}, "message 0, hello world\n"); }
-
 }  // namespace zappy::server::command

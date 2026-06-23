@@ -16,7 +16,6 @@
 
 #include "ICommand.hpp"
 #include "guiCommand/IGuiCommand.hpp"
-#include "protocol/Commands.hpp"
 
 namespace zappy::server::command {
 
