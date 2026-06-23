@@ -13,8 +13,8 @@
 #include "rmodels/Model.hpp"
 
 namespace zappy::gui::graphics::scene {
-Tile3D::Tile3D(int gridX, int gridY, raylib::rmath::Vector3 position)
-    : _gridX{gridX}, _gridY{gridY}, _position{position} {}
+Tile3D::Tile3D(const Tile3DPosition gridPosition, raylib::rmath::Vector3 position)
+    : _gridPosition{gridPosition}, _position{position} {}
 
 void Tile3D::draw(const raylib::rmodels::Model& model) const {
     model.drawModel(_position, TILE_SCALE, raylib::Color::White());

@@ -46,10 +46,10 @@ class TileManager {
     [[nodiscard]] int width() const { return _width; }
     [[nodiscard]] int height() const { return _height; }
     [[nodiscard]] const std::vector<Tile3D>& tiles() const { return _tiles; }
-    [[nodiscard]] bool contains(int x, int y) const;
-    [[nodiscard]] raylib::rmath::Vector3 tilePosition(int x, int y) const;
-    [[nodiscard]] std::optional<std::reference_wrapper<const Tile3D>> tileAt(int x, int y) const;
-    [[nodiscard]] std::optional<std::reference_wrapper<Tile3D>> mutableTileAt(int x, int y);
+    [[nodiscard]] bool contains(Tile3DPosition position) const;
+    [[nodiscard]] raylib::rmath::Vector3 tilePosition(Tile3DPosition position) const;
+    [[nodiscard]] std::optional<std::reference_wrapper<const Tile3D>> tileAt(Tile3DPosition position) const;
+    [[nodiscard]] std::optional<std::reference_wrapper<Tile3D>> tileAt(Tile3DPosition position);
 
     void handleMapSize(const shared::protocol::server::Msz& command);
     void handleTileContent(const shared::protocol::server::Bct& command);

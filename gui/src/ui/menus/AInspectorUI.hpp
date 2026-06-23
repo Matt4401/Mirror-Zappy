@@ -23,8 +23,8 @@ namespace zappy::gui::ui::menus {
 
 class AInspectorUI : public components::UIGamePanel {
   public:
-    AInspectorUI(float x, float y, float width, const std::string& title,
-                 std::shared_ptr<events::EventDispatcher> dispatcher, const std::shared_ptr<raylib::rtext::Font>& font,
+    AInspectorUI(float x, float y, float width, const std::string& title, events::EventDispatcher& dispatcher,
+                 const std::shared_ptr<raylib::rtext::Font>& font,
                  std::function<void(const std::string&)> onSendCommand);
     ~AInspectorUI() override = 0;
 
@@ -44,7 +44,7 @@ class AInspectorUI : public components::UIGamePanel {
     void buildInventoryPanel();
     void drawInventoryPanel(float& currentY, float startX, float panelW);
 
-    [[nodiscard]] std::shared_ptr<events::EventDispatcher>& getDispatcher() { return _dispatcher; }
+    [[nodiscard]] events::EventDispatcher& getDispatcher() { return _dispatcher.get(); }
     [[nodiscard]] std::shared_ptr<raylib::rtext::Font>& getFont() { return _font; }
     [[nodiscard]] const std::function<void(const std::string&)>& getOnSendCommand() const { return _onSendCommand; }
     [[nodiscard]] std::vector<events::EventDispatcher::EventToken>& getEventTokens() { return _eventTokens; }
@@ -56,7 +56,7 @@ class AInspectorUI : public components::UIGamePanel {
     [[nodiscard]] float getServerFreq() const { return _serverFreq; }
 
   private:
-    std::shared_ptr<events::EventDispatcher> _dispatcher;
+    std::reference_wrapper<events::EventDispatcher> _dispatcher;
     std::shared_ptr<raylib::rtext::Font> _font;
     std::function<void(const std::string&)> _onSendCommand;
     std::vector<events::EventDispatcher::EventToken> _eventTokens;

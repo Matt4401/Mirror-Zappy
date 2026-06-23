@@ -8,8 +8,6 @@
 #include "WorldManager.hpp"
 
 #include <functional>
-#include <memory>
-#include <utility>
 
 #include "PlayerManager.hpp"
 #include "TileManager.hpp"
@@ -17,10 +15,7 @@
 #include "protocol/Commands.hpp"
 
 namespace zappy::gui::graphics::scene {
-WorldManager::WorldManager(std::shared_ptr<events::EventDispatcher> dispatcher) : _dispatcher(std::move(dispatcher)) {
-    if (!_dispatcher) {
-        return;
-    }
+WorldManager::WorldManager(events::EventDispatcher& dispatcher) : _dispatcher(dispatcher) {
     initMapSubscriptions();
     initPlayerSubscriptions();
     initResourceSubscriptions();

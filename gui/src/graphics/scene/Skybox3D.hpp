@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <memory>
+#include <functional>
 #include <optional>
 
 #include "Color.hpp"
@@ -31,7 +31,7 @@ class Skybox3D {
     static constexpr float EVENING_START = 0.72F;
     static constexpr float NIGHT_START = 0.88F;
 
-    explicit Skybox3D(std::shared_ptr<events::EventDispatcher> dispatcher = nullptr);
+    explicit Skybox3D(events::EventDispatcher& dispatcher);
     ~Skybox3D();
     Skybox3D(const Skybox3D& other) = delete;
     Skybox3D& operator=(const Skybox3D& other) = delete;
@@ -52,7 +52,7 @@ class Skybox3D {
     std::optional<raylib::rtextures::Texture2D> _cubemap;
     float _dayProgress{0.25F};
 
-    std::shared_ptr<events::EventDispatcher> _dispatcher;
+    std::reference_wrapper<events::EventDispatcher> _dispatcher;
     events::EventDispatcher::EventToken _timeToken{0};
     events::TimeMode _timeMode{events::TimeMode::CYCLE};
 };

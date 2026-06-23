@@ -65,13 +65,13 @@ class PlayerManager {
     void handleEggDropAnimation(const shared::protocol::server::Pfk& command) {}    // TODO
 
   private:
-    [[nodiscard]] std::optional<std::reference_wrapper<game::Player>> mutablePlayerById(int id);
+    [[nodiscard]] std::optional<std::reference_wrapper<game::Player>> playerById(int id);
     [[nodiscard]] std::optional<std::reference_wrapper<game::Team>> teamForPlayer(int playerId);
     [[nodiscard]] game::Team& ensureTeamExist(const std::string& name);
     [[nodiscard]] raylib::Color nextTeamColor() const;
     [[nodiscard]] static game::Player::cardinalPoint orientationFromProtocol(int orientation);
 
-    void updatePlayerPosition(game::Player& player, int x, int y) const;
+    void updatePlayerPosition(game::Player& player, Tile3DPosition tilePosition) const;
     void removeEgg(int eggId);
 
     TileManager& _tileManager;

@@ -8,7 +8,6 @@
 #pragma once
 
 #include <functional>
-#include <memory>
 #include <optional>
 #include <string>
 #include <vector>
@@ -24,7 +23,7 @@
 namespace zappy::gui::graphics::scene {
 class WorldManager {
   public:
-    explicit WorldManager(std::shared_ptr<events::EventDispatcher> dispatcher);
+    explicit WorldManager(events::EventDispatcher& dispatcher);
     ~WorldManager();
     WorldManager(const WorldManager& other) = delete;
     WorldManager& operator=(const WorldManager& other) = delete;
@@ -36,13 +35,13 @@ class WorldManager {
     [[nodiscard]] const std::vector<Tile3D>& tiles() const { return _tileManager.tiles(); }
     [[nodiscard]] const std::vector<game::Team>& teams() const { return _playerManager.teams(); }
     [[nodiscard]] int timeUnit() const { return _timeUnit; }
-    [[nodiscard]] const std::optional<std::string>& winningTeam() const { return _winningTeam; }
+    [[nodiscard]] const std::string& winningTeam() const { return _winningTeam; }
     [[nodiscard]] const std::string& lastServerMessage() const { return _lastServerMessage; }
     [[nodiscard]] const std::vector<Incantation>& activeIncantations() const {
         return _playerManager.activeIncantations();
     }
-    [[nodiscard]] std::optional<std::reference_wrapper<const Tile3D>> tileAt(int x, int y) const {
-        return _tileManager.tileAt(x, y);
+    [[nodiscard]] std::optional<std::reference_wrapper<const Tile3D>> tileAt(Tile3DPosition position) const {
+        return _tileManager.tileAt(position);
     }
     [[nodiscard]] std::optional<std::reference_wrapper<const game::Player>> playerById(int id) const {
         return _playerManager.playerById(id);
@@ -70,16 +69,16 @@ class WorldManager {
 
     template <typename EventType>
     void subscribe(const std::function<void(const EventType&)>& callback) {
-        const auto token = _dispatcher->subscribe<EventType>(callback);
-        _unsubscribers.emplace_back([this, token]() { _dispatcher->unsubscribe<EventType>(token); });
+        const auto token = _dispatcher.get().subscribe<EventType>(callback);
+        _unsubscribers.emplace_back([this, token]() { _dispatcher.get().unsubscribe<EventType>(token); });
     }
 
-    std::shared_ptr<events::EventDispatcher> _dispatcher;
+    std::reference_wrapper<events::EventDispatcher> _dispatcher;
     std::vector<std::function<void()>> _unsubscribers;
     TileManager _tileManager;
     PlayerManager _playerManager{_tileManager};
     int _timeUnit{100};
-    std::optional<std::string> _winningTeam;
+    std::string _winningTeam;
     std::string _lastServerMessage;
 };
 }  // namespace zappy::gui::graphics::scene

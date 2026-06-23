@@ -10,9 +10,9 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
-#include <utility>
 
 #include "ItemBag.hpp"
+#include "graphics/scene/Tile3D.hpp"
 #include "rcore/BoundingBox.hpp"
 #include "rmath/Vector3.hpp"
 
@@ -21,8 +21,7 @@ class Player {
   public:
     enum class cardinalPoint : std::uint8_t { NORTH = 1, EAST = 2, SOUTH = 3, WEST = 4 };
 
-    Player(int id, raylib::rmath::Vector3 position, std::string name, cardinalPoint orientation, std::size_t level = 1)
-        : _id(id), _position(position), _name(std::move(name)), _orientation(orientation), _level(level) {}
+    Player(int id, raylib::rmath::Vector3 position, std::string name, cardinalPoint orientation, std::size_t level = 1);
     ~Player() = default;
     Player(const Player& other) = delete;
     Player& operator=(const Player& other) = delete;
@@ -35,15 +34,11 @@ class Player {
     void setName(const std::string& name) { _name = name; }
     [[nodiscard]] cardinalPoint orientation() const { return _orientation; }
     [[nodiscard]] std::size_t level() const { return _level; }
-    [[nodiscard]] int tileX() const { return _tileX; }
-    [[nodiscard]] int tileY() const { return _tileY; }
+    [[nodiscard]] graphics::scene::Tile3DPosition tilePosition() const { return _tilePosition; }
     [[nodiscard]] const game::ItemBag& itemBag() const { return _itemBag; }
     [[nodiscard]] game::ItemBag& itemBag() { return _itemBag; }
     void setPosition(const raylib::rmath::Vector3& position) { _position = position; }
-    void setTilePosition(int x, int y) {
-        _tileX = x;
-        _tileY = y;
-    }
+    void setTilePosition(graphics::scene::Tile3DPosition tilePosition);
     void setOrientation(cardinalPoint orientation) { _orientation = orientation; }
     void setLevel(std::size_t level) { _level = level; }
     void setTextureId(const std::string& textureId) { _textureId = textureId; }
@@ -60,7 +55,6 @@ class Player {
     std::size_t _level{1};
     std::size_t _life{10};
     std::string _textureId;
-    int _tileX{0};
-    int _tileY{0};
+    graphics::scene::Tile3DPosition _tilePosition;
 };
 }  // namespace zappy::gui::game

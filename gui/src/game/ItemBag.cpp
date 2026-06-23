@@ -7,6 +7,7 @@
 
 #include "ItemBag.hpp"
 
+#include <algorithm>
 #include <cstddef>
 #include <memory>
 #include <string_view>
@@ -46,16 +47,14 @@ std::size_t ItemBag::quantity(const std::string_view name) const {
 }
 
 void ItemBag::removeItem(const std::string_view name, const std::size_t quantity) {
-    for (auto it = _items.begin(); it != _items.end(); ++it) {
-        if (it->object->name() != name) {
-            continue;
-        }
-        if (it->quantity > quantity) {
-            it->quantity -= quantity;
+    auto item = std::ranges::find_if(_items, [name](const Item& item) { return item.object->name() == name; });
+
+    if (item != _items.end()) {
+        if (item->quantity <= quantity) {
+            _items.erase(item);
         } else {
-            _items.erase(it);
+            item->quantity -= quantity;
         }
-        return;
     }
 }
 }  // namespace zappy::gui::game

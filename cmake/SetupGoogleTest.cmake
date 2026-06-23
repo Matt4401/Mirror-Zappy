@@ -4,7 +4,7 @@ include(InternetCheck)
 check_internet_connection()
 
 macro(setup_googletest)
-    if (INTERNET_AVAILABLE)
+    if (INTERNET_AVAILABLE OR EXISTS "${CMAKE_BINARY_DIR}/_deps/googletest-src/CMakeLists.txt")
         FetchContent_Declare(
                 googletest
                 GIT_REPOSITORY https://github.com/google/googletest.git

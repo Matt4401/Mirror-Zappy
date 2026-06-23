@@ -31,13 +31,14 @@ void TileManager::handleMapSize(const shared::protocol::server::Msz& command) {
 
     for (int y = 0; y < _height; ++y) {
         for (int x = 0; x < _width; ++x) {
-            _tiles.emplace_back(x, y, tilePosition(x, y));
+            const Tile3DPosition position{.x = x, .y = y};
+            _tiles.emplace_back(position, tilePosition(position));
         }
     }
 }
 
 void TileManager::handleTileContent(const shared::protocol::server::Bct& command) {
-    const auto tile = mutableTileAt(command.x, command.y);
+    const auto tile = tileAt({.x = command.x, .y = command.y});
     if (!tile.has_value()) {
         return;
     }
@@ -48,28 +49,32 @@ void TileManager::handleTileContent(const shared::protocol::server::Bct& command
                       command.phiras, command.thystame});
 }
 
-bool TileManager::contains(const int x, const int y) const { return x >= 0 && y >= 0 && x < _width && y < _height; }
-
-raylib::rmath::Vector3 TileManager::tilePosition(const int x, const int y) const {
-    const float offsetX = static_cast<float>(_width - 1) * Tile3D::TILE_SIZE * 0.5F;
-    const float offsetZ = static_cast<float>(_height - 1) * Tile3D::TILE_SIZE * 0.5F;
-    return {(static_cast<float>(x) * Tile3D::TILE_SIZE) - offsetX, 0.0F,
-            (static_cast<float>(y) * Tile3D::TILE_SIZE) - offsetZ};
+bool TileManager::contains(const Tile3DPosition position) const {
+    return position.x >= 0 && position.y >= 0 && position.x < _width && position.y < _height;
 }
 
-std::optional<std::reference_wrapper<const Tile3D>> TileManager::tileAt(const int x, const int y) const {
-    if (!contains(x, y)) {
+raylib::rmath::Vector3 TileManager::tilePosition(const Tile3DPosition position) const {
+    const float offsetX = static_cast<float>(_width - 1) * Tile3D::TILE_SIZE * 0.5F;
+    const float offsetZ = static_cast<float>(_height - 1) * Tile3D::TILE_SIZE * 0.5F;
+    return {(static_cast<float>(position.x) * Tile3D::TILE_SIZE) - offsetX, 0.0F,
+            (static_cast<float>(position.y) * Tile3D::TILE_SIZE) - offsetZ};
+}
+
+std::optional<std::reference_wrapper<const Tile3D>> TileManager::tileAt(const Tile3DPosition position) const {
+    if (!contains(position)) {
         return std::nullopt;
     }
-    const auto index = (static_cast<std::size_t>(y) * static_cast<std::size_t>(_width)) + static_cast<std::size_t>(x);
+    const auto index = (static_cast<std::size_t>(position.y) * static_cast<std::size_t>(_width)) +
+                       static_cast<std::size_t>(position.x);
     return std::cref(_tiles.at(index));
 }
 
-std::optional<std::reference_wrapper<Tile3D>> TileManager::mutableTileAt(const int x, const int y) {
-    if (!contains(x, y)) {
+std::optional<std::reference_wrapper<Tile3D>> TileManager::tileAt(const Tile3DPosition position) {
+    if (!contains(position)) {
         return std::nullopt;
     }
-    const auto index = (static_cast<std::size_t>(y) * static_cast<std::size_t>(_width)) + static_cast<std::size_t>(x);
+    const auto index = (static_cast<std::size_t>(position.y) * static_cast<std::size_t>(_width)) +
+                       static_cast<std::size_t>(position.x);
     return std::ref(_tiles.at(index));
 }
 
@@ -89,7 +94,7 @@ std::unique_ptr<game::IObject> TileManager::makeResource(const int resourceId,
 }
 
 void TileManager::replaceResources(game::ItemBag& bag, const raylib::rmath::Vector3& position,
-                                   const std::array<int, 7>& quantities) const {
+                                   const std::array<int, ResourceCount>& quantities) const {
     bag.clear();
     for (std::size_t resourceId = 0; resourceId < quantities.size(); ++resourceId) {
         if (quantities.at(resourceId) > 0) {

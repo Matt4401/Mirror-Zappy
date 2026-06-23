@@ -27,27 +27,29 @@ void PlayerManager::handleTeamName(const shared::protocol::server::Tna& command)
 }
 
 void PlayerManager::handlePlayerConnected(const shared::protocol::server::Pnw& command) {
-    if (!_tileManager.contains(command.x, command.y) || command.orientation < 1 || command.orientation > 4) {
+    const Tile3DPosition tilePosition{.x = command.x, .y = command.y};
+    if (!_tileManager.contains(tilePosition) || command.orientation < 1 || command.orientation > 4) {
         return;
     }
 
-    auto position = _tileManager.tilePosition(command.x, command.y);
+    auto position = _tileManager.tilePosition(tilePosition);
     position.setY(Tile3D::TILE_SIZE * DefaultPlayerOffsetY);
     auto& player = ensureTeamExist(command.teamName)
                        .addPlayer(command.playerId, position, orientationFromProtocol(command.orientation),
                                   static_cast<std::size_t>(std::max(command.level, 1)));
     player.setPosition(position);
-    player.setTilePosition(command.x, command.y);
+    player.setTilePosition(tilePosition);
     player.setOrientation(orientationFromProtocol(command.orientation));
     player.setLevel(static_cast<std::size_t>(std::max(command.level, 1)));
 }
 
 void PlayerManager::handlePlayerPosition(const shared::protocol::server::Ppo& command) {
-    if (!_tileManager.contains(command.x, command.y) || command.orientation < 1 || command.orientation > 4) {
+    const Tile3DPosition tilePosition{.x = command.x, .y = command.y};
+    if (!_tileManager.contains(tilePosition) || command.orientation < 1 || command.orientation > 4) {
         return;
     }
-    if (const auto player = mutablePlayerById(command.playerId); player.has_value()) {
-        updatePlayerPosition(player->get(), command.x, command.y);
+    if (const auto player = playerById(command.playerId); player.has_value()) {
+        updatePlayerPosition(player->get(), tilePosition);
         player->get().setOrientation(orientationFromProtocol(command.orientation));
     }
 }
@@ -56,27 +58,28 @@ void PlayerManager::handlePlayerLevel(const shared::protocol::server::Plv& comma
     if (command.level < 1) {
         return;
     }
-    if (const auto player = mutablePlayerById(command.playerId); player.has_value()) {
+    if (const auto player = playerById(command.playerId); player.has_value()) {
         player->get().setLevel(static_cast<std::size_t>(command.level));
     }
 }
 
 void PlayerManager::handlePlayerInventory(const shared::protocol::server::Pin& command) {
-    if (!_tileManager.contains(command.x, command.y)) {
+    const Tile3DPosition tilePosition{.x = command.x, .y = command.y};
+    if (!_tileManager.contains(tilePosition)) {
         return;
     }
-    const auto player = mutablePlayerById(command.playerId);
+    const auto player = playerById(command.playerId);
     if (!player.has_value()) {
         return;
     }
-    updatePlayerPosition(player->get(), command.x, command.y);
+    updatePlayerPosition(player->get(), tilePosition);
     _tileManager.replaceResources(player->get().itemBag(), player->get().position(),
                                   {command.food, command.linemate, command.deraumere, command.sibur, command.mendiane,
                                    command.phiras, command.thystame});
 }
 
 void PlayerManager::handleIncantationStart(const shared::protocol::server::Pic& command) {
-    if (!_tileManager.contains(command.x, command.y) || command.level < 1 || command.playerIds.empty()) {
+    if (!_tileManager.contains({.x = command.x, .y = command.y}) || command.level < 1 || command.playerIds.empty()) {
         return;
     }
     const auto incantation = std::ranges::find_if(_activeIncantations, [&command](const Incantation& active) {
@@ -104,7 +107,7 @@ void PlayerManager::handleIncantationEnd(const shared::protocol::server::Pie& co
     }
     if (command.incantationResult != 0) {
         for (const int playerId : incantation->playerIds) {
-            if (const auto player = mutablePlayerById(playerId); player.has_value()) {
+            if (const auto player = playerById(playerId); player.has_value()) {
                 const auto nextLevel = static_cast<std::size_t>(incantation->level) + 1U;
                 player->get().setLevel(std::max(player->get().level(), nextLevel));
             }
@@ -114,11 +117,11 @@ void PlayerManager::handleIncantationEnd(const shared::protocol::server::Pie& co
 }
 
 void PlayerManager::handleResourceDropped(const shared::protocol::server::Pdr& command) {
-    const auto player = mutablePlayerById(command.playerId);
+    const auto player = playerById(command.playerId);
     if (!player.has_value()) {
         return;
     }
-    const auto tile = _tileManager.mutableTileAt(player->get().tileX(), player->get().tileY());
+    const auto tile = _tileManager.tileAt(player->get().tilePosition());
     if (!tile.has_value()) {
         return;
     }
@@ -127,11 +130,11 @@ void PlayerManager::handleResourceDropped(const shared::protocol::server::Pdr& c
 }
 
 void PlayerManager::handleResourceCollected(const shared::protocol::server::Pgt& command) {
-    const auto player = mutablePlayerById(command.playerId);
+    const auto player = playerById(command.playerId);
     if (!player.has_value()) {
         return;
     }
-    const auto tile = _tileManager.mutableTileAt(player->get().tileX(), player->get().tileY());
+    const auto tile = _tileManager.tileAt(player->get().tilePosition());
     if (!tile.has_value()) {
         return;
     }
@@ -146,14 +149,15 @@ void PlayerManager::handlePlayerDeath(const shared::protocol::server::Pdi& comma
 }
 
 void PlayerManager::handleEggLaid(const shared::protocol::server::Enw& command) {
-    if (!_tileManager.contains(command.x, command.y)) {
+    const Tile3DPosition tilePosition{.x = command.x, .y = command.y};
+    if (!_tileManager.contains(tilePosition)) {
         return;
     }
     const auto team = teamForPlayer(command.playerId);
     if (!team.has_value()) {
         return;
     }
-    auto position = _tileManager.tilePosition(command.x, command.y);
+    auto position = _tileManager.tilePosition(tilePosition);
     position.setY(Tile3D::TILE_SIZE);
     team->get().addEgg(command.eggId, command.playerId, position);
 }
@@ -172,12 +176,12 @@ std::optional<std::reference_wrapper<const game::Player>> PlayerManager::playerB
 }
 
 void PlayerManager::updatePlayerName(const int id, const std::string& name) {
-    if (const auto player = mutablePlayerById(id); player.has_value()) {
+    if (const auto player = playerById(id); player.has_value()) {
         player->get().setName(name);
     }
 }
 
-std::optional<std::reference_wrapper<game::Player>> PlayerManager::mutablePlayerById(const int id) {
+std::optional<std::reference_wrapper<game::Player>> PlayerManager::playerById(const int id) {
     for (auto& team : _teams) {
         if (const auto player = team.findPlayer(id); player.has_value()) {
             return player;
@@ -195,11 +199,11 @@ std::optional<std::reference_wrapper<game::Team>> PlayerManager::teamForPlayer(c
     return std::nullopt;
 }
 
-void PlayerManager::updatePlayerPosition(game::Player& player, const int x, const int y) const {
-    auto position = _tileManager.tilePosition(x, y);
+void PlayerManager::updatePlayerPosition(game::Player& player, const Tile3DPosition tilePosition) const {
+    auto position = _tileManager.tilePosition(tilePosition);
     position.setY(Tile3D::TILE_SIZE * DefaultPlayerOffsetY);
     player.setPosition(position);
-    player.setTilePosition(x, y);
+    player.setTilePosition(tilePosition);
 }
 
 game::Team& PlayerManager::ensureTeamExist(const std::string& name) {

@@ -26,9 +26,9 @@ namespace {
 class WorldManagerTest : public testing::Test {
   protected:
     void createPlayer(int id = 42, int x = 1, int y = 1, std::string teamName = "blue") {
-        dispatcher->dispatch(shared::protocol::server::Msz{.width = 4, .height = 4});
-        dispatcher->dispatch(shared::protocol::server::Tna{.teamName = teamName});
-        dispatcher->dispatch(shared::protocol::server::Pnw{
+        dispatcher.dispatch(shared::protocol::server::Msz{.width = 4, .height = 4});
+        dispatcher.dispatch(shared::protocol::server::Tna{.teamName = teamName});
+        dispatcher.dispatch(shared::protocol::server::Pnw{
             .playerId = id,
             .x = x,
             .y = y,
@@ -47,36 +47,33 @@ class WorldManagerTest : public testing::Test {
     }
 
     [[nodiscard]] const Tile3D& requireTile(int x, int y) const {
-        const auto tile = world.tileAt(x, y);
+        const auto tile = world.tileAt({.x = x, .y = y});
         if (!tile.has_value()) {
             throw std::logic_error("expected tile is missing");
         }
         return tile->get();
     }
 
-    std::shared_ptr<events::EventDispatcher>
-        dispatcher =  // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes,
-                      // misc-non-private-member-variables-in-classes)
-        std::make_shared<events::EventDispatcher>();
-    WorldManager world{dispatcher};  // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes,
-                                     // misc-non-private-member-variables-in-classes)
+    events::EventDispatcher dispatcher;  // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes,
+                                         // misc-non-private-member-variables-in-classes)
+    WorldManager world{dispatcher};      // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes,
+                                         // misc-non-private-member-variables-in-classes)
 };
 
 TEST_F(WorldManagerTest, MszBuildsTheMap) {
-    dispatcher->dispatch(shared::protocol::server::Msz{.width = 3, .height = 2});
+    dispatcher.dispatch(shared::protocol::server::Msz{.width = 3, .height = 2});
 
     EXPECT_EQ(world.width(), 3);
     EXPECT_EQ(world.height(), 2);
     EXPECT_EQ(world.tiles().size(), 6);
-    EXPECT_TRUE(world.tileAt(2, 1).has_value());
-    EXPECT_FALSE(world.tileAt(3, 1).has_value());
-    EXPECT_EQ(requireTile(2, 1).gridX(), 2);
-    EXPECT_EQ(requireTile(2, 1).gridY(), 1);
+    EXPECT_TRUE(world.tileAt({.x = 2, .y = 1}).has_value());
+    EXPECT_FALSE(world.tileAt({.x = 3, .y = 1}).has_value());
+    EXPECT_EQ(requireTile(2, 1).gridPosition(), (Tile3DPosition{.x = 2, .y = 1}));
 }
 
 TEST_F(WorldManagerTest, BctReplacesTileResources) {
-    dispatcher->dispatch(shared::protocol::server::Msz{.width = 2, .height = 2});
-    dispatcher->dispatch(shared::protocol::server::Bct{
+    dispatcher.dispatch(shared::protocol::server::Msz{.width = 2, .height = 2});
+    dispatcher.dispatch(shared::protocol::server::Bct{
         .x = 1,
         .y = 0,
         .food = 4,
@@ -98,17 +95,17 @@ TEST_F(WorldManagerTest, BctReplacesTileResources) {
 }
 
 TEST_F(WorldManagerTest, TnaAddsEachTeamOnlyOnce) {
-    dispatcher->dispatch(shared::protocol::server::Tna{.teamName = "red"});
-    dispatcher->dispatch(shared::protocol::server::Tna{.teamName = "red"});
+    dispatcher.dispatch(shared::protocol::server::Tna{.teamName = "red"});
+    dispatcher.dispatch(shared::protocol::server::Tna{.teamName = "red"});
 
     ASSERT_EQ(world.teams().size(), 1);
     EXPECT_EQ(world.teams().front().name(), "red");
 }
 
 TEST_F(WorldManagerTest, PnwAddsAPlayerToItsTeam) {
-    dispatcher->dispatch(shared::protocol::server::Msz{.width = 4, .height = 4});
-    dispatcher->dispatch(shared::protocol::server::Tna{.teamName = "blue"});
-    dispatcher->dispatch(shared::protocol::server::Pnw{
+    dispatcher.dispatch(shared::protocol::server::Msz{.width = 4, .height = 4});
+    dispatcher.dispatch(shared::protocol::server::Tna{.teamName = "blue"});
+    dispatcher.dispatch(shared::protocol::server::Pnw{
         .playerId = 42,
         .x = 2,
         .y = 1,
@@ -128,11 +125,10 @@ TEST_F(WorldManagerTest, PnwAddsAPlayerToItsTeam) {
 TEST_F(WorldManagerTest, PpoUpdatesPlayerPositionAndOrientation) {
     createPlayer();
 
-    dispatcher->dispatch(shared::protocol::server::Ppo{.playerId = 42, .x = 3, .y = 2, .orientation = 4});
+    dispatcher.dispatch(shared::protocol::server::Ppo{.playerId = 42, .x = 3, .y = 2, .orientation = 4});
 
     const auto& player = requirePlayer(42);
-    EXPECT_EQ(player.tileX(), 3);
-    EXPECT_EQ(player.tileY(), 2);
+    EXPECT_EQ(player.tilePosition(), (Tile3DPosition{.x = 3, .y = 2}));
     EXPECT_EQ(player.orientation(), game::Player::cardinalPoint::WEST);
 }
 
@@ -147,7 +143,7 @@ TEST_F(WorldManagerTest, PlayerNameCanBeUpdatedByGuiEvent) {
 TEST_F(WorldManagerTest, PlvUpdatesPlayerLevel) {
     createPlayer();
 
-    dispatcher->dispatch(shared::protocol::server::Plv{.playerId = 42, .level = 6});
+    dispatcher.dispatch(shared::protocol::server::Plv{.playerId = 42, .level = 6});
 
     EXPECT_EQ(requirePlayer(42).level(), 6);
 }
@@ -155,7 +151,7 @@ TEST_F(WorldManagerTest, PlvUpdatesPlayerLevel) {
 TEST_F(WorldManagerTest, PinReplacesPlayerInventoryAndSynchronizesPosition) {
     createPlayer();
 
-    dispatcher->dispatch(shared::protocol::server::Pin{
+    dispatcher.dispatch(shared::protocol::server::Pin{
         .playerId = 42,
         .x = 2,
         .y = 3,
@@ -169,8 +165,7 @@ TEST_F(WorldManagerTest, PinReplacesPlayerInventoryAndSynchronizesPosition) {
     });
 
     const auto& player = requirePlayer(42);
-    EXPECT_EQ(player.tileX(), 2);
-    EXPECT_EQ(player.tileY(), 3);
+    EXPECT_EQ(player.tilePosition(), (Tile3DPosition{.x = 2, .y = 3}));
     EXPECT_EQ(player.itemBag().quantity("Food"), 8);
     EXPECT_EQ(player.itemBag().quantity("Linemate"), 1);
     EXPECT_EQ(player.itemBag().quantity("Sibur"), 2);
@@ -180,7 +175,7 @@ TEST_F(WorldManagerTest, PicAndPieTrackIncantationAndUpgradeParticipantsOnSucces
     createPlayer(42, 1, 1);
     createPlayer(43, 1, 1);
 
-    dispatcher->dispatch(shared::protocol::server::Pic{
+    dispatcher.dispatch(shared::protocol::server::Pic{
         .x = 1,
         .y = 1,
         .level = 1,
@@ -190,7 +185,7 @@ TEST_F(WorldManagerTest, PicAndPieTrackIncantationAndUpgradeParticipantsOnSucces
     ASSERT_EQ(world.activeIncantations().size(), 1);
     EXPECT_EQ(world.activeIncantations().front().playerIds.size(), 2);
 
-    dispatcher->dispatch(shared::protocol::server::Pie{.x = 1, .y = 1, .incantationResult = 1});
+    dispatcher.dispatch(shared::protocol::server::Pie{.x = 1, .y = 1, .incantationResult = 1});
 
     EXPECT_TRUE(world.activeIncantations().empty());
     EXPECT_EQ(requirePlayer(42).level(), 2);
@@ -199,9 +194,9 @@ TEST_F(WorldManagerTest, PicAndPieTrackIncantationAndUpgradeParticipantsOnSucces
 
 TEST_F(WorldManagerTest, FailedPieClearsIncantationWithoutChangingLevel) {
     createPlayer();
-    dispatcher->dispatch(shared::protocol::server::Pic{.x = 1, .y = 1, .level = 1, .playerIds = {42}});
+    dispatcher.dispatch(shared::protocol::server::Pic{.x = 1, .y = 1, .level = 1, .playerIds = {42}});
 
-    dispatcher->dispatch(shared::protocol::server::Pie{.x = 1, .y = 1, .incantationResult = 0});
+    dispatcher.dispatch(shared::protocol::server::Pie{.x = 1, .y = 1, .incantationResult = 0});
 
     EXPECT_TRUE(world.activeIncantations().empty());
     EXPECT_EQ(requirePlayer(42).level(), 1);
@@ -209,15 +204,15 @@ TEST_F(WorldManagerTest, FailedPieClearsIncantationWithoutChangingLevel) {
 
 TEST_F(WorldManagerTest, PgtAndPdrTransferResourcesBetweenTileAndPlayer) {
     createPlayer();
-    dispatcher->dispatch(shared::protocol::server::Bct{.x = 1, .y = 1, .food = 2});
-    dispatcher->dispatch(shared::protocol::server::Pin{.playerId = 42, .x = 1, .y = 1, .food = 1});
+    dispatcher.dispatch(shared::protocol::server::Bct{.x = 1, .y = 1, .food = 2});
+    dispatcher.dispatch(shared::protocol::server::Pin{.playerId = 42, .x = 1, .y = 1, .food = 1});
 
-    dispatcher->dispatch(shared::protocol::server::Pgt{.playerId = 42, .resourceId = 0});
+    dispatcher.dispatch(shared::protocol::server::Pgt{.playerId = 42, .resourceId = 0});
 
     EXPECT_EQ(requirePlayer(42).itemBag().quantity("Food"), 2);
     EXPECT_EQ(requireTile(1, 1).itemBag().quantity("Food"), 1);
 
-    dispatcher->dispatch(shared::protocol::server::Pdr{.playerId = 42, .resourceId = 0});
+    dispatcher.dispatch(shared::protocol::server::Pdr{.playerId = 42, .resourceId = 0});
 
     EXPECT_EQ(requirePlayer(42).itemBag().quantity("Food"), 1);
     EXPECT_EQ(requireTile(1, 1).itemBag().quantity("Food"), 2);
@@ -226,7 +221,7 @@ TEST_F(WorldManagerTest, PgtAndPdrTransferResourcesBetweenTileAndPlayer) {
 TEST_F(WorldManagerTest, PdiRemovesPlayerFromWorld) {
     createPlayer();
 
-    dispatcher->dispatch(shared::protocol::server::Pdi{.playerId = 42});
+    dispatcher.dispatch(shared::protocol::server::Pdi{.playerId = 42});
 
     EXPECT_FALSE(world.playerById(42).has_value());
     ASSERT_EQ(world.teams().size(), 1);
@@ -236,27 +231,27 @@ TEST_F(WorldManagerTest, PdiRemovesPlayerFromWorld) {
 TEST_F(WorldManagerTest, EnwAddsEggAndEboOrEdiRemoveIt) {
     createPlayer();
 
-    dispatcher->dispatch(shared::protocol::server::Enw{.eggId = 7, .playerId = 42, .x = 1, .y = 2});
-    dispatcher->dispatch(shared::protocol::server::Enw{.eggId = 8, .playerId = 42, .x = 2, .y = 2});
+    dispatcher.dispatch(shared::protocol::server::Enw{.eggId = 7, .playerId = 42, .x = 1, .y = 2});
+    dispatcher.dispatch(shared::protocol::server::Enw{.eggId = 8, .playerId = 42, .x = 2, .y = 2});
 
     ASSERT_EQ(world.teams().front().eggs().size(), 2);
     EXPECT_EQ(world.teams().front().eggs().front().id(), 7);
 
-    dispatcher->dispatch(shared::protocol::server::Ebo{.eggId = 7});
+    dispatcher.dispatch(shared::protocol::server::Ebo{.eggId = 7});
     ASSERT_EQ(world.teams().front().eggs().size(), 1);
     EXPECT_EQ(world.teams().front().eggs().front().id(), 8);
 
-    dispatcher->dispatch(shared::protocol::server::Edi{.eggId = 8});
+    dispatcher.dispatch(shared::protocol::server::Edi{.eggId = 8});
     EXPECT_TRUE(world.teams().front().eggs().empty());
 }
 
 TEST_F(WorldManagerTest, GlobalWorldStateTracksTimeWinnerAndServerMessage) {
-    dispatcher->dispatch(shared::protocol::server::Sgt{.timeUnit = 50});
+    dispatcher.dispatch(shared::protocol::server::Sgt{.timeUnit = 50});
     EXPECT_EQ(world.timeUnit(), 50);
 
-    dispatcher->dispatch(shared::protocol::server::Sst{.timeUnit = 120});
-    dispatcher->dispatch(shared::protocol::server::Seg{.teamName = "blue"});
-    dispatcher->dispatch(shared::protocol::server::Smg{.message = "game over"});
+    dispatcher.dispatch(shared::protocol::server::Sst{.timeUnit = 120});
+    dispatcher.dispatch(shared::protocol::server::Seg{.teamName = "blue"});
+    dispatcher.dispatch(shared::protocol::server::Smg{.message = "game over"});
 
     EXPECT_EQ(world.timeUnit(), 120);
     EXPECT_EQ(world.winningTeam(), std::optional<std::string>{"blue"});

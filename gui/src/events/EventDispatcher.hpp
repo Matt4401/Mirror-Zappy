@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include <any>
 #include <cstdint>
 #include <functional>
 #include <typeindex>
@@ -35,11 +34,16 @@ class EventDispatcher {
      * @brief Subscribe to a specific command type with a callback function.
      */
     template <typename CommandType>
-    [[nodiscard]] EventToken subscribe(const std::function<void(const CommandType&)>& callback) {
-        auto type = std::type_index(typeid(CommandType));
+    [[nodiscard]] EventToken subscribe(std::move_only_function<void(const CommandType&)> callback) {
+        const auto type = std::type_index(typeid(CommandType));
         const EventToken token = _nextToken++;
 
-        _listeners[type].emplace_back(token, std::make_any<std::function<void(const CommandType&)>>(callback));
+        std::move_only_function<void(const void*)> erasedCallback =
+            [callback = std::move(callback)](const void* event) mutable {
+                callback(*static_cast<const CommandType*>(event));
+            };
+
+        _listeners[type].push_back(Listener(token, std::move(erasedCallback)));
         return token;
     }
 
@@ -48,21 +52,19 @@ class EventDispatcher {
      */
     template <typename CommandType>
     void unsubscribe(EventToken token) {
-        auto type = std::type_index(typeid(CommandType));
+        const auto type = std::type_index(typeid(CommandType));
         if (auto it = _listeners.find(type); it != _listeners.end()) {
-            std::erase_if(it->second, [token](const auto& pair) { return pair.first == token; });
+            std::erase_if(it->second, [token](const Listener& listener) { return listener.token == token; });
         }
     }
 
     template <typename EventType>
     void dispatch(const EventType& event) {
-        auto type = std::type_index(typeid(EventType));
+        const auto type = std::type_index(typeid(EventType));
 
         if (auto it = _listeners.find(type); it != _listeners.end()) {
-            for (const auto& [token, anyCallback] : it->second) {
-                (void)token;
-                auto callback = std::any_cast<std::function<void(const EventType&)>>(anyCallback);
-                callback(event);
+            for (auto& listener : it->second) {
+                listener.callback(&event);
             }
         }
     }
@@ -73,8 +75,13 @@ class EventDispatcher {
     void dispatch(const shared::protocol::ServerCommand& command);
 
   private:
-    std::unordered_map<std::type_index, std::vector<std::pair<EventToken, std::any>>> _listeners;
-    EventToken _nextToken = 0;
+    struct Listener {
+        EventToken token;
+        std::move_only_function<void(const void*)> callback;
+    };
+
+    std::unordered_map<std::type_index, std::vector<Listener>> _listeners;
+    EventToken _nextToken = 1;
 };
 
 }  // namespace zappy::gui::events

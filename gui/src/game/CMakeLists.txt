@@ -28,3 +28,6 @@ target_link_libraries(zappy_gui_game PUBLIC
         zappy_gui_game_components
         zappy_server_objects
 )
+target_link_libraries(zappy_gui_game PRIVATE
+        zappy_gui_assets
+)

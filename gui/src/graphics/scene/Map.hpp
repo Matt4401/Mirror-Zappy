@@ -8,7 +8,6 @@
 #pragma once
 #include <functional>
 #include <map>
-#include <memory>
 #include <string>
 #include <utility>
 
@@ -39,8 +38,7 @@ class Map {
     static constexpr const char* MENDIANE_MODEL_RESOURCE = "assets/orange-ore/scene.gltf";
     static constexpr const char* FOOD_TEXTURE_RESOURCE = "assets/food.glb";
 
-    Map(std::shared_ptr<raylib::rcore::Camera> camera, std::reference_wrapper<WorldManager> worldManager,
-        std::shared_ptr<events::EventDispatcher> dispatcher = nullptr);
+    Map(raylib::rcore::Camera& camera, WorldManager& worldManager, events::EventDispatcher& dispatcher);
     ~Map();
     Map(const Map& other) = delete;
     Map& operator=(const Map& other) = delete;
@@ -56,8 +54,8 @@ class Map {
     void dispatchClickedPlayer(const game::Team& team, const game::Player& player) const;
     void dispatchClickedTile(const Tile3D& tile) const;
 
-    std::shared_ptr<raylib::rcore::Camera> _camera;
-    std::shared_ptr<events::EventDispatcher> _dispatcher;
+    std::reference_wrapper<raylib::rcore::Camera> _camera;
+    std::reference_wrapper<events::EventDispatcher> _dispatcher;
     std::reference_wrapper<WorldManager> _worldManager;
     game::GameModel _gameModel;
     std::map<std::string, ItemFunc> _itemDrawFunctions;

@@ -11,7 +11,6 @@
 
 #include <memory>
 #include <string>
-#include <utility>
 
 #include "AssetManager.hpp"
 #include "events/EventDispatcher.hpp"
@@ -23,14 +22,18 @@
 #include "ui/hud/GameHUD.hpp"
 
 namespace zappy::gui::graphics {
-Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher)
-    : _dispatcher(std::move(dispatcher)), _worldManager(_dispatcher), _map(_camera, _worldManager, _dispatcher) {
+Render::Render(events::EventDispatcher& dispatcher)
+    : _skybox(dispatcher),
+      _dispatcher(dispatcher),
+      _worldManager(dispatcher),
+      _map(_camera, _worldManager, dispatcher) {
     _window.setTargetFPS(DefaultFps);
     raylib::rcore::Window::setExitKey(0);
 
     AssetManager::getInstance().loadFont(DefaultFontName, "assets/fonts/Minecraft.ttf");
 
-    _gameHUD = std::make_shared<ui::hud::GameHUD>(_dispatcher, AssetManager::getInstance().getFont(DefaultFontName));
+    _gameHUD =
+        std::make_shared<ui::hud::GameHUD>(_dispatcher.get(), AssetManager::getInstance().getFont(DefaultFontName));
     _gameHUD->registerToUIManager(_uiManager);
 
     if (auto pauseMenu = _gameHUD->getPauseMenu()) {
@@ -113,12 +116,11 @@ void Render::update() {
     }
 
     if (!_uiMode) {
-        _camera->updateCamera(CAMERA_FREE);
-        if (_camera->position().y() < scene::Tile3D::TILE_SIZE * 1.3F) {
-            _camera->setPosition({_camera->position().x(), scene::Tile3D::TILE_SIZE * 1.3F, _camera->position().z()});
-            _camera->setTarget({_camera->target().x(),
-                                _camera->target().y() + (raylib::rcore::Window::frameTime() * 2.0F),
-                                _camera->target().z()});
+        _camera.updateCamera(CAMERA_FREE);
+        if (_camera.position().y() < scene::Tile3D::TILE_SIZE * 1.3F) {
+            _camera.setPosition({_camera.position().x(), scene::Tile3D::TILE_SIZE * 1.3F, _camera.position().z()});
+            _camera.setTarget({_camera.target().x(), _camera.target().y() + (raylib::rcore::Window::frameTime() * 2.0F),
+                               _camera.target().z()});
         }
     }
 
@@ -134,7 +136,7 @@ void Render::update() {
 void Render::render2D() {}
 
 void Render::render3D() {
-    _camera->beginMode3D();
+    _camera.beginMode3D();
     _skybox.draw();
     _map.draw();
     raylib::rcore::Camera::endMode3D();

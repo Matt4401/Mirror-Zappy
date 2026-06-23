@@ -24,9 +24,8 @@
 #include "rcore/Event.hpp"
 
 namespace zappy::gui::graphics::scene {
-Map::Map(std::shared_ptr<raylib::rcore::Camera> camera, std::reference_wrapper<WorldManager> worldManager,
-         std::shared_ptr<events::EventDispatcher> dispatcher)
-    : _camera(std::move(camera)), _dispatcher(std::move(dispatcher)), _worldManager(worldManager), _gameModel(_camera) {
+Map::Map(raylib::rcore::Camera& camera, WorldManager& worldManager, events::EventDispatcher& dispatcher)
+    : _camera(camera), _dispatcher(dispatcher), _worldManager(worldManager), _gameModel(_camera) {
     _itemDrawFunctions["Deraumere"] = [this](const game::IObject& object) { object.draw(_deraumereModel); };
     _itemDrawFunctions["Linemate"] = [this](const game::IObject& object) { object.draw(_linemateModel); };
     _itemDrawFunctions["Sibur"] = [this](const game::IObject& object) { object.draw(_siburModel); };
@@ -35,22 +34,19 @@ Map::Map(std::shared_ptr<raylib::rcore::Camera> camera, std::reference_wrapper<W
     _itemDrawFunctions["Mendiane"] = [this](const game::IObject& object) { object.draw(_mendianeModel); };
     _itemDrawFunctions["Food"] = [this](const game::IObject& object) { object.draw(_foodModel); };
 
-    if (_dispatcher) {
-        _nameToken = _dispatcher->subscribe<events::PlayerNameChanged>([this](const events::PlayerNameChanged& e) {
-            _worldManager.get().updatePlayerName(e.playerId, e.newName);
-        });
-    }
+    _nameToken = _dispatcher.get().subscribe<events::PlayerNameChanged>(
+        [this](const events::PlayerNameChanged& e) { _worldManager.get().updatePlayerName(e.playerId, e.newName); });
 }
 
 Map::~Map() {
-    if (_dispatcher && _nameToken != 0) {
-        _dispatcher->unsubscribe<events::PlayerNameChanged>(_nameToken);
+    if (_nameToken != 0) {
+        _dispatcher.get().unsubscribe<events::PlayerNameChanged>(_nameToken);
     }
 }
 
 void Map::draw() const {
     for (const auto& tile : _worldManager.get().tiles()) {
-        if (_camera->isVisibleFromCamera(tile.position())) {
+        if (_camera.get().isVisibleFromCamera(tile.position())) {
             tile.draw(_tileModel);
             if (tile.itemBag().hasItems()) {
                 drawItems(tile);
@@ -72,17 +68,17 @@ void Map::drawItems(const Tile3D& tile) const {
 }
 
 void Map::handleEvent() {
-    if (!raylib::rcore::Event::isMouseButtonPressed(MOUSE_LEFT_CLICK) || !_camera) {
+    if (!raylib::rcore::Event::isMouseButtonPressed(MOUSE_LEFT_CLICK)) {
         return;
     }
 
-    const auto ray = raylib::rcore::Event::mouseRay(*_camera);
+    const auto ray = raylib::rcore::Event::mouseRay(_camera.get());
     std::optional<SelectedPlayer> selected;
     float nearestDistance = std::numeric_limits<float>::max();
 
     for (const auto& team : _worldManager.get().teams()) {
         for (const auto& player : team.players()) {
-            if (!_camera->isVisibleFromCamera(player.position())) {
+            if (!_camera.get().isVisibleFromCamera(player.position())) {
                 continue;
             }
             const auto collision = ray.collision(player.boundingBox());
@@ -102,7 +98,7 @@ void Map::handleEvent() {
     nearestDistance = std::numeric_limits<float>::max();
 
     for (const auto& tile : _worldManager.get().tiles()) {
-        if (!_camera->isVisibleFromCamera(tile.position())) {
+        if (!_camera.get().isVisibleFromCamera(tile.position())) {
             continue;
         }
         const auto collision = ray.collision(tile.boundingBox());
@@ -118,10 +114,7 @@ void Map::handleEvent() {
 }
 
 void Map::dispatchClickedPlayer(const game::Team& team, const game::Player& player) const {
-    if (!_dispatcher) {
-        return;
-    }
-    _dispatcher->dispatch(events::PlayerClicked{
+    _dispatcher.get().dispatch(events::PlayerClicked{
         .playerId = player.id(),
         .teamName = team.name(),
         .playerName = player.name(),
@@ -132,12 +125,10 @@ void Map::dispatchClickedPlayer(const game::Team& team, const game::Player& play
 }
 
 void Map::dispatchClickedTile(const Tile3D& tile) const {
-    if (!_dispatcher) {
-        return;
-    }
-    _dispatcher->dispatch(events::TileClicked{
-        .x = tile.gridX(),
-        .y = tile.gridY(),
+    const auto gridPosition = tile.gridPosition();
+    _dispatcher.get().dispatch(events::TileClicked{
+        .x = gridPosition.x,
+        .y = gridPosition.y,
     });
 }
 }  // namespace zappy::gui::graphics::scene

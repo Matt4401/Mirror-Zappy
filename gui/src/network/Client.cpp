@@ -24,15 +24,13 @@
 #include "strategy/GUIStrategy.hpp"
 
 namespace zappy::gui::network {
-Client::Client(const parser::GuiConfig& config, std::shared_ptr<events::EventDispatcher> dispatcher)
-    : _socket{std::make_unique<::network::socket::ClientSocket>(config.machine, config.port)},
-      _dispatcher{std::move(dispatcher)} {
+Client::Client(const parser::GuiConfig& config, events::EventDispatcher& dispatcher)
+    : _socket{std::make_unique<::network::socket::ClientSocket>(config.machine, config.port)}, _dispatcher{dispatcher} {
     initNetwork();
 }
 
-Client::Client(std::unique_ptr<shared::network::IClientSocket> socket,
-               std::shared_ptr<events::EventDispatcher> dispatcher)
-    : _socket{std::move(socket)}, _dispatcher{std::move(dispatcher)} {
+Client::Client(std::unique_ptr<shared::network::IClientSocket> socket, events::EventDispatcher& dispatcher)
+    : _socket{std::move(socket)}, _dispatcher{dispatcher} {
     initNetwork();
 }
 
@@ -55,27 +53,23 @@ void Client::initNetwork() {
         throw ::network::exception::SocketError(std::string("failed to send team name"));
     }
 
-    if (_dispatcher) {
-        _sendToken = _dispatcher->subscribe<events::SendCommand>([this](const events::SendCommand& cmd) {
-            if (_socket->send(cmd.payload) == 0) {
-                std::cerr << "Failed to send command to server: " << cmd.payload << std::endl;
-            }
-        });
-    }
+    _sendToken = _dispatcher.get().subscribe<events::SendCommand>([this](const events::SendCommand& cmd) {
+        if (_socket->send(cmd.payload) == 0) {
+            std::cerr << "Failed to send command to server: " << cmd.payload << std::endl;
+        }
+    });
 }
 
 Client::~Client() {
-    if (_dispatcher && _sendToken != 0) {
-        _dispatcher->unsubscribe<events::SendCommand>(_sendToken);
+    if (_sendToken != 0) {
+        _dispatcher.get().unsubscribe<events::SendCommand>(_sendToken);
     }
 }
 
 void Client::update() {
     while (auto msg = _socket->tryPopMessage()) {
         auto serverCmd = shared::protocol::Parser::parseServerCommand(*msg);
-        if (_dispatcher) {
-            _dispatcher->dispatch(serverCmd);
-        }
+        _dispatcher.get().dispatch(serverCmd);
     }
 }
 

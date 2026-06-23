@@ -63,34 +63,32 @@ constexpr float CenterDivisor = 2.0F;
 constexpr raylib::Color BoxBgColor(200, 200, 200, 255);
 }  // namespace
 
-TileInspectorUI::TileInspectorUI(float x, float y, float width, std::shared_ptr<events::EventDispatcher> dispatcher,
+TileInspectorUI::TileInspectorUI(float x, float y, float width, events::EventDispatcher& dispatcher,
                                  const std::shared_ptr<raylib::rtext::Font>& font,
                                  std::function<void(const std::string&)> onSendCommand)
-    : AInspectorUI(x, y, width, "Tile Inspector", std::move(dispatcher), font, std::move(onSendCommand)) {
+    : AInspectorUI(x, y, width, "Tile Inspector", dispatcher, font, std::move(onSendCommand)) {
     buildInventoryPanel();
     buildScannerPanel();
 
-    if (getDispatcher()) {
-        getEventTokens().push_back(getDispatcher()->subscribe<events::TileClicked>(
-            [this](const events::TileClicked& e) { onTileClicked(e); }));
-        getEventTokens().push_back(getDispatcher()->subscribe<events::PlayerClicked>(
-            [this](const events::PlayerClicked& /*e*/) { setVisible(false); }));
-        getEventTokens().push_back(getDispatcher()->subscribe<shared::protocol::server::Bct>(
-            [this](const shared::protocol::server::Bct& cmd) { onBctReceived(cmd); }));
-        getEventTokens().push_back(getDispatcher()->subscribe<shared::protocol::server::Pic>(
-            [this](const shared::protocol::server::Pic& cmd) { onPicReceived(cmd); }));
-        getEventTokens().push_back(getDispatcher()->subscribe<shared::protocol::server::Pie>(
-            [this](const shared::protocol::server::Pie& cmd) { onPieReceived(cmd); }));
-    }
+    getEventTokens().push_back(
+        getDispatcher().subscribe<events::TileClicked>([this](const events::TileClicked& e) { onTileClicked(e); }));
+    getEventTokens().push_back(getDispatcher().subscribe<events::PlayerClicked>(
+        [this](const events::PlayerClicked& /*e*/) { setVisible(false); }));
+    getEventTokens().push_back(getDispatcher().subscribe<shared::protocol::server::Bct>(
+        [this](const shared::protocol::server::Bct& cmd) { onBctReceived(cmd); }));
+    getEventTokens().push_back(getDispatcher().subscribe<shared::protocol::server::Pic>(
+        [this](const shared::protocol::server::Pic& cmd) { onPicReceived(cmd); }));
+    getEventTokens().push_back(getDispatcher().subscribe<shared::protocol::server::Pie>(
+        [this](const shared::protocol::server::Pie& cmd) { onPieReceived(cmd); }));
 }
 
 TileInspectorUI::~TileInspectorUI() {
-    if (getDispatcher() && getEventTokens().size() >= ExpectedEventTokens) {
-        getDispatcher()->unsubscribe<events::TileClicked>(getEventTokens().at(0));
-        getDispatcher()->unsubscribe<events::PlayerClicked>(getEventTokens().at(1));
-        getDispatcher()->unsubscribe<shared::protocol::server::Bct>(getEventTokens().at(2));
-        getDispatcher()->unsubscribe<shared::protocol::server::Pic>(getEventTokens().at(3));
-        getDispatcher()->unsubscribe<shared::protocol::server::Pie>(getEventTokens().at(4));
+    if (getEventTokens().size() >= ExpectedEventTokens) {
+        getDispatcher().unsubscribe<events::TileClicked>(getEventTokens().at(0));
+        getDispatcher().unsubscribe<events::PlayerClicked>(getEventTokens().at(1));
+        getDispatcher().unsubscribe<shared::protocol::server::Bct>(getEventTokens().at(2));
+        getDispatcher().unsubscribe<shared::protocol::server::Pic>(getEventTokens().at(3));
+        getDispatcher().unsubscribe<shared::protocol::server::Pie>(getEventTokens().at(4));
     }
 }
 
@@ -112,11 +110,11 @@ void TileInspectorUI::buildScannerPanel() {
 }
 
 void TileInspectorUI::onTileClicked(const events::TileClicked& event) {
-    _targetGridX = event.x;
-    _targetGridY = event.y;
+    _targetGridPosition = {.x = event.x, .y = event.y};
 
     if (_posText) {
-        _posText->setText("Grid Pos: (" + std::to_string(_targetGridX) + ", " + std::to_string(_targetGridY) + ")");
+        _posText->setText("Grid Pos: (" + std::to_string(_targetGridPosition.x) + ", " +
+                          std::to_string(_targetGridPosition.y) + ")");
     }
 
     setVisible(true);
@@ -124,7 +122,7 @@ void TileInspectorUI::onTileClicked(const events::TileClicked& event) {
 }
 
 void TileInspectorUI::onBctReceived(const shared::protocol::server::Bct& cmd) {
-    if (cmd.x == _targetGridX && cmd.y == _targetGridY) {
+    if (cmd.x == _targetGridPosition.x && cmd.y == _targetGridPosition.y) {
         if (getInventoryTexts().size() >= TotalInventoryItems) {
             getInventoryTexts().at(0)->setText(std::to_string(cmd.food));
             getInventoryTexts().at(1)->setText(std::to_string(cmd.linemate));
@@ -138,22 +136,22 @@ void TileInspectorUI::onBctReceived(const shared::protocol::server::Bct& cmd) {
 }
 
 void TileInspectorUI::onPicReceived(const shared::protocol::server::Pic& cmd) {
-    if (cmd.x == _targetGridX && cmd.y == _targetGridY) {
+    if (cmd.x == _targetGridPosition.x && cmd.y == _targetGridPosition.y) {
         _scannerInfo->setText("Ritual active! Lvl " + std::to_string(cmd.level) +
                               "\nPlayers: " + std::to_string(cmd.playerIds.size()));
     }
 }
 
 void TileInspectorUI::onPieReceived(const shared::protocol::server::Pie& cmd) {
-    if (cmd.x == _targetGridX && cmd.y == _targetGridY) {
+    if (cmd.x == _targetGridPosition.x && cmd.y == _targetGridPosition.y) {
         _scannerInfo->setText("No ritual active\nResult: " + std::to_string(cmd.incantationResult));
     }
 }
 
 void TileInspectorUI::requestTileSync() const {
-    if (getOnSendCommand() && _targetGridX >= 0 && _targetGridY >= 0) {
-        getOnSendCommand()(
-            shared::protocol::Emitter::build(shared::protocol::client::Bct{.x = _targetGridX, .y = _targetGridY}));
+    if (getOnSendCommand() && _targetGridPosition.x >= 0 && _targetGridPosition.y >= 0) {
+        getOnSendCommand()(shared::protocol::Emitter::build(
+            shared::protocol::client::Bct{.x = _targetGridPosition.x, .y = _targetGridPosition.y}));
     }
 }
 
@@ -162,8 +160,7 @@ void TileInspectorUI::update() { AInspectorUI::update(); }
 void TileInspectorUI::setVisible(bool visible) {
     AInspectorUI::setVisible(visible);
     if (!visible) {
-        _targetGridX = -1;
-        _targetGridY = -1;
+        _targetGridPosition = {-1, -1};
     }
 }
 
