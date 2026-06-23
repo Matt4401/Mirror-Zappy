@@ -36,11 +36,11 @@
 
 namespace zappy::gui::ui::menus {
 
-WorldControlUI::WorldControlUI(float x, float width, std::shared_ptr<events::EventDispatcher> dispatcher,
+WorldControlUI::WorldControlUI(float x, float width, events::EventDispatcher& dispatcher,
                                std::shared_ptr<raylib::rtext::Font> font,
                                std::function<void(const std::string&)> onSendCommand)
     : components::UIGamePanel(x, 0.0F, width, ContentHeight + FoldBtnHeight, "World Control"),
-      _dispatcher(std::move(dispatcher)),
+      _dispatcher(dispatcher),
       _font(std::move(font)),
       _onSendCommand(std::move(onSendCommand)),
       _currentHeight(0.0F) {
@@ -90,9 +90,6 @@ void WorldControlUI::initTimeControls() {
     _timeDropdown->setSelectedIndex(4);
 
     _timeDropdown->setOnSelect([this](const std::string& option) {
-        if (!_dispatcher) {
-            return;
-        }
         events::TimeMode mode = events::TimeMode::CYCLE;
         if (option == "morning") {
             mode = events::TimeMode::MORNING;
@@ -103,28 +100,24 @@ void WorldControlUI::initTimeControls() {
         } else if (option == "night") {
             mode = events::TimeMode::NIGHT;
         }
-        _dispatcher->dispatch(events::TimeOfDayChanged{mode});
+        _dispatcher.get().dispatch(events::TimeOfDayChanged{mode});
     });
 }
 
 void WorldControlUI::initEventSubscriptions() {
-    if (_dispatcher) {
-        _eventTokens.push_back(
-            _dispatcher->subscribe<shared::protocol::server::Sgt>([this](const shared::protocol::server::Sgt& cmd) {
-                _serverFreq = static_cast<float>(cmd.timeUnit);
-                _speedSlider->setValue(_serverFreq);
-                std::stringstream ss;
-                ss << std::fixed << std::setprecision(0) << _serverFreq;
-                _speedValueText->setText(ss.str());
-            }));
-    }
+    _eventTokens.push_back(
+        _dispatcher.get().subscribe<shared::protocol::server::Sgt>([this](const shared::protocol::server::Sgt& cmd) {
+            _serverFreq = static_cast<float>(cmd.timeUnit);
+            _speedSlider->setValue(_serverFreq);
+            std::stringstream ss;
+            ss << std::fixed << std::setprecision(0) << _serverFreq;
+            _speedValueText->setText(ss.str());
+        }));
 }
 
 WorldControlUI::~WorldControlUI() {
-    if (_dispatcher) {
-        for (auto token : _eventTokens) {
-            _dispatcher->unsubscribe<shared::protocol::server::Sgt>(token);
-        }
+    for (auto token : _eventTokens) {
+        _dispatcher.get().unsubscribe<shared::protocol::server::Sgt>(token);
     }
 }
 

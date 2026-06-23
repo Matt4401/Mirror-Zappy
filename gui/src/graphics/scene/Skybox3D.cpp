@@ -10,8 +10,6 @@
 #include <raylib.h>
 
 #include <cmath>
-#include <memory>
-#include <utility>
 
 #include "Color.hpp"
 #include "EventDispatcher.hpp"
@@ -25,10 +23,10 @@
 
 namespace zappy::gui::graphics::scene {
 
-Skybox3D::Skybox3D(std::shared_ptr<events::EventDispatcher> dispatcher)
+Skybox3D::Skybox3D(events::EventDispatcher& dispatcher)
     : _model(raylib::rmodels::Mesh::genCube(1.0F, 1.0F, 1.0F)),
       _shader("assets/shaders/skybox.vs", "assets/shaders/skybox.fs"),
-      _dispatcher(std::move(dispatcher)) {
+      _dispatcher(dispatcher) {
     int const environmentMapLoc = _shader.getLocation("environmentMap");
     _shader.setLocation(SHADER_LOC_MAP_CUBEMAP, environmentMapLoc);
 
@@ -36,15 +34,13 @@ Skybox3D::Skybox3D(std::shared_ptr<events::EventDispatcher> dispatcher)
 
     loadCubemap();
 
-    if (_dispatcher) {
-        _timeToken = _dispatcher->subscribe<events::TimeOfDayChanged>(
-            [this](const events::TimeOfDayChanged& e) { _timeMode = e.mode; });
-    }
+    _timeToken = _dispatcher.get().subscribe<events::TimeOfDayChanged>(
+        [this](const events::TimeOfDayChanged& e) { _timeMode = e.mode; });
 }
 
 Skybox3D::~Skybox3D() {
-    if (_dispatcher && _timeToken != 0) {
-        _dispatcher->unsubscribe<events::TimeOfDayChanged>(_timeToken);
+    if (_timeToken != 0) {
+        _dispatcher.get().unsubscribe<events::TimeOfDayChanged>(_timeToken);
     }
 }
 
