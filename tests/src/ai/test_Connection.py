@@ -36,7 +36,6 @@ class TestConnectionUnit(unittest.TestCase):
             Connection("127.0.0.1", 4242, "TeamA")
         self.assertEqual(cm.exception.code, 84)
 
-
     @patch("Connection.Connection.connect")
     @patch("Connection.Connection.do_handshake")
     def test_broadcast_queue_operations(self, mock_handshake, mock_connect):
