@@ -32,6 +32,10 @@
 namespace zappy::gui::graphics::scene {
 class TileManager {
   public:
+    static constexpr auto ResourceCount = 7;
+    static constexpr std::array<std::string_view, ResourceCount> ResourceNames = {
+        "Food", "Linemate", "Deraumere", "Sibur", "Mendiane", "Phiras", "Thystame",
+    };
     TileManager() = default;
     ~TileManager() = default;
     TileManager(const TileManager& other) = delete;

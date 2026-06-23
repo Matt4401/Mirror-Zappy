@@ -18,4 +18,4 @@ test_binaries/
 binary_ref/
 logs/
 *.log
-*.txt
+*.sh

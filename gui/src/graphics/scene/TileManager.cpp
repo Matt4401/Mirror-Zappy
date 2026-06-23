@@ -74,9 +74,6 @@ std::optional<std::reference_wrapper<Tile3D>> TileManager::mutableTileAt(const i
 }
 
 std::optional<std::string_view> TileManager::resourceName(const int resourceId) {
-    static constexpr std::array<std::string_view, 7> ResourceNames = {
-        "Food", "Linemate", "Deraumere", "Sibur", "Mendiane", "Phiras", "Thystame",
-    };
     if (resourceId < 0 || std::cmp_greater_equal(resourceId, ResourceNames.size())) {
         return std::nullopt;
     }
