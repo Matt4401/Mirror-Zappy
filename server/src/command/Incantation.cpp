@@ -7,6 +7,10 @@
 
 #include "Incantation.hpp"
 
+#include <array>
+#include <cstddef>
+
+#include "ACommand.hpp"
 #include "game/Player.hpp"
 #include "game/World.hpp"
 #include "protocol/Commands.hpp"
@@ -20,9 +24,11 @@ bool Incantation::start(game::World& world, game::Player& player) {
     auto vecPlayerIds = world.playersWithSameLevelOnTile(player.position(), player.level());
 
     if (player.checkCondition(world.resourcesAt(player.position()), vecPlayerIds.size())) {
-        world.addGuiEvent(shared::protocol::Emitter::build(
-            shared::protocol::server::Pic{static_cast<int>(player.position().x), static_cast<int>(player.position().y),
-                                          (player.level()), vecPlayerIds}));
+        world.addGuiEvent(
+            shared::protocol::Emitter::build(shared::protocol::server::Pic{.x = static_cast<int>(player.position().x),
+                                                                           .y = static_cast<int>(player.position().y),
+                                                                           .level = player.level(),
+                                                                           .playerIds = vecPlayerIds}));
         return true;
     }
     return false;
@@ -49,8 +55,10 @@ void Incantation::execute(game::World& world, game::Player& player) {
         player.addResponse("ko\n");
         isSuccess = false;
     }
-    world.addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pie{
-        static_cast<int>(player.position().x), static_cast<int>(player.position().y), isSuccess}));
+    world.addGuiEvent(
+        shared::protocol::Emitter::build(shared::protocol::server::Pie{.x = static_cast<int>(player.position().x),
+                                                                       .y = static_cast<int>(player.position().y),
+                                                                       .incantationResult = isSuccess}));
 }
 
 std::array<game::Condition, game::kNbLevel> getCondition() {

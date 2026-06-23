@@ -97,7 +97,7 @@ class Player {
 
     [[nodiscard]] bool hasCommands() const;
     void tryStartNextCommand(World& world, bool isMidTick = false);
-    int level() const;
+    [[nodiscard]] int level() const;
     void levelUp();
     bool checkCondition(const std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)>& resources,
                         std::size_t nbPlayer) const;

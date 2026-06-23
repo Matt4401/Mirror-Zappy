@@ -159,7 +159,7 @@ std::vector<Position> Player::getLookPos(const Position mapLimit) {
     std::vector pos{{Position{.x = _pos.x, .y = _pos.y}}};
     pos.reserve((static_cast<std::size_t>(_level) + 1) * (static_cast<std::size_t>(_level) + 1));
 
-    for (std::uint8_t i = 0; i < _level; i++) {
+    for (int i = 0; i < _level; i++) {
         const Position actualDiagPos = getNthDiagonalLeftPosition(i + 1, mapLimit);
         pos.emplace_back(actualDiagPos);
         const int stepsToRight = 2 * (i + 1);
@@ -196,7 +196,8 @@ int Player::level() const { return _level; }
 
 void Player::levelUp() { _level++; }
 
-constexpr bool hasEnoughResources(const command::InventoryArray& groundInv, const command::InventoryArray& required) {
+static constexpr bool hasEnoughResources(const command::InventoryArray& groundInv,
+                                         const command::InventoryArray& required) {
     for (std::size_t i = 0; i < groundInv.size(); ++i) {
         if (groundInv.at(i) < required.at(i)) {
             return false;

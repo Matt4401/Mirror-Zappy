@@ -1,3 +1,11 @@
+/*
+** EPITECH PROJECT, 2026
+** zappy
+** File description:
+** Incantation
+*/
+
+// NOLINTBEGIN
 #include "command/Incantation.hpp"
 
 #include <gtest/gtest.h>
@@ -138,3 +146,4 @@ TEST_F(IncantationTest, MultiPlayerRequirementLevel2To3) {
 }
 
 }  // namespace zappy::server::command
+// NOLINTEND
