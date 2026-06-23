@@ -91,7 +91,7 @@ void Map::drawItems(const Tile3D& tile) const {
     }
 }
 
-void Map::handleEvent(const raylib::rcore::Event& /*event*/) {
+void Map::handleEvent() {
     if (!raylib::rcore::Event::isMouseButtonPressed(MOUSE_LEFT_CLICK) || !_camera) {
         return;
     }
