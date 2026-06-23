@@ -64,20 +64,20 @@ class Shapes {
         std::array<float, 2> const y = {bb.min.y, bb.max.y};
         std::array<float, 2> const z = {bb.min.z, bb.max.z};
 
-        drawCube({x[0] + (w / 2.0F), y[0], z[0]}, w, thick, thick, color);
-        drawCube({x[0] + (w / 2.0F), y[0], z[1]}, w, thick, thick, color);
-        drawCube({x[0], y[0], z[0] + (d / 2.0F)}, thick, thick, d, color);
-        drawCube({x[1], y[0], z[0] + (d / 2.0F)}, thick, thick, d, color);
+        drawCube({x.at(0) + (w / 2.0F), y.at(0), z.at(0)}, w, thick, thick, color);
+        drawCube({x.at(0) + (w / 2.0F), y.at(0), z.at(1)}, w, thick, thick, color);
+        drawCube({x.at(0), y.at(0), z.at(0) + (d / 2.0F)}, thick, thick, d, color);
+        drawCube({x.at(1), y.at(0), z.at(0) + (d / 2.0F)}, thick, thick, d, color);
 
-        drawCube({x[0] + (w / 2.0F), y[1], z[0]}, w, thick, thick, color);
-        drawCube({x[0] + (w / 2.0F), y[1], z[1]}, w, thick, thick, color);
-        drawCube({x[0], y[1], z[0] + (d / 2.0F)}, thick, thick, d, color);
-        drawCube({x[1], y[1], z[0] + (d / 2.0F)}, thick, thick, d, color);
+        drawCube({x.at(0) + (w / 2.0F), y.at(1), z.at(0)}, w, thick, thick, color);
+        drawCube({x.at(0) + (w / 2.0F), y.at(1), z.at(1)}, w, thick, thick, color);
+        drawCube({x.at(0), y.at(1), z.at(0) + (d / 2.0F)}, thick, thick, d, color);
+        drawCube({x.at(1), y.at(1), z.at(0) + (d / 2.0F)}, thick, thick, d, color);
 
-        drawCube({x[0], y[0] + (h / 2.0F), z[0]}, thick, h, thick, color);
-        drawCube({x[0], y[0] + (h / 2.0F), z[1]}, thick, h, thick, color);
-        drawCube({x[1], y[0] + (h / 2.0F), z[0]}, thick, h, thick, color);
-        drawCube({x[1], y[0] + (h / 2.0F), z[1]}, thick, h, thick, color);
+        drawCube({x.at(0), y.at(0) + (h / 2.0F), z.at(0)}, thick, h, thick, color);
+        drawCube({x.at(0), y.at(0) + (h / 2.0F), z.at(1)}, thick, h, thick, color);
+        drawCube({x.at(1), y.at(0) + (h / 2.0F), z.at(0)}, thick, h, thick, color);
+        drawCube({x.at(1), y.at(0) + (h / 2.0F), z.at(1)}, thick, h, thick, color);
     }
 };
 
