@@ -19,8 +19,10 @@
 #include "graphics/scene/WorldManager.hpp"
 #include "gui/src/game/Player.hpp"
 #include "protocol/Commands.hpp"
+#include "gui/src/game/ItemBag.hpp"
 
 namespace zappy::gui::graphics::scene {
+//NOLINTNEXTLINE(cppcoreguidelines-special-member-functions)
 class WorldManagerTest : public testing::Test {
   protected:
     void createPlayer(int id = 42, int x = 1, int y = 1, std::string teamName = "blue") {

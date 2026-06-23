@@ -100,14 +100,13 @@ class WorldManager {
     [[nodiscard]] raylib::Color nextTeamColor() const;
     [[nodiscard]] static game::Player::cardinalPoint orientationFromProtocol(int orientation);
     [[nodiscard]] static std::optional<std::string_view> resourceName(int resourceId);
-    [[nodiscard]] std::unique_ptr<game::IObject> makeResource(int resourceId,
-                                                              const raylib::rmath::Vector3& position);
+    [[nodiscard]] std::unique_ptr<game::IObject> makeResource(int resourceId, const raylib::rmath::Vector3& position);
 
     void updatePlayerPosition(game::Player& player, int x, int y);
     void replaceResources(game::ItemBag& bag, const raylib::rmath::Vector3& position,
-                                 const std::array<int, 7>& quantities);
+                          const std::array<int, 7>& quantities);
     void addResource(game::ItemBag& bag, const raylib::rmath::Vector3& position, int resourceId,
-                            std::size_t quantity = 1);
+                     std::size_t quantity = 1);
     static void removeResource(game::ItemBag& bag, int resourceId, std::size_t quantity = 1);
     void removeEgg(int eggId);
 
