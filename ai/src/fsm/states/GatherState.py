@@ -23,4 +23,3 @@ class GatherState(AState):
                 self.trantorian.player_state.inventory.update_inventory(resp)
             else:
                 self.trantorian.move_to_tile(tile_index)
-        return
