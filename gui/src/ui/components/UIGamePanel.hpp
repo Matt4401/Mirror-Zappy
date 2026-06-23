@@ -41,6 +41,7 @@ class UIGamePanel : public IUIComponent {
     void setSize(float width, float height) override;
     [[nodiscard]] bool isVisible() const override;
     void setVisible(bool visible) override;
+    [[nodiscard]] bool isHovered() const override { return false; }
 
     void addComponent(const std::shared_ptr<IUIComponent>& component);
     void addHeaderComponent(const std::shared_ptr<IUIComponent>& component);

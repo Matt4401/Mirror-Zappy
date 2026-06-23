@@ -39,6 +39,7 @@ class UIButton : public IUIComponent {
     void setSize(float width, float height) override;
     [[nodiscard]] bool isVisible() const override;
     void setVisible(bool visible) override;
+    [[nodiscard]] bool isHovered() const override { return _isHovered; }
 
     void setOnClick(std::function<void()> callback);
     void setFontSize(float size);

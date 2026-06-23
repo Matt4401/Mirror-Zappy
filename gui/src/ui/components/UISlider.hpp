@@ -36,6 +36,7 @@ class UISlider : public IUIComponent {
     void setSize(float width, float height) override;
     [[nodiscard]] bool isVisible() const override;
     void setVisible(bool visible) override;
+    [[nodiscard]] bool isHovered() const override { return _isHovered || _isDragging; }
 
     void setOnValueChanged(std::function<void(float)> callback);
     void setValue(float value);

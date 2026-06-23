@@ -36,6 +36,7 @@ class UIText : public IUIComponent {
     void setSize(float width, float height) override;
     [[nodiscard]] bool isVisible() const override;
     void setVisible(bool visible) override;
+    [[nodiscard]] bool isHovered() const override { return false; }
 
     void setText(const std::string& text);
     void setFontSize(float size);

@@ -39,6 +39,7 @@ class UITextbox : public IUIComponent {
     void setSize(float width, float height) override;
     [[nodiscard]] bool isVisible() const override;
     void setVisible(bool visible) override;
+    [[nodiscard]] bool isHovered() const override { return _isHovered; }
 
     [[nodiscard]] std::string getText() const;
     void setText(const std::string& text);
