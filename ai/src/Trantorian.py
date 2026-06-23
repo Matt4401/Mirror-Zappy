@@ -1,6 +1,8 @@
 from src.Connection import Connection
 from src.PlayerState import PlayerState
 from src.SendCommand import SendCommand
+from src.util.VisionManager import VisionManager
+from src.ParseCommand import ParseCommand
 import threading
 import math
 
@@ -73,6 +75,8 @@ class Trantorian:
         self.connection = Connection(host, port, team_name)
         self.player_state = PlayerState(team_name)
         self.send_command = SendCommand(self.connection)
+        self.vision = VisionManager()
+        self.parser = ParseCommand(self.player_state.inventory)
 
     def move_to_tile(self, index):
         if index == 0:
@@ -118,3 +122,19 @@ class Trantorian:
                 missing[resource] = required_amount - current_amount
 
         return missing
+
+    def refresh_inventory(self):
+        cmd_id = self.send_command.inventory()
+        if cmd_id == 84:
+            return False
+        raw_response = self.connection.get_command_response(cmd_id)
+        if raw_response:
+            try:
+                self.parser.parse_inventory(raw_response)
+                return True
+            except ValueError as e:
+                print(f"erro while parse inventory : {e}")
+                return False
+        else:
+            print(f"Timeout server didn't answer to the inventory cmd: {cmd_id})")
+            return False
