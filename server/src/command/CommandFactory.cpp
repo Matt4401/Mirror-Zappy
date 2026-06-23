@@ -36,6 +36,11 @@
 namespace zappy::server::command {
 
 CommandFactory::CommandFactory() {
+    registerCommands();
+    registerGuiCommands();
+}
+
+void CommandFactory::registerCommands() {
     _creators.emplace("Forward", [](std::string_view) { return std::make_unique<Forward>(); });
     _creators.emplace("Left", [](std::string_view) { return std::make_unique<Left>(); });
     _creators.emplace("Right", [](std::string_view) { return std::make_unique<Right>(); });
@@ -59,7 +64,9 @@ CommandFactory::CommandFactory() {
         return nullptr;
     });
     _creators.emplace("Fork", [](std::string_view) { return std::make_unique<Fork>(); });
+}
 
+void CommandFactory::registerGuiCommands() {
     _guiCreators.emplace("msz", [](std::string_view) { return std::make_unique<guiCommand::Msz>(); });
     _guiCreators.emplace("sgt", [](std::string_view) { return std::make_unique<guiCommand::Sgt>(); });
     _guiCreators.emplace("bct", [](std::string_view rawCommand) -> std::unique_ptr<guiCommand::IGuiCommand> {
