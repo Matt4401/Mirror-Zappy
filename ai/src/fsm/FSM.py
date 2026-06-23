@@ -44,7 +44,7 @@ class FiniteStateMachine:
             self.transition_to(SurviveState)
             return
 
-        if self.trantorian.has_all_stones():  # methode a faire
+        if self.trantorian.has_enough_resources_for(self.trantorian.player_state.level + 1):
             self.transition_to(EvolveState)
 
         else:
