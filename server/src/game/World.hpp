@@ -38,8 +38,21 @@ struct Tile {
 
 struct Condition {
     std::size_t nbPlayer;
-    std::array<std::size_t, static_cast<std::uint8_t>(game::ItemType::COUNT)> resources;
+    std::array<std::size_t, static_cast<std::uint8_t>(ItemType::COUNT)> resources;
 };
+
+using InventoryArray = std::array<std::size_t, static_cast<std::uint8_t>(ItemType::COUNT)>;
+
+inline std::array<Condition, kNbLevel> getCondition() {
+    static constexpr std::array kCondition = {Condition{.nbPlayer = 1, .resources = {0, 1, 0, 0, 0, 0, 0}},
+                                              Condition{.nbPlayer = 2, .resources = {0, 1, 1, 1, 0, 0, 0}},
+                                              Condition{.nbPlayer = 2, .resources = {0, 2, 0, 1, 0, 2, 0}},
+                                              Condition{.nbPlayer = 4, .resources = {0, 1, 1, 2, 0, 1, 0}},
+                                              Condition{.nbPlayer = 4, .resources = {0, 1, 2, 1, 3, 0, 0}},
+                                              Condition{.nbPlayer = 6, .resources = {0, 1, 2, 3, 0, 1, 0}},
+                                              Condition{.nbPlayer = 6, .resources = {0, 2, 2, 2, 2, 2, 1}}};
+    return kCondition;
+}
 
 class World {
   public:

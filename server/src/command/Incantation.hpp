@@ -16,10 +16,6 @@
 
 namespace zappy::server::command {
 
-using InventoryArray = std::array<std::size_t, static_cast<std::uint8_t>(game::ItemType::COUNT)>;
-
-std::array<game::Condition, game::kNbLevel> getCondition();
-
 class Incantation : public ACommand {
   public:
     Incantation();

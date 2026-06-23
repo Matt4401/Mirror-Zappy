@@ -16,13 +16,12 @@
 #include <vector>
 
 #include "command/ICommand.hpp"
-#include "command/Incantation.hpp"
 #include "exception/TooMuchCmd.hpp"
 #include "game/World.hpp"
 
 namespace {
-constexpr bool hasEnoughResources(const zappy::server::command::InventoryArray& groundInv,
-                                  const zappy::server::command::InventoryArray& required) {
+constexpr bool hasEnoughResources(const zappy::server::game::InventoryArray& groundInv,
+                                  const zappy::server::game::InventoryArray& required) {
     for (std::size_t i = 0; i < groundInv.size(); ++i) {
         if (groundInv.at(i) < required.at(i)) {
             return false;
@@ -210,7 +209,7 @@ void Player::levelUp() { _level++; }
 
 bool Player::checkCondition(const std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)>& resources,
                             const std::size_t nbPlayer) const {
-    auto condition = command::getCondition().at(_level - 1);
+    auto condition = getCondition().at(_level - 1);
     return condition.nbPlayer <= nbPlayer && hasEnoughResources(resources, condition.resources);
 }
 
