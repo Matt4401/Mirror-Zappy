@@ -38,8 +38,12 @@ void checkBroadcastMessage(const game::Position& receiverPos, const std::string&
     ASSERT_TRUE(senderIdOpt.has_value());
     ASSERT_TRUE(receiverIdOpt.has_value());
 
-    const auto senderId = senderIdOpt.value();
-    const auto receiverId = receiverIdOpt.value();
+    unsigned long senderId = 0;
+    unsigned long receiverId = 0;
+    if (senderIdOpt.has_value() && receiverIdOpt.has_value()) {
+        senderId = senderIdOpt.value();
+        receiverId = receiverIdOpt.value();
+    }
 
     const auto& playerList = world.playerList();
     auto& sender = *playerList.at(senderId);
