@@ -206,12 +206,26 @@ void Core::handleGuiMessage(int clientId, std::string_view message) {
     auto command = _commandFactory.createGuiCommand(message);
 
     if (command != nullptr) {
-        const std::string response = command->execute(*this);
+        const auto response = command->execute(*this);
 
         _timeUnit = static_cast<int>(1.0F / static_cast<float>(_config.freq) * 1000);
-        if (!response.empty()) {
-            _sessionManager->sendMessage(clientId, response);
+        if (response.message.empty() || response.isArgumentError || response.isCommandError) {
+            if (response.isArgumentError) {
+                _sessionManager->sendMessage(clientId, "sbp\n");
+            } else {
+                _sessionManager->sendMessage(clientId, "suc\n");
+            }
+            return;
         }
+        if (response.sendToEveryone) {
+            for (const auto& [clientId, state] : _clientStates) {
+                if (state == ClientState::GUI) {
+                    _sessionManager->sendMessage(clientId, response.message);
+                }
+            }
+            return;
+        }
+        _sessionManager->sendMessage(clientId, response.message);
     } else {
         _sessionManager->sendMessage(clientId, "suc\n");
     }
@@ -266,8 +280,8 @@ void Core::sendGuiInitialState(int clientId) {
     _sessionManager->sendMessage(
         clientId,
         shared::protocol::Emitter::build(shared::protocol::server::Sgt{.timeUnit = static_cast<int>(_config.freq)}));
-    _sessionManager->sendMessage(clientId, mct.execute(*this));
-    _sessionManager->sendMessage(clientId, tna.execute(*this));
+    _sessionManager->sendMessage(clientId, mct.execute(*this).message);
+    _sessionManager->sendMessage(clientId, tna.execute(*this).message);
     for (const auto& [eggId, egg] : eggs) {
         _sessionManager->sendMessage(clientId, shared::protocol::Emitter::build(shared::protocol::server::Enw{
                                                    .eggId = static_cast<int>(egg.id),
