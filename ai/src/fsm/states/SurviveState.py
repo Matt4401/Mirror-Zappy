@@ -6,7 +6,7 @@ class SurviveState(AState):
         closest_food_idx = self.trantorian.vision.get_tile_index_of("food")
 
         if closest_food_idx is not None:
-            # self.trantorian.move_to_tile(closest_food_idx) # Fct de pathfinding de noah (pas encore push)
+            self.trantorian.move_to_tile(closest_food_idx)
             self.trantorian.send_command.take_object("food")
 
         else:
