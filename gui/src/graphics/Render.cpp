@@ -127,7 +127,11 @@ void Render::update() {
     if (_uiMode) {
         if (!_uiManager.isHovered()) {
             _map.handleEvent();
+        } else {
+            _map.clearHoveredTile();
         }
+    } else {
+        _map.clearHoveredTile();
     }
 
     _skybox.update(raylib::rcore::Window::frameTime(), static_cast<float>(_worldManager.timeUnit()));
