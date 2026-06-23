@@ -120,7 +120,7 @@ void Render::update() {
     handleInput();
 
     _uiManager.update();
-    _uiManager.handleEvent(_event);
+    _uiManager.handleEvent();
 
     if (_updateMode == UpdateMode::PauseMenuOnly) {
         return;
@@ -138,7 +138,7 @@ void Render::update() {
 
     if (_uiMode) {
         if (!_uiManager.isHovered()) {
-            _map.handleEvent(_event);
+            _map.handleEvent();
         }
     }
 

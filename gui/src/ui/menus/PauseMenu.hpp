@@ -11,7 +11,6 @@
 #include <memory>
 
 #include "events/EventDispatcher.hpp"
-#include "rcore/Event.hpp"
 #include "rtext/Font.hpp"
 #include "ui/IUIComponent.hpp"
 #include "ui/components/UIButton.hpp"
@@ -32,7 +31,7 @@ class PauseMenu : public IUIComponent {
 
     void draw() override;
     void update() override;
-    void handleEvent(const raylib::rcore::Event& event) override;
+    void handleEvent() override;
 
     void setPosition(float x, float y) override;
     void setSize(float width, float height) override;

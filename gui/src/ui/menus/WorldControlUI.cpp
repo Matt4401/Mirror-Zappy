@@ -243,7 +243,7 @@ void WorldControlUI::update() {
     }
 }
 
-void WorldControlUI::handleEvent(const raylib::rcore::Event& event) {
+void WorldControlUI::handleEvent() {
     if (!isVisible()) {
         return;
     }
@@ -264,15 +264,15 @@ void WorldControlUI::handleEvent(const raylib::rcore::Event& event) {
     }
 
     if (_foldBtn) {
-        _foldBtn->handleEvent(event);
+        _foldBtn->handleEvent();
     }
 
     if (_currentHeight > MinUpdateHeight) {
         if (_timeDropdown) {
-            _timeDropdown->handleEvent(event);
+            _timeDropdown->handleEvent();
         }
         if (_speedSlider) {
-            _speedSlider->handleEvent(event);
+            _speedSlider->handleEvent();
         }
     }
 }

@@ -11,7 +11,6 @@
 #include <vector>
 
 #include "IUIComponent.hpp"
-#include "rcore/Event.hpp"
 
 namespace zappy::gui::ui {
 
@@ -31,7 +30,7 @@ class UIManager {
 
     void update();
     void draw();
-    void handleEvent(const raylib::rcore::Event& event);
+    void handleEvent();
 
     [[nodiscard]] bool isHovered() const;
 

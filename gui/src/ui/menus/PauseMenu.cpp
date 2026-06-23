@@ -13,7 +13,6 @@
 
 #include "Color.hpp"
 #include "EventDispatcher.hpp"
-#include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
 #include "rtext/Font.hpp"
 #include "ui/components/UIButton.hpp"
@@ -82,14 +81,14 @@ void PauseMenu::update() {
     _settingsBtn->update();
 }
 
-void PauseMenu::handleEvent(const raylib::rcore::Event& event) {
+void PauseMenu::handleEvent() {
     if (!_isVisible) {
         return;
     }
-    _resumeBtn->handleEvent(event);
-    _exitBtn->handleEvent(event);
-    _uiConfigBtn->handleEvent(event);
-    _settingsBtn->handleEvent(event);
+    _resumeBtn->handleEvent();
+    _exitBtn->handleEvent();
+    _uiConfigBtn->handleEvent();
+    _settingsBtn->handleEvent();
 }
 
 void PauseMenu::setPosition(float /*x*/, float /*y*/) {}

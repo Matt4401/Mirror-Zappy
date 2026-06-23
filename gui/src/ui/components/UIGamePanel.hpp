@@ -14,7 +14,6 @@
 #include "Color.hpp"
 #include "UIPanel.hpp"
 #include "UIText.hpp"
-#include "rcore/Event.hpp"
 #include "rmath/Vector2.hpp"
 #include "ui/IUIComponent.hpp"
 
@@ -35,7 +34,7 @@ class UIGamePanel : public IUIComponent {
 
     void draw() override;
     void update() override;
-    void handleEvent(const raylib::rcore::Event& event) override;
+    void handleEvent() override;
 
     void setPosition(float x, float y) override;
     void setSize(float width, float height) override;

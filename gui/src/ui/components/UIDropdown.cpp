@@ -117,8 +117,7 @@ void UIDropdown::update() {
     }
 }
 
-void UIDropdown::handleEvent(const raylib::rcore::Event& event) {
-    (void)event;
+void UIDropdown::handleEvent() {
     if (!_isVisible) {
         return;
     }

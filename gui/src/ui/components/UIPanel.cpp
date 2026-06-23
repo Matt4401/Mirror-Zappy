@@ -54,13 +54,13 @@ void UIPanel::update() {
     }
 }
 
-void UIPanel::handleEvent(const raylib::rcore::Event& event) {
+void UIPanel::handleEvent() {
     if (!_isVisible) {
         return;
     }
     for (auto& child : std::views::reverse(_children)) {
         if (child->isVisible()) {
-            child->handleEvent(event);
+            child->handleEvent();
         }
     }
 }

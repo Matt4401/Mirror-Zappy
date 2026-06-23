@@ -148,7 +148,7 @@ void UIButton::update() {
     }
 }
 
-void UIButton::handleEvent(const raylib::rcore::Event& event) {
+void UIButton::handleEvent() {
     if (!_isVisible) {
         return;
     }
@@ -160,7 +160,7 @@ void UIButton::handleEvent(const raylib::rcore::Event& event) {
     }
 
     if (_label) {
-        _label->handleEvent(event);
+        _label->handleEvent();
     }
 }
 

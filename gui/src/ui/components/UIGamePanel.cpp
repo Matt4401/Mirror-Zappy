@@ -123,7 +123,7 @@ void UIGamePanel::update() {
     }
 }
 
-void UIGamePanel::handleEvent(const raylib::rcore::Event& event) {
+void UIGamePanel::handleEvent() {
     if (!_isVisible) {
         return;
     }
@@ -139,7 +139,7 @@ void UIGamePanel::handleEvent(const raylib::rcore::Event& event) {
         _isCollapsed = !_isCollapsed;
     }
 
-    _mainPanel->handleEvent(event);
+    _mainPanel->handleEvent();
 
     if (_isCollapsed) {
         return;
@@ -161,7 +161,7 @@ void UIGamePanel::handleEvent(const raylib::rcore::Event& event) {
 
             for (auto& child : _contentChildren) {
                 if (child->isVisible()) {
-                    child->handleEvent(event);
+                    child->handleEvent();
                 }
             }
         }

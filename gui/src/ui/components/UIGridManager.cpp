@@ -87,14 +87,14 @@ void UIGridManager::update() {
     }
 }
 
-void UIGridManager::handleEvent(const raylib::rcore::Event& event) {
+void UIGridManager::handleEvent() {
     if (!_isVisible) {
         return;
     }
 
     if (!_isConfigMode) {
         for (auto& _panel : std::ranges::reverse_view(_panels)) {
-            _panel.panel->handleEvent(event);
+            _panel.panel->handleEvent();
         }
         return;
     }
