@@ -15,9 +15,6 @@ class Trantorian:
         self.player_state = PlayerState(team_name)
         self.send_command = SendCommand(self.connection)
 
-    def run(self):
-        pass
-
     def move_to_tile(self, index):
         if index == 0:
             return

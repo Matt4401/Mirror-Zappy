@@ -8,7 +8,9 @@ from .Constant import DISTRIBUTION_VALUE
 class TickManager:
     def __init__(self, agent_id: int):
         self.tick = 0
-        self.broadcast_offset = (agent_id * PRIME_NUMBER_COMBINATION) % DISTRIBUTION_VALUE
+        self.broadcast_offset = (
+            agent_id * PRIME_NUMBER_COMBINATION
+        ) % DISTRIBUTION_VALUE
 
     def tick_update(self) -> list[str]:
         cmds = []

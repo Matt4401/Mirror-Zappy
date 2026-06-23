@@ -38,7 +38,7 @@ class FiniteStateMachine:
                 # lancer un broad cast
 
     def update_state(self):
-        food = self.trantorian.inventory.get_food()
+        food = self.trantorian.player_state.inventory.get_food()
 
         if food < SURVIVAL_THRESHOLD:
             self.transition_to(SurviveState)

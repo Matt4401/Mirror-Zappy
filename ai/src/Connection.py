@@ -63,6 +63,7 @@ class Connection:
         self.event_thread = None
         self.connect(host, port)
         self.do_handshake()
+        self.start()
 
     def connect(self, host, port):
         try:

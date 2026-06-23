@@ -1,8 +1,11 @@
 import sys
 import argparse
 from src.Trantorian import Trantorian
-from util.IdGenerator import generate_id
-from util.InitLogger import PlayerLogger
+from src.util.IdGenerator import generate_id
+from src.util.InitLogger import PlayerLogger
+from src.fsm.TickManager import TickManager
+from src.fsm.FSM import FiniteStateMachine
+from src.fsm.states.SurviveState import SurviveState
 
 
 def mainAI():
@@ -29,5 +32,11 @@ def mainAI():
 
     PlayerLogger.setup_logging(player_id)
 
-    main_class = Trantorian(port, machine, name)  # noqa: F841
-    main_class.run()
+    trantorian = Trantorian(port, machine, name)  # noqa: F841
+    print("trantorian is readyy")
+
+    id = generate_id(trantorian.team_name)
+
+    tick_manager = TickManager(10)
+    fsm = FiniteStateMachine(SurviveState, trantorian, tick_manager)
+    fsm.run()
