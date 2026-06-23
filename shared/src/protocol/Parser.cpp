@@ -7,6 +7,7 @@
 
 #include "protocol/Parser.hpp"
 
+#include <istream>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -227,6 +228,7 @@ ServerCommand parseServerSbp(std::istringstream& /*unused*/) { return server::Sb
 
 ClientCommand parseClientMsz(std::istringstream& iss) {
     client::Msz cmd{};
+    iss >> std::ws;
     if (iss.eof()) {
         return cmd;
     }
@@ -235,6 +237,7 @@ ClientCommand parseClientMsz(std::istringstream& iss) {
 
 ClientCommand parseClientBct(std::istringstream& iss) {
     client::Bct cmd{};
+    iss >> std::ws;
     if (iss >> cmd.x >> cmd.y && iss.eof()) {
         return cmd;
     }
@@ -243,6 +246,7 @@ ClientCommand parseClientBct(std::istringstream& iss) {
 
 ClientCommand parseClientMct(std::istringstream& iss) {
     client::Mct cmd{};
+    iss >> std::ws;
     if (iss.eof()) {
         return cmd;
     }
@@ -250,6 +254,7 @@ ClientCommand parseClientMct(std::istringstream& iss) {
 }
 ClientCommand parseClientTna(std::istringstream& iss) {
     client::Tna cmd{};
+    iss >> std::ws;
     if (iss.eof()) {
         return cmd;
     }
@@ -258,6 +263,7 @@ ClientCommand parseClientTna(std::istringstream& iss) {
 
 ClientCommand parseClientPpo(std::istringstream& iss) {
     client::Ppo cmd{};
+    iss >> std::ws;
     if (extractHashId(iss, cmd.playerId)) {
         return cmd;
     }
@@ -266,6 +272,7 @@ ClientCommand parseClientPpo(std::istringstream& iss) {
 
 ClientCommand parseClientPlv(std::istringstream& iss) {
     client::Plv cmd{};
+    iss >> std::ws;
     if (extractHashId(iss, cmd.playerId)) {
         return cmd;
     }
@@ -274,6 +281,7 @@ ClientCommand parseClientPlv(std::istringstream& iss) {
 
 ClientCommand parseClientPin(std::istringstream& iss) {
     client::Pin cmd{};
+    iss >> std::ws;
     if (extractHashId(iss, cmd.playerId)) {
         return cmd;
     }
@@ -282,6 +290,7 @@ ClientCommand parseClientPin(std::istringstream& iss) {
 
 ClientCommand parseClientSgt(std::istringstream& iss) {
     client::Sgt cmd{};
+    iss >> std::ws;
     if (iss.eof()) {
         return cmd;
     }
@@ -290,6 +299,7 @@ ClientCommand parseClientSgt(std::istringstream& iss) {
 
 ClientCommand parseClientSst(std::istringstream& iss) {
     client::Sst cmd{};
+    iss >> std::ws;
     if (iss >> cmd.timeUnit) {
         return cmd;
     }

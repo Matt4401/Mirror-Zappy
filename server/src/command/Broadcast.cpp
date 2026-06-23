@@ -82,9 +82,9 @@ std::uint8_t Broadcast::getDirectionFromAngle(double angleInDegrees) {
     if (angleInDegrees < 0.0) {
         angleInDegrees += 360.0;
     }
-    const auto sector = static_cast<int>(std::round(angleInDegrees / kSectorSize)) % 8;
+    const auto sector = static_cast<int>(std::round(angleInDegrees / kSectorSize)) % kDirectionNumber;
 
-    return directionMapping.at(sector);
+    return kDirectionMapping.at(sector);
 }
 
 }  // namespace zappy::server::command

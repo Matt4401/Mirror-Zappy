@@ -17,10 +17,11 @@
 #include "game/Player.hpp"
 #include "game/World.hpp"
 
-static constexpr int kTimeLimit = 7;
-static constexpr double kSectorSize = 360 / 8.0;
-static constexpr double kHalfSectorSize = kSectorSize / 2.0;
-static constexpr std::array<std::uint8_t, 8> directionMapping = {1, 2, 3, 4, 5, 6, 7, 8};
+constexpr int kTimeLimit = 7;
+constexpr double kSectorSize = 360 / 8.0;
+constexpr double kHalfSectorSize = kSectorSize / 2.0;
+constexpr std::uint8_t kDirectionNumber = 8;
+constexpr std::array<std::uint8_t, kDirectionNumber> kDirectionMapping = {1, 2, 3, 4, 5, 6, 7, 8};
 
 namespace zappy::server::command {
 
