@@ -14,6 +14,8 @@
 #include "command/ACommand.hpp"
 #include "game/Player.hpp"
 #include "game/World.hpp"
+#include "protocol/Commands.hpp"
+#include "protocol/Emitter.hpp"
 
 namespace zappy::server::command {
 Take::Take(std::string arg) : ACommand{kTimeLimit}, _arg(std::move(arg)) {}
@@ -25,7 +27,14 @@ bool Take::start(game::World& world, game::Player& player) {
         return false;
     }
     const auto& resources = world.resourcesAt(player.position());
-    return resources.at(static_cast<std::uint8_t>(it->second)) > 0;
+
+    if (resources.at(static_cast<std::uint8_t>(it->second)) > 0) {
+        world.addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pdr{
+            .playerId = static_cast<int>(player.id()),
+        }));
+        return true;
+    }
+    return false;
 }
 void Take::execute(game::World& world, game::Player& player) {
     const game::ItemType item = game::mapItemString().at(_arg);
