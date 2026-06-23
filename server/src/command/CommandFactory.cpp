@@ -28,6 +28,7 @@
 #include "guiCommand/Mct.hpp"
 #include "guiCommand/Msz.hpp"
 #include "guiCommand/Sgt.hpp"
+#include "guiCommand/Sst.hpp"
 #include "guiCommand/Tna.hpp"
 #include "protocol/Commands.hpp"
 #include "protocol/Parser.hpp"
@@ -71,6 +72,14 @@ CommandFactory::CommandFactory() {
     });
     _guiCreators.emplace("mct", [](std::string_view) { return std::make_unique<guiCommand::Mct>(); });
     _guiCreators.emplace("tna", [](std::string_view) { return std::make_unique<guiCommand::Tna>(); });
+    _guiCreators.emplace("sst", [](std::string_view rawCommand) -> std::unique_ptr<guiCommand::IGuiCommand> {
+        auto parsedCmd = shared::protocol::Parser::parseClientCommand(rawCommand);
+
+        if (const auto* sstParams = std::get_if<shared::protocol::client::Sst>(&parsedCmd)) {
+            return std::make_unique<guiCommand::Sst>(sstParams->timeUnit);
+        }
+        return nullptr;
+    });
 }
 
 std::unique_ptr<ICommand> CommandFactory::createCommand(std::string_view rawCommand) const {
