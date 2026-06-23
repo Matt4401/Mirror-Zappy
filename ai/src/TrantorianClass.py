@@ -1,5 +1,4 @@
 import math
-from SendCommand import SendCommand
 
 
 class Trantorian:
