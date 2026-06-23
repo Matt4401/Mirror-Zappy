@@ -1,4 +1,5 @@
-from src.InventoryClass import Inventory
+from util.InventoryClass import Inventory
+from util.VisionManager import VisionManager
 import random
 
 
@@ -7,14 +8,8 @@ class PlayerState:
         self.level = 0
         self.team_name = team_name
         self.direction = random.randint(1, 8)
-        self.vision = None
+        self.vision = VisionManager()
         self.inventory = Inventory()
-
-    def get_food(self):
-        return self.food_remaining
-
-    def update_food(self, new_food):
-        self.food_remaining += new_food
 
     def get_direction(self):
         return self.direction
@@ -34,8 +29,12 @@ class PlayerState:
     def update_inventory(self, new_inventory):
         self.inventory = new_inventory
 
+    def get_food(self):
+        return self.inventory.get_food()
+
     def upgrade_level(self):
         self.level += 1
+        self.vision.set_level(self.level)
 
     def get_level(self):
         return self.level
