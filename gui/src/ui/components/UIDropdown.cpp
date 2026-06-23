@@ -10,6 +10,7 @@
 #include <cstddef>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -67,7 +68,7 @@ void UIDropdown::draw() {
             raylib::rmath::Rectangle const itemRec{
                 .x = _position.x(), .y = currentY, .width = _size.x(), .height = _size.y()};
 
-            bool const isHovered = (_hoveredIndex >= 0 && i == static_cast<size_t>(_hoveredIndex));
+            bool const isHovered = (_hoveredIndex.has_value() && i == _hoveredIndex.value());
             Shapes::drawRectangleRec(itemRec, isHovered ? HoverColor : BackgroundColor);
             Shapes::drawRectangleLinesEx(itemRec, 1.0F, BorderColor);
 
@@ -94,7 +95,7 @@ void UIDropdown::update() {
     _isMainHovered = (mousePos.x() >= mainRec.x && mousePos.x() <= mainRec.x + mainRec.width &&
                       mousePos.y() >= mainRec.y && mousePos.y() <= mainRec.y + mainRec.height);
 
-    _hoveredIndex = -1;
+    _hoveredIndex = std::nullopt;
     if (_isOpen) {
         float startY = _position.y();
         if (_direction == Direction::DOWN) {
@@ -109,7 +110,7 @@ void UIDropdown::update() {
                 .x = _position.x(), .y = currentY, .width = _size.x(), .height = _size.y()};
             if (mousePos.x() >= itemRec.x && mousePos.x() <= itemRec.x + itemRec.width && mousePos.y() >= itemRec.y &&
                 mousePos.y() <= itemRec.y + itemRec.height) {
-                _hoveredIndex = static_cast<int>(i);
+                _hoveredIndex = i;
                 break;
             }
         }
@@ -124,8 +125,8 @@ void UIDropdown::handleEvent(const raylib::rcore::Event& event) {
 
     if (raylib::rcore::Event::isMouseButtonReleased(MouseLeftButton)) {
         if (_isOpen) {
-            if (_hoveredIndex != -1) {
-                _selectedIndex = static_cast<size_t>(_hoveredIndex);
+            if (_hoveredIndex.has_value()) {
+                _selectedIndex = _hoveredIndex.value();
                 if (_onSelect) {
                     _onSelect(_options.at(_selectedIndex));
                 }

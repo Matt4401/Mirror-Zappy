@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -70,7 +71,7 @@ class UIDropdown : public IUIComponent {
     std::shared_ptr<raylib::rtext::Font> _fontRef;
     std::function<void(const std::string&)> _onSelect;
 
-    int _hoveredIndex{-1};
+    std::optional<size_t> _hoveredIndex{std::nullopt};
     bool _isMainHovered{false};
 
     static constexpr int MouseLeftButton = 0;
