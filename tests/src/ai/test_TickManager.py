@@ -5,7 +5,6 @@ from unittest.mock import patch
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
 
-# Import de la classe depuis le package util
 from ai.src.fsm.TickManager import TickManager
 
 
@@ -15,7 +14,6 @@ def test_tick_manager_initialization():
     assert tm.broadcast_offset == 21
 
 
-# Remplacement des cibles de patch par le chemin absolu exact
 @patch("ai.src.fsm.TickManager.INVENTORY_INTERVAL", 5)
 @patch("ai.src.fsm.TickManager.LOOK_INTERVAL", 10)
 @patch("ai.src.fsm.TickManager.BROADCAST_INTERVAL", 20)
