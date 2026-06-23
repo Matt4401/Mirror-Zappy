@@ -11,6 +11,8 @@
 #include <memory>
 #include <utility>
 
+#include "PlayerManager.hpp"
+#include "TileManager.hpp"
 #include "events/EventDispatcher.hpp"
 #include "protocol/Commands.hpp"
 
@@ -19,44 +21,49 @@ WorldManager::WorldManager(std::shared_ptr<events::EventDispatcher> dispatcher) 
     if (!_dispatcher) {
         return;
     }
-    subscribe<shared::protocol::server::Msz>(
-        [this](const shared::protocol::server::Msz& command) { _tileManager.handleMapSize(command); });
-    subscribe<shared::protocol::server::Bct>(
-        [this](const shared::protocol::server::Bct& command) { _tileManager.handleTileContent(command); });
-    subscribe<shared::protocol::server::Tna>(
-        [this](const shared::protocol::server::Tna& command) { _playerManager.handleTeamName(command); });
-    subscribe<shared::protocol::server::Pnw>(
-        [this](const shared::protocol::server::Pnw& command) { _playerManager.handlePlayerConnected(command); });
-    subscribe<shared::protocol::server::Ppo>(
-        [this](const shared::protocol::server::Ppo& command) { _playerManager.handlePlayerPosition(command); });
-    subscribe<shared::protocol::server::Plv>(
-        [this](const shared::protocol::server::Plv& command) { _playerManager.handlePlayerLevel(command); });
-    subscribe<shared::protocol::server::Pin>(
-        [this](const shared::protocol::server::Pin& command) { _playerManager.handlePlayerInventory(command); });
-    subscribe<shared::protocol::server::Pic>(
-        [this](const shared::protocol::server::Pic& command) { _playerManager.handleIncantationStart(command); });
-    subscribe<shared::protocol::server::Pie>(
-        [this](const shared::protocol::server::Pie& command) { _playerManager.handleIncantationEnd(command); });
-    subscribe<shared::protocol::server::Pdr>(
-        [this](const shared::protocol::server::Pdr& command) { _playerManager.handleResourceDropped(command); });
-    subscribe<shared::protocol::server::Pgt>(
-        [this](const shared::protocol::server::Pgt& command) { _playerManager.handleResourceCollected(command); });
-    subscribe<shared::protocol::server::Pdi>(
-        [this](const shared::protocol::server::Pdi& command) { _playerManager.handlePlayerDeath(command); });
-    subscribe<shared::protocol::server::Enw>(
-        [this](const shared::protocol::server::Enw& command) { _playerManager.handleEggLaid(command); });
+    initMapSubscriptions();
+    initPlayerSubscriptions();
+    initResourceSubscriptions();
+    initEggSubscriptions();
+    initGameSubscriptions();
+}
+
+void WorldManager::initMapSubscriptions() {
+    registerHandler(&_tileManager, &TileManager::handleMapSize);
+    registerHandler(&_tileManager, &TileManager::handleTileContent);
+}
+
+void WorldManager::initPlayerSubscriptions() {
+    registerHandler(&_playerManager, &PlayerManager::handleTeamName);
+    registerHandler(&_playerManager, &PlayerManager::handlePlayerConnected);
+    registerHandler(&_playerManager, &PlayerManager::handlePlayerPosition);
+    registerHandler(&_playerManager, &PlayerManager::handlePlayerLevel);
+    registerHandler(&_playerManager, &PlayerManager::handlePlayerInventory);
+    registerHandler(&_playerManager, &PlayerManager::handlePlayerDeath);
+}
+
+void WorldManager::initResourceSubscriptions() {
+    registerHandler(&_playerManager, &PlayerManager::handleIncantationStart);
+    registerHandler(&_playerManager, &PlayerManager::handleIncantationEnd);
+    registerHandler(&_playerManager, &PlayerManager::handleResourceDropped);
+    registerHandler(&_playerManager, &PlayerManager::handleResourceCollected);
+}
+
+void WorldManager::initEggSubscriptions() {
+    registerHandler(&_playerManager, &PlayerManager::handleEggLaid);
     subscribe<shared::protocol::server::Ebo>(
         [this](const shared::protocol::server::Ebo& command) { _playerManager.handleEggRemoved(command); });
     subscribe<shared::protocol::server::Edi>(
         [this](const shared::protocol::server::Edi& command) { _playerManager.handleEggRemoved(command); });
+}
+
+void WorldManager::initGameSubscriptions() {
     subscribe<shared::protocol::server::Sgt>(
         [this](const shared::protocol::server::Sgt& command) { handleTimeUnit(command); });
     subscribe<shared::protocol::server::Sst>(
         [this](const shared::protocol::server::Sst& command) { handleTimeUnit(command); });
-    subscribe<shared::protocol::server::Seg>(
-        [this](const shared::protocol::server::Seg& command) { handleGameEnd(command); });
-    subscribe<shared::protocol::server::Smg>(
-        [this](const shared::protocol::server::Smg& command) { handleServerMessage(command); });
+    registerHandler(this, &WorldManager::handleGameEnd);
+    registerHandler(this, &WorldManager::handleServerMessage);
 }
 
 WorldManager::~WorldManager() {

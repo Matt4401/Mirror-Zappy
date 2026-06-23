@@ -57,6 +57,17 @@ class WorldManager {
     void handleUnknownCommand(const shared::protocol::ServerCommand& command) {}  // TODO
     void handleWrongParam(const shared::protocol::server::Sbp& command) {}        // TODO
 
+    void initMapSubscriptions();
+    void initPlayerSubscriptions();
+    void initResourceSubscriptions();
+    void initEggSubscriptions();
+    void initGameSubscriptions();
+
+    template <typename Cmd, typename InstanceType>
+    void registerHandler(InstanceType* instance, void (InstanceType::*handler)(const Cmd&)) {
+        subscribe<Cmd>([instance, handler](const Cmd& cmd) { (instance->*handler)(cmd); });
+    }
+
     template <typename EventType>
     void subscribe(const std::function<void(const EventType&)>& callback) {
         const auto token = _dispatcher->subscribe<EventType>(callback);
