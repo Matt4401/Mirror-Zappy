@@ -139,6 +139,55 @@ bool Player::hasCommands() const { return _currentCommand != nullptr || !_comman
 
 void Player::setPosition(const Position pos) { _pos = pos; }
 
+Position Player::getLeftTile(const Position ogPos, const Position& mapLimit) {
+    auto [fst, snd] = leftTile.at(static_cast<uint8_t>(_orientation));
+    const std::size_t width = mapLimit.x;
+    const std::size_t height = mapLimit.y;
+    Position newPos{};
+
+    newPos.x = (ogPos.x + fst + width) % width;
+    newPos.y = (ogPos.y + snd + height) % height;
+
+    return newPos;
+}
+
 std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> Player::inventory() const { return _inventory; }
+
+std::vector<Position> Player::getLookPos(const Position mapLimit) {
+    std::vector pos{{Position{.x = _pos.x, .y = _pos.y}}};
+    pos.reserve((static_cast<std::size_t>(_level) + 1) * (static_cast<std::size_t>(_level) + 1));
+
+    for (std::uint8_t i = 0; i < _level; i++) {
+        const Position actualDiagPos = getNthDiagonalLeftPosition(i + 1, mapLimit);
+        pos.emplace_back(actualDiagPos);
+        const int stepsToRight = 2 * (i + 1);
+        for (int j = 0; j < stepsToRight; j++) {
+            pos.emplace_back(getLeftTile(pos.back(), mapLimit));
+        }
+    }
+    return pos;
+}
+
+Position Player::getNthDiagonalLeftPosition(const std::size_t n, const Position mapLimit) {
+    auto [baseDx, baseDy] = diagonalLeftMove.at(static_cast<std::uint8_t>(_orientation));
+
+    const int width = static_cast<int>(mapLimit.x);
+    const int height = static_cast<int>(mapLimit.y);
+    const int step = static_cast<int>(n);
+
+    const int dx = baseDx * step;
+    const int dy = baseDy * step;
+
+    int newX = (static_cast<int>(_pos.x) + dx) % width;
+    if (newX < 0) {
+        newX += width;
+    }
+    int newY = (static_cast<int>(_pos.y) + dy) % height;
+    if (newY < 0) {
+        newY += height;
+    }
+
+    return Position{.x = static_cast<std::size_t>(newX), .y = static_cast<std::size_t>(newY)};
+}
 
 }  // namespace zappy::server::game
