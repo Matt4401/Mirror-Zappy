@@ -20,9 +20,8 @@
 
 namespace zappy::gui::ui::menus {
 
-PauseMenu::PauseMenu(std::shared_ptr<events::EventDispatcher> dispatcher,
-                     const std::shared_ptr<raylib::rtext::Font>& font)
-    : _dispatcher(std::move(dispatcher)) {
+PauseMenu::PauseMenu(events::EventDispatcher& dispatcher, const std::shared_ptr<raylib::rtext::Font>& font)
+    : _dispatcher(dispatcher) {
     int const screenWidth = raylib::rcore::Window::screenWidth();
     int const screenHeight = raylib::rcore::Window::screenHeight();
 

@@ -17,7 +17,7 @@
 #include "rtextures/Texture2D.hpp"
 
 namespace zappy::gui::game {
-GameModel::GameModel(std::shared_ptr<raylib::rcore::Camera>& camera) : _camera(camera) {
+GameModel::GameModel(raylib::rcore::Camera& camera) : _camera(camera) {
     if (_playerModel.model().materials != nullptr &&
         _playerModel.model().materials[0].maps !=  // NOLINT (cppcoreguidelines-pro-bounds-pointer-arithmetic)
             nullptr) {
@@ -33,7 +33,7 @@ GameModel::GameModel(std::shared_ptr<raylib::rcore::Camera>& camera) : _camera(c
 
 void GameModel::drawPlayer(raylib::rmath::Vector3 position,
                            const std::shared_ptr<raylib::rtextures::Texture2D>& texture) const {
-    if (_camera->isVisibleFromCamera(position)) {
+    if (_camera.get().isVisibleFromCamera(position)) {
         if (texture && texture->valid()) {
             _playerModel.setMaterialTexture(0, MATERIAL_MAP_ALBEDO, *texture);
         } else if (_defaultPlayerTexture && _defaultPlayerTexture->valid()) {
@@ -43,7 +43,7 @@ void GameModel::drawPlayer(raylib::rmath::Vector3 position,
     }
 }
 void GameModel::drawEgg(raylib::rmath::Vector3 position) const {
-    if (_camera->isVisibleFromCamera(position)) {
+    if (_camera.get().isVisibleFromCamera(position)) {
         _eggModel.drawModel(position, EGG_SCALE, raylib::Color::White());
     }
 }

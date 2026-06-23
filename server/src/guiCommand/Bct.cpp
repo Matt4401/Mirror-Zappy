@@ -18,7 +18,7 @@
 
 namespace zappy::server::guiCommand {
 
-Bct::Bct(int x, int y) : _x(x), _y(y) {}
+Bct::Bct(shared::protocol::client::Bct cmd) : _x(cmd.x), _y(cmd.y) {}
 
 GuiResponse Bct::execute(Core& core) {
     const auto mapSize = core.world().sizeMap();

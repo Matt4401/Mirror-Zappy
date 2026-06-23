@@ -48,3 +48,6 @@ target_link_libraries(zappy_gui_ui PUBLIC
         zappy_shared
         zappy_gui_events
 )
+target_link_libraries(zappy_gui_ui PRIVATE
+        zappy_gui_assets
+)

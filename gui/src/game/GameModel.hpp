@@ -6,6 +6,7 @@
 */
 
 #pragma once
+#include <functional>
 #include <memory>
 
 #include "rcore/Camera.hpp"
@@ -21,7 +22,7 @@ class GameModel {
     static constexpr auto EGG_MODEL_RESOURCE = "assets/minecraft_dragon_egg/scene.gltf";
     static constexpr auto EGG_SCALE = 0.6F;
 
-    GameModel(std::shared_ptr<raylib::rcore::Camera>& camera);
+    GameModel(raylib::rcore::Camera& camera);
     ~GameModel() = default;
     GameModel(const GameModel& other) = delete;
     GameModel& operator=(const GameModel& other) = delete;
@@ -34,7 +35,7 @@ class GameModel {
 
   protected:
   private:
-    std::shared_ptr<raylib::rcore::Camera> _camera;
+    std::reference_wrapper<raylib::rcore::Camera> _camera;
     mutable raylib::rmodels::Model _playerModel{PLAYER_MODEL_RESOURCE};
     std::shared_ptr<raylib::rtextures::Texture2D> _defaultPlayerTexture;
     raylib::rmodels::Model _eggModel{EGG_MODEL_RESOURCE};

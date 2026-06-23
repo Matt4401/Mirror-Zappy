@@ -7,6 +7,9 @@
 
 #include <gtest/gtest.h>
 
+#include <memory>
+#include <utility>
+
 #include "../../../../gui/src/events/EventDispatcher.hpp"
 #include "protocol/Commands.hpp"
 
@@ -68,4 +71,18 @@ TEST(EventDispatcherTest, MultipleListenersAndDifferentCommands) {
 
     EXPECT_EQ(mszCount, 2);
     EXPECT_EQ(pnwCount, 1);
+}
+
+TEST(EventDispatcherTest, SupportsMoveOnlyCallback) {
+    EventDispatcher dispatcher;
+    int receivedWidth = 0;
+    auto state = std::make_unique<int>(5);
+
+    const auto token = dispatcher.subscribe<server::Msz>(
+        [state = std::move(state), &receivedWidth](const server::Msz& cmd) { receivedWidth = *state + cmd.width; });
+    (void)token;
+
+    dispatcher.dispatch(server::Msz{.width = 10, .height = 20});
+
+    EXPECT_EQ(receivedWidth, 15);
 }

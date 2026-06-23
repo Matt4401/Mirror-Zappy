@@ -14,6 +14,7 @@
 #include "AInspectorUI.hpp"
 #include "EventDispatcher.hpp"
 #include "events/GuiEvents.hpp"
+#include "graphics/scene/Tile3D.hpp"
 #include "protocol/Commands.hpp"
 #include "rtext/Font.hpp"
 #include "ui/components/UIImage.hpp"
@@ -23,7 +24,7 @@ namespace zappy::gui::ui::menus {
 
 class TileInspectorUI : public AInspectorUI {
   public:
-    TileInspectorUI(float x, float y, float width, std::shared_ptr<events::EventDispatcher> dispatcher,
+    TileInspectorUI(float x, float y, float width, events::EventDispatcher& dispatcher,
                     const std::shared_ptr<raylib::rtext::Font>& font,
                     std::function<void(const std::string&)> onSendCommand = nullptr);
     ~TileInspectorUI() override;
@@ -49,8 +50,7 @@ class TileInspectorUI : public AInspectorUI {
 
     void onBctReceived(const shared::protocol::server::Bct& cmd);
 
-    int _targetGridX{-1};
-    int _targetGridY{-1};
+    graphics::scene::Tile3DPosition _targetGridPosition = graphics::scene::Tile3DPosition(-1, -1);
 
     std::shared_ptr<components::UIText> _posText;
     std::shared_ptr<components::UIText> _scannerTitle;

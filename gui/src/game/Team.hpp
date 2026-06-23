@@ -7,8 +7,11 @@
 
 #pragma once
 #include <cstddef>
+#include <functional>
+#include <optional>
 #include <rmath/Vector3.hpp>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "Color.hpp"
@@ -19,8 +22,8 @@
 namespace zappy::gui::game {
 class Team {
   public:
-    Team(std::string& name, std::size_t slot, raylib::Color teamColor)
-        : _name(name), _teamColor(teamColor), _eggs(slot) {};
+    Team(std::string name, std::size_t slot, raylib::Color teamColor)
+        : _name(std::move(name)), _teamColor(teamColor), _eggs(slot) {};
     ~Team() = default;
     Team(const Team& other) = delete;
     Team& operator=(const Team& other) = delete;
@@ -29,21 +32,20 @@ class Team {
 
     void draw(const GameModel& gameModel) const;
 
-    void addPlayer(int id, raylib::rmath::Vector3 position, Player::cardinalPoint orientation) {
-        _players.emplace_back(id, position, _name + std::to_string(id), orientation);
-    }
+    Player& addPlayer(int id, raylib::rmath::Vector3 position, Player::cardinalPoint orientation,
+                      std::size_t level = 1);
 
-    void updatePlayerName(int id, const std::string& name) {
-        for (auto& player : _players) {
-            if (player.id() == id) {
-                player.setName(name);
-                break;
-            }
-        }
-    }
+    void updatePlayerName(int id, const std::string& name);
 
+    [[nodiscard]] bool hasPlayer(int id) const;
+    [[nodiscard]] std::optional<std::reference_wrapper<Player>> findPlayer(int id);
+    [[nodiscard]] std::optional<std::reference_wrapper<const Player>> findPlayer(int id) const;
+    void removePlayer(int id);
+    void addEgg(int id, int playerId, const raylib::rmath::Vector3& position);
+    void removeEgg(int id);
     [[nodiscard]] const std::string& name() const { return _name; }
     [[nodiscard]] const std::vector<Player>& players() const { return _players; }
+    [[nodiscard]] const std::vector<Egg>& eggs() const { return _eggs; }
     [[nodiscard]] raylib::Color color() const { return _teamColor; }
 
   protected:
