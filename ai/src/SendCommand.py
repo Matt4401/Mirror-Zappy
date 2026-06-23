@@ -12,10 +12,10 @@ class SendCommand:
         self.connection.send_connection("Left")
 
     def look(self):
-        self.connection.send_connection("Look")
+        return self.connection.send_connection("Look")
 
     def inventory(self):
-        self.connection.send_connection("Inventory")
+        return self.connection.send_connection("Inventory")
 
     def broadcast(self, txt):
         self.connection.send_connection("Broadcast <" + txt + ">")
