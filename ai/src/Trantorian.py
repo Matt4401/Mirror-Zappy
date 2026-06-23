@@ -101,7 +101,7 @@ class Trantorian:
         for resource, required_amount in requirements.items():
             if resource == "player":
                 continue
-            current_amount = self.player_state.inventory.get(resource, 0)
+            current_amount = getattr(self.player_state.inventory, resource, 0)
             if current_amount < required_amount:
                 return False
 
@@ -116,7 +116,7 @@ class Trantorian:
         for resource, required_amount in requirements.items():
             if resource == "player":
                 continue
-            current_amount = self.player_state.inventory.get(resource, 0)
+            current_amount = getattr(self.player_state.inventory, resource, 0)
             if current_amount < required_amount:
                 missing[resource] = required_amount - current_amount
 
