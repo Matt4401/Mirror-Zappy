@@ -82,7 +82,7 @@ struct Pic {
 struct Pie {
     int x = 0;
     int y = 0;
-    int incantationResult = 0;
+    bool incantationResult = 0;
 };
 struct Pfk {
     int playerId = 0;

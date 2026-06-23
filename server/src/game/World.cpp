@@ -410,4 +410,15 @@ void World::clearAllResourcesAndEggs() {
 }
 const std::unordered_map<std::size_t, Egg>& World::vecEggs() const { return _vecEggs; }
 
+std::vector<int> World::playersWithSameLevelOnTile(const Position position, const int level) const {
+    const auto playerIds = _tiles.at(getTileIndex(position)).players;
+    std::vector<int> vecPlayerId{};
+    for (const auto& playerId : playerIds) {
+        if (_playerList.find(playerId)->second->level() == level) {
+            vecPlayerId.push_back(playerId);
+        }
+    }
+    return vecPlayerId;
+}
+
 }  // namespace zappy::server::game

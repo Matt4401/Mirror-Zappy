@@ -16,6 +16,7 @@
 #include <vector>
 
 #include "command/ICommand.hpp"
+#include "command/Incantation.hpp"
 #include "exception/TooMuchCmd.hpp"
 #include "game/World.hpp"
 
@@ -188,6 +189,25 @@ Position Player::getNthDiagonalLeftPosition(const std::size_t n, const Position 
     }
 
     return Position{.x = static_cast<std::size_t>(newX), .y = static_cast<std::size_t>(newY)};
+}
+
+int Player::level() const { return _level; }
+
+void Player::levelUp() { _level++; }
+
+constexpr bool hasEnoughResources(const command::InventoryArray& playerInv, const command::InventoryArray& required) {
+    for (std::size_t i = 0; i < playerInv.size(); ++i) {
+        if (playerInv.at(i) < required.at(i)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool Player::checkCondition(const std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)>& resources,
+                            const std::size_t nbPlayer) const {
+    auto condition = command::getCondition().at(_level - 1);
+    return condition.nbPlayer <= nbPlayer && hasEnoughResources(resources, condition.resources);
 }
 
 }  // namespace zappy::server::game
