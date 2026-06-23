@@ -66,7 +66,7 @@ class Player {
     ~Player() = default;
 
     void addItem(ItemType item, std::size_t quantity = 1);
-    void subItem(ItemType item, std::size_t quantity = 1);
+    bool subItem(ItemType item, std::size_t quantity = 1);
     void setItem(ItemType item, size_t amount);
     [[nodiscard]] std::size_t getItem(ItemType item) const;
 
