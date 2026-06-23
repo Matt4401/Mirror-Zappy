@@ -8,6 +8,8 @@ class SurviveState(AState):
         if closest_food_idx is not None:
             self.trantorian.move_to_tile(closest_food_idx)
             self.trantorian.send_command.take_object("food")
+            resp = self.trantorian.send_command.inventory()
+            self.trantorian.player_state.inventory.update_inventory(resp)
 
         else:
             look_resp = self.trantorian.send_command.look()
