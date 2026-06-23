@@ -12,7 +12,6 @@
 #include <utility>
 
 #include "Color.hpp"
-#include "rcore/Event.hpp"
 #include "rmath/Vector2.hpp"
 #include "rtext/Font.hpp"
 #include "rtext/Text.hpp"
@@ -36,7 +35,7 @@ void UIText::draw() {
 
 void UIText::update() {}
 
-void UIText::handleEvent(const raylib::rcore::Event& /*event*/) {}
+void UIText::handleEvent() {}
 
 void UIText::setPosition(float x, float y) { _position = raylib::rmath::Vector2(x, y); }
 

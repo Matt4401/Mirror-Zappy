@@ -14,7 +14,6 @@
 #include "Color.hpp"
 #include "UIPanel.hpp"
 #include "UIText.hpp"
-#include "rcore/Event.hpp"
 #include "rmath/Vector2.hpp"
 #include "ui/IUIComponent.hpp"
 
@@ -35,12 +34,13 @@ class UIGamePanel : public IUIComponent {
 
     void draw() override;
     void update() override;
-    void handleEvent(const raylib::rcore::Event& event) override;
+    void handleEvent() override;
 
     void setPosition(float x, float y) override;
     void setSize(float width, float height) override;
     [[nodiscard]] bool isVisible() const override;
     void setVisible(bool visible) override;
+    [[nodiscard]] bool isHovered() const override;
 
     void addComponent(const std::shared_ptr<IUIComponent>& component);
     void addHeaderComponent(const std::shared_ptr<IUIComponent>& component);
@@ -60,8 +60,17 @@ class UIGamePanel : public IUIComponent {
         }
     }
     [[nodiscard]] bool isConfigMode() const { return _isConfigMode; }
-    void setCustomLayout(bool customLayout) { _customLayout = customLayout; }
+    void setCustomLayout(bool custom) { _customLayout = custom; }
+    void setDragged(bool dragged) { _isDragged = dragged; }
+    [[nodiscard]] bool isDragged() const { return _isDragged; }
+
+    void setResizable(bool resizable) { _isResizable = resizable; }
+    [[nodiscard]] bool isResizable() const { return _isResizable; }
+
     void updateChildrenLayout();
+
+    [[nodiscard]] bool isCollapsed() const { return _isCollapsed; }
+    void setCollapsed(bool collapsed) { _isCollapsed = collapsed; }
 
     void setTitle(const std::string& title);
 
@@ -70,6 +79,16 @@ class UIGamePanel : public IUIComponent {
     [[nodiscard]] raylib::rmath::Vector2 getSize() const { return _size; }
     [[nodiscard]] float getCurrentHeight() const { return _currentHeight; }
     [[nodiscard]] static constexpr float getHeaderHeight() { return DefaultHeaderHeight; }
+
+  protected:
+    void setBasePosition(float x, float y) {
+        _position.setX(x);
+        _position.setY(y);
+    }
+    void setBaseSize(float width, float height) {
+        _size.setX(width);
+        _size.setY(height);
+    }
 
   private:
     void updateTextPosition();
@@ -88,7 +107,9 @@ class UIGamePanel : public IUIComponent {
 
     bool _isCollapsed{false};
     bool _isConfigMode{false};
-    bool _customLayout{false};
+    bool _customLayout = false;
+    bool _isDragged = false;
+    bool _isResizable = true;
     bool _wasVisibleBeforeConfig{true};
     float _expandedHeight;
     float _currentHeight;

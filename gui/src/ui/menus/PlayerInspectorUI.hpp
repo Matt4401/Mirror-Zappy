@@ -17,7 +17,6 @@
 #include "events/GuiEvents.hpp"
 #include "protocol/Commands.hpp"
 #include "rcore/Camera.hpp"
-#include "rcore/Event.hpp"
 #include "rmath/Vector3.hpp"
 #include "rmodels/Model.hpp"
 #include "rtext/Font.hpp"
@@ -43,7 +42,7 @@ class PlayerInspectorUI : public AInspectorUI {
 
     void draw() override;
     void update() override;
-    void handleEvent(const raylib::rcore::Event& event) override;
+    void handleEvent() override;
 
     void onPlayerClicked(const events::PlayerClicked& event);
     void setVisible(bool visible) override;

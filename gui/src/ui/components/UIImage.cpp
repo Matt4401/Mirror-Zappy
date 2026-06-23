@@ -14,7 +14,6 @@
 
 #include "Color.hpp"
 #include "graphics/AssetManager.hpp"
-#include "rcore/Event.hpp"
 
 namespace zappy::gui::ui::components {
 
@@ -40,7 +39,7 @@ void UIImage::draw() {
 
 void UIImage::update() {}
 
-void UIImage::handleEvent(const raylib::rcore::Event& /*event*/) {}
+void UIImage::handleEvent() {}
 
 void UIImage::setPosition(float x, float y) { _position = {x, y}; }
 

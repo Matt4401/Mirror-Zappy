@@ -20,7 +20,6 @@
 #include "game/Team.hpp"
 #include "game/components/IObject.hpp"
 #include "rcore/Camera.hpp"
-#include "rcore/Event.hpp"
 #include "rmodels/Model.hpp"
 
 namespace zappy::gui::graphics::scene {
@@ -49,7 +48,7 @@ class Map {
     Map& operator=(Map&& other) = delete;
 
     void draw() const;
-    void handleEvent(const raylib::rcore::Event& event);
+    void handleEvent();
 
   protected:
   private:
