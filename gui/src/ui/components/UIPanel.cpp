@@ -76,6 +76,18 @@ bool UIPanel::isVisible() const { return _isVisible; }
 
 void UIPanel::setVisible(bool visible) { _isVisible = visible; }
 
+bool UIPanel::isHovered() const {
+    if (!_isVisible) {
+        return false;
+    }
+    raylib::rmath::Vector2 const mousePos = raylib::rcore::Event::getMousePositionStatic();
+    raylib::rmath::Rectangle const rec{_position.x(), _position.y(), _size.x(), _size.y()};
+    if (raylib::rshapes::Shapes::checkCollisionPointRec(mousePos, rec)) {
+        return true;
+    }
+    return std::ranges::any_of(_children, [](const auto& child) { return child->isHovered(); });
+}
+
 void UIPanel::addComponent(const std::shared_ptr<IUIComponent>& component) {
     if (component && std::ranges::find(_children, component) == _children.end()) {
         _children.emplace_back(component);

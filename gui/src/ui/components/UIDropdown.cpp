@@ -7,8 +7,6 @@
 
 #include "UIDropdown.hpp"
 
-#include <raylib.h>
-
 #include <cstddef>
 #include <functional>
 #include <memory>
@@ -50,7 +48,7 @@ void UIDropdown::draw() {
     float const textYOffset = (_size.y() - DefaultFontSize) / 2.0F;
 
     if (!_options.empty() && _selectedIndex < _options.size()) {
-        UIText mainText(_options[_selectedIndex], _fontRef);
+        UIText mainText(_options.at(_selectedIndex), _fontRef);
         mainText.setFontSize(static_cast<int>(DefaultFontSize));
         mainText.setColor(TextColor);
         mainText.setPosition(_position.x() + TextPaddingX, _position.y() + textYOffset);
@@ -69,11 +67,11 @@ void UIDropdown::draw() {
             raylib::rmath::Rectangle const itemRec{
                 .x = _position.x(), .y = currentY, .width = _size.x(), .height = _size.y()};
 
-            bool const isHovered = (static_cast<int>(i) == _hoveredIndex);
+            bool const isHovered = (_hoveredIndex >= 0 && i == static_cast<size_t>(_hoveredIndex));
             Shapes::drawRectangleRec(itemRec, isHovered ? HoverColor : BackgroundColor);
             Shapes::drawRectangleLinesEx(itemRec, 1.0F, BorderColor);
 
-            UIText itemText(_options[i], _fontRef);
+            UIText itemText(_options.at(i), _fontRef);
             itemText.setFontSize(static_cast<int>(DefaultFontSize));
             itemText.setColor(TextColor);
             itemText.setPosition(_position.x() + TextPaddingX, currentY + textYOffset);
@@ -129,7 +127,7 @@ void UIDropdown::handleEvent(const raylib::rcore::Event& event) {
             if (_hoveredIndex != -1) {
                 _selectedIndex = static_cast<size_t>(_hoveredIndex);
                 if (_onSelect) {
-                    _onSelect(_options[_selectedIndex]);
+                    _onSelect(_options.at(_selectedIndex));
                 }
                 _isOpen = false;
             } else {
@@ -173,7 +171,7 @@ std::string UIDropdown::getSelectedOption() const {
     if (_options.empty() || _selectedIndex >= _options.size()) {
         return "";
     }
-    return _options[_selectedIndex];
+    return _options.at(_selectedIndex);
 }
 
 }  // namespace zappy::gui::ui::components

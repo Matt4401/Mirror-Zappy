@@ -35,7 +35,7 @@ class UIPanel : public IUIComponent {
     void setSize(float width, float height) override;
     [[nodiscard]] bool isVisible() const override;
     void setVisible(bool visible) override;
-    [[nodiscard]] bool isHovered() const override { return false; }
+    [[nodiscard]] bool isHovered() const override;
 
     void setRounded(bool rounded);
 

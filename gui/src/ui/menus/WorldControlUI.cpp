@@ -7,8 +7,6 @@
 
 #include "WorldControlUI.hpp"
 
-#include <raylib.h>
-
 #include <algorithm>
 #include <cmath>
 #include <functional>
@@ -86,7 +84,7 @@ void WorldControlUI::initTimeControls() {
     _timeTitle->setFontSize(DefaultFontSize);
     _timeTitle->setColor(raylib::Color::Black());
 
-    std::vector<std::string> options{"morning", "afternoon", "evening", "night", "cycle"};
+    const std::vector<std::string> options{"morning", "afternoon", "evening", "night", "cycle"};
     _timeDropdown = std::make_shared<components::UIDropdown>(0.0F, 0.0F, DropdownWidth, DropdownHeight, options, _font);
     _timeDropdown->setDirection(components::UIDropdown::Direction::UP);
     _timeDropdown->setSelectedIndex(4);
@@ -192,6 +190,17 @@ bool WorldControlUI::isHovered() const {
         if (raylib::rshapes::Shapes::checkCollisionPointRec(mousePos, contentRec)) {
             return true;
         }
+
+        if (_timeDropdown && _timeDropdown->isOpen()) {
+            raylib::rmath::Vector2 const ddPos = _timeDropdown->getPosition();
+            raylib::rmath::Vector2 const ddSize = _timeDropdown->getSize();
+            float const expandedHeight = ddSize.y() * static_cast<float>(_timeDropdown->getOptionsCount());
+            raylib::rmath::Rectangle const dropdownRec{
+                .x = ddPos.x(), .y = ddPos.y() - expandedHeight, .width = ddSize.x(), .height = expandedHeight};
+            if (raylib::rshapes::Shapes::checkCollisionPointRec(mousePos, dropdownRec)) {
+                return true;
+            }
+        }
     }
     return false;
 }
@@ -248,7 +257,7 @@ void WorldControlUI::handleEvent(const raylib::rcore::Event& event) {
         }
         if (_isDragging) {
             float const dx = raylib::rcore::Event::getMouseDeltaStatic().x();
-            float const screenWidth = static_cast<float>(raylib::rcore::Window::screenWidth());
+            auto const screenWidth = static_cast<float>(raylib::rcore::Window::screenWidth());
             setPosition(std::clamp(getPosition().x() + dx, 0.0F, screenWidth - getSize().x()), getPosition().y());
             return;
         }

@@ -98,6 +98,15 @@ void PauseMenu::setSize(float /*width*/, float /*height*/) {}
 bool PauseMenu::isVisible() const { return _isVisible; }
 void PauseMenu::setVisible(bool visible) { _isVisible = visible; }
 
+bool PauseMenu::isHovered() const {
+    if (!_isVisible) {
+        return false;
+    }
+    return (_backgroundPanel && _backgroundPanel->isHovered()) || (_resumeBtn && _resumeBtn->isHovered()) ||
+           (_exitBtn && _exitBtn->isHovered()) || (_uiConfigBtn && _uiConfigBtn->isHovered()) ||
+           (_settingsBtn && _settingsBtn->isHovered());
+}
+
 void PauseMenu::setOnExit(std::function<void()> callback) { _onExit = std::move(callback); }
 void PauseMenu::setOnUIConfig(std::function<void()> callback) { _onUIConfig = std::move(callback); }
 

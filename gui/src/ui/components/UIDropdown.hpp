@@ -50,6 +50,10 @@ class UIDropdown : public IUIComponent {
     void setSelectedIndex(size_t index);
     [[nodiscard]] size_t getSelectedIndex() const;
     [[nodiscard]] std::string getSelectedOption() const;
+    [[nodiscard]] bool isOpen() const { return _isOpen; }
+    [[nodiscard]] size_t getOptionsCount() const { return _options.size(); }
+    [[nodiscard]] raylib::rmath::Vector2 getPosition() const { return _position; }
+    [[nodiscard]] raylib::rmath::Vector2 getSize() const { return _size; }
 
   private:
     void updateTextPositions();
