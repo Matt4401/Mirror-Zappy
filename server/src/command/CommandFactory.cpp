@@ -76,25 +76,23 @@ void CommandFactory::registerCommands() {
 }
 
 void CommandFactory::registerGuiCommands() {
-    _guiCreators.emplace("msz", [](std::string_view) { return std::make_unique<guiCommand::Msz>(); });
-    _guiCreators.emplace("sgt", [](std::string_view) { return std::make_unique<guiCommand::Sgt>(); });
-    _guiCreators.emplace("bct", [](std::string_view rawCommand) -> std::unique_ptr<guiCommand::IGuiCommand> {
-        auto parsedCmd = shared::protocol::Parser::parseClientCommand(rawCommand);
-
-        if (const auto* bctParams = std::get_if<shared::protocol::client::Bct>(&parsedCmd)) {
-            return std::make_unique<guiCommand::Bct>(bctParams->x, bctParams->y);
-        }
-        return std::make_unique<guiCommand::Sbp>();
+    _guiCreators.emplace("msz", [](std::string_view rawCommand) {
+        return parseAndCreateGuiCommand<shared::protocol::client::Msz, guiCommand::Msz>(rawCommand);
     });
-    _guiCreators.emplace("mct", [](std::string_view) { return std::make_unique<guiCommand::Mct>(); });
-    _guiCreators.emplace("tna", [](std::string_view) { return std::make_unique<guiCommand::Tna>(); });
-    _guiCreators.emplace("sst", [](std::string_view rawCommand) -> std::unique_ptr<guiCommand::IGuiCommand> {
-        auto parsedCmd = shared::protocol::Parser::parseClientCommand(rawCommand);
-
-        if (const auto* sstParams = std::get_if<shared::protocol::client::Sst>(&parsedCmd)) {
-            return std::make_unique<guiCommand::Sst>(sstParams->timeUnit);
-        }
-        return std::make_unique<guiCommand::Sbp>();
+    _guiCreators.emplace("sgt", [](std::string_view rawCommand) {
+        return parseAndCreateGuiCommand<shared::protocol::client::Sgt, guiCommand::Sgt>(rawCommand);
+    });
+    _guiCreators.emplace("bct", [](std::string_view rawCommand) {
+        return parseAndCreateGuiCommand<shared::protocol::client::Bct, guiCommand::Bct>(rawCommand);
+    });
+    _guiCreators.emplace("mct", [](std::string_view rawCommand) {
+        return parseAndCreateGuiCommand<shared::protocol::client::Mct, guiCommand::Mct>(rawCommand);
+    });
+    _guiCreators.emplace("tna", [](std::string_view rawCommand) {
+        return parseAndCreateGuiCommand<shared::protocol::client::Tna, guiCommand::Tna>(rawCommand);
+    });
+    _guiCreators.emplace("sst", [](std::string_view rawCommand) {
+        return parseAndCreateGuiCommand<shared::protocol::client::Sst, guiCommand::Sst>(rawCommand);
     });
 }
 
@@ -135,6 +133,20 @@ std::vector<std::string> CommandFactory::extractAllCmd(const std::string_view ra
         result.push_back(word);
     }
     return result;
+}
+
+template <typename ParsedCommandType, typename GuiCommandType>
+std::unique_ptr<guiCommand::IGuiCommand> CommandFactory::parseAndCreateGuiCommand(std::string_view rawCommand) {
+    auto parsedCmd = shared::protocol::Parser::parseClientCommand(rawCommand);
+
+    if (const auto* params = std::get_if<ParsedCommandType>(&parsedCmd)) {
+        if constexpr (std::is_constructible_v<GuiCommandType, ParsedCommandType>) {
+            return std::make_unique<GuiCommandType>(*params);
+        } else if constexpr (std::is_default_constructible_v<GuiCommandType>) {
+            return std::make_unique<GuiCommandType>();
+        }
+    }
+    return std::make_unique<guiCommand::Sbp>();
 }
 
 }  // namespace zappy::server::command
