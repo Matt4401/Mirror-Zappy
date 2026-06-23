@@ -388,16 +388,14 @@ std::string World::transformResourcesToStr(const Tile& tile) {
 
 std::string World::visionOfPlayer(const std::vector<Position>& Positions) const {
     std::string str{"["};
-    for (const auto& position : Positions) {
-        const auto tile = _tiles.at(getTileIndex(position));
-        auto tmpStr = transformResourcesToStr(tile);
-        if (tmpStr.empty()) {
+    for (std::size_t i = 0; i < Positions.size(); ++i) {
+        if (i > 0) {
             str += ',';
-        } else {
-            str += tmpStr;
         }
+        const auto& tile = _tiles.at(getTileIndex(Positions.at(i)));
+        str += transformResourcesToStr(tile);
     }
-    str += ']';
+    str += "]\n";
     return str;
 }
 

@@ -50,9 +50,39 @@ TEST_F(LookTest, ExecuteLookLevel1EmptyMap) {
 
     auto responses = player.responses();
     ASSERT_FALSE(responses.empty());
-    static constexpr std::string expectedStart = "[ player,,,]";
-    ASSERT_EQ(responses.front().substr(0, expectedStart.size()), expectedStart);
+    static constexpr std::string expectedStart = "[ player,,,]\n";
+    ASSERT_EQ(responses.front(), expectedStart);
 }
+
+TEST_F(LookTest, ExecuteLookWhithSomeItem) {
+    game::World world{config};
+
+    const auto idOpt = world.spawnPlayer("Team1");
+    ASSERT_TRUE(idOpt.has_value());
+
+    const auto& playerList = world.playerList();
+    auto& player = *playerList.at(idOpt.value());
+
+    world.clearAllResourcesAndEggs();
+    const std::unique_ptr<ICommand> look = std::make_unique<Look>();
+
+    world.addItemOnGround(game::ItemType::Food, game::Position{.x = 5, .y = 6});
+    world.addItemOnGround(game::ItemType::Linemate, game::Position{.x = 5, .y = 6});
+
+    auto oldPos = player.position();
+    player.setOrientation(game::cardinalPoint::NORTH);
+    player.setPosition(game::Position{.x = 5, .y = 5});
+    world.updatePositionOnMap(idOpt.value(), oldPos, game::Position{.x = 5, .y = 5});
+
+    look->execute(world, player);
+
+    auto responses = player.responses();
+    ASSERT_FALSE(responses.empty());
+    const std::string expectedStart = "[ player,, food linemate,]\n";
+
+    ASSERT_EQ(responses.front(), expectedStart);
+}
+
 TEST_F(LookTest, ExecuteLookWithItemsAndPlayers) {
     game::World world{config};
     game::Player player{1, 5, 5, game::cardinalPoint::NORTH};
