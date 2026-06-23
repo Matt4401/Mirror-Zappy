@@ -1,5 +1,5 @@
-from util.InventoryClass import Inventory
-from util.VisionManager import VisionManager
+from src.util.InventoryClass import Inventory
+from src.util.VisionManager import VisionManager
 import random
 
 

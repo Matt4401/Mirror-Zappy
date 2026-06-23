@@ -26,11 +26,11 @@ class FiniteStateMachine:
     def send_auto_cmds(self, meta_cmds: list[str]):
         for cmd in meta_cmds:
             if cmd == "Inventory":
-                resp = self.trantorian.connexion.send_command("Inventory")
+                resp = self.trantorian.connection.send_command("Inventory")
                 self.trantorian.inventory.update(resp)
 
             elif cmd == "Look":
-                resp = self.trantorian.connexion.send_command("Look")
+                resp = self.trantorian.connection.send_command("Look")
                 self.trantorian.vision.update(resp)
 
             elif cmd is None:
