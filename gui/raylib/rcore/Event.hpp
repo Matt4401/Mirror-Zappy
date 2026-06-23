@@ -41,6 +41,7 @@ class Event {
         return {GetMousePosition().x, GetMousePosition().y};
     }
     [[nodiscard]] static float getMouseWheelMoveStatic() { return GetMouseWheelMove(); }
+    [[nodiscard]] static rmath::Vector2 getMouseDeltaStatic() { return {GetMouseDelta().x, GetMouseDelta().y}; }
     [[nodiscard]] static Ray mouseRay(const Camera& camera) {
         return Ray(GetScreenToWorldRay(GetMousePosition(), camera.camera()));
     }
