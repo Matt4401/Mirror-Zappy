@@ -23,7 +23,6 @@
 #include "game/components/IObject.hpp"
 #include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
-#include "rmath/Vector3.hpp"
 #include "rshapes/Shapes.hpp"
 
 namespace zappy::gui::graphics::scene {
@@ -75,24 +74,24 @@ void Map::drawItems(const Tile3D& tile) const {
 }
 
 void Map::handleEvent() {
-    _hoveredTile = nullptr;                                                                                                                                    
-    const auto ray = raylib::rcore::Event::mouseRay(_camera.get());                                                                                            
-    float nearestDistance = std::numeric_limits<float>::max();                                                                                                 
+    _hoveredTile = nullptr;
+    const auto ray = raylib::rcore::Event::mouseRay(_camera.get());
+    float nearestDistance = std::numeric_limits<float>::max();
 
-    for (const auto& tile : _worldManager.get().tiles()) {                                                                                                     
-        if (!_camera.get().isVisibleFromCamera(tile.position())) {                                                                                             
-            continue;                                                                                                                                          
-        }                                                                                                                                                      
-        const auto collision = ray.collision(tile.boundingBox(_tileModel.getBoundingBox()));                                                                   
-        if (collision.hit && collision.distance < nearestDistance) {                                                                                           
-            nearestDistance = collision.distance;                                                                                                              
-            _hoveredTile = &tile;                                                                                                                              
-        }                                                                                                                                                      
-    }                                                                                                                                                          
+    for (const auto& tile : _worldManager.get().tiles()) {
+        if (!_camera.get().isVisibleFromCamera(tile.position())) {
+            continue;
+        }
+        const auto collision = ray.collision(tile.boundingBox(_tileModel.getBoundingBox()));
+        if (collision.hit && collision.distance < nearestDistance) {
+            nearestDistance = collision.distance;
+            _hoveredTile = &tile;
+        }
+    }
 
-    if (!raylib::rcore::Event::isMouseButtonPressed(MOUSE_LEFT_CLICK)) {                                                                                       
-        return;                                                                                                                                                
-    }                                                                                                                                                          
+    if (!raylib::rcore::Event::isMouseButtonPressed(MOUSE_LEFT_CLICK)) {
+        return;
+    }
 
     std::optional<SelectedPlayer> selected;
     nearestDistance = std::numeric_limits<float>::max();
