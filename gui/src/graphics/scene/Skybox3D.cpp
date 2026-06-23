@@ -10,9 +10,12 @@
 #include <raylib.h>
 
 #include <cmath>
+#include <memory>
 #include <utility>
 
 #include "Color.hpp"
+#include "EventDispatcher.hpp"
+#include "GuiEvents.hpp"
 #include "rcore/Matrix.hpp"
 #include "rcore/Rlgl.hpp"
 #include "rmath/Vector3.hpp"
@@ -22,33 +25,27 @@
 
 namespace zappy::gui::graphics::scene {
 
-Skybox3D::Skybox3D()
+Skybox3D::Skybox3D(std::shared_ptr<events::EventDispatcher> dispatcher)
     : _model(raylib::rmodels::Mesh::genCube(1.0F, 1.0F, 1.0F)),
-      _shader("assets/shaders/skybox.vs", "assets/shaders/skybox.fs") {
+      _shader("assets/shaders/skybox.vs", "assets/shaders/skybox.fs"),
+      _dispatcher(std::move(dispatcher)) {
     int const environmentMapLoc = _shader.getLocation("environmentMap");
     _shader.setLocation(SHADER_LOC_MAP_CUBEMAP, environmentMapLoc);
 
     _model.setMaterialShader(0, _shader);
 
     loadCubemap();
+
+    if (_dispatcher) {
+        _timeToken = _dispatcher->subscribe<events::TimeOfDayChanged>(
+            [this](const events::TimeOfDayChanged& e) { _timeMode = e.mode; });
+    }
 }
 
-Skybox3D::~Skybox3D() = default;
-
-Skybox3D::Skybox3D(Skybox3D&& other) noexcept
-    : _model{std::move(other._model)},
-      _shader{std::move(other._shader)},
-      _cubemap{std::move(other._cubemap)},
-      _dayProgress{other._dayProgress} {}
-
-Skybox3D& Skybox3D::operator=(Skybox3D&& other) noexcept {
-    if (this != &other) {
-        _model = std::move(other._model);
-        _shader = std::move(other._shader);
-        _cubemap = std::move(other._cubemap);
-        _dayProgress = other._dayProgress;
+Skybox3D::~Skybox3D() {
+    if (_dispatcher && _timeToken != 0) {
+        _dispatcher->unsubscribe<events::TimeOfDayChanged>(_timeToken);
     }
-    return *this;
 }
 
 void Skybox3D::loadCubemap() {
@@ -108,6 +105,21 @@ void Skybox3D::draw() const {
 }
 
 raylib::Color Skybox3D::currentTint() const {
+    if (_timeMode != events::TimeMode::CYCLE) {
+        switch (_timeMode) {
+            case events::TimeMode::MORNING:
+                return SUNRISE;
+            case events::TimeMode::AFTERNOON:
+                return DAY;
+            case events::TimeMode::EVENING:
+                return SUNSET;
+            case events::TimeMode::NIGHT:
+                return NIGHT;
+            default:
+                break;
+        }
+    }
+
     if (_dayProgress < MORNING_START) {
         return raylib::Color::lerp(NIGHT, SUNRISE, _dayProgress / MORNING_START);
     }

@@ -20,7 +20,6 @@
 #include "game/Team.hpp"
 #include "game/components/IObject.hpp"
 #include "rcore/Camera.hpp"
-#include "rcore/Event.hpp"
 #include "rmodels/Model.hpp"
 
 namespace zappy::gui::graphics::scene {
@@ -51,7 +50,7 @@ class Map {
     void resize(int width, int height);
 
     void draw() const;
-    void handleEvent(const raylib::rcore::Event& event);
+    void handleEvent();
 
   protected:
   private:

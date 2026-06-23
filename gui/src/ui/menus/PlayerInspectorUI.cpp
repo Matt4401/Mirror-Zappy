@@ -29,7 +29,6 @@
 #include "protocol/Commands.hpp"
 #include "protocol/Emitter.hpp"
 #include "rcore/Camera.hpp"
-#include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
 #include "rmath/Vector3.hpp"
 #include "rmodels/Model.hpp"
@@ -364,17 +363,17 @@ void PlayerInspectorUI::updateHearts() {
     }
 }
 
-void PlayerInspectorUI::handleEvent(const raylib::rcore::Event& event) {
-    AInspectorUI::handleEvent(event);
+void PlayerInspectorUI::handleEvent() {
+    AInspectorUI::handleEvent();
     if (!isVisible()) {
         return;
     }
 
     if (_firstPersonBtn) {
-        _firstPersonBtn->handleEvent(event);
+        _firstPersonBtn->handleEvent();
     }
     if (_nameBox) {
-        _nameBox->handleEvent(event);
+        _nameBox->handleEvent();
     }
 }
 
