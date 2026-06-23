@@ -63,6 +63,9 @@ class UIGamePanel : public IUIComponent {
     void setCustomLayout(bool customLayout) { _customLayout = customLayout; }
     void updateChildrenLayout();
 
+    [[nodiscard]] bool isCollapsed() const { return _isCollapsed; }
+    void setCollapsed(bool collapsed) { _isCollapsed = collapsed; }
+
     void setTitle(const std::string& title);
 
     void setNextPanel(const std::shared_ptr<UIGamePanel>& panel, float gapPixels = 0.0F);
