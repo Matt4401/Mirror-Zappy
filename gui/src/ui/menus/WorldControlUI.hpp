@@ -73,6 +73,7 @@ class WorldControlUI : public components::UIGamePanel {
 
     static constexpr float FoldBtnWidth = 80.0F;
     static constexpr float FoldBtnHeight = 35.0F;
+    static constexpr float FoldBtnFontSize = 24.0F;
     static constexpr float ContentHeight = 60.0F;
     static constexpr float LerpSpeedMultiplier = 15.0F;
 

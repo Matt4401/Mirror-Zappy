@@ -45,7 +45,7 @@ WorldControlUI::WorldControlUI(float x, float width, std::shared_ptr<events::Eve
       _onSendCommand(std::move(onSendCommand)),
       _currentHeight(0.0F) {
     _foldBtn = std::make_shared<components::UIButton>(0.0F, 0.0F, FoldBtnWidth, FoldBtnHeight, "^", _font);
-    _foldBtn->setFontSize(24.0F);
+    _foldBtn->setFontSize(FoldBtnFontSize);
     _foldBtn->setOnClick([this]() { _isFolded = !_isFolded; });
 
     initSpeedControls();
