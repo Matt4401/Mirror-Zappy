@@ -27,6 +27,8 @@ struct Position {
     std::size_t y;
 };
 
+using CoordinateMove = std::pair<int, int>;
+
 enum class ItemType : uint8_t { Food, Linemate, Deraumere, Sibur, Mendiane, Phiras, Thystame, COUNT };
 
 constexpr std::array<std::string, static_cast<std::size_t>(ItemType::COUNT)> kInventoryOrder = {
@@ -34,16 +36,15 @@ constexpr std::array<std::string, static_cast<std::size_t>(ItemType::COUNT)> kIn
 
 enum class cardinalPoint : uint8_t { NORTH, EAST, SOUTH, WEST, COUNT };
 
-constexpr std::array<std::pair<int, int>, 4> playerMove = {{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}};
+constexpr std::array<CoordinateMove, 4> playerMove = {{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}};
 
-constexpr std::array<std::pair<int, int>, 4> diagonalLeftMove = {{{-1, 1}, {1, 1}, {1, -1}, {-1, -1}}};
+constexpr std::array<CoordinateMove, 4> diagonalLeftMove = {{{-1, 1}, {1, 1}, {1, -1}, {-1, -1}}};
 
-constexpr std::array<std::pair<int, int>, 4> leftTile = {{{1, 0}, {0, -1}, {-1, 0}, {0, 1}}};
+constexpr std::array<CoordinateMove, 4> leftTile = {{{1, 0}, {0, -1}, {-1, 0}, {0, 1}}};
 
 static constexpr std::size_t kNbLifeTickFood = 126;
 static constexpr std::size_t kNbStartFood = 10;
 static constexpr std::uint8_t kMaxNbCmd = 10;
-static constexpr std::uint8_t kMaxLookPos = 81;
 
 static std::unordered_map<std::string, ItemType> mapItemString() {
     static const std::unordered_map<std::string, ItemType> kMapItemString = {
