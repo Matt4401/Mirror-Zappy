@@ -33,11 +33,17 @@
 
 namespace zappy::server {
 
-Core::Core(const std::span<char*> args) : _args(args) {}
+Core::Core(const std::span<char*> args) : _args(args) {
+    try {
+        setup();
+    } catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        throw;
+    }
+}
 
 int Core::run() {
     try {
-        setup();
         loop();
     } catch (const zappy::shared::exception::Exception& e) {
         if (std::string(e.what()) == zappy::parser::kUsageThrowMessage) {
@@ -170,6 +176,15 @@ void Core::handleHandshake(int clientId, std::string_view teamName) {
     _clientStates[clientId] = ClientState::IN_GAME;
     _sessionManager->sendMessage(clientId, std::format("{}\n{} {}\n", _world->getAvailableSlotInTeam(teamName),
                                                        _world->sizeMap().x, _world->sizeMap().y));
+    const auto& playerList = _world->playerList();
+    _world->addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pnw{
+        .playerId = static_cast<int>(playerIdOpt.value()),
+        .x = static_cast<int>(playerList.at(playerIdOpt.value())->position().x),
+        .y = static_cast<int>(playerList.at(playerIdOpt.value())->position().y),
+        .orientation = static_cast<int>(playerList.at(playerIdOpt.value())->orientation()),
+        .level = 1,
+        .teamName = std::string{teamName},
+    }));
 }
 
 void Core::handleInGameMessage(int clientId, std::string_view message) {
@@ -193,6 +208,7 @@ void Core::handleGuiMessage(int clientId, std::string_view message) {
     if (command != nullptr) {
         const std::string response = command->execute(*this);
 
+        _timeUnit = static_cast<int>(1.0F / static_cast<float>(_config.freq) * 1000);
         if (!response.empty()) {
             _sessionManager->sendMessage(clientId, response);
         }
