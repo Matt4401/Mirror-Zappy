@@ -28,17 +28,19 @@ bool Take::start(game::World& world, game::Player& player) {
     }
     const auto& resources = world.resourcesAt(player.position());
 
-    if (resources.at(static_cast<std::uint8_t>(it->second)) > 0) {
-        world.addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pdr{
-            .playerId = static_cast<int>(player.id()),
-        }));
-        return true;
-    }
-    return false;
+    return resources.at(static_cast<std::uint8_t>(it->second)) > 0;
 }
 void Take::execute(game::World& world, game::Player& player) {
     const game::ItemType item = game::mapItemString().at(_arg);
-    world.removeItemOnGround(item, player.position());
     player.addItem(item);
+    if (!world.removeItemOnGround(item, player.position())) {
+        player.addResponse("ko\n");
+        return;
+    }
+    world.addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pgt{
+        .playerId = static_cast<int>(player.id()),
+        .resourceId = static_cast<int>(item),
+    }));
+    player.addResponse("ok\n");
 }
 }  // namespace zappy::server::command

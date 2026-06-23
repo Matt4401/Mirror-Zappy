@@ -42,8 +42,6 @@ add_library(zappy_server_objects OBJECT
         src/command/Inventory.hpp
         src/command/Unknown.cpp
         src/command/Unknown.hpp
-        src/guiCommand/Pdr.cpp
-        src/guiCommand/Pdr.hpp
 )
 target_include_directories(zappy_server_objects PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src

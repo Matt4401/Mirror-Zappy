@@ -72,7 +72,7 @@ class World {
 
     const std::unordered_map<std::size_t, std::unique_ptr<Player>>& playerList() const;
     void addItemOnGround(ItemType item, Position pos);
-    void removeItemOnGround(ItemType item, Position pos);
+    bool removeItemOnGround(ItemType item, Position pos);
 
     [[nodiscard]] int getNextExecutionTick() const;
     [[nodiscard]] std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> resourcesAt(Position pos) const;
