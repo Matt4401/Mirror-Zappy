@@ -24,7 +24,7 @@
 
 namespace zappy::gui::graphics {
 Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher)
-    : _dispatcher(std::move(dispatcher)), _map(2, 2, _camera, _dispatcher) {
+    : _skybox(dispatcher), _dispatcher(std::move(dispatcher)), _map(2, 2, _camera, _dispatcher) {
     if (_dispatcher) {
         _mszToken = _dispatcher->subscribe<shared::protocol::server::Msz>(
             [this](const shared::protocol::server::Msz& cmd) { _map.resize(cmd.width, cmd.height); });
@@ -44,6 +44,9 @@ Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher)
         pauseMenu->setOnUIConfig([this, pauseMenu]() {
             if (auto grid = _gameHUD->getGridManager()) {
                 grid->setConfigMode(true);
+            }
+            if (auto worldControl = _gameHUD->getWorldControl()) {
+                worldControl->setConfigMode(true);
             }
             _uiMode = true;
             pauseMenu->setVisible(false);
@@ -86,8 +89,14 @@ void Render::updateCursorState() const {
 
 void Render::handleInput() {
     if (raylib::rcore::Event::isKeyPressed(EscapeKey)) {
-        if (_gameHUD && _gameHUD->getGridManager() && _gameHUD->getGridManager()->isConfigMode()) {
-            _gameHUD->getGridManager()->setConfigMode(false);
+        if (_gameHUD && ((_gameHUD->getGridManager() && _gameHUD->getGridManager()->isConfigMode()) ||
+                         (_gameHUD->getWorldControl() && _gameHUD->getWorldControl()->isConfigMode()))) {
+            if (auto grid = _gameHUD->getGridManager()) {
+                grid->setConfigMode(false);
+            }
+            if (auto worldControl = _gameHUD->getWorldControl()) {
+                worldControl->setConfigMode(false);
+            }
             _uiMode = false;
             _updateMode = UpdateMode::All;
         } else if (_gameHUD && _gameHUD->getPauseMenu()) {
@@ -128,7 +137,9 @@ void Render::update() {
     }
 
     if (_uiMode) {
-        _map.handleEvent(_event);
+        if (!_uiManager.isHovered()) {
+            _map.handleEvent(_event);
+        }
     }
 
     _skybox.update(raylib::rcore::Window::frameTime(), _serverFrequency);
