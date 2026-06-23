@@ -19,7 +19,7 @@ class GatherState(AState):
             stone, tile_index = visible[0]
 
             if tile_index == 0:
-                self.trantorian.send_command.take(stone)
+                self.trantorian.send_command.take_object(stone)
                 resp = self.trantorian.send_command.inventory()
                 self.trantorian.player_state.inventory.update_inventory(resp)
             else:
