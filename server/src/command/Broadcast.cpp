@@ -17,13 +17,14 @@
 #include "command/ACommand.hpp"
 #include "game/Player.hpp"
 #include "game/World.hpp"
+#include "protocol/Commands.hpp"
+#include "protocol/Emitter.hpp"
 
 namespace zappy::server::command {
 
 Broadcast::Broadcast(std::string args) : ACommand(kTimeLimit), _args{std::move(args)} {}
 
 void Broadcast::execute(game::World& world, game::Player& player) {
-    player.addResponse("ok\n");
     const auto& players = world.playerList();
 
     for (const auto& [id, otherPlayer] : players) {
@@ -32,6 +33,9 @@ void Broadcast::execute(game::World& world, game::Player& player) {
             otherPlayer->addResponse("message " + std::to_string(direction) + ", " + _args + "\n");
         }
     }
+    player.addResponse("ok\n");
+    world.addGuiEvent(shared::protocol::Emitter::build(
+        shared::protocol::server::Pbc{.playerId = static_cast<int>(player.id()), .message = _args}));
 }
 
 std::uint8_t Broadcast::getDirection(const game::Player& player, const game::Player& otherPlayer,
