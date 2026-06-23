@@ -42,19 +42,19 @@ class FiniteStateMachine:
 
         if food < SURVIVAL_THRESHOLD:
             self.transition_to(SurviveState)
+            return
 
-        elif not isinstance(self.state, SurviveState):
-            if self.trantorian.has_all_stones():  # methode a faire
-                self.transition_to(EvolveState)
+        if self.trantorian.has_all_stones():  # methode a faire
+            self.transition_to(EvolveState)
 
-            else:
-                # broadcast_resp= self.sender.send_cmd("Broadcast")
-                # if dangereuse team avec ennemis proche (choisir un seuil):
-                #     self.transition_to(AttackState)
-                # else if notre team pas assez de memebre (choisir un seuil)
-                #     self.transition_to(ReproduceState)
-                # else:
-                self.transition_to(GatherState)
+        else:
+            # broadcast_resp= self.sender.send_cmd("Broadcast")
+            # if dangereuse team avec ennemis proche (choisir un seuil):
+            #     self.transition_to(AttackState)
+            # else if notre team pas assez de memebre (choisir un seuil)
+            #     self.transition_to(ReproduceState)
+            # else:
+            self.transition_to(GatherState)
 
     def transition_to(self, state_class):
         if not isinstance(self.state, state_class):
