@@ -9,7 +9,7 @@ class GatherState(AState):
         needed_stones = list(needed_dict.keys())
 
         if not needed_stones:
-            return EvolveState(self.trantorian)
+            return
 
         visible = self.trantorian.player_state.vision.find_any(needed_stones)
 
@@ -24,4 +24,4 @@ class GatherState(AState):
                 self.trantorian.player_state.inventory.update_inventory(resp)
             else:
                 self.trantorian.move_to_tile(tile_index)
-        return self
+        return
