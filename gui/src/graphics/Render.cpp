@@ -24,7 +24,10 @@
 
 namespace zappy::gui::graphics {
 Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher)
-    : _skybox(dispatcher), _dispatcher(std::move(dispatcher)), _map(2, 2, _camera, _dispatcher) {
+    : _skybox(dispatcher),
+      _dispatcher(std::move(dispatcher)),
+      _worldManager(_dispatcher),
+      _map(_camera, _worldManager, _dispatcher) {
     _window.setTargetFPS(DefaultFps);
     raylib::rcore::Window::setExitKey(0);
 
