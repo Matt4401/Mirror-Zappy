@@ -42,6 +42,7 @@ class UIButton : public IUIComponent {
 
     void setOnClick(std::function<void()> callback);
     void setFontSize(float size);
+    void setText(const std::string& text);
 
   private:
     void updateTextPosition();

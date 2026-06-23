@@ -189,4 +189,11 @@ void UIButton::setFontSize(float size) {
     updateTextPosition();
 }
 
+void UIButton::setText(const std::string& text) {
+    if (_label) {
+        _label->setText(text);
+        updateTextPosition();
+    }
+}
+
 }  // namespace zappy::gui::ui::components
