@@ -27,6 +27,7 @@
 #include "guiCommand/IGuiCommand.hpp"
 #include "guiCommand/Mct.hpp"
 #include "guiCommand/Msz.hpp"
+#include "guiCommand/Sbp.hpp"
 #include "guiCommand/Sgt.hpp"
 #include "guiCommand/Sst.hpp"
 #include "guiCommand/Tna.hpp"
@@ -36,6 +37,11 @@
 namespace zappy::server::command {
 
 CommandFactory::CommandFactory() {
+    registerCommands();
+    registerGuiCommands();
+}
+
+void CommandFactory::registerCommands() {
     _creators.emplace("Forward", [](std::string_view) { return std::make_unique<Forward>(); });
     _creators.emplace("Left", [](std::string_view) { return std::make_unique<Left>(); });
     _creators.emplace("Right", [](std::string_view) { return std::make_unique<Right>(); });
@@ -59,7 +65,9 @@ CommandFactory::CommandFactory() {
         return nullptr;
     });
     _creators.emplace("Fork", [](std::string_view) { return std::make_unique<Fork>(); });
+}
 
+void CommandFactory::registerGuiCommands() {
     _guiCreators.emplace("msz", [](std::string_view) { return std::make_unique<guiCommand::Msz>(); });
     _guiCreators.emplace("sgt", [](std::string_view) { return std::make_unique<guiCommand::Sgt>(); });
     _guiCreators.emplace("bct", [](std::string_view rawCommand) -> std::unique_ptr<guiCommand::IGuiCommand> {
@@ -68,7 +76,7 @@ CommandFactory::CommandFactory() {
         if (const auto* bctParams = std::get_if<shared::protocol::client::Bct>(&parsedCmd)) {
             return std::make_unique<guiCommand::Bct>(bctParams->x, bctParams->y);
         }
-        return nullptr;
+        return std::make_unique<guiCommand::Sbp>();
     });
     _guiCreators.emplace("mct", [](std::string_view) { return std::make_unique<guiCommand::Mct>(); });
     _guiCreators.emplace("tna", [](std::string_view) { return std::make_unique<guiCommand::Tna>(); });
@@ -78,7 +86,7 @@ CommandFactory::CommandFactory() {
         if (const auto* sstParams = std::get_if<shared::protocol::client::Sst>(&parsedCmd)) {
             return std::make_unique<guiCommand::Sst>(sstParams->timeUnit);
         }
-        return nullptr;
+        return std::make_unique<guiCommand::Sbp>();
     });
 }
 
