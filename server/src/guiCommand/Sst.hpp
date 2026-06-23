@@ -5,6 +5,8 @@
 ** SST
 */
 
+#pragma once
+
 #include "guiCommand/IGuiCommand.hpp"
 
 namespace zappy::server::guiCommand {
