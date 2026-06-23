@@ -35,6 +35,20 @@ Map::Map(int width, int height, std::shared_ptr<raylib::rcore::Camera> camera,
     _itemDrawFunctions["Thystame"] = [this](const game::IObject& object) { object.draw(_thystameModel); };
     _itemDrawFunctions["Mendiane"] = [this](const game::IObject& object) { object.draw(_mendianeModel); };
     _itemDrawFunctions["Food"] = [this](const game::IObject& object) { object.draw(_foodModel); };
+
+    if (_dispatcher) {
+        _nameToken = _dispatcher->subscribe<events::PlayerNameChanged>([this](const events::PlayerNameChanged& e) {
+            for (auto& team : _teams) {
+                team.updatePlayerName(e.playerId, e.newName);
+            }
+        });
+    }
+}
+
+Map::~Map() {
+    if (_dispatcher && _nameToken != 0) {
+        _dispatcher->unsubscribe<events::PlayerNameChanged>(_nameToken);
+    }
 }
 
 void Map::resize(int width, int height) {
@@ -77,12 +91,12 @@ void Map::drawItems(const Tile3D& tile) const {
     }
 }
 
-void Map::handleEvent(const raylib::rcore::Event& event) {
+void Map::handleEvent(const raylib::rcore::Event& /*event*/) {
     if (!raylib::rcore::Event::isMouseButtonPressed(MOUSE_LEFT_CLICK) || !_camera) {
         return;
     }
 
-    const auto ray = event.mouseRay(*_camera);
+    const auto ray = raylib::rcore::Event::mouseRay(*_camera);
     std::optional<SelectedPlayer> selected;
     float nearestDistance = std::numeric_limits<float>::max();
 

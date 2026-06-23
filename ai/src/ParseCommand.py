@@ -35,7 +35,18 @@ class ParseCommand:
         pass
 
     def parse_look(self, data):
-        pass
+        clean_data = data.strip("[]\n ")
+        raw_tiles = clean_data.split(",")
+        parsed_tiles = []
+        for tile in raw_tiles:
+            tile = tile.strip()
+            if not tile:
+                parsed_tiles.append([])
+            else:
+                objects_on_tile = tile.split()
+                parsed_tiles.append(objects_on_tile)
+
+        return parsed_tiles
 
     def parse_eject(self, data):
         pass
