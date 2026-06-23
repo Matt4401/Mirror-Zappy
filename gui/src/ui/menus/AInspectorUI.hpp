@@ -13,11 +13,8 @@
 #include <vector>
 
 #include "events/EventDispatcher.hpp"
-#include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
-#include "rmodels/Model.hpp"
 #include "rtext/Font.hpp"
-#include "rtextures/RenderTexture2D.hpp"
 #include "ui/components/UIButton.hpp"
 #include "ui/components/UIGamePanel.hpp"
 #include "ui/components/UIImage.hpp"
@@ -47,7 +44,6 @@ class AInspectorUI : public components::UIGamePanel {
   protected:
     void buildInventoryPanel();
     void drawInventoryPanel(float& currentY, float startX, float panelW);
-    void draw3DPreview();
 
     [[nodiscard]] std::shared_ptr<events::EventDispatcher>& getDispatcher() { return _dispatcher; }
     [[nodiscard]] std::shared_ptr<raylib::rtext::Font>& getFont() { return _font; }
@@ -58,11 +54,6 @@ class AInspectorUI : public components::UIGamePanel {
     [[nodiscard]] std::vector<std::shared_ptr<components::UIImage>>& getInventoryImages() { return _inventoryImages; }
     [[nodiscard]] std::vector<std::shared_ptr<components::UIText>>& getInventoryTexts() { return _inventoryTexts; }
 
-    [[nodiscard]] raylib::rcore::Camera& getPreviewCamera() { return _previewCamera; }
-    [[nodiscard]] std::shared_ptr<raylib::rmodels::Model>& getPreviewModel() { return _previewModel; }
-    [[nodiscard]] std::shared_ptr<raylib::rtextures::RenderTexture2D>& getPreviewRenderTexture() {
-        return _previewRenderTexture;
-    }
     [[nodiscard]] float getServerFreq() const { return _serverFreq; }
 
   private:
@@ -76,9 +67,6 @@ class AInspectorUI : public components::UIGamePanel {
     std::vector<std::shared_ptr<components::UIText>> _inventoryTexts;
     std::shared_ptr<components::UIButton> _closeBtn;
 
-    raylib::rcore::Camera _previewCamera;
-    std::shared_ptr<raylib::rmodels::Model> _previewModel;
-    std::shared_ptr<raylib::rtextures::RenderTexture2D> _previewRenderTexture;
     float _serverFreq{100.0F};
 };
 

@@ -33,6 +33,15 @@ class Team {
         _players.emplace_back(id, position, _name + std::to_string(id), orientation);
     }
 
+    void updatePlayerName(int id, const std::string& name) {
+        for (auto& player : _players) {
+            if (player.id() == id) {
+                player.setName(name);
+                break;
+            }
+        }
+    }
+
     [[nodiscard]] const std::string& name() const { return _name; }
     [[nodiscard]] const std::vector<Player>& players() const { return _players; }
     [[nodiscard]] raylib::Color color() const { return _teamColor; }

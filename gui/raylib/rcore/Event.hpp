@@ -29,6 +29,7 @@ class Event {
     [[nodiscard]] static bool isKeyPressed(int key) { return IsKeyPressed(key); }
     [[nodiscard]] static bool isKeyDown(int key) { return IsKeyDown(key); }
     [[nodiscard]] static bool isKeyReleased(int key) { return IsKeyReleased(key); }
+    [[nodiscard]] static int getCharPressed() { return GetCharPressed(); }
 
     [[nodiscard]] rmath::Vector2 getMousePosition() const { return _mousePosition; }
     [[nodiscard]] float getMouseWheelMove() const { return _mouseWheelMove; }
@@ -40,8 +41,8 @@ class Event {
         return {GetMousePosition().x, GetMousePosition().y};
     }
     [[nodiscard]] static float getMouseWheelMoveStatic() { return GetMouseWheelMove(); }
-    [[nodiscard]] Ray mouseRay(const Camera& camera) const {
-        return Ray(GetMouseRay(_mousePosition.vector(), camera.camera()));
+    [[nodiscard]] static Ray mouseRay(const Camera& camera) {
+        return Ray(GetScreenToWorldRay(GetMousePosition(), camera.camera()));
     }
 
   protected:
