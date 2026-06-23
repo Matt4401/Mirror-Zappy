@@ -1,5 +1,4 @@
 from ..AState import AState
-from ai.src.fsm.states.EvolveState import EvolveState
 
 
 class GatherState(AState):
