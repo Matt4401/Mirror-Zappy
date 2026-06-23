@@ -48,22 +48,6 @@ Skybox3D::~Skybox3D() {
     }
 }
 
-Skybox3D::Skybox3D(Skybox3D&& other) noexcept
-    : _model{std::move(other._model)},
-      _shader{std::move(other._shader)},
-      _cubemap{std::move(other._cubemap)},
-      _dayProgress{other._dayProgress} {}
-
-Skybox3D& Skybox3D::operator=(Skybox3D&& other) noexcept {
-    if (this != &other) {
-        _model = std::move(other._model);
-        _shader = std::move(other._shader);
-        _cubemap = std::move(other._cubemap);
-        _dayProgress = other._dayProgress;
-    }
-    return *this;
-}
-
 void Skybox3D::loadCubemap() {
     raylib::rtextures::Image const right("assets/images/skybox/Right.png");
     raylib::rtextures::Image const left("assets/images/skybox/Left.png");

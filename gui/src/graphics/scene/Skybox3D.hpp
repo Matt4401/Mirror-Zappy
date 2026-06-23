@@ -35,8 +35,8 @@ class Skybox3D {
     ~Skybox3D();
     Skybox3D(const Skybox3D& other) = delete;
     Skybox3D& operator=(const Skybox3D& other) = delete;
-    Skybox3D(Skybox3D&& other) noexcept;
-    Skybox3D& operator=(Skybox3D&& other) noexcept;
+    Skybox3D(Skybox3D&& other) = delete;
+    Skybox3D& operator=(Skybox3D&& other) = delete;
 
     void update(float deltaTime, float serverFrequency);
     void draw() const;
