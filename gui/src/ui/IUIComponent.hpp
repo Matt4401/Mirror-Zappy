@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include "rcore/Event.hpp"
-
 namespace zappy::gui::ui {
 
 class IUIComponent {
@@ -23,12 +21,13 @@ class IUIComponent {
 
     virtual void draw() = 0;
     virtual void update() = 0;
-    virtual void handleEvent(const raylib::rcore::Event& event) = 0;
+    virtual void handleEvent() = 0;
 
     virtual void setPosition(float x, float y) = 0;
     virtual void setSize(float width, float height) = 0;
     [[nodiscard]] virtual bool isVisible() const = 0;
     virtual void setVisible(bool visible) = 0;
+    [[nodiscard]] virtual bool isHovered() const = 0;
 };
 
 }  // namespace zappy::gui::ui

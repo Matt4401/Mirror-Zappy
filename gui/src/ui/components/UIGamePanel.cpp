@@ -123,7 +123,7 @@ void UIGamePanel::update() {
     }
 }
 
-void UIGamePanel::handleEvent(const raylib::rcore::Event& event) {
+void UIGamePanel::handleEvent() {
     if (!_isVisible) {
         return;
     }
@@ -139,7 +139,7 @@ void UIGamePanel::handleEvent(const raylib::rcore::Event& event) {
         _isCollapsed = !_isCollapsed;
     }
 
-    _mainPanel->handleEvent(event);
+    _mainPanel->handleEvent();
 
     if (_isCollapsed) {
         return;
@@ -161,7 +161,7 @@ void UIGamePanel::handleEvent(const raylib::rcore::Event& event) {
 
             for (auto& child : _contentChildren) {
                 if (child->isVisible()) {
-                    child->handleEvent(event);
+                    child->handleEvent();
                 }
             }
         }
@@ -196,6 +196,34 @@ void UIGamePanel::setSize(float width, float height) {
 bool UIGamePanel::isVisible() const { return _isVisible; }
 
 void UIGamePanel::setVisible(bool visible) { _isVisible = visible; }
+
+bool UIGamePanel::isHovered() const {
+    if (!_isVisible) {
+        return false;
+    }
+    if (_mainPanel && _mainPanel->isHovered()) {
+        return true;
+    }
+    raylib::rmath::Vector2 const mousePos = raylib::rcore::Event::getMousePositionStatic();
+    raylib::rmath::Rectangle const headerRec{
+        .x = _position.x(), .y = _position.y(), .width = _size.x(), .height = DefaultHeaderHeight};
+    if (raylib::rshapes::Shapes::checkCollisionPointRec(mousePos, headerRec)) {
+        return true;
+    }
+    if (!_isCollapsed && !_isConfigMode) {
+        raylib::rmath::Rectangle const contentRec{.x = _position.x(),
+                                                  .y = _position.y() + DefaultHeaderHeight,
+                                                  .width = _size.x(),
+                                                  .height = _currentHeight - DefaultHeaderHeight};
+        if (raylib::rshapes::Shapes::checkCollisionPointRec(mousePos, contentRec)) {
+            return true;
+        }
+        if (std::ranges::any_of(_contentChildren, [](const auto& child) { return child->isHovered(); })) {
+            return true;
+        }
+    }
+    return false;
+}
 
 void UIGamePanel::addComponent(const std::shared_ptr<IUIComponent>& component) {
     if (component) {

@@ -20,7 +20,6 @@
 #include "components/UIImage.hpp"
 #include "components/UIText.hpp"
 #include "protocol/Commands.hpp"
-#include "rcore/Event.hpp"
 #include "rshapes/Shapes.hpp"
 #include "rtext/Font.hpp"
 
@@ -130,13 +129,13 @@ void AInspectorUI::update() {
     }
 }
 
-void AInspectorUI::handleEvent(const raylib::rcore::Event& event) {
-    components::UIGamePanel::handleEvent(event);
+void AInspectorUI::handleEvent() {
+    components::UIGamePanel::handleEvent();
     if (!isVisible()) {
         return;
     }
     if (_closeBtn) {
-        _closeBtn->handleEvent(event);
+        _closeBtn->handleEvent();
     }
 }
 

@@ -54,13 +54,13 @@ void UIPanel::update() {
     }
 }
 
-void UIPanel::handleEvent(const raylib::rcore::Event& event) {
+void UIPanel::handleEvent() {
     if (!_isVisible) {
         return;
     }
     for (auto& child : std::views::reverse(_children)) {
         if (child->isVisible()) {
-            child->handleEvent(event);
+            child->handleEvent();
         }
     }
 }
@@ -75,6 +75,18 @@ void UIPanel::setSize(float width, float height) { _size = raylib::rmath::Vector
 bool UIPanel::isVisible() const { return _isVisible; }
 
 void UIPanel::setVisible(bool visible) { _isVisible = visible; }
+
+bool UIPanel::isHovered() const {
+    if (!_isVisible) {
+        return false;
+    }
+    raylib::rmath::Vector2 const mousePos = raylib::rcore::Event::getMousePositionStatic();
+    raylib::rmath::Rectangle const rec{.x = _position.x(), .y = _position.y(), .width = _size.x(), .height = _size.y()};
+    if (raylib::rshapes::Shapes::checkCollisionPointRec(mousePos, rec)) {
+        return true;
+    }
+    return std::ranges::any_of(_children, [](const auto& child) { return child->isHovered(); });
+}
 
 void UIPanel::addComponent(const std::shared_ptr<IUIComponent>& component) {
     if (component && std::ranges::find(_children, component) == _children.end()) {

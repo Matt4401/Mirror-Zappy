@@ -24,7 +24,7 @@
 
 namespace zappy::gui::graphics {
 Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher)
-    : _dispatcher(std::move(dispatcher)), _worldManager(_dispatcher), _map(_camera, _worldManager, _dispatcher) {
+    : _skybox(dispatcher), _dispatcher(std::move(dispatcher)), _map(2, 2, _camera, _dispatcher) {
     _window.setTargetFPS(DefaultFps);
     raylib::rcore::Window::setExitKey(0);
 
@@ -38,6 +38,9 @@ Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher)
         pauseMenu->setOnUIConfig([this, pauseMenu]() {
             if (auto grid = _gameHUD->getGridManager()) {
                 grid->setConfigMode(true);
+            }
+            if (auto worldControl = _gameHUD->getWorldControl()) {
+                worldControl->setConfigMode(true);
             }
             _uiMode = true;
             pauseMenu->setVisible(false);
@@ -72,8 +75,14 @@ void Render::updateCursorState() const {
 
 void Render::handleInput() {
     if (raylib::rcore::Event::isKeyPressed(EscapeKey)) {
-        if (_gameHUD && _gameHUD->getGridManager() && _gameHUD->getGridManager()->isConfigMode()) {
-            _gameHUD->getGridManager()->setConfigMode(false);
+        if (_gameHUD && ((_gameHUD->getGridManager() && _gameHUD->getGridManager()->isConfigMode()) ||
+                         (_gameHUD->getWorldControl() && _gameHUD->getWorldControl()->isConfigMode()))) {
+            if (auto grid = _gameHUD->getGridManager()) {
+                grid->setConfigMode(false);
+            }
+            if (auto worldControl = _gameHUD->getWorldControl()) {
+                worldControl->setConfigMode(false);
+            }
             _uiMode = false;
             _updateMode = UpdateMode::All;
         } else if (_gameHUD && _gameHUD->getPauseMenu()) {
@@ -97,7 +106,7 @@ void Render::update() {
     handleInput();
 
     _uiManager.update();
-    _uiManager.handleEvent(_event);
+    _uiManager.handleEvent();
 
     if (_updateMode == UpdateMode::PauseMenuOnly) {
         return;
@@ -114,7 +123,9 @@ void Render::update() {
     }
 
     if (_uiMode) {
-        _map.handleEvent(_event);
+        if (!_uiManager.isHovered()) {
+            _map.handleEvent();
+        }
     }
 
     _skybox.update(raylib::rcore::Window::frameTime(), static_cast<float>(_worldManager.timeUnit()));
