@@ -70,7 +70,7 @@ void UIGridManager::update() {
             data.panel->setSize(static_cast<float>(data.grid.w) * cellW, static_cast<float>(data.grid.h) * cellH);
             bool isRoot = true;
             for (const auto& other : _panels) {
-                if (other.panel != data.panel) {
+                if (other.panel != data.panel && other.panel->isVisible()) {
                     int const gap = data.grid.y - (other.grid.y + other.grid.h);
                     if (other.grid.x == data.grid.x && (gap == 0 || gap == 1)) {
                         isRoot = false;
@@ -355,6 +355,9 @@ void UIGridManager::autoLinkPanels() {
                 continue;
             }
             if (topData.panel == _draggedPanel || bottomData.panel == _draggedPanel) {
+                continue;
+            }
+            if (!topData.panel->isVisible() || !bottomData.panel->isVisible()) {
                 continue;
             }
             int const gap = bottomData.grid.y - (topData.grid.y + topData.grid.h);
