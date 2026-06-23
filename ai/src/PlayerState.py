@@ -5,7 +5,7 @@ import random
 
 class PlayerState:
     def __init__(self, team_name):
-        self.level = 0
+        self.level = 1
         self.team_name = team_name
         self.direction = random.randint(1, 8)
         self.vision = VisionManager()
