@@ -11,7 +11,6 @@
 #include <memory>
 #include <ranges>
 
-#include "rcore/Event.hpp"
 #include "ui/IUIComponent.hpp"
 
 namespace zappy::gui::ui {
@@ -47,12 +46,17 @@ void UIManager::draw() {
     }
 }
 
-void UIManager::handleEvent(const raylib::rcore::Event& event) {
+void UIManager::handleEvent() {
     for (auto& _component : std::ranges::reverse_view(_components)) {
         if (_component->isVisible()) {
-            _component->handleEvent(event);
+            _component->handleEvent();
         }
     }
+}
+
+bool UIManager::isHovered() const {
+    return std::ranges::any_of(_components,
+                               [](const auto& component) { return component->isVisible() && component->isHovered(); });
 }
 
 }  // namespace zappy::gui::ui

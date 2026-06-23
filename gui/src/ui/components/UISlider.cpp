@@ -101,8 +101,7 @@ void UISlider::update() {
     }
 }
 
-void UISlider::handleEvent(const raylib::rcore::Event& event) {
-    (void)event;
+void UISlider::handleEvent() {
     if (!_isVisible) {
         return;
     }

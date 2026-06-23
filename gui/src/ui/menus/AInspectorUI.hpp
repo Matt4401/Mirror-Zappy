@@ -13,7 +13,6 @@
 #include <vector>
 
 #include "events/EventDispatcher.hpp"
-#include "rcore/Event.hpp"
 #include "rtext/Font.hpp"
 #include "ui/components/UIButton.hpp"
 #include "ui/components/UIGamePanel.hpp"
@@ -36,7 +35,7 @@ class AInspectorUI : public components::UIGamePanel {
 
     void draw() override;
     void update() override;
-    void handleEvent(const raylib::rcore::Event& event) override;
+    void handleEvent() override;
 
     void setVisible(bool visible) override;
     void setPosition(float x, float y) override;

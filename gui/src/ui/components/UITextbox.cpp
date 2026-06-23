@@ -111,8 +111,7 @@ void UITextbox::handleInput() {
     }
 }
 
-void UITextbox::handleEvent(const raylib::rcore::Event& event) {
-    (void)event;
+void UITextbox::handleEvent() {
     if (!_isVisible) {
         return;
     }
