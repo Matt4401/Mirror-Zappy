@@ -7,6 +7,7 @@
 
 #include "protocol/Parser.hpp"
 
+#include <istream>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -225,21 +226,44 @@ ServerCommand parseServerSmg(std::istringstream& iss) {
 ServerCommand parseServerSuc(std::istringstream& /*unused*/) { return server::Suc{}; }
 ServerCommand parseServerSbp(std::istringstream& /*unused*/) { return server::Sbp{}; }
 
-ClientCommand parseClientMsz(std::istringstream& /*unused*/) { return client::Msz{}; }
+ClientCommand parseClientMsz(std::istringstream& iss) {
+    client::Msz cmd{};
+    iss >> std::ws;
+    if (iss.eof()) {
+        return cmd;
+    }
+    return UnknownCommand{};
+}
 
 ClientCommand parseClientBct(std::istringstream& iss) {
     client::Bct cmd{};
+    iss >> std::ws;
     if (iss >> cmd.x >> cmd.y && iss.eof()) {
         return cmd;
     }
     return UnknownCommand{};
 }
 
-ClientCommand parseClientMct(std::istringstream& /*unused*/) { return client::Mct{}; }
-ClientCommand parseClientTna(std::istringstream& /*unused*/) { return client::Tna{}; }
+ClientCommand parseClientMct(std::istringstream& iss) {
+    client::Mct cmd{};
+    iss >> std::ws;
+    if (iss.eof()) {
+        return cmd;
+    }
+    return UnknownCommand{};
+}
+ClientCommand parseClientTna(std::istringstream& iss) {
+    client::Tna cmd{};
+    iss >> std::ws;
+    if (iss.eof()) {
+        return cmd;
+    }
+    return UnknownCommand{};
+}
 
 ClientCommand parseClientPpo(std::istringstream& iss) {
     client::Ppo cmd{};
+    iss >> std::ws;
     if (extractHashId(iss, cmd.playerId)) {
         return cmd;
     }
@@ -248,6 +272,7 @@ ClientCommand parseClientPpo(std::istringstream& iss) {
 
 ClientCommand parseClientPlv(std::istringstream& iss) {
     client::Plv cmd{};
+    iss >> std::ws;
     if (extractHashId(iss, cmd.playerId)) {
         return cmd;
     }
@@ -256,16 +281,25 @@ ClientCommand parseClientPlv(std::istringstream& iss) {
 
 ClientCommand parseClientPin(std::istringstream& iss) {
     client::Pin cmd{};
+    iss >> std::ws;
     if (extractHashId(iss, cmd.playerId)) {
         return cmd;
     }
     return UnknownCommand{};
 }
 
-ClientCommand parseClientSgt(std::istringstream& /*unused*/) { return client::Sgt{}; }
+ClientCommand parseClientSgt(std::istringstream& iss) {
+    client::Sgt cmd{};
+    iss >> std::ws;
+    if (iss.eof()) {
+        return cmd;
+    }
+    return UnknownCommand{};
+}
 
 ClientCommand parseClientSst(std::istringstream& iss) {
     client::Sst cmd{};
+    iss >> std::ws;
     if (iss >> cmd.timeUnit) {
         return cmd;
     }
