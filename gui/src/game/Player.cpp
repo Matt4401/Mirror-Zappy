@@ -11,6 +11,7 @@
 #include <string>
 #include <utility>
 
+#include "graphics/scene/Tile3D.hpp"
 #include "rcore/BoundingBox.hpp"
 #include "rmath/Vector3.hpp"
 

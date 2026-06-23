@@ -20,6 +20,7 @@
 #include "components/UIGamePanel.hpp"
 #include "components/UIImage.hpp"
 #include "components/UIText.hpp"
+#include "graphics/scene/Tile3D.hpp"
 #include "protocol/Commands.hpp"
 #include "protocol/Emitter.hpp"
 #include "rcore/Window.hpp"
@@ -160,7 +161,7 @@ void TileInspectorUI::update() { AInspectorUI::update(); }
 void TileInspectorUI::setVisible(bool visible) {
     AInspectorUI::setVisible(visible);
     if (!visible) {
-        _targetGridPosition = {-1, -1};
+        _targetGridPosition = graphics::scene::Tile3DPosition(-1, -1);
     }
 }
 

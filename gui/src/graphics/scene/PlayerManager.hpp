@@ -15,6 +15,7 @@
 
 #include "Color.hpp"
 #include "TileManager.hpp"
+#include "graphics/scene/Tile3D.hpp"
 #include "gui/src/game/Player.hpp"
 #include "gui/src/game/Team.hpp"
 #include "protocol/Commands.hpp"

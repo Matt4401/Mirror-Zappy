@@ -50,7 +50,7 @@ class TileInspectorUI : public AInspectorUI {
 
     void onBctReceived(const shared::protocol::server::Bct& cmd);
 
-    graphics::scene::Tile3DPosition _targetGridPosition{-1, -1};
+    graphics::scene::Tile3DPosition _targetGridPosition = graphics::scene::Tile3DPosition(-1, -1);
 
     std::shared_ptr<components::UIText> _posText;
     std::shared_ptr<components::UIText> _scannerTitle;

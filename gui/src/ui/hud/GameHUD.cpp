@@ -9,7 +9,6 @@
 
 #include <memory>
 #include <string>
-#include <utility>
 
 #include "EventDispatcher.hpp"
 #include "UIManager.hpp"

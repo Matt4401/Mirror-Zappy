@@ -8,6 +8,7 @@
 #include <gtest/gtest.h>
 
 #include <memory>
+#include <utility>
 
 #include "../../../../gui/src/events/EventDispatcher.hpp"
 #include "protocol/Commands.hpp"
