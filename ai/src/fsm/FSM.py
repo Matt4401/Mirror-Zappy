@@ -5,19 +5,36 @@ from .states.EvolveState import EvolveState
 from .states.GatherState import GatherState
 from .states.SurviveState import SurviveState
 from .AState import AState
+from .TickManager import TickManager
 
 
 class FiniteStateMachine:
-    def __init__(self, default_state: AState, trantorian):
+    def __init__(self, default_state: AState, trantorian, tick_manager: TickManager):
         self.state = default_state
         self.trantorian = trantorian
+        self.tick_manager = tick_manager
         self.sender = []
 
     def run(self):
         while True:
-            self.trantorian.inventory = self.trantorian.connexion.send_command("Inventory")
+            meta_cmds = self.tick_manager.tick_update()
+            self.send_auto_cmds(meta_cmds)
             self.update_state()
             self.execute_state()
+
+    def send_auto_cmds(self, meta_cmds: list[str]):
+        for cmd in meta_cmds:
+            if cmd == "Inventory":
+                resp = self.trantorian.connexion.send_command("Inventory")
+                self.trantorian.inventory.update(resp)
+
+            elif cmd == "Look":
+                resp = self.trantorian.connexion.send_command("Look")
+                self.trantorian.vision.update(resp)
+
+            elif cmd is None:
+                return
+                # lancer un broad cast
 
     def update_state(self):
         food = self.trantorian.inventory.get_food()
