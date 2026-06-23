@@ -19,6 +19,8 @@ class GatherState(AState):
 
         if not visible:
             self.trantorian.send_command.forward()
+            look_resp = self.trantorian.send_command.look()
+            self.trantorian.vision = look_resp
         else:
             stone, tile_index = visible
 
@@ -28,3 +30,5 @@ class GatherState(AState):
                 self.trantorian.player_state.inventory.update_inventory(resp)
             else:
                 self.trantorian.move_to_tile(tile_index)
+                look_resp = self.trantorian.send_command.look()
+                self.trantorian.vision = look_resp

@@ -18,3 +18,5 @@ class SurviveState(AState):
         closest_food_idx = self.trantorian.vision.get_tile_index_of("food")
         if closest_food_idx is None:
             self.trantorian.send_command.forward()
+            look_resp = self.trantorian.send_command.look()
+            self.trantorian.vision = look_resp
