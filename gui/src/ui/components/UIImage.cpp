@@ -11,17 +11,19 @@
 #include <iostream>
 #include <memory>
 #include <string>
-#include <utility>
 
 #include "Color.hpp"
+#include "graphics/AssetManager.hpp"
 #include "rcore/Event.hpp"
-#include "rtextures/Texture2D.hpp"
 
 namespace zappy::gui::ui::components {
 
 UIImage::UIImage(const std::string& path) : _path(path) {
     try {
-        _texture = std::make_unique<raylib::rtextures::Texture2D>(path);
+        if (!path.empty()) {
+            graphics::AssetManager::getInstance().loadTexture(path, path);
+            _texture = graphics::AssetManager::getInstance().getTexture(path);
+        }
         if (_texture && _texture->valid()) {
             _size = {static_cast<float>(_texture->width()), static_cast<float>(_texture->height())};
         }
@@ -64,12 +66,17 @@ void UIImage::setScale(float scale) {
 
 void UIImage::setTexture(const std::string& path) {
     try {
-        auto newTexture = std::make_unique<raylib::rtextures::Texture2D>(path);
+        if (path.empty()) {
+            return;
+        }
+        graphics::AssetManager::getInstance().loadTexture(path, path);
+        auto newTexture = graphics::AssetManager::getInstance().getTexture(path);
         if (!newTexture || !newTexture->valid()) {
             std::cerr << "[UIImage] Error loading texture: Invalid texture" << std::endl;
             return;
         }
-        _texture = std::move(newTexture);
+        _texture = newTexture;
+        _path = path;
         _size = {static_cast<float>(_texture->width()), static_cast<float>(_texture->height())};
         if (_texture->width() > 0) {
             _scale = _size.x() / static_cast<float>(_texture->width());
