@@ -16,6 +16,8 @@ add_library(zappy_server_objects OBJECT
         src/guiCommand/Bct.hpp
         src/guiCommand/Tna.cpp
         src/guiCommand/Tna.hpp
+        src/guiCommand/Sst.cpp
+        src/guiCommand/Sst.hpp
         src/command/ICommand.hpp
         src/command/ACommand.hpp
         src/command/CommandFactory.cpp
@@ -42,6 +44,8 @@ add_library(zappy_server_objects OBJECT
         src/command/Inventory.hpp
         src/command/Unknown.cpp
         src/command/Unknown.hpp
+        src/command/Look.cpp
+        src/command/Look.hpp
 )
 target_include_directories(zappy_server_objects PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src

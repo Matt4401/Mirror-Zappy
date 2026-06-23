@@ -35,13 +35,14 @@ class Core {
 
     int run();
     void stop();
-    void setup();
 
     [[nodiscard]] const game::World& world() const { return *_world; }
     [[nodiscard]] parser::ServerConfig& config() { return _config; }
 
   private:
     enum class ClientState : std::uint8_t { WAITING_TEAM_SELECTION, IN_GAME, GUI };
+
+    void setup();
 
     static void formatReceivedString(std::string& str);
 
