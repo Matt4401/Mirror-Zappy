@@ -1,4 +1,5 @@
 from .Constant import SURVIVAL_THRESHOLD
+
 # from .states.AttackState import AttackState
 # from .states.ReproduceState import ReproduceState
 from .states.EvolveState import EvolveState
@@ -15,7 +16,9 @@ class FiniteStateMachine:
 
     def run(self):
         while True:
-            self.trantorian.inventory = self.trantorian.connexion.send_command("Inventory")
+            self.trantorian.inventory = self.trantorian.connexion.send_command(
+                "Inventory"
+            )
             self.update_state()
             self.execute_state()
 
