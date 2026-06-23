@@ -81,7 +81,7 @@ bool UIPanel::isHovered() const {
         return false;
     }
     raylib::rmath::Vector2 const mousePos = raylib::rcore::Event::getMousePositionStatic();
-    raylib::rmath::Rectangle const rec{_position.x(), _position.y(), _size.x(), _size.y()};
+    raylib::rmath::Rectangle const rec{.x = _position.x(), .y = _position.y(), .width = _size.x(), .height = _size.y()};
     if (raylib::rshapes::Shapes::checkCollisionPointRec(mousePos, rec)) {
         return true;
     }
