@@ -75,6 +75,16 @@ class UIGamePanel : public IUIComponent {
     [[nodiscard]] float getCurrentHeight() const { return _currentHeight; }
     [[nodiscard]] static constexpr float getHeaderHeight() { return DefaultHeaderHeight; }
 
+  protected:
+    void setBasePosition(float x, float y) {
+        _position.setX(x);
+        _position.setY(y);
+    }
+    void setBaseSize(float width, float height) {
+        _size.setX(width);
+        _size.setY(height);
+    }
+
   private:
     void updateTextPosition();
 
