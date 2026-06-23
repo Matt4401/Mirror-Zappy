@@ -32,11 +32,11 @@ bool Take::start(game::World& world, game::Player& player) {
 }
 void Take::execute(game::World& world, game::Player& player) {
     const game::ItemType item = game::mapItemString().at(_arg);
-    player.addItem(item);
     if (!world.removeItemOnGround(item, player.position())) {
         player.addResponse("ko\n");
         return;
     }
+    player.addItem(item);
     world.addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pgt{
         .playerId = static_cast<int>(player.id()),
         .resourceId = static_cast<int>(item),

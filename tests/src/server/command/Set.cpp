@@ -118,11 +118,9 @@ TEST(SetTest, FailedExecute) {
     };
     game::World world{config};
     game::Player player{0, 5, 5, game::cardinalPoint::NORTH};
-
-    const game::ItemType item = game::mapItemString().at("deraumere");
-
     Set set{"deraumere"};
     set.execute(world, player);
     ASSERT_EQ(player.responses().front(), "ko\n");
+    ASSERT_EQ(player.inventory().at(static_cast<std::uint8_t>(game::ItemType::Deraumere)), 0);
 }
 }  // namespace zappy::server::command

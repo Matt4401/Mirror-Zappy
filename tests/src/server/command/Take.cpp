@@ -129,6 +129,7 @@ TEST(TakeTest, FailedExecute) {
     Take take{"deraumere"};
     take.execute(world, player);
     ASSERT_EQ(player.responses().front(), "ko\n");
+    ASSERT_EQ(player.inventory().at(static_cast<std::uint8_t>(game::ItemType::Deraumere)), 0);
 }
 
 }  // namespace zappy::server::command
