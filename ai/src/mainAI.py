@@ -29,5 +29,5 @@ def mainAI():
 
     PlayerLogger.setup_logging(player_id)
 
-    main_class = Trantorian(trantorian, port, machine, name)  # noqa: F841
+    main_class = Trantorian(port, machine, name)  # noqa: F841
     main_class.run()

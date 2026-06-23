@@ -6,8 +6,7 @@ import math
 
 
 class Trantorian:
-    def __init__(self, trantorian, port, host, team_name):
-        self.trantorian = trantorian
+    def __init__(self, port, host, team_name):
         self.thread = threading.Lock()
         self.answer_list = []
         self.data_lock = threading.Lock()
