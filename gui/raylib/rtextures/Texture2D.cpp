@@ -11,6 +11,8 @@
 
 #include "Color.hpp"
 #include "Image.hpp"
+#include "rmath/Rectangle.hpp"
+#include "rmath/Vector2.hpp"
 
 namespace zappy::gui::raylib::rtextures {
 void Texture2D::drawCoverPanned(int width, int height, float horizontalPan, zappy::gui::raylib::Color tint) const {
@@ -19,7 +21,7 @@ void Texture2D::drawCoverPanned(int width, int height, float horizontalPan, zapp
     }
     const float textureRatio = static_cast<float>(_texture.width) / static_cast<float>(_texture.height);
     const float screenRatio = static_cast<float>(width) / static_cast<float>(height);
-    Rectangle source(0.0F, 0.0F, static_cast<float>(_texture.width), static_cast<float>(_texture.height));
+    rmath::Rectangle source{0.0F, 0.0F, static_cast<float>(_texture.width), static_cast<float>(_texture.height)};
 
     if (textureRatio > screenRatio) {
         source.width = static_cast<float>(_texture.height) * screenRatio;
@@ -29,8 +31,11 @@ void Texture2D::drawCoverPanned(int width, int height, float horizontalPan, zapp
         source.y = (static_cast<float>(_texture.height) - source.height) * 0.5F;
     }
 
-    DrawTexturePro(_texture, source, Rectangle(0.0F, 0.0F, static_cast<float>(width), static_cast<float>(height)),
-                   Vector2(0.0F, 0.0F), 0.0F, tint.color());
+    rmath::Rectangle const dest{0.0F, 0.0F, static_cast<float>(width), static_cast<float>(height)};
+    rmath::Vector2 const origin{0.0F, 0.0F};
+
+    ::DrawTexturePro(_texture, ::Rectangle{source.x, source.y, source.width, source.height},
+                     ::Rectangle{dest.x, dest.y, dest.width, dest.height}, origin.vector(), 0.0F, tint.color());
 }
 
 void Texture2D::reset() {
