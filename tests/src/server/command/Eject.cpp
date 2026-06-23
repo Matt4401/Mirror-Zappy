@@ -35,7 +35,11 @@ TEST(EjectTest, CheckRequiredTicks) {
 }
 
 TEST(EjectTest, StartFailsIfTileIsEmpty) {
-    game::World world{kDefaultConfig};
+    auto modifConfig = kDefaultConfig;
+    modifConfig.clientLimit = 1;
+    modifConfig.teamNames = {"Team1"};
+
+    game::World world{modifConfig};
 
     auto idOpt = world.spawnPlayer("Team1");
     ASSERT_TRUE(idOpt.has_value());
