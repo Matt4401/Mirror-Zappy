@@ -1,7 +1,6 @@
 import sys
 import argparse
-from src.AITeamClass import AITeam
-from src.TrantorianClass import Trantorian
+from src.Trantorian import Trantorian
 from util.IdGenerator import generate_id
 from util.InitLogger import PlayerLogger
 
@@ -30,6 +29,5 @@ def mainAI():
 
     PlayerLogger.setup_logging(player_id)
 
-    trantorian = Trantorian("matt4401")
-    main_class = AITeam(trantorian, port, machine, name)  # noqa: F841
+    main_class = Trantorian(port, machine, name)  # noqa: F841
     main_class.run()
