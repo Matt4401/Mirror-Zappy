@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <string>
-
 #include "guiCommand/IGuiCommand.hpp"
 
 namespace zappy::server::guiCommand {
@@ -22,6 +20,6 @@ class Tna : public IGuiCommand {
     Tna& operator=(Tna&& other) = delete;
     ~Tna() override = default;
 
-    std::string execute(Core& core) override;
+    GuiResponse execute(Core& core) override;
 };
 }  // namespace zappy::server::guiCommand

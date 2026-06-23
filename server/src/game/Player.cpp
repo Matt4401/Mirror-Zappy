@@ -35,12 +35,13 @@ void Player::addItem(ItemType item, const std::size_t quantity) {
     }
 }
 
-void Player::subItem(ItemType item, const std::size_t quantity) {
-    const auto nbInventory = _inventory.at(static_cast<uint8_t>(item));
+bool Player::subItem(ItemType item, const std::size_t quantity) {
+    const auto& nbInventory = _inventory.at(static_cast<uint8_t>(item));
     if (nbInventory <= quantity) {
-        return;
+        return false;
     }
     _inventory.at(static_cast<uint8_t>(item)) -= quantity;
+    return true;
 }
 
 std::size_t Player::getItem(ItemType item) const { return _inventory.at(static_cast<uint8_t>(item)); }

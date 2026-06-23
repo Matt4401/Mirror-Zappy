@@ -302,8 +302,13 @@ void World::addItemOnGround(ItemType item, const Position pos) {
     _tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(item))++;
 }
 
-void World::removeItemOnGround(ItemType item, const Position pos) {
-    _tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(item))--;
+bool World::removeItemOnGround(ItemType item, const Position pos) {
+    auto& resources = _tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(item));
+    if (resources > 0) {
+        resources--;
+        return true;
+    }
+    return false;
 }
 
 std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> World::resourcesAt(const Position position) const {

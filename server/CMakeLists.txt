@@ -18,6 +18,8 @@ add_library(zappy_server_objects OBJECT
         src/guiCommand/Tna.hpp
         src/guiCommand/Sst.cpp
         src/guiCommand/Sst.hpp
+        src/guiCommand/Sbp.cpp
+        src/guiCommand/Sbp.hpp
         src/command/ICommand.hpp
         src/command/ACommand.hpp
         src/command/CommandFactory.cpp
