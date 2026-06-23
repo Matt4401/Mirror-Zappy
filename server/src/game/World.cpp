@@ -420,7 +420,7 @@ std::vector<int> World::playersWithSameLevelOnTile(const Position position, cons
     std::vector<int> vecPlayerId{};
     for (const auto& playerId : playerIds) {
         if (_playerList.find(playerId)->second->level() == level) {
-            vecPlayerId.push_back(playerId);
+            vecPlayerId.push_back(static_cast<int>(playerId));
         }
     }
     return vecPlayerId;

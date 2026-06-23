@@ -20,6 +20,17 @@
 #include "exception/TooMuchCmd.hpp"
 #include "game/World.hpp"
 
+static constexpr bool hasEnoughResources(const zappy::server::command::InventoryArray& groundInv,
+                                         const zappy::server::command::InventoryArray& required) {
+    for (std::size_t i = 0; i < groundInv.size(); ++i) {
+        if (groundInv.at(i) < required.at(i)) {
+            return false;
+        }
+        ²
+    }
+    return true;
+}
+
 namespace zappy::server::game {
 
 Player::Player(const std::size_t id, const std::size_t x, const std::size_t y, const cardinalPoint orient)
@@ -195,16 +206,6 @@ Position Player::getNthDiagonalLeftPosition(const std::size_t n, const Position 
 int Player::level() const { return _level; }
 
 void Player::levelUp() { _level++; }
-
-static constexpr bool hasEnoughResources(const command::InventoryArray& groundInv,
-                                         const command::InventoryArray& required) {
-    for (std::size_t i = 0; i < groundInv.size(); ++i) {
-        if (groundInv.at(i) < required.at(i)) {
-            return false;
-        }
-    }
-    return true;
-}
 
 bool Player::checkCondition(const std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)>& resources,
                             const std::size_t nbPlayer) const {

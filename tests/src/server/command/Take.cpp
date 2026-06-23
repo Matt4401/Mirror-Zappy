@@ -55,9 +55,14 @@ TEST(TakeTest, CheckStartValidItemButEmptyTile) {
 
     auto playerIdOpt = world.spawnPlayer("test");
     ASSERT_TRUE(playerIdOpt.has_value());
+
+    if (!playerIdOpt.has_value()) {
+        return;
+    }
+
     auto& player = *world.playerList().at(playerIdOpt.value());
 
-    const game::Position targetPos = {5, 5};
+    constexpr auto targetPos = game::Position{.x = 5, .y = 5};
     world.updatePositionOnMap(player.id(), player.position(), targetPos);
     player.setPosition(targetPos);
 
