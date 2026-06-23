@@ -27,6 +27,7 @@
 #include "guiCommand/IGuiCommand.hpp"
 #include "guiCommand/Mct.hpp"
 #include "guiCommand/Msz.hpp"
+#include "guiCommand/Sbp.hpp"
 #include "guiCommand/Sgt.hpp"
 #include "guiCommand/Sst.hpp"
 #include "guiCommand/Tna.hpp"
@@ -75,7 +76,7 @@ void CommandFactory::registerGuiCommands() {
         if (const auto* bctParams = std::get_if<shared::protocol::client::Bct>(&parsedCmd)) {
             return std::make_unique<guiCommand::Bct>(bctParams->x, bctParams->y);
         }
-        return nullptr;
+        return std::make_unique<guiCommand::Sbp>();
     });
     _guiCreators.emplace("mct", [](std::string_view) { return std::make_unique<guiCommand::Mct>(); });
     _guiCreators.emplace("tna", [](std::string_view) { return std::make_unique<guiCommand::Tna>(); });
@@ -85,7 +86,7 @@ void CommandFactory::registerGuiCommands() {
         if (const auto* sstParams = std::get_if<shared::protocol::client::Sst>(&parsedCmd)) {
             return std::make_unique<guiCommand::Sst>(sstParams->timeUnit);
         }
-        return nullptr;
+        return std::make_unique<guiCommand::Sbp>();
     });
 }
 
