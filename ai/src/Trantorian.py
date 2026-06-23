@@ -2,6 +2,7 @@ from src.Connection import Connection
 from src.PlayerState import PlayerState
 from src.SendCommand import SendCommand
 import threading
+import math
 
 
 class Trantorian:

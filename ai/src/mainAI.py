@@ -1,7 +1,6 @@
 import sys
 import argparse
 from src.Trantorian import Trantorian
-from src.TrantorianClass import Trantorian
 from util.IdGenerator import generate_id
 from util.InitLogger import PlayerLogger
 
