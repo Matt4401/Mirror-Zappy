@@ -37,7 +37,7 @@ TEST(SetTest, CheckStartInvalidItem) {
     game::World world{config};
     game::Player player{0, 5, 5, game::cardinalPoint::NORTH};
 
-    Set set{"ressource_inconnue_au_bataillon"};
+    Set set{"UnknownResources"};
 
     ASSERT_FALSE(set.start(world, player));
 }
@@ -100,11 +100,27 @@ TEST(SetTest, CheckExecuteInventoryAndWorld) {
     const auto initialGroundCount = world.resourcesAt(player.position()).at(itemIdx);
 
     set.execute(world, player);
-
+    ASSERT_EQ(player.responses().front(), "ok\n");
     ASSERT_EQ(player.inventory().at(itemIdx), 0);
 
     const auto finalGroundCount = world.resourcesAt(player.position()).at(itemIdx);
     ASSERT_EQ(finalGroundCount, initialGroundCount + 1);
 }
 
+TEST(SetTest, FailedExecute) {
+    const auto config = parser::ServerConfig{
+        .port = 80,
+        .width = 16,
+        .height = 16,
+        .teamNames = {"test"},
+        .clientLimit = 1,
+        .freq = 100,
+    };
+    game::World world{config};
+    game::Player player{0, 5, 5, game::cardinalPoint::NORTH};
+    Set set{"deraumere"};
+    set.execute(world, player);
+    ASSERT_EQ(player.responses().front(), "ko\n");
+    ASSERT_EQ(player.inventory().at(static_cast<std::uint8_t>(game::ItemType::Deraumere)), 0);
+}
 }  // namespace zappy::server::command
