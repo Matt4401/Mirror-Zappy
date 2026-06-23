@@ -47,7 +47,7 @@ void CommandFactory::registerCommands() {
         const auto& parseCmd = extractAllCmd(rawCommand);
 
         if (parseCmd.size() >= 2) {
-            return std::make_unique<Broadcast>(std::string(parseCmd.at(1)));
+            return std::make_unique<Broadcast>(std::string(rawCommand.substr(parseCmd.at(0).size() + 1)));
         }
         return nullptr;
     });

@@ -20,7 +20,8 @@ namespace zappy::server::command {
 namespace {
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
-void checkBroadcastMessage(const game::Position& receiverPos, const std::string& expectedMessage) {
+void checkBroadcastMessage(const game::Position& receiverPos, const std::string& expectedMessage,
+                           game::Position senderPos = {.x = 5, .y = 5}) {
     const parser::ServerConfig config = {
         .port = 8080,
         .width = 10,
@@ -52,11 +53,12 @@ void checkBroadcastMessage(const game::Position& receiverPos, const std::string&
     const auto oldSenderPos = sender.position();
     const auto oldReceiverPos = receiver.position();
 
-    sender.setPosition(game::Position{.x = 5, .y = 5});
+    sender.setPosition(senderPos);
     receiver.setPosition(receiverPos);
+
     receiver.setOrientation(game::cardinalPoint::NORTH);
 
-    world.updatePositionOnMap(senderId, oldSenderPos, game::Position{.x = 5, .y = 5});
+    world.updatePositionOnMap(senderId, oldSenderPos, senderPos);
     world.updatePositionOnMap(receiverId, oldReceiverPos, receiverPos);
 
     Broadcast broadcast{"hello world"};
@@ -96,4 +98,25 @@ TEST(BroadcastTest, ExecuteEast) { checkBroadcastMessage({.x = 6, .y = 5}, "mess
 TEST(BroadcastTest, ExecuteNorthEast) { checkBroadcastMessage({.x = 6, .y = 4}, "message 4, hello world\n"); }
 
 TEST(BroadcastTest, ExecuteSame) { checkBroadcastMessage({.x = 5, .y = 5}, "message 0, hello world\n"); }
+
+TEST(BroadcastTest, TorusWrapEast) {
+    checkBroadcastMessage({.x = 8, .y = 5}, "message 7, hello world\n", {.x = 1, .y = 5});
+}
+
+TEST(BroadcastTest, TorusWrapWest) {
+    checkBroadcastMessage({.x = 1, .y = 5}, "message 3, hello world\n", {.x = 8, .y = 5});
+}
+
+TEST(BroadcastTest, TorusWrapNorth) {
+    checkBroadcastMessage({.x = 5, .y = 1}, "message 1, hello world\n", {.x = 5, .y = 8});
+}
+
+TEST(BroadcastTest, TorusWrapSouth) {
+    checkBroadcastMessage({.x = 5, .y = 8}, "message 5, hello world\n", {.x = 5, .y = 1});
+}
+
+TEST(BroadcastTest, TorusWrapNorthWest) {
+    checkBroadcastMessage({.x = 1, .y = 1}, "message 2, hello world\n", {.x = 8, .y = 8});
+}
+
 }  // namespace zappy::server::command

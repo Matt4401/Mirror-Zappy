@@ -49,6 +49,7 @@ TEST(CommandFactoryTest, CreateCommandBroadcastIgnoresExtraArguments) {
     auto command = factory.createCommand("Broadcast Hello World\n");
     EXPECT_NE(command, nullptr);
     EXPECT_TRUE(dynamic_cast<Broadcast*>(command.get()) != nullptr);
+    const auto* broadcastCommand = dynamic_cast<Broadcast*>(command.get());
 }
 
 TEST(CommandFactoryTest, CreateGuiCommandReturnsNullptrForEmptyString) {
