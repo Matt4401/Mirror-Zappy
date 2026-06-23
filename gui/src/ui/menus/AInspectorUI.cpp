@@ -62,13 +62,13 @@ AInspectorUI::AInspectorUI(float x, float y, float width, const std::string& tit
     _closeBtn->setOnClick([this]() { this->setVisible(false); });
     addHeaderComponent(_closeBtn);
 
-    _eventTokens.push_back(_dispatcher.get().subscribe<shared::protocol::server::Sgt>(
-        [this](const shared::protocol::server::Sgt& cmd) { _serverFreq = static_cast<float>(cmd.timeUnit); }));
+    _serverFrequencyToken = _dispatcher.get().subscribe<shared::protocol::server::Sgt>(
+        [this](const shared::protocol::server::Sgt& cmd) { _serverFreq = static_cast<float>(cmd.timeUnit); });
 }
 
 AInspectorUI::~AInspectorUI() {
-    if (!_eventTokens.empty()) {
-        _dispatcher.get().unsubscribe<shared::protocol::server::Sgt>(_eventTokens.front());
+    if (_serverFrequencyToken != 0) {
+        _dispatcher.get().unsubscribe<shared::protocol::server::Sgt>(_serverFrequencyToken);
     }
 }
 

@@ -59,6 +59,7 @@ class AInspectorUI : public components::UIGamePanel {
     std::reference_wrapper<events::EventDispatcher> _dispatcher;
     std::shared_ptr<raylib::rtext::Font> _font;
     std::function<void(const std::string&)> _onSendCommand;
+    events::EventDispatcher::EventToken _serverFrequencyToken{0};
     std::vector<events::EventDispatcher::EventToken> _eventTokens;
 
     std::shared_ptr<components::UIText> _inventoryTitleText;
