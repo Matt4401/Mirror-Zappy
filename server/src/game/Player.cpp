@@ -20,8 +20,9 @@
 #include "exception/TooMuchCmd.hpp"
 #include "game/World.hpp"
 
-static constexpr bool hasEnoughResources(const zappy::server::command::InventoryArray& groundInv,
-                                         const zappy::server::command::InventoryArray& required) {
+namespace {
+constexpr bool hasEnoughResources(const zappy::server::command::InventoryArray& groundInv,
+                                  const zappy::server::command::InventoryArray& required) {
     for (std::size_t i = 0; i < groundInv.size(); ++i) {
         if (groundInv.at(i) < required.at(i)) {
             return false;
@@ -29,6 +30,7 @@ static constexpr bool hasEnoughResources(const zappy::server::command::Inventory
     }
     return true;
 }
+}  // namespace
 
 namespace zappy::server::game {
 
