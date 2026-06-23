@@ -29,6 +29,7 @@ class UIText : public IUIComponent {
 
     void draw() override;
     void update() override;
+    void handleEvent(const raylib::rcore::Event& event) override;
 
     void setPosition(float x, float y) override;
     void setSize(float width, float height) override;

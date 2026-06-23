@@ -35,6 +35,8 @@ void UIText::draw() {
 
 void UIText::update() {}
 
+void UIText::handleEvent(const raylib::rcore::Event& /*event*/) {}
+
 void UIText::setPosition(float x, float y) { _position = raylib::rmath::Vector2(x, y); }
 
 void UIText::setSize(float /*width*/, float /*height*/) {}
