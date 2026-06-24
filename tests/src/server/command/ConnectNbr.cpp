@@ -18,7 +18,7 @@
 
 namespace zappy::server::command {
 
-// NOLINTNEXTLINE
+// NOLINTBEGIN
 static const parser::ServerConfig kDefaultConfig = {
     .port = 8080,
     .width = 10,
@@ -71,5 +71,7 @@ TEST(ConnectNbrTest, StartReturnsZeroWhenTeamIsFull) {
     ASSERT_EQ(responses.size(), 1);
     EXPECT_EQ(responses.front(), "0\n");
 }
+
+// NOLINTEND
 
 }  // namespace zappy::server::command
