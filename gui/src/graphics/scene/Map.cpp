@@ -178,6 +178,6 @@ void Map::handleRequestCyclePlayer(const events::RequestCyclePlayer& e) {
         nextIndex = 0;
     }
 
-    dispatchClickedPlayer(allPlayers[nextIndex].first.get(), allPlayers[nextIndex].second.get());
+    dispatchClickedPlayer(allPlayers.at(nextIndex).first.get(), allPlayers.at(nextIndex).second.get());
 }
 }  // namespace zappy::gui::graphics::scene

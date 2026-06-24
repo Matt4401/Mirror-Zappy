@@ -326,7 +326,7 @@ void PlayerManager::recalculateTileOffsets(const Tile3DPosition tilePosition) {
     const float radius = 0.35F * Tile3D::TILE_SIZE;
 
     for (size_t i = 0; i < count; ++i) {
-        auto& player = playersOnTile[i].get();
+        auto& player = playersOnTile.at(i).get();
         if (count == 1) {
             player.setTargetOffset({0.0F, 0.0F, 0.0F});
             if (!player.moving()) {
