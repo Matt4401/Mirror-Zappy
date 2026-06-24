@@ -305,6 +305,15 @@ void UIGamePanel::updateChildrenLayout() {
     }
 }
 
+void UIGamePanel::scrollToBottom() {
+    if (_contentChildren.empty() || _customLayout) {
+        return;
+    }
+    updateChildrenLayout();
+    _scrollOffset = _maxScroll;
+    updateChildrenLayout();
+}
+
 void UIGamePanel::setTitle(const std::string& title) {
     if (_titleText) {
         _titleText->setText(title);
