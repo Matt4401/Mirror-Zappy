@@ -66,6 +66,9 @@ void Player::pushCommand(std::unique_ptr<command::ICommand> command) {
 }
 
 void Player::update(World& world) {
+    if (_isDead) {
+        return;
+    }
     if (_lifeTick > 0) {
         _lifeTick--;
     }
@@ -86,7 +89,7 @@ void Player::update(World& world) {
             }));
 
         } else {
-            world.removePlayer(_id);
+            kill();
             return;
         }
     }
@@ -159,9 +162,14 @@ std::size_t Player::id() const { return _id; }
 std::size_t Player::nbLifeTick() const { return _lifeTick; }
 
 void Player::kill() {
+    if (_isDead) {
+        return;
+    }
     _isDead = true;
     _buffersResponses = {"dead\n"};
 }
+
+bool Player::isDead() const { return _isDead; }
 
 void Player::moveWithOrientation(const Position& limit, cardinalPoint orientation) {
     auto [fst, snd] = playerMove.at(static_cast<std::uint8_t>(orientation));

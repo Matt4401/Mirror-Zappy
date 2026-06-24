@@ -190,6 +190,9 @@ void World::update() {
         respawnTicks = 0;
     }
     for (const auto& player : _playerList | std::views::values) {
+        if (player->isDead()) {
+            continue;
+        }
         player->update(*this);
     }
 }
@@ -211,13 +214,16 @@ std::unordered_map<std::size_t, std::vector<std::string>> World::getAllResponses
 }
 
 std::size_t World::removePlayer(const std::size_t id) {
-    const auto& player = _playerList.at(id);
+    auto it = _playerList.find(id);
+    if (it == _playerList.end()) {
+        return 0;
+    }
+    const auto& player = it->second;
 
     player->kill();
     removePlayerFromTeam(id);
     erasePlayerFromTile(getTileIndex(player->position()), id);
-    addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pdi{.playerId = static_cast<int>(id)}));
-    _playerList.erase(id);
+    _playerList.erase(it);
     return id;
 }
 
