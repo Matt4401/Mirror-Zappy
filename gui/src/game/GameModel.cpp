@@ -9,6 +9,7 @@
 
 #include <raylib.h>
 
+#include <cstddef>
 #include <memory>
 
 #include "Color.hpp"
