@@ -11,6 +11,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <utility>
 
 #include "Color.hpp"
@@ -19,34 +20,12 @@
 #include "components/UIGamePanel.hpp"
 #include "components/UIImage.hpp"
 #include "components/UIText.hpp"
+#include "graphics/AssetManager.hpp"
 #include "protocol/Commands.hpp"
 #include "rshapes/Shapes.hpp"
 #include "rtext/Font.hpp"
 
 namespace zappy::gui::ui::menus {
-
-namespace {
-constexpr float InspectorInitialHeight = 550.0F;
-
-constexpr float InvGridTotalWidth = 230.0F;
-constexpr float InvTitleToGridSpacing = 30.0F;
-constexpr float InvCellSize = 70.0F;
-constexpr float InvCellSpacing = 80.0F;
-constexpr float InvCellTextOffsetX = 10.0F;
-constexpr float InvCellTextOffsetY = 50.0F;
-constexpr float InfoFontSize = 16.0F;
-constexpr float HeaderFontSize = 20.0F;
-
-constexpr float CloseBtnSize = 24.0F;
-constexpr float CloseBtnFontSize = 16.0F;
-constexpr float CloseBtnXOffset = 45.0F;
-constexpr float CloseBtnYOffset = 8.0F;
-
-constexpr float InvIconSize = 30.0F;
-
-constexpr int ElementCount = 7;
-}  // namespace
-
 AInspectorUI::AInspectorUI(float x, float y, float width, const std::string& title, events::EventDispatcher& dispatcher,
                            const std::shared_ptr<raylib::rtext::Font>& font,
                            std::function<void(const std::string&)> onSendCommand)
@@ -77,16 +56,18 @@ void AInspectorUI::buildInventoryPanel() {
     _inventoryTitleText->setFontSize(static_cast<int>(HeaderFontSize));
     _inventoryTitleText->setColor(raylib::Color::Black());
 
-    for (int i = 0; i < ElementCount; ++i) {
+    auto& assetManager = graphics::AssetManager::getInstance();
+    for (const auto& asset : InventoryIconAssets) {
         auto text = std::make_shared<components::UIText>("0", _font);
         text->setFontSize(static_cast<int>(InfoFontSize));
         text->setColor(raylib::Color::White());
         _inventoryTexts.push_back(text);
 
-        auto img = std::make_shared<components::UIImage>(
-            "assets/images/ui/id.png");  // TODO: Replace with actual inventory item image
-        img->setSize(InvIconSize, InvIconSize);
-        _inventoryImages.push_back(img);
+        if (assetManager.loadTexture(asset.id, asset.path)) {
+            auto img = std::make_shared<components::UIImage>(assetManager.getTexture(asset.id), asset.id);
+            img->setSize(InvIconSize, InvIconSize);
+            _inventoryImages.push_back(img);
+        }
     }
 }
 
@@ -108,11 +89,11 @@ void AInspectorUI::drawInventoryPanel(float& currentY, float startX, float panel
                                                   raylib::Color(200, 200, 200, 255));
 
         invText->setPosition(cellX + InvCellTextOffsetX, cellY + InvCellTextOffsetY);
-        invText->draw();
 
         auto img = _inventoryImages.at(i);
-        img->setPosition(cellX + InvCellTextOffsetX, cellY + InvCellTextOffsetY);
+        img->setPosition(cellX + InvCellIconOffsetX, cellY + InvCellIconOffsetY);
         img->draw();
+        invText->draw();
     }
     currentY += InvCellSpacing * 3.0F;
 }
