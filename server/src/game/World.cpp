@@ -212,22 +212,12 @@ std::unordered_map<std::size_t, std::vector<std::string>> World::getAllResponses
 
 std::size_t World::removePlayer(const std::size_t id) {
     const auto& player = _playerList.at(id);
+
     player->kill();
     removePlayerFromTeam(id);
     erasePlayerFromTile(getTileIndex(player->position()), id);
+    addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pdi{.playerId = static_cast<int>(id)}));
     return player->id();
-}
-
-std::vector<std::size_t> World::collectAndKillDeadPlayers() const {
-    std::vector<std::size_t> deadIds;
-
-    for (const auto& val : _playerList | std::views::values) {
-        if (val->nbLifeTick() == 0) {
-            val->kill();
-            deadIds.emplace_back(val->id());
-        }
-    }
-    return deadIds;
 }
 
 std::size_t World::getAvailableSlotInTeam(std::string_view teamName) const {
