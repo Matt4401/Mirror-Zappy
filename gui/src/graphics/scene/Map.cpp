@@ -7,11 +7,14 @@
 
 #include "Map.hpp"
 
+#include <algorithm>
 #include <functional>
+#include <iterator>
 #include <limits>
 #include <memory>
 #include <optional>
 #include <utility>
+#include <vector>
 
 #include "Color.hpp"
 #include "Tile3D.hpp"
@@ -38,11 +41,17 @@ Map::Map(raylib::rcore::Camera& camera, WorldManager& worldManager, events::Even
 
     _nameToken = _dispatcher.get().subscribe<events::PlayerNameChanged>(
         [this](const events::PlayerNameChanged& e) { _worldManager.get().updatePlayerName(e.playerId, e.newName); });
+
+    _cycleToken = _dispatcher.get().subscribe<events::RequestCyclePlayer>(
+        [this](const events::RequestCyclePlayer& e) { handleRequestCyclePlayer(e); });
 }
 
 Map::~Map() {
     if (_nameToken != 0) {
         _dispatcher.get().unsubscribe<events::PlayerNameChanged>(_nameToken);
+    }
+    if (_cycleToken != 0) {
+        _dispatcher.get().unsubscribe<events::RequestCyclePlayer>(_cycleToken);
     }
 }
 
@@ -136,5 +145,39 @@ void Map::dispatchClickedTile(const Tile3D& tile) const {
         .x = gridPosition.x,
         .y = gridPosition.y,
     });
+}
+
+void Map::handleRequestCyclePlayer(const events::RequestCyclePlayer& e) {
+    std::vector<std::pair<std::reference_wrapper<const game::Team>, std::reference_wrapper<const game::Player>>>
+        allPlayers;
+    for (const auto& team : _worldManager.get().teams()) {
+        for (const auto& player : team.players()) {
+            allPlayers.emplace_back(std::cref(team), std::cref(player));
+        }
+    }
+    if (allPlayers.empty()) {
+        return;
+    }
+
+    std::ranges::sort(allPlayers,
+                      [](const auto& a, const auto& b) { return a.second.get().id() < b.second.get().id(); });
+
+    auto it = std::ranges::find_if(allPlayers,
+                                   [&e](const auto& pair) { return pair.second.get().id() == e.currentPlayerId; });
+
+    int currentIndex = 0;
+    if (it != allPlayers.end()) {
+        currentIndex = static_cast<int>(std::distance(allPlayers.begin(), it));
+    }
+
+    int nextIndex = currentIndex + e.direction;
+    if (nextIndex < 0) {
+        nextIndex = static_cast<int>(allPlayers.size()) - 1;
+    }
+    if (nextIndex >= static_cast<int>(allPlayers.size())) {
+        nextIndex = 0;
+    }
+
+    dispatchClickedPlayer(allPlayers[nextIndex].first.get(), allPlayers[nextIndex].second.get());
 }
 }  // namespace zappy::gui::graphics::scene
