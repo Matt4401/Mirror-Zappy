@@ -56,13 +56,13 @@ class AInspectorUI : public components::UIGamePanel {
     };
 
     static constexpr std::array<InventoryIconAsset, ElementCount> InventoryIconAssets = {{
-        ("inventory.food"sv, "assets/images/ui/Food.png"sv),
-        ("inventory.linemate"sv, "assets/images/ui/Linemate.png"sv),
-        ("inventory.deraumere"sv, "assets/images/ui/Deraumere.png"sv),
-        ("inventory.sibur"sv, "assets/images/ui/Sibur.png"sv),
-        ("inventory.mendiane"sv, "assets/images/ui/Mendiane.png"sv),
-        ("inventory.phiras"sv, "assets/images/ui/Phiras.png"sv),
-        ("inventory.thystame"sv, "assets/images/ui/Thystame.png"sv),
+        {.id = "inventory.food"sv, .path = "assets/images/ui/Food.png"sv},
+        {.id = "inventory.linemate"sv, .path = "assets/images/ui/Linemate.png"sv},
+        {.id = "inventory.deraumere"sv, .path = "assets/images/ui/Deraumere.png"sv},
+        {.id = "inventory.sibur"sv, .path = "assets/images/ui/Sibur.png"sv},
+        {.id = "inventory.mendiane"sv, .path = "assets/images/ui/Mendiane.png"sv},
+        {.id = "inventory.phiras"sv, .path = "assets/images/ui/Phiras.png"sv},
+        {.id = "inventory.thystame"sv, .path = "assets/images/ui/Thystame.png"sv},
     }};
 
   public:
