@@ -66,6 +66,7 @@ void Player::setPosition(const raylib::rmath::Vector3& position) {
 
 void Player::setFuturePosition(const raylib::rmath::Vector3& position) {
     _futurePosition = position;
+    _wrappedPosition.reset();
     _isMoving = _position != _futurePosition;
 }
 

@@ -210,26 +210,8 @@ void PlayerManager::updatePlayerPosition(game::Player& player, const Tile3DPosit
     auto destination = _tileManager.tilePosition(tilePosition);
     destination.setY(Tile3D::TILE_SIZE * DefaultPlayerOffsetY);
 
-    const auto currentTile = player.tilePosition();
     auto exitPosition = player.position();
-    bool wraps = false;
-    if (_tileManager.width() > 1 && currentTile.y == tilePosition.y && currentTile.x == 0 &&
-        tilePosition.x == _tileManager.width() - 1) {
-        exitPosition.setX(exitPosition.x() - Tile3D::TILE_SIZE);
-        wraps = true;
-    } else if (_tileManager.width() > 1 && currentTile.y == tilePosition.y &&
-               currentTile.x == _tileManager.width() - 1 && tilePosition.x == 0) {
-        exitPosition.setX(exitPosition.x() + Tile3D::TILE_SIZE);
-        wraps = true;
-    } else if (_tileManager.height() > 1 && currentTile.x == tilePosition.x && currentTile.y == 0 &&
-               tilePosition.y == _tileManager.height() - 1) {
-        exitPosition.setZ(exitPosition.z() - Tile3D::TILE_SIZE);
-        wraps = true;
-    } else if (_tileManager.height() > 1 && currentTile.x == tilePosition.x &&
-               currentTile.y == _tileManager.height() - 1 && tilePosition.y == 0) {
-        exitPosition.setZ(exitPosition.z() + Tile3D::TILE_SIZE);
-        wraps = true;
-    }
+    const bool wraps = wrapPositionIfNeeded(player, tilePosition, exitPosition);
 
     if (wraps) {
         player.setWrappedFuturePosition(exitPosition, destination);
@@ -237,6 +219,33 @@ void PlayerManager::updatePlayerPosition(game::Player& player, const Tile3DPosit
         player.setFuturePosition(destination);
     }
     player.setTilePosition(tilePosition);
+}
+
+bool PlayerManager::wrapPositionIfNeeded(const game::Player& player, const Tile3DPosition tilePosition,
+                                         raylib::rmath::Vector3& exitPosition) const {
+    const auto currentTile = player.tilePosition();
+
+    if (_tileManager.width() > 1 && currentTile.y == tilePosition.y && currentTile.x == 0 &&
+        tilePosition.x == _tileManager.width() - 1) {
+        exitPosition.setX(exitPosition.x() - Tile3D::TILE_SIZE);
+        return true;
+    }
+    if (_tileManager.width() > 1 && currentTile.y == tilePosition.y && currentTile.x == _tileManager.width() - 1 &&
+        tilePosition.x == 0) {
+        exitPosition.setX(exitPosition.x() + Tile3D::TILE_SIZE);
+        return true;
+    }
+    if (_tileManager.height() > 1 && currentTile.x == tilePosition.x && currentTile.y == 0 &&
+        tilePosition.y == _tileManager.height() - 1) {
+        exitPosition.setZ(exitPosition.z() - Tile3D::TILE_SIZE);
+        return true;
+    }
+    if (_tileManager.height() > 1 && currentTile.x == tilePosition.x && currentTile.y == _tileManager.height() - 1 &&
+        tilePosition.y == 0) {
+        exitPosition.setZ(exitPosition.z() + Tile3D::TILE_SIZE);
+        return true;
+    }
+    return false;
 }
 
 game::Team& PlayerManager::ensureTeamExist(const std::string& name) {

@@ -84,6 +84,8 @@ class PlayerManager {
     void updatePlayerPosition(game::Player& player, Tile3DPosition tilePosition) const;
     void redistributeInitialEggs();
     void removeEgg(int eggId);
+    [[nodiscard]] bool wrapPositionIfNeeded(const game::Player& player, Tile3DPosition tilePosition,
+                                            raylib::rmath::Vector3& exitPosition) const;
 
     TileManager& _tileManager;
     std::vector<game::Team> _teams;

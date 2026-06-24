@@ -133,7 +133,7 @@ TEST_F(WorldManagerTest, PpoUpdatesPlayerPositionAndOrientation) {
 }
 
 TEST_F(WorldManagerTest, PlayerMovesTowardsItsTargetAndStopsOnIt) {
-    static constexpr float TestDeltaTime = 0.1F;
+    static constexpr float TestDeltaTime = 0.01F;
     createPlayer();
     const auto start = requirePlayer(42).position();
 
@@ -154,7 +154,7 @@ TEST_F(WorldManagerTest, PlayerMovesTowardsItsTargetAndStopsOnIt) {
 }
 
 TEST_F(WorldManagerTest, PlayerLeavesTheMapBeforeWrappingToTheOppositeEdge) {
-    static constexpr float TestDeltaTime = 0.1F;
+    static constexpr float TestDeltaTime = 0.01F;
     createPlayer(42, 0, 1);
     const auto start = requirePlayer(42).position();
 
