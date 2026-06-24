@@ -18,6 +18,7 @@
 #include "guiCommand/Bct.hpp"
 #include "guiCommand/Mct.hpp"
 #include "guiCommand/Msz.hpp"
+#include "guiCommand/Pin.hpp"
 #include "guiCommand/Sgt.hpp"
 #include "guiCommand/Tna.hpp"
 #include "protocol/Commands.hpp"
@@ -129,4 +130,38 @@ TEST(TnaCommandTest, ExecuteReturnsTeamNames) {
     const std::string response = command.execute(core).message;
 
     EXPECT_EQ(response, "tna teamA\ntna teamB\n");
+}
+
+TEST(PinCommandTest, PinCmd) {
+    auto args = createDummyArgs();
+    zappy::server::Core core{std::span(args)};
+
+    // NOLINTNEXTLINE
+    auto& world = const_cast<zappy::server::game::World&>(core.world());
+
+    auto playerIdOpt = world.spawnPlayer("teamA");
+
+    ASSERT_TRUE(playerIdOpt.has_value());
+
+    if (!playerIdOpt.has_value()) {
+        return;
+    }
+
+    const auto& player = world.playerList().at(playerIdOpt.value());
+    const auto& inventory = player->inventory();
+    zappy::server::guiCommand::Pin command{static_cast<int>(playerIdOpt.value())};
+
+    const std::string response = command.execute(core).message;
+    auto [x, y] = player->position();
+    std::string expectedResponse;
+    expectedResponse +=
+        "pin #" + std::to_string(playerIdOpt.value()) + " " + std::to_string(x) + " " + std::to_string(y) + " " +
+        std::to_string(inventory.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Food))) + " " +
+        std::to_string(inventory.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Linemate))) + " " +
+        std::to_string(inventory.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Deraumere))) + " " +
+        std::to_string(inventory.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Sibur))) + " " +
+        std::to_string(inventory.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Mendiane))) + " " +
+        std::to_string(inventory.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Phiras))) + " " +
+        std::to_string(inventory.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Thystame))) + "\n";
+    ASSERT_EQ(response, expectedResponse);
 }
