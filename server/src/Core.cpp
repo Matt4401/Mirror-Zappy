@@ -284,6 +284,23 @@ void Core::sendGuiInitialState(int clientId) {
         shared::protocol::Emitter::build(shared::protocol::server::Sgt{.timeUnit = static_cast<int>(_config.freq)}));
     _sessionManager->sendMessage(clientId, mct.execute(*this).message);
     _sessionManager->sendMessage(clientId, tna.execute(*this).message);
+    for (const auto& [playerId, player] : _world->playerList()) {
+        _sessionManager->sendMessage(clientId, shared::protocol::Emitter::build(shared::protocol::server::Pnw{
+                                                   .playerId = static_cast<int>(playerId),
+                                                   .x = static_cast<int>(player->position().x),
+                                                   .y = static_cast<int>(player->position().y),
+                                                   .orientation = static_cast<int>(player->orientation()),
+                                                   .level = player->level(),
+                                                   .teamName = world().getPlayerTeam(playerId)}));
+        // TODO: Uncomment this when the inventory is implemented
+        // _sessionManager->sendMessage(clientId, shared::protocol::Emitter::build(shared::protocol::server::Pin{
+        //                                            .playerId = static_cast<int>(playerId),
+        //                                            .x = static_cast<int>(player->position().x),
+        //                                            .y = static_cast<int>(player->position().y),
+        //                                            .inventory = player->inventory()}));
+        _sessionManager->sendMessage(clientId, shared::protocol::Emitter::build(shared::protocol::server::Plv{
+                                                   .playerId = static_cast<int>(playerId), .level = player->level()}));
+    }
     for (const auto& [eggId, egg] : eggs) {
         _sessionManager->sendMessage(clientId, shared::protocol::Emitter::build(shared::protocol::server::Enw{
                                                    .eggId = static_cast<int>(egg.id),
