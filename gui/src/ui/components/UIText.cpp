@@ -7,16 +7,14 @@
 
 #include "UIText.hpp"
 
-#include <raylib.h>
-
 #include <memory>
 #include <string>
 #include <utility>
 
 #include "Color.hpp"
-#include "rcore/Event.hpp"
 #include "rmath/Vector2.hpp"
 #include "rtext/Font.hpp"
+#include "rtext/Text.hpp"
 
 namespace zappy::gui::ui::components {
 
@@ -31,12 +29,13 @@ void UIText::draw() {
     if (!_isVisible || _text.empty() || !_font || !_font->valid()) {
         return;
     }
-    ::DrawTextEx(_font->font(), _text.c_str(), _position.vector(), _fontSize, _spacing, _color.color());
+    raylib::rtext::Text const textObj(_text, _position);
+    textObj.draw(*_font, _fontSize, _spacing, _color);
 }
 
 void UIText::update() {}
 
-void UIText::handleEvent(const raylib::rcore::Event& /*event*/) {}
+void UIText::handleEvent() {}
 
 void UIText::setPosition(float x, float y) { _position = raylib::rmath::Vector2(x, y); }
 
@@ -53,5 +52,12 @@ void UIText::setFontSize(float size) { _fontSize = size; }
 void UIText::setColor(raylib::Color color) { _color = color; }
 
 void UIText::setSpacing(float spacing) { _spacing = spacing; }
+
+float UIText::getWidth() const {
+    if (_text.empty() || !_font || !_font->valid()) {
+        return 0.0F;
+    }
+    return raylib::rtext::Text::measureText(*_font, _text, _fontSize, _spacing).x();
+}
 
 }  // namespace zappy::gui::ui::components

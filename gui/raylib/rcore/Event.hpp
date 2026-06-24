@@ -8,18 +8,15 @@
 #pragma once
 #include <raylib.h>
 
-#include <functional>
-#include <map>
 #include <vector>
 
-#include "context/EventContext.hpp"
+#include "rcore/Camera.hpp"
+#include "rcore/Ray.hpp"
 #include "rmath/Vector2.hpp"
 
 namespace zappy::gui::raylib::rcore {
 class Event {
   public:
-    using EventFunc = std::function<void(EventContext&)>;
-
     Event();
     ~Event() = default;
     Event(const Event& other) = delete;
@@ -29,11 +26,10 @@ class Event {
 
     void update();
 
-    void handleEvent(EventContext& context);
-
     [[nodiscard]] static bool isKeyPressed(int key) { return IsKeyPressed(key); }
     [[nodiscard]] static bool isKeyDown(int key) { return IsKeyDown(key); }
     [[nodiscard]] static bool isKeyReleased(int key) { return IsKeyReleased(key); }
+    [[nodiscard]] static int getCharPressed() { return GetCharPressed(); }
 
     [[nodiscard]] rmath::Vector2 getMousePosition() const { return _mousePosition; }
     [[nodiscard]] float getMouseWheelMove() const { return _mouseWheelMove; }
@@ -44,10 +40,14 @@ class Event {
     [[nodiscard]] static rmath::Vector2 getMousePositionStatic() {
         return {GetMousePosition().x, GetMousePosition().y};
     }
+    [[nodiscard]] static float getMouseWheelMoveStatic() { return GetMouseWheelMove(); }
+    [[nodiscard]] static rmath::Vector2 getMouseDeltaStatic() { return {GetMouseDelta().x, GetMouseDelta().y}; }
+    [[nodiscard]] static Ray mouseRay(const Camera& camera) {
+        return Ray(GetScreenToWorldRay(GetMousePosition(), camera.camera()));
+    }
 
   protected:
   private:
-    std::map<int, EventFunc> _keyEvents;
     std::vector<int> _pressedKeys;
     rmath::Vector2 _mousePosition;
     float _mouseWheelMove = 0.0F;

@@ -37,7 +37,7 @@ TEST(TakeTest, CheckStartInvalidItem) {
     game::World world{config};
     game::Player player{0, 5, 5, game::cardinalPoint::NORTH};
 
-    Take take{"item_qui_n_existe_pas"};
+    Take take{"wrongItem"};
 
     ASSERT_FALSE(take.start(world, player));
 }
@@ -52,7 +52,21 @@ TEST(TakeTest, CheckStartValidItemButEmptyTile) {
         .freq = 100,
     };
     game::World world{config};
-    game::Player player{0, 5, 5, game::cardinalPoint::NORTH};
+
+    auto playerIdOpt = world.spawnPlayer("test");
+    ASSERT_TRUE(playerIdOpt.has_value());
+
+    if (!playerIdOpt.has_value()) {
+        return;
+    }
+
+    auto& player = *world.playerList().at(playerIdOpt.value());
+
+    constexpr auto targetPos = game::Position{.x = 5, .y = 5};
+    world.updatePositionOnMap(player.id(), player.position(), targetPos);
+    player.setPosition(targetPos);
+
+    world.clearAllResourcesAndEggs();
 
     Take take{"food"};
 
@@ -90,16 +104,42 @@ TEST(TakeTest, CheckExecuteMovementAndInventory) {
     game::World world{config};
     game::Player player{0, 5, 5, game::cardinalPoint::NORTH};
 
-    world.addItemOnGround(game::ItemType::Food, player.position());
-
+    auto nbActualFood = world.resourcesAt(player.position()).at(static_cast<std::uint8_t>(game::ItemType::Food));
+    if (nbActualFood == 0) {
+        world.addItemOnGround(game::ItemType::Food, player.position());
+        nbActualFood++;
+    }
+    while (nbActualFood != 1) {
+        world.removeItemOnGround(game::ItemType::Food, player.position());
+        nbActualFood--;
+    }
     Take take{"food"};
 
     take.execute(world, player);
 
-    const auto& ressources = world.tileResources(player.position());
+    const auto& resources = world.resourcesAt(player.position());
 
-    ASSERT_EQ(ressources.at(static_cast<std::uint8_t>(game::ItemType::Food)), 0);
+    ASSERT_EQ(resources.at(static_cast<std::uint8_t>(game::ItemType::Food)), 0);
     ASSERT_EQ(player.inventory().at(static_cast<std::uint8_t>(game::ItemType::Food)), 11);
+}
+
+TEST(TakeTest, FailedExecute) {
+    const auto config = parser::ServerConfig{
+        .port = 80,
+        .width = 16,
+        .height = 16,
+        .teamNames = {"test"},
+        .clientLimit = 1,
+        .freq = 100,
+    };
+    game::World world{config};
+    game::Player player{0, 5, 5, game::cardinalPoint::NORTH};
+
+    world.clearAllResourcesAndEggs();
+    Take take{"deraumere"};
+    take.execute(world, player);
+    ASSERT_EQ(player.responses().front(), "ko\n");
+    ASSERT_EQ(player.inventory().at(static_cast<std::uint8_t>(game::ItemType::Deraumere)), 0);
 }
 
 }  // namespace zappy::server::command

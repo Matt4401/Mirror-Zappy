@@ -7,8 +7,6 @@
 
 #include "UIGamePanel.hpp"
 
-#include <raylib.h>
-
 #include <algorithm>
 #include <cmath>
 #include <memory>
@@ -19,7 +17,9 @@
 #include "graphics/AssetManager.hpp"
 #include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
+#include "rmath/Rectangle.hpp"
 #include "rmath/Vector2.hpp"
+#include "rshapes/Shapes.hpp"
 #include "rtext/Font.hpp"
 #include "rtext/Text.hpp"
 #include "ui/IUIComponent.hpp"
@@ -73,8 +73,11 @@ void UIGamePanel::draw() {
 
     _mainPanel->draw();
 
-    BeginScissorMode(static_cast<int>(_position.x()), static_cast<int>(_position.y() + DefaultHeaderHeight),
-                     static_cast<int>(_size.x()), static_cast<int>(_currentHeight - DefaultHeaderHeight));
+    int const scissorW = static_cast<int>(std::max(0.0F, _size.x() - (2.0F * Padding)));
+    int const scissorH = static_cast<int>(std::max(0.0F, _currentHeight - DefaultHeaderHeight - Padding));
+
+    raylib::rcore::Window::beginScissorMode(static_cast<int>(_position.x() + Padding),
+                                            static_cast<int>(_position.y() + DefaultHeaderHeight), scissorW, scissorH);
 
     if (!_isConfigMode) {
         for (auto& child : _contentChildren) {
@@ -84,7 +87,7 @@ void UIGamePanel::draw() {
         }
     }
 
-    EndScissorMode();
+    raylib::rcore::Window::endScissorMode();
 }
 
 void UIGamePanel::update() {
@@ -122,13 +125,13 @@ void UIGamePanel::update() {
     }
 }
 
-void UIGamePanel::handleEvent(const raylib::rcore::Event& event) {
+void UIGamePanel::handleEvent() {
     if (!_isVisible) {
         return;
     }
 
     raylib::rmath::Vector2 const mousePos = raylib::rcore::Event::getMousePositionStatic();
-    Rectangle const headerRec{
+    raylib::rmath::Rectangle const headerRec{
         .x = _position.x(), .y = _position.y(), .width = _size.x(), .height = DefaultHeaderHeight};
 
     bool const isHovered = (mousePos.x() >= headerRec.x && mousePos.x() <= headerRec.x + headerRec.width &&
@@ -138,7 +141,7 @@ void UIGamePanel::handleEvent(const raylib::rcore::Event& event) {
         _isCollapsed = !_isCollapsed;
     }
 
-    _mainPanel->handleEvent(event);
+    _mainPanel->handleEvent();
 
     if (_isCollapsed) {
         return;
@@ -146,12 +149,12 @@ void UIGamePanel::handleEvent(const raylib::rcore::Event& event) {
 
     if (!_isConfigMode) {
         raylib::rmath::Vector2 const mousePos = raylib::rcore::Event::getMousePositionStatic();
-        Rectangle const contentRec{.x = _position.x(),
-                                   .y = _position.y() + DefaultHeaderHeight,
-                                   .width = _size.x(),
-                                   .height = _currentHeight - DefaultHeaderHeight};
-        if (CheckCollisionPointRec(mousePos.vector(), contentRec)) {
-            float const wheelMove = ::GetMouseWheelMove();
+        raylib::rmath::Rectangle const contentRec{.x = _position.x(),
+                                                  .y = _position.y() + DefaultHeaderHeight,
+                                                  .width = _size.x(),
+                                                  .height = _currentHeight - DefaultHeaderHeight};
+        if (raylib::rshapes::Shapes::checkCollisionPointRec(mousePos, contentRec)) {
+            float const wheelMove = raylib::rcore::Event::getMouseWheelMoveStatic();
             if (wheelMove != 0.0F) {
                 _scrollOffset -= wheelMove * ScrollSpeed;
                 _scrollOffset = std::clamp(_scrollOffset, 0.0F, _maxScroll);
@@ -160,7 +163,7 @@ void UIGamePanel::handleEvent(const raylib::rcore::Event& event) {
 
             for (auto& child : _contentChildren) {
                 if (child->isVisible()) {
-                    child->handleEvent(event);
+                    child->handleEvent();
                 }
             }
         }
@@ -196,10 +199,44 @@ bool UIGamePanel::isVisible() const { return _isVisible; }
 
 void UIGamePanel::setVisible(bool visible) { _isVisible = visible; }
 
+bool UIGamePanel::isHovered() const {
+    if (!_isVisible) {
+        return false;
+    }
+    if (_mainPanel && _mainPanel->isHovered()) {
+        return true;
+    }
+    raylib::rmath::Vector2 const mousePos = raylib::rcore::Event::getMousePositionStatic();
+    raylib::rmath::Rectangle const headerRec{
+        .x = _position.x(), .y = _position.y(), .width = _size.x(), .height = DefaultHeaderHeight};
+    if (raylib::rshapes::Shapes::checkCollisionPointRec(mousePos, headerRec)) {
+        return true;
+    }
+    if (!_isCollapsed && !_isConfigMode) {
+        raylib::rmath::Rectangle const contentRec{.x = _position.x(),
+                                                  .y = _position.y() + DefaultHeaderHeight,
+                                                  .width = _size.x(),
+                                                  .height = _currentHeight - DefaultHeaderHeight};
+        if (raylib::rshapes::Shapes::checkCollisionPointRec(mousePos, contentRec)) {
+            return true;
+        }
+        if (std::ranges::any_of(_contentChildren, [](const auto& child) { return child->isHovered(); })) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void UIGamePanel::addComponent(const std::shared_ptr<IUIComponent>& component) {
     if (component) {
         _contentChildren.emplace_back(component);
         updateChildrenLayout();
+    }
+}
+
+void UIGamePanel::addHeaderComponent(const std::shared_ptr<IUIComponent>& component) {
+    if (component && _mainPanel) {
+        _mainPanel->addComponent(component);
     }
 }
 
@@ -222,19 +259,32 @@ void UIGamePanel::updateTextPosition() {
     }
 
     auto font = graphics::AssetManager::getInstance().getFont(DefaultFontName);
-    int const fontSize = font && font->valid() ? font->baseSize() : DefaultFontSize;
+    int fontSize = font && font->valid() ? font->baseSize() : DefaultFontSize;
     raylib::rtext::Font const defaultFont;
-    float const textWidth =
-        raylib::rtext::Text::measureText(font && font->valid() ? *font : defaultFont, _titleText->text(),
-                                         static_cast<float>(fontSize), TextSpacing)
-            .x();
-    auto const textHeight = static_cast<float>(fontSize);
 
+    float const maxWidth = _size.x() * 0.70F;
+    float textWidth = raylib::rtext::Text::measureText(font && font->valid() ? *font : defaultFont, _titleText->text(),
+                                                       static_cast<float>(fontSize), TextSpacing)
+                          .x();
+
+    while (textWidth > maxWidth && fontSize > 8) {
+        fontSize--;
+        textWidth = raylib::rtext::Text::measureText(font && font->valid() ? *font : defaultFont, _titleText->text(),
+                                                     static_cast<float>(fontSize), TextSpacing)
+                        .x();
+    }
+
+    _titleText->setFontSize(static_cast<float>(fontSize));
+
+    auto const textHeight = static_cast<float>(fontSize);
     _titleText->setPosition(_position.x() + ((_size.x() - textWidth) / 2.0F),
                             _position.y() + ((DefaultHeaderHeight - textHeight) / 2.0F));
 }
 
 void UIGamePanel::updateChildrenLayout() {
+    if (_customLayout) {
+        return;
+    }
     if (_contentChildren.empty()) {
         _maxScroll = 0.0F;
         _scrollOffset = 0.0F;
@@ -267,6 +317,22 @@ void UIGamePanel::updateChildrenLayout() {
         child->setVisible(isInside);
 
         currentY += itemHeight + spacing;
+    }
+}
+
+void UIGamePanel::scrollToBottom() {
+    if (_contentChildren.empty() || _customLayout) {
+        return;
+    }
+    updateChildrenLayout();
+    _scrollOffset = _maxScroll;
+    updateChildrenLayout();
+}
+
+void UIGamePanel::setTitle(const std::string& title) {
+    if (_titleText) {
+        _titleText->setText(title);
+        updateTextPosition();
     }
 }
 

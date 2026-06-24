@@ -8,6 +8,7 @@
 #pragma once
 #include <cstddef>
 #include <memory>
+#include <string_view>
 #include <vector>
 
 #include "components/IObject.hpp"
@@ -29,9 +30,12 @@ class ItemBag {
 
     [[nodiscard]] bool hasItems() const { return !_items.empty(); }
     [[nodiscard]] const std::vector<Item>& items() const { return _items; }
+    [[nodiscard]] std::size_t quantity(std::string_view name) const;
 
     void addItem(std::unique_ptr<zappy::gui::game::IObject> object, std::size_t quantity = 1);
     void removeItem(std::size_t index);
+    void removeItem(std::string_view name, std::size_t quantity = 1);
+    void clear() { _items.clear(); }
 
   protected:
   private:

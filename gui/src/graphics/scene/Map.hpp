@@ -8,12 +8,14 @@
 #pragma once
 #include <functional>
 #include <map>
-#include <memory>
 #include <string>
-#include <vector>
+#include <utility>
 
 #include "Tile3D.hpp"
+#include "WorldManager.hpp"
+#include "events/EventDispatcher.hpp"
 #include "game/GameModel.hpp"
+#include "game/Player.hpp"
 #include "game/Team.hpp"
 #include "game/components/IObject.hpp"
 #include "rcore/Camera.hpp"
@@ -23,6 +25,8 @@ namespace zappy::gui::graphics::scene {
 class Map {
   public:
     using ItemFunc = std::function<void(const game::IObject& object)>;
+    using SelectedPlayer =
+        std::pair<std::reference_wrapper<const game::Team>, std::reference_wrapper<const game::Player>>;
 
     static constexpr const char* TILE_MODEL_RESOURCE = "assets/minecraft-grass-block/source/Grass_Block.obj";
 
@@ -34,24 +38,28 @@ class Map {
     static constexpr const char* MENDIANE_MODEL_RESOURCE = "assets/orange-ore/scene.gltf";
     static constexpr const char* FOOD_TEXTURE_RESOURCE = "assets/food.glb";
 
-    Map(int width, int height, std::shared_ptr<raylib::rcore::Camera> camera);
-    ~Map() = default;
+    Map(raylib::rcore::Camera& camera, WorldManager& worldManager, events::EventDispatcher& dispatcher);
+    ~Map();
     Map(const Map& other) = delete;
     Map& operator=(const Map& other) = delete;
-    Map(Map&& other) noexcept = default;
-    Map& operator=(Map&& other) noexcept = default;
-
-    void resize(int width, int height);
+    Map(Map&& other) = delete;
+    Map& operator=(Map&& other) = delete;
 
     void draw() const;
+    void handleEvent();
+
+    void clearHoveredTile() { _hoveredTile = nullptr; }
 
   protected:
   private:
     void drawItems(const Tile3D& tile) const;
+    void dispatchClickedPlayer(const game::Team& team, const game::Player& player) const;
+    void dispatchClickedTile(const Tile3D& tile) const;
 
-    std::shared_ptr<raylib::rcore::Camera> _camera;
-    std::vector<Tile3D> _tiles;
-    std::vector<game::Team> _teams;
+    const Tile3D* _hoveredTile{nullptr};
+    std::reference_wrapper<raylib::rcore::Camera> _camera;
+    std::reference_wrapper<events::EventDispatcher> _dispatcher;
+    std::reference_wrapper<WorldManager> _worldManager;
     game::GameModel _gameModel;
     std::map<std::string, ItemFunc> _itemDrawFunctions;
     raylib::rmodels::Model _tileModel{TILE_MODEL_RESOURCE};
@@ -62,5 +70,8 @@ class Map {
     raylib::rmodels::Model _thystameModel{THYSTAME_MODEL_RESOURCE};
     raylib::rmodels::Model _mendianeModel{MENDIANE_MODEL_RESOURCE};
     raylib::rmodels::Model _foodModel{FOOD_TEXTURE_RESOURCE};
+    events::EventDispatcher::EventToken _nameToken{0};
+
+    static constexpr int MOUSE_LEFT_CLICK = 0;
 };
 }  // namespace zappy::gui::graphics::scene

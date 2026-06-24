@@ -4,6 +4,7 @@ add_library(zappy_gui_game
         ItemBag.cpp
         Team.cpp
         GameModel.cpp
+        Player.cpp
 )
 target_sources(zappy_gui_game PUBLIC
         FILE_SET HEADERS
@@ -26,4 +27,7 @@ target_link_libraries(zappy_gui_game PUBLIC
         zappy_gui_raylib
         zappy_gui_game_components
         zappy_server_objects
+)
+target_link_libraries(zappy_gui_game PRIVATE
+        zappy_gui_assets
 )

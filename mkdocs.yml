@@ -1,0 +1,18 @@
+site_name: Zappy documentation
+nav:
+  - Home: index.md
+  - Network (Shared): network.md
+  - Server:
+      - Overview: server/index.md
+      - Architecture: server/architecture.md
+      - Core Orchestrator: server/core.md
+      - Game Engine: server/game_engine.md
+  - AI:
+      - Overview: ai/index.md
+  - GUI:
+      - Overview: gui/index.md
+theme:
+  name: readthedocs
+plugins:
+  - search
+  - mermaid2

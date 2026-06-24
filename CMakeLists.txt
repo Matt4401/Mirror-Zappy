@@ -14,13 +14,13 @@ include(CTest)
 
 option(ENABLE_COVERAGE "Enable code coverage instrumentation" OFF)
 
-if(ENABLE_COVERAGE)
+if (ENABLE_COVERAGE)
     message(STATUS "Code coverage instrumentation enabled (-g -O0 --coverage)")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 --coverage")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 --coverage")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
-endif()
+endif ()
 
 add_custom_command(
         OUTPUT ${CMAKE_SOURCE_DIR}/zappy_ai
@@ -29,14 +29,14 @@ add_custom_command(
         DEPENDS ${CMAKE_SOURCE_DIR}/ai/zappy_ai.py
 )
 
-add_custom_target(prepare_script ALL DEPENDS ${CMAKE_SOURCE_DIR}/zappy_ai)
+add_custom_target(zappy_ai ALL DEPENDS ${CMAKE_SOURCE_DIR}/zappy_ai)
 
 add_custom_target(tests_functional
-    COMMAND bash run_tests.sh -v
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/functional_tests
-    DEPENDS zappy_server
-    COMMENT "Lancement des tests fonctionnels Zappy..."
-    USES_TERMINAL
+        COMMAND bash run_tests.sh -v
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/functional_tests
+        DEPENDS zappy_server
+        COMMENT "Starting zappy functional tests..."
+        USES_TERMINAL
 )
 
 add_subdirectory(shared)

@@ -16,6 +16,10 @@ add_library(zappy_server_objects OBJECT
         src/guiCommand/Bct.hpp
         src/guiCommand/Tna.cpp
         src/guiCommand/Tna.hpp
+        src/guiCommand/Sst.cpp
+        src/guiCommand/Sst.hpp
+        src/guiCommand/Sbp.cpp
+        src/guiCommand/Sbp.hpp
         src/command/ICommand.hpp
         src/command/ACommand.hpp
         src/command/CommandFactory.cpp
@@ -28,8 +32,12 @@ add_library(zappy_server_objects OBJECT
         src/command/Left.hpp
         src/command/Right.cpp
         src/command/Right.hpp
+        src/command/ConnectNbr.cpp
+        src/command/ConnectNbr.hpp
         src/game/Team.cpp
         src/game/Team.hpp
+        src/command/Broadcast.cpp
+        src/command/Broadcast.hpp
         src/command/Eject.cpp
         src/command/Eject.hpp
         src/command/Fork.cpp
@@ -42,6 +50,10 @@ add_library(zappy_server_objects OBJECT
         src/command/Inventory.hpp
         src/command/Unknown.cpp
         src/command/Unknown.hpp
+        src/command/Look.cpp
+        src/command/Look.hpp
+        src/command/Incantation.cpp
+        src/command/Incantation.hpp
 )
 target_include_directories(zappy_server_objects PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src

@@ -9,6 +9,9 @@ class VisionManager:
     def update_tiles(self, cleaned_new_tiles):
         self.tiles = cleaned_new_tiles
 
+    def get_tiles(self):
+        return self.tiles
+
     def remove_resource_underfoot(self, resource_name):
         if self.tiles and resource_name in self.tiles[0]:
             self.tiles[0].remove(resource_name)

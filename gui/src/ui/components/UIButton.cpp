@@ -7,8 +7,6 @@
 
 #include "UIButton.hpp"
 
-#include <raylib.h>
-
 #include <functional>
 #include <memory>
 #include <string>
@@ -16,6 +14,8 @@
 
 #include "Color.hpp"
 #include "rcore/Event.hpp"
+#include "rcore/Window.hpp"
+#include "rmath/Rectangle.hpp"
 #include "rmath/Vector2.hpp"
 #include "rshapes/Shapes.hpp"
 #include "rtext/Font.hpp"
@@ -66,7 +66,7 @@ void UIButton::draw() {
         return;
     }
 
-    Rectangle const rec{.x = _position.x(), .y = _position.y(), .width = _size.x(), .height = _size.y()};
+    raylib::rmath::Rectangle const rec{.x = _position.x(), .y = _position.y(), .width = _size.x(), .height = _size.y()};
 
     raylib::Color innerFill = _isHovered ? HoveredFillColor : NormalFillColor;
     raylib::Color topBorder = BrightBorderColor;
@@ -128,12 +128,18 @@ void UIButton::update() {
         return;
     }
 
-    raylib::rmath::Vector2 const mousePos = raylib::rcore::Event::getMousePositionStatic();
-    Rectangle const rec{.x = _position.x(), .y = _position.y(), .width = _size.x(), .height = _size.y()};
-    _isHovered = (mousePos.x() >= rec.x && mousePos.x() <= rec.x + rec.width && mousePos.y() >= rec.y &&
-                  mousePos.y() <= rec.y + rec.height);
+    if (raylib::rcore::Window::isCursorHidden()) {
+        _isHovered = false;
+        _isPressed = false;
+    } else {
+        raylib::rmath::Vector2 const mousePos = raylib::rcore::Event::getMousePositionStatic();
+        raylib::rmath::Rectangle const rec{
+            .x = _position.x(), .y = _position.y(), .width = _size.x(), .height = _size.y()};
+        _isHovered = (mousePos.x() >= rec.x && mousePos.x() <= rec.x + rec.width && mousePos.y() >= rec.y &&
+                      mousePos.y() <= rec.y + rec.height);
 
-    _isPressed = _isHovered && raylib::rcore::Event::isMouseButtonDown(MouseLeftButton);
+        _isPressed = _isHovered && raylib::rcore::Event::isMouseButtonDown(MouseLeftButton);
+    }
 
     updateTextPosition();
 
@@ -142,7 +148,7 @@ void UIButton::update() {
     }
 }
 
-void UIButton::handleEvent(const raylib::rcore::Event& event) {
+void UIButton::handleEvent() {
     if (!_isVisible) {
         return;
     }
@@ -154,7 +160,7 @@ void UIButton::handleEvent(const raylib::rcore::Event& event) {
     }
 
     if (_label) {
-        _label->handleEvent(event);
+        _label->handleEvent();
     }
 }
 
@@ -181,6 +187,13 @@ void UIButton::setFontSize(float size) {
     }
     _fontSize = size;
     updateTextPosition();
+}
+
+void UIButton::setText(const std::string& text) {
+    if (_label) {
+        _label->setText(text);
+        updateTextPosition();
+    }
 }
 
 }  // namespace zappy::gui::ui::components

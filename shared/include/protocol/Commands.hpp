@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <string>
 #include <variant>
 #include <vector>
@@ -77,12 +78,12 @@ struct Pic {
     int x = 0;
     int y = 0;
     int level = 0;
-    std::vector<int> playerIds;
+    std::vector<std::size_t> playerIds;
 };
 struct Pie {
     int x = 0;
     int y = 0;
-    int incantationResult = 0;
+    bool incantationResult = false;
 };
 struct Pfk {
     int playerId = 0;

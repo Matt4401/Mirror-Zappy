@@ -7,8 +7,6 @@
 
 #include "EventDispatcher.hpp"
 
-#include <functional>
-#include <type_traits>
 #include <typeindex>
 #include <variant>
 
@@ -16,18 +14,14 @@
 
 namespace zappy::gui::events {
 void EventDispatcher::dispatch(const shared::protocol::ServerCommand& command) {
-    std::visit(
-        [this](const auto& cmd) {
-            using RealCmdType = std::decay_t<decltype(cmd)>;
-            auto type = std::type_index(typeid(RealCmdType));
+    std::visit([this](const auto& event) { dispatch(event); }, command);
 
-            if (auto it = _listeners.find(type); it != _listeners.end()) {
-                for (const auto& [token, anyCallback] : it->second) {
-                    auto callback = std::any_cast<std::function<void(const RealCmdType&)>>(anyCallback);
-                    callback(cmd);
-                }
-            }
-        },
-        command);
+    const auto type = std::type_index(typeid(shared::protocol::ServerCommand));
+    if (auto it = _listeners.find(type); it != _listeners.end()) {
+        for (auto& listener : it->second) {
+            listener.callback(&command);
+        }
+    }
 }
+
 }  // namespace zappy::gui::events

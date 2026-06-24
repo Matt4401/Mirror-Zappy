@@ -10,75 +10,49 @@
 #include <raylib.h>
 
 #include <memory>
-#include <utility>
+#include <string>
 
 #include "AssetManager.hpp"
 #include "events/EventDispatcher.hpp"
-#include "protocol/Commands.hpp"
 #include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
 #include "scene/Tile3D.hpp"
-#include "ui/components/UIButton.hpp"
-#include "ui/components/UIGamePanel.hpp"
-#include "ui/components/UIGridManager.hpp"
-#include "ui/components/UIText.hpp"
-#include "ui/menus/PauseMenu.hpp"
+#include "scene/WorldManager.hpp"
+#include "ui/hud/GameHUD.hpp"
 
 namespace zappy::gui::graphics {
-Render::Render(std::shared_ptr<events::EventDispatcher> dispatcher) : _dispatcher(std::move(dispatcher)) {
-    if (_dispatcher) {
-        _mszToken = _dispatcher->subscribe<shared::protocol::server::Msz>(
-            [this](const shared::protocol::server::Msz& cmd) { _map.resize(cmd.width, cmd.height); });
-        _sgtToken = _dispatcher->subscribe<shared::protocol::server::Sgt>(
-            [this](const shared::protocol::server::Sgt& cmd) { _serverFrequency = static_cast<float>(cmd.timeUnit); });
-    }
+Render::Render(events::EventDispatcher& dispatcher)
+    : _skybox(dispatcher),
+      _dispatcher(dispatcher),
+      _worldManager(dispatcher),
+      _map(_camera, _worldManager, dispatcher) {
     _window.setTargetFPS(DefaultFps);
     raylib::rcore::Window::setExitKey(0);
 
     AssetManager::getInstance().loadFont(DefaultFontName, "assets/fonts/Minecraft.ttf");
 
-    // Temporary tests panels
-    _gridManager = std::make_shared<ui::components::UIGridManager>();
-    _uiManager.addComponent(_gridManager);
+    _gameHUD =
+        std::make_shared<ui::hud::GameHUD>(_dispatcher.get(), AssetManager::getInstance().getFont(DefaultFontName));
+    _gameHUD->registerToUIManager(_uiManager);
 
-    _demoPanel = std::make_shared<ui::components::UIGamePanel>(0, 0, 0, 0, "Player Info");
-    auto font = AssetManager::getInstance().getFont(DefaultFontName);
-    auto btn = std::make_shared<ui::components::UIButton>(100.0F, 120.0F, 200.0F, 40.0F, "Click me!", font);
-    auto text = std::make_shared<ui::components::UIText>("Level 8 Player", font);
-    text->setPosition(100.0F, 200.0F);
-    _demoPanel->addComponent(btn);
-    _demoPanel->addComponent(text);
-
-    auto _demoPanel2 = std::make_shared<ui::components::UIGamePanel>(0, 0, 0, 0, "Inventory");
-    auto text2 = std::make_shared<ui::components::UIText>("Empty", font);
-    text2->setPosition(100.0F, 200.0F);
-    _demoPanel2->addComponent(text2);
-
-    _gridManager->addPanel(_demoPanel, 1, 1, 12, 18);
-    _gridManager->addPanel(_demoPanel2, 1, 19, 12, 8);
-
-    _pauseMenu =
-        std::make_shared<ui::menus::PauseMenu>(_dispatcher, AssetManager::getInstance().getFont(DefaultFontName));
-    _pauseMenu->setOnExit([this]() { _isExiting = true; });
-    _pauseMenu->setOnUIConfig([this]() {
-        _gridManager->setConfigMode(true);
-        _uiMode = true;
-        _pauseMenu->setVisible(false);
-    });
-    _uiManager.addComponent(_pauseMenu);
+    if (auto pauseMenu = _gameHUD->getPauseMenu()) {
+        pauseMenu->setOnExit([this]() { _isExiting = true; });
+        pauseMenu->setOnUIConfig([this, pauseMenu]() {
+            if (auto grid = _gameHUD->getGridManager()) {
+                grid->setConfigMode(true);
+            }
+            if (auto worldControl = _gameHUD->getWorldControl()) {
+                worldControl->setConfigMode(true);
+            }
+            _uiMode = true;
+            pauseMenu->setVisible(false);
+        });
+    }
 }
 
 Render::~Render() {
-    if (_dispatcher) {
-        if (_mszToken != 0) {
-            _dispatcher->unsubscribe<shared::protocol::server::Msz>(_mszToken);
-        }
-        if (_sgtToken != 0) {
-            _dispatcher->unsubscribe<shared::protocol::server::Sgt>(_sgtToken);
-        }
-    }
-    _pauseMenu.reset();
+    _gameHUD.reset();
     _uiManager.clear();
     AssetManager::getInstance().clear();
 }
@@ -87,9 +61,6 @@ bool Render::isRunning() const { return !_window.shouldClose() && !_isExiting; }
 
 void Render::renderFrame() {
     update();
-    if (_updateMode == UpdateMode::All) {
-        _event.handleEvent(_eventContext);
-    }
     _window.beginDrawing();
     render2D();
     render3D();
@@ -98,7 +69,7 @@ void Render::renderFrame() {
 }
 
 void Render::updateCursorState() const {
-    if (_pauseMenu->isVisible() || _uiMode) {
+    if ((_gameHUD && _gameHUD->getPauseMenu() && _gameHUD->getPauseMenu()->isVisible()) || _uiMode) {
         raylib::rcore::Window::enableCursor();
     } else {
         raylib::rcore::Window::disableCursor();
@@ -107,20 +78,26 @@ void Render::updateCursorState() const {
 
 void Render::handleInput() {
     if (raylib::rcore::Event::isKeyPressed(EscapeKey)) {
-        if (_gridManager && _gridManager->isConfigMode()) {
-            _gridManager->setConfigMode(false);
+        if (_gameHUD && ((_gameHUD->getGridManager() && _gameHUD->getGridManager()->isConfigMode()) ||
+                         (_gameHUD->getWorldControl() && _gameHUD->getWorldControl()->isConfigMode()))) {
+            if (auto grid = _gameHUD->getGridManager()) {
+                grid->setConfigMode(false);
+            }
+            if (auto worldControl = _gameHUD->getWorldControl()) {
+                worldControl->setConfigMode(false);
+            }
             _uiMode = false;
             _updateMode = UpdateMode::All;
-        } else {
-            bool const pauseVisible = !_pauseMenu->isVisible();
-            _pauseMenu->setVisible(pauseVisible);
+        } else if (_gameHUD && _gameHUD->getPauseMenu()) {
+            bool const pauseVisible = !_gameHUD->getPauseMenu()->isVisible();
+            _gameHUD->getPauseMenu()->setVisible(pauseVisible);
             _updateMode = pauseVisible ? UpdateMode::PauseMenuOnly : UpdateMode::All;
         }
         updateCursorState();
     }
 
     if (raylib::rcore::Event::isKeyPressed(LeftAltKey)) {
-        if (!_gridManager || !_gridManager->isConfigMode()) {
+        if (!_gameHUD || !_gameHUD->getGridManager() || !_gameHUD->getGridManager()->isConfigMode()) {
             _uiMode = !_uiMode;
             updateCursorState();
         }
@@ -128,33 +105,42 @@ void Render::handleInput() {
 }
 
 void Render::update() {
+    _event.update();
     handleInput();
 
     _uiManager.update();
-    _uiManager.handleEvent(_event);
+    _uiManager.handleEvent();
 
     if (_updateMode == UpdateMode::PauseMenuOnly) {
         return;
     }
 
     if (!_uiMode) {
-        _camera->updateCamera(CAMERA_FREE);
-        if (_camera->position().y() < scene::Tile3D::TILE_SIZE * 1.3F) {
-            _camera->setPosition({_camera->position().x(), scene::Tile3D::TILE_SIZE * 1.3F, _camera->position().z()});
-            _camera->setTarget({_camera->target().x(),
-                                _camera->target().y() + (raylib::rcore::Window::frameTime() * 2.0F),
-                                _camera->target().z()});
+        _camera.updateCamera(CAMERA_FREE);
+        if (_camera.position().y() < scene::Tile3D::TILE_SIZE * 1.3F) {
+            _camera.setPosition({_camera.position().x(), scene::Tile3D::TILE_SIZE * 1.3F, _camera.position().z()});
+            _camera.setTarget({_camera.target().x(), _camera.target().y() + (raylib::rcore::Window::frameTime() * 2.0F),
+                               _camera.target().z()});
         }
-        _event.update();
     }
 
-    _skybox.update(raylib::rcore::Window::frameTime(), _serverFrequency);
+    if (_uiMode) {
+        if (!_uiManager.isHovered()) {
+            _map.handleEvent();
+        } else {
+            _map.clearHoveredTile();
+        }
+    } else {
+        _map.clearHoveredTile();
+    }
+
+    _skybox.update(raylib::rcore::Window::frameTime(), static_cast<float>(_worldManager.timeUnit()));
 }
 
 void Render::render2D() {}
 
 void Render::render3D() {
-    _camera->beginMode3D();
+    _camera.beginMode3D();
     _skybox.draw();
     _map.draw();
     raylib::rcore::Camera::endMode3D();

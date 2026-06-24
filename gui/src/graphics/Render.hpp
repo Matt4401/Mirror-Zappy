@@ -8,21 +8,20 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <string>
 
 #include "Map.hpp"
 #include "Skybox3D.hpp"
-#include "context/EventContext.hpp"
+#include "WorldManager.hpp"
 #include "events/EventDispatcher.hpp"
 #include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
 #include "rmath/Vector3.hpp"
 #include "ui/UIManager.hpp"
-#include "ui/components/UIGamePanel.hpp"
-#include "ui/components/UIGridManager.hpp"
-#include "ui/menus/PauseMenu.hpp"
+#include "ui/hud/GameHUD.hpp"
 
 namespace zappy::gui::graphics {
 class Render {
@@ -30,7 +29,7 @@ class Render {
     static constexpr const std::string WINDOW_NAME = "Zappy GUI";
     static constexpr int FLAG_FULLSCREEN_MODE = 2;
 
-    explicit Render(std::shared_ptr<events::EventDispatcher> dispatcher = nullptr);
+    explicit Render(events::EventDispatcher& dispatcher);
     ~Render();
     Render(const Render& other) = delete;
     Render& operator=(const Render& other) = delete;
@@ -50,25 +49,18 @@ class Render {
     void update();
     void render2D();
     void render3D();
-    void handleEvents();
     void updateCursorState() const;
     void handleInput();
 
     raylib::rcore::Window _window{WINDOW_NAME.c_str()};
-    std::shared_ptr<raylib::rcore::Camera> _camera{
-        std::make_shared<raylib::rcore::Camera>(raylib::rmath::Vector3{10.0F, 10.0F, 10.0F})};
-    EventContext _eventContext{_camera};
+    raylib::rcore::Camera _camera{raylib::rmath::Vector3{10.0F, 10.0F, 10.0F}};
     scene::Skybox3D _skybox;
     raylib::rcore::Event _event;
-    scene::Map _map{2, 2, _camera};  // TEMPORARY MAP SIZE, JUST FOR TESTING
-    std::shared_ptr<events::EventDispatcher> _dispatcher;
-    events::EventDispatcher::EventToken _mszToken{0};
-    events::EventDispatcher::EventToken _sgtToken{0};
-    float _serverFrequency{100.0F};
+    std::reference_wrapper<events::EventDispatcher> _dispatcher;
+    scene::WorldManager _worldManager;
+    scene::Map _map;
     ui::UIManager _uiManager;
-    std::shared_ptr<ui::menus::PauseMenu> _pauseMenu;
-    std::shared_ptr<ui::components::UIGamePanel> _demoPanel;
-    std::shared_ptr<ui::components::UIGridManager> _gridManager;
+    std::shared_ptr<ui::hud::GameHUD> _gameHUD;
     bool _isExiting{false};
     bool _uiMode{false};
     UpdateMode _updateMode{UpdateMode::All};

@@ -33,11 +33,17 @@
 
 namespace zappy::server {
 
-Core::Core(const std::span<char*> args) : _args(args) {}
+Core::Core(const std::span<char*> args) : _args(args) {
+    try {
+        setup();
+    } catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        throw;
+    }
+}
 
 int Core::run() {
     try {
-        setup();
         loop();
     } catch (const zappy::shared::exception::Exception& e) {
         if (std::string(e.what()) == zappy::parser::kUsageThrowMessage) {
@@ -61,6 +67,8 @@ void Core::setup() {
     _world = std::make_unique<game::World>(_config);
     _timeUnit = static_cast<int>(1.0F / static_cast<float>(_config.freq) * 1000);
 }
+
+void Core::stop() { _isRunning = false; }
 
 void Core::loop() {
     auto nextTickTarget = std::chrono::steady_clock::now() + std::chrono::milliseconds{_timeUnit};
@@ -170,6 +178,15 @@ void Core::handleHandshake(int clientId, std::string_view teamName) {
     _clientStates[clientId] = ClientState::IN_GAME;
     _sessionManager->sendMessage(clientId, std::format("{}\n{} {}\n", _world->getAvailableSlotInTeam(teamName),
                                                        _world->sizeMap().x, _world->sizeMap().y));
+    const auto& playerList = _world->playerList();
+    _world->addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pnw{
+        .playerId = static_cast<int>(playerIdOpt.value()),
+        .x = static_cast<int>(playerList.at(playerIdOpt.value())->position().x),
+        .y = static_cast<int>(playerList.at(playerIdOpt.value())->position().y),
+        .orientation = static_cast<int>(playerList.at(playerIdOpt.value())->orientation()),
+        .level = 1,
+        .teamName = std::string{teamName},
+    }));
 }
 
 void Core::handleInGameMessage(int clientId, std::string_view message) {
@@ -191,11 +208,26 @@ void Core::handleGuiMessage(int clientId, std::string_view message) {
     auto command = _commandFactory.createGuiCommand(message);
 
     if (command != nullptr) {
-        const std::string response = command->execute(*this);
+        const auto response = command->execute(*this);
 
-        if (!response.empty()) {
-            _sessionManager->sendMessage(clientId, response);
+        _timeUnit = static_cast<int>(1.0F / static_cast<float>(_config.freq) * 1000);
+        if (response.message.empty() || response.isArgumentError || response.isCommandError) {
+            if (response.isArgumentError) {
+                _sessionManager->sendMessage(clientId, "sbp\n");
+            } else {
+                _sessionManager->sendMessage(clientId, "suc\n");
+            }
+            return;
         }
+        if (response.sendToEveryone) {
+            for (const auto& [clientId, state] : _clientStates) {
+                if (state == ClientState::GUI) {
+                    _sessionManager->sendMessage(clientId, response.message);
+                }
+            }
+            return;
+        }
+        _sessionManager->sendMessage(clientId, response.message);
     } else {
         _sessionManager->sendMessage(clientId, "suc\n");
     }
@@ -241,6 +273,7 @@ void Core::flushGuiResponses() {
 }
 
 void Core::sendGuiInitialState(int clientId) {
+    const auto& eggs = _world->vecEggs();
     guiCommand::Mct mct{};
     guiCommand::Tna tna{};
     _sessionManager->sendMessage(clientId, shared::protocol::Emitter::build(shared::protocol::server::Msz{
@@ -249,8 +282,15 @@ void Core::sendGuiInitialState(int clientId) {
     _sessionManager->sendMessage(
         clientId,
         shared::protocol::Emitter::build(shared::protocol::server::Sgt{.timeUnit = static_cast<int>(_config.freq)}));
-    _sessionManager->sendMessage(clientId, mct.execute(*this));
-    _sessionManager->sendMessage(clientId, tna.execute(*this));
+    _sessionManager->sendMessage(clientId, mct.execute(*this).message);
+    _sessionManager->sendMessage(clientId, tna.execute(*this).message);
+    for (const auto& [eggId, egg] : eggs) {
+        _sessionManager->sendMessage(clientId, shared::protocol::Emitter::build(shared::protocol::server::Enw{
+                                                   .eggId = static_cast<int>(egg.id),
+                                                   .playerId = -1,
+                                                   .x = static_cast<int>(egg.position.x),
+                                                   .y = static_cast<int>(egg.position.y)}));
+    }
 }
 
 }  // namespace zappy::server

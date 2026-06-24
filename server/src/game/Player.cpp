@@ -19,6 +19,18 @@
 #include "exception/TooMuchCmd.hpp"
 #include "game/World.hpp"
 
+namespace {
+constexpr bool hasEnoughResources(const zappy::server::game::InventoryArray& groundInv,
+                                  const zappy::server::game::InventoryArray& required) {
+    for (std::size_t i = 0; i < groundInv.size(); ++i) {
+        if (groundInv.at(i) < required.at(i)) {
+            return false;
+        }
+    }
+    return true;
+}
+}  // namespace
+
 namespace zappy::server::game {
 
 Player::Player(const std::size_t id, const std::size_t x, const std::size_t y, const cardinalPoint orient)
@@ -28,23 +40,24 @@ Player::Player(const std::size_t id, const std::size_t x, const std::size_t y, c
 }
 
 void Player::addItem(ItemType item, const std::size_t quantity) {
-    _inventory.at(static_cast<uint8_t>(item)) += quantity;
+    _inventory.at(static_cast<std::uint8_t>(item)) += quantity;
     if (item == ItemType::Food) {
         _lifeTick += kNbLifeTickFood * quantity;
     }
 }
 
-void Player::subItem(ItemType item, const std::size_t quantity) {
-    const auto nbInventory = _inventory.at(static_cast<uint8_t>(item));
+bool Player::subItem(ItemType item, const std::size_t quantity) {
+    auto& nbInventory = _inventory.at(static_cast<std::uint8_t>(item));
     if (nbInventory < quantity) {
-        return;
+        return false;
     }
-    _inventory.at(static_cast<uint8_t>(item)) -= quantity;
+    nbInventory -= quantity;
+    return true;
 }
 
-std::size_t Player::getItem(ItemType item) const { return _inventory.at(static_cast<uint8_t>(item)); }
+std::size_t Player::getItem(ItemType item) const { return _inventory.at(static_cast<std::uint8_t>(item)); }
 
-void Player::setItem(ItemType item, const size_t amount) { _inventory.at(static_cast<size_t>(item)) = amount; }
+void Player::setItem(ItemType item, const size_t amount) { _inventory.at(static_cast<std::size_t>(item)) = amount; }
 
 void Player::pushCommand(std::unique_ptr<command::ICommand> command) {
     if (_commands.size() + (_currentCommand != nullptr ? 1 : 0) >= kMaxNbCmd) {
@@ -56,17 +69,21 @@ void Player::pushCommand(std::unique_ptr<command::ICommand> command) {
 void Player::update(World& world) {
     _lifeTick--;
 
-    if (_cmdTick > 0) {
+    if (_isNewCommand) {
+        _isNewCommand = false;
+    } else if (_cmdTick > 0) {
         _cmdTick--;
     }
     if (_cmdTick == 0 && _currentCommand != nullptr) {
         _currentCommand->execute(world, *this);
         _currentCommand = nullptr;
     }
-    tryStartNextCommand(world);
+    if (_currentCommand == nullptr) {
+        tryStartNextCommand(world, false);
+    }
 }
 
-void Player::tryStartNextCommand(World& world) {
+void Player::tryStartNextCommand(World& world, bool isMidTick) {
     if (_cmdTick > 0 || _currentCommand != nullptr) {
         return;
     }
@@ -78,15 +95,21 @@ void Player::tryStartNextCommand(World& world) {
         if (!_currentCommand->start(world, *this)) {
             _buffersResponses.emplace_back("ko\n");
             _currentCommand = nullptr;
-        } else {
-            _cmdTick = _currentCommand->requiredTicks();
-            return;
+            continue;
         }
+        _cmdTick = _currentCommand->requiredTicks();
+        _isNewCommand = isMidTick;
+        if (_cmdTick == 0) {
+            _currentCommand->execute(world, *this);
+            _currentCommand = nullptr;
+            continue;
+        }
+        return;
     }
 }
 
 void Player::moveForward(const Position& limit) {
-    auto [fst, snd] = playerMove.at(static_cast<uint8_t>(_orientation));
+    auto [fst, snd] = playerMove.at(static_cast<std::uint8_t>(_orientation));
     const int width = static_cast<int>(limit.x);
     const int height = static_cast<int>(limit.y);
     const int newX = (static_cast<int>(_pos.x) + fst + width) % width;
@@ -120,7 +143,7 @@ void Player::kill() {
 }
 
 void Player::moveWithOrientation(const Position& limit, cardinalPoint orientation) {
-    auto [fst, snd] = playerMove.at(static_cast<uint8_t>(orientation));
+    auto [fst, snd] = playerMove.at(static_cast<std::uint8_t>(orientation));
     const std::size_t width = limit.x;
     const std::size_t height = limit.y;
 
@@ -134,6 +157,65 @@ bool Player::hasCommands() const { return _currentCommand != nullptr || !_comman
 
 void Player::setPosition(const Position pos) { _pos = pos; }
 
+Position Player::getLeftTile(const Position ogPos, const Position& mapLimit) {
+    auto [fst, snd] = leftTile.at(static_cast<uint8_t>(_orientation));
+    const std::size_t width = mapLimit.x;
+    const std::size_t height = mapLimit.y;
+    Position newPos{};
+
+    newPos.x = (ogPos.x + fst + width) % width;
+    newPos.y = (ogPos.y + snd + height) % height;
+
+    return newPos;
+}
+
 std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> Player::inventory() const { return _inventory; }
+
+std::vector<Position> Player::getLookPos(const Position mapLimit) {
+    std::vector pos{{Position{.x = _pos.x, .y = _pos.y}}};
+    pos.reserve((static_cast<std::size_t>(_level) + 1) * (static_cast<std::size_t>(_level) + 1));
+
+    for (int i = 0; i < _level; i++) {
+        const Position actualDiagPos = getNthDiagonalLeftPosition(i + 1, mapLimit);
+        pos.emplace_back(actualDiagPos);
+        const int stepsToRight = 2 * (i + 1);
+        for (int j = 0; j < stepsToRight; j++) {
+            pos.emplace_back(getLeftTile(pos.back(), mapLimit));
+        }
+    }
+    return pos;
+}
+
+Position Player::getNthDiagonalLeftPosition(const std::size_t n, const Position mapLimit) {
+    auto [baseDx, baseDy] = diagonalLeftMove.at(static_cast<std::uint8_t>(_orientation));
+
+    const int width = static_cast<int>(mapLimit.x);
+    const int height = static_cast<int>(mapLimit.y);
+    const int step = static_cast<int>(n);
+
+    const int dx = baseDx * step;
+    const int dy = baseDy * step;
+
+    int newX = (static_cast<int>(_pos.x) + dx) % width;
+    if (newX < 0) {
+        newX += width;
+    }
+    int newY = (static_cast<int>(_pos.y) + dy) % height;
+    if (newY < 0) {
+        newY += height;
+    }
+
+    return Position{.x = static_cast<std::size_t>(newX), .y = static_cast<std::size_t>(newY)};
+}
+
+int Player::level() const { return _level; }
+
+void Player::levelUp() { _level++; }
+
+bool Player::checkIncantationRequirements(
+    const std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)>& resources, const std::size_t nbPlayer) const {
+    auto condition = getCondition().at(_level - 1);
+    return condition.nbPlayer <= nbPlayer && hasEnoughResources(resources, condition.resources);
+}
 
 }  // namespace zappy::server::game

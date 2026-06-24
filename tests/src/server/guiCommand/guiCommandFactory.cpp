@@ -10,6 +10,7 @@
 #include <string>
 
 #include "command/CommandFactory.hpp"
+#include "guiCommand/Sbp.hpp"
 
 TEST(GuiCommandFactoryTest, CreateMszCommand) {
     const zappy::server::command::CommandFactory factory;
@@ -39,7 +40,9 @@ TEST(GuiCommandFactoryTest, CreateBctCommandWithInvalidParamsReturnsNullptr) {
     const std::string rawCommand = "bct invalid_params";
     auto command = factory.createGuiCommand(rawCommand);
 
-    EXPECT_EQ(command, nullptr);
+    ASSERT_NE(command, nullptr);
+    const auto& sbpCommand = dynamic_cast<zappy::server::guiCommand::Sbp*>(command.get());
+    EXPECT_NE(sbpCommand, nullptr);
 }
 
 TEST(GuiCommandFactoryTest, CreateBctCommandWithMissingParamsReturnsNullptr) {
@@ -47,7 +50,9 @@ TEST(GuiCommandFactoryTest, CreateBctCommandWithMissingParamsReturnsNullptr) {
     const std::string rawCommand = "bct 1";
     auto command = factory.createGuiCommand(rawCommand);
 
-    EXPECT_EQ(command, nullptr);
+    ASSERT_NE(command, nullptr);
+    const auto& sbpCommand = dynamic_cast<zappy::server::guiCommand::Sbp*>(command.get());
+    EXPECT_NE(sbpCommand, nullptr);
 }
 
 TEST(GuiCommandFactoryTest, CreateBctCommandWithExtraParamsReturnsNullptr) {
@@ -55,7 +60,9 @@ TEST(GuiCommandFactoryTest, CreateBctCommandWithExtraParamsReturnsNullptr) {
     const std::string rawCommand = "bct 1 2 extra_param";
     auto command = factory.createGuiCommand(rawCommand);
 
-    EXPECT_EQ(command, nullptr);
+    ASSERT_NE(command, nullptr);
+    const auto& sbpCommand = dynamic_cast<zappy::server::guiCommand::Sbp*>(command.get());
+    EXPECT_NE(sbpCommand, nullptr);
 }
 
 TEST(GuiCommandFactoryTest, CreateMctCommand) {
@@ -72,4 +79,30 @@ TEST(GuiCommandFactoryTest, CreateTnaCommand) {
     auto command = factory.createGuiCommand(rawCommand);
 
     EXPECT_NE(command, nullptr);
+}
+
+TEST(GuiCommandFactoryTest, CreateSstCommand) {
+    const zappy::server::command::CommandFactory factory;
+    std::string rawCommand = "sst 10   ";
+    auto command = factory.createGuiCommand(rawCommand);
+
+    EXPECT_NE(command, nullptr);
+    rawCommand = "sst invalid_param";
+    command = factory.createGuiCommand(rawCommand);
+    ASSERT_NE(command, nullptr);
+    const auto& sbpCommand = dynamic_cast<zappy::server::guiCommand::Sbp*>(command.get());
+    EXPECT_NE(sbpCommand, nullptr);
+}
+
+TEST(GuiCommandFactoryTest, CreateSgtCommand) {
+    const zappy::server::command::CommandFactory factory;
+    std::string rawCommand = "sgt 10 ";
+    auto command = factory.createGuiCommand(rawCommand);
+
+    EXPECT_NE(command, nullptr);
+    rawCommand = "sgt invalid_param";
+    command = factory.createGuiCommand(rawCommand);
+    ASSERT_NE(command, nullptr);
+    const auto& sbpCommand = dynamic_cast<zappy::server::guiCommand::Sbp*>(command.get());
+    EXPECT_NE(sbpCommand, nullptr);
 }

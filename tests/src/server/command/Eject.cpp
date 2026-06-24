@@ -35,7 +35,11 @@ TEST(EjectTest, CheckRequiredTicks) {
 }
 
 TEST(EjectTest, StartFailsIfTileIsEmpty) {
-    game::World world{kDefaultConfig};
+    auto modifConfig = kDefaultConfig;
+    modifConfig.clientLimit = 1;
+    modifConfig.teamNames = {"Team1"};
+
+    game::World world{modifConfig};
 
     auto idOpt = world.spawnPlayer("Team1");
     ASSERT_TRUE(idOpt.has_value());
@@ -64,12 +68,16 @@ TEST(EjectTest, ExecuteEjectsOtherPlayerAndSendsResponse) {
     auto& launcher = *playerList.at(idLauncher);
     auto& victim = *playerList.at(idVictim);
 
+    auto oldLauncherPos = launcher.position();
+    auto oldVictimPos = victim.position();
+
     launcher.setOrientation(game::cardinalPoint::NORTH);
 
     launcher.setPosition(game::Position{.x = 5, .y = 5});
     victim.setPosition(game::Position{.x = 5, .y = 5});
-    world.updatePositionOnMap(idLauncher, game::Position{.x = 0, .y = 0}, game::Position{.x = 5, .y = 5});
-    world.updatePositionOnMap(idVictim, game::Position{.x = 0, .y = 0}, game::Position{.x = 5, .y = 5});
+
+    world.updatePositionOnMap(idLauncher, oldLauncherPos, game::Position{.x = 5, .y = 5});
+    world.updatePositionOnMap(idVictim, oldVictimPos, game::Position{.x = 5, .y = 5});
 
     const std::unique_ptr<ICommand> eject = std::make_unique<Eject>();
     eject->execute(world, launcher);
