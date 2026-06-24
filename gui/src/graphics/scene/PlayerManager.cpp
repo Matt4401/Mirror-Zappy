@@ -7,6 +7,8 @@
 
 #include "PlayerManager.hpp"
 
+#include <raylib.h>
+
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -15,6 +17,7 @@
 #include <functional>
 #include <optional>
 #include <string>
+#include <vector>
 
 #include "Color.hpp"
 #include "Tile3D.hpp"
@@ -22,6 +25,7 @@
 #include "gui/src/game/Player.hpp"
 #include "gui/src/game/Team.hpp"
 #include "protocol/Commands.hpp"
+#include "rmath/Vector3.hpp"
 
 namespace zappy::gui::graphics::scene {
 void PlayerManager::handleTeamName(const shared::protocol::server::Tna& command) {
@@ -43,6 +47,7 @@ void PlayerManager::handlePlayerConnected(const shared::protocol::server::Pnw& c
     player.setTilePosition(tilePosition);
     player.setOrientation(orientationFromProtocol(command.orientation));
     player.setLevel(static_cast<std::size_t>(std::max(command.level, 1)));
+    recalculateTileOffsets(tilePosition);
 }
 
 void PlayerManager::handlePlayerPosition(const shared::protocol::server::Ppo& command) {
@@ -51,8 +56,11 @@ void PlayerManager::handlePlayerPosition(const shared::protocol::server::Ppo& co
         return;
     }
     if (const auto player = playerById(command.playerId); player.has_value()) {
+        const auto oldTilePosition = player->get().tilePosition();
         updatePlayerPosition(player->get(), tilePosition);
         player->get().setOrientation(orientationFromProtocol(command.orientation));
+        recalculateTileOffsets(oldTilePosition);
+        recalculateTileOffsets(tilePosition);
     }
 }
 
@@ -145,8 +153,12 @@ void PlayerManager::handleResourceCollected(const shared::protocol::server::Pgt&
 }
 
 void PlayerManager::handlePlayerDeath(const shared::protocol::server::Pdi& command) {
-    if (const auto team = teamForPlayer(command.playerId); team.has_value()) {
-        team->get().removePlayer(command.playerId);
+    if (const auto player = playerById(command.playerId); player.has_value()) {
+        const auto oldTilePosition = player->get().tilePosition();
+        if (const auto team = teamForPlayer(command.playerId); team.has_value()) {
+            team->get().removePlayer(command.playerId);
+        }
+        recalculateTileOffsets(oldTilePosition);
     }
 }
 
@@ -293,6 +305,41 @@ void PlayerManager::redistributeInitialEggs() {
 void PlayerManager::movePlayers(const int serverFrequency, const float deltaTime) {
     for (auto& team : _teams) {
         team.movePlayers(serverFrequency, deltaTime);
+    }
+}
+
+void PlayerManager::recalculateTileOffsets(const Tile3DPosition tilePosition) {
+    std::vector<std::reference_wrapper<game::Player>> playersOnTile;
+    for (auto& team : _teams) {
+        for (auto& player : team.players()) {
+            if (player.tilePosition().x == tilePosition.x && player.tilePosition().y == tilePosition.y) {
+                playersOnTile.push_back(std::ref(player));
+            }
+        }
+    }
+
+    const size_t count = playersOnTile.size();
+    if (count == 0) {
+        return;
+    }
+
+    const float radius = 0.35F * Tile3D::TILE_SIZE;
+
+    for (size_t i = 0; i < count; ++i) {
+        auto& player = playersOnTile[i].get();
+        if (count == 1) {
+            player.setTargetOffset({0.0F, 0.0F, 0.0F});
+            if (!player.moving()) {
+                player.snapOffset({0.0F, 0.0F, 0.0F});
+            }
+        } else {
+            const float angle = (static_cast<float>(i) * 2.0F * PI) / static_cast<float>(count);
+            const raylib::rmath::Vector3 offset = {std::cos(angle) * radius, 0.0F, std::sin(angle) * radius};
+            player.setTargetOffset(offset);
+            if (!player.moving()) {
+                player.snapOffset(offset);
+            }
+        }
     }
 }
 }  // namespace zappy::gui::graphics::scene
