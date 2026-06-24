@@ -182,6 +182,9 @@ void World::updatePositionOnMap(const std::size_t id, const Position& oldPositio
 }
 
 void World::update() {
+    if (_isGameEnd) {
+        return;
+    }
     respawnTicks++;
     if (respawnTicks == kNbTicksToRespawn) {
         addItemsToMap();
@@ -193,6 +196,7 @@ void World::update() {
         }
         player->update(*this);
     }
+    checkGameEnd();
 }
 
 void World::removeFromMap(const std::size_t id) {
@@ -470,6 +474,24 @@ void World::clearAllResourcesAndEggs() {
         tile.eggs.clear();
     }
 }
+
+void World::checkGameEnd() {
+    for (const auto& [teamName, team] : _teamList) {
+        std::uint8_t playerAtMaxLevel = 0;
+        for (const auto& playerId : team->listPlayerId()) {
+            const auto& player = _playerList.at(playerId);
+            if (player->level() == kNbLevel + 1) {
+                playerAtMaxLevel++;
+            }
+        }
+        if (playerAtMaxLevel >= kNbPlayerToWin) {
+            _isGameEnd = true;
+            addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Seg{.teamName = teamName}));
+            return;
+        }
+    }
+}
+
 const std::unordered_map<std::size_t, Egg>& World::vecEggs() const { return _vecEggs; }
 
 Tile World::tile(const Position position) const { return _tiles.at(getTileIndex(position)); }
