@@ -117,7 +117,7 @@ PlayerInspectorUI::PlayerInspectorUI(float x, float y, float width, events::Even
     buildInfoPanel();
     buildInventoryPanel();
 
-    _previewModel = std::make_shared<raylib::rmodels::Model>("assets/jeffrey/scene.gltf");
+    _previewModel = std::make_shared<raylib::rmodels::Model>("assets/models/player.gltf");
 
     _firstPersonBtn->setFontSize(FirstPersonBtnFontSize);
 
