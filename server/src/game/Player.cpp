@@ -211,7 +211,7 @@ Position Player::getNthDiagonalLeftPosition(const std::size_t n, const Position 
 int Player::level() const { return _level; }
 
 void Player::levelUp() {
-    if (_level <= < kNbLevel) {
+    if (_level <= kNbLevel) {
         _level++;
     }
 }
