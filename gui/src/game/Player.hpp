@@ -32,7 +32,10 @@ class Player {
     Player& operator=(Player&& other) noexcept = default;
 
     [[nodiscard]] int id() const { return _id; }
-    [[nodiscard]] raylib::rmath::Vector3 position() const { return {_position.x(), _position.y(), _position.z()}; }
+    [[nodiscard]] raylib::rmath::Vector3 position() const {
+        return {_position.x() + _offset.x(), _position.y() + _offset.y(), _position.z() + _offset.z()};
+    }
+    [[nodiscard]] raylib::rmath::Vector3 basePosition() const { return _position; }
     [[nodiscard]] const std::string& name() const { return _name; }
     void setName(const std::string& name) { _name = name; }
     [[nodiscard]] cardinalPoint orientation() const { return _orientation; }
@@ -40,6 +43,11 @@ class Player {
     [[nodiscard]] graphics::scene::Tile3DPosition tilePosition() const { return _tilePosition; }
     [[nodiscard]] const game::ItemBag& itemBag() const { return _itemBag; }
     [[nodiscard]] game::ItemBag& itemBag() { return _itemBag; }
+    void setTargetOffset(const raylib::rmath::Vector3& offset) { _targetOffset = offset; }
+    void snapOffset(const raylib::rmath::Vector3& offset) {
+        _offset = offset;
+        _targetOffset = offset;
+    }
     void setPosition(const raylib::rmath::Vector3& position);
     void setFuturePosition(const raylib::rmath::Vector3& position);
     void setWrappedFuturePosition(const raylib::rmath::Vector3& exitPosition,
@@ -61,6 +69,8 @@ class Player {
     game::ItemBag _itemBag;
     raylib::rmath::Vector3 _position{10.0F, 10.0F, 0.0F};
     raylib::rmath::Vector3 _futurePosition{10.0F, 10.0F, 0.0F};
+    raylib::rmath::Vector3 _offset{0.0F, 0.0F, 0.0F};
+    raylib::rmath::Vector3 _targetOffset{0.0F, 0.0F, 0.0F};
     std::optional<raylib::rmath::Vector3> _wrappedPosition;
     std::string _name;
     cardinalPoint _orientation{cardinalPoint::NORTH};

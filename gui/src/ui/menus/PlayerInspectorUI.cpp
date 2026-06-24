@@ -29,6 +29,7 @@
 #include "protocol/Commands.hpp"
 #include "protocol/Emitter.hpp"
 #include "rcore/Camera.hpp"
+#include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
 #include "rmath/Vector3.hpp"
 #include "rmodels/Model.hpp"
@@ -48,7 +49,6 @@ constexpr float FoodMax = 126.0F;
 
 constexpr float PrimaryIconSize = 28.0F;
 constexpr float PosIconSize = 20.0F;
-constexpr float InfoFontSize = 16.0F;
 
 constexpr float BaseYOffset = 60.0F;
 constexpr float NameBoxHeight = 30.0F;
@@ -364,6 +364,14 @@ void PlayerInspectorUI::handleEvent() {
     AInspectorUI::handleEvent();
     if (!isVisible()) {
         return;
+    }
+
+    if (_targetPlayerId != -1) {
+        if (raylib::rcore::Event::isKeyPressed(KEY_LEFT)) {
+            getDispatcher().dispatch(events::RequestCyclePlayer{.direction = -1, .currentPlayerId = _targetPlayerId});
+        } else if (raylib::rcore::Event::isKeyPressed(KEY_RIGHT)) {
+            getDispatcher().dispatch(events::RequestCyclePlayer{.direction = 1, .currentPlayerId = _targetPlayerId});
+        }
     }
 
     if (_firstPersonBtn) {

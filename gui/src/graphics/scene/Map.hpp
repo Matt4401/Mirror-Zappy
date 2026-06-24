@@ -11,6 +11,7 @@
 #include <string>
 #include <utility>
 
+#include "GuiEvents.hpp"
 #include "Tile3D.hpp"
 #include "WorldManager.hpp"
 #include "events/EventDispatcher.hpp"
@@ -55,6 +56,7 @@ class Map {
     void drawItems(const Tile3D& tile) const;
     void dispatchClickedPlayer(const game::Team& team, const game::Player& player) const;
     void dispatchClickedTile(const Tile3D& tile) const;
+    void handleRequestCyclePlayer(const events::RequestCyclePlayer& e);
 
     const Tile3D* _hoveredTile{nullptr};
     std::reference_wrapper<raylib::rcore::Camera> _camera;
@@ -71,6 +73,7 @@ class Map {
     raylib::rmodels::Model _mendianeModel{MENDIANE_MODEL_RESOURCE};
     raylib::rmodels::Model _foodModel{FOOD_TEXTURE_RESOURCE};
     events::EventDispatcher::EventToken _nameToken{0};
+    events::EventDispatcher::EventToken _cycleToken{0};
 
     static constexpr int MOUSE_LEFT_CLICK = 0;
 };
