@@ -29,6 +29,7 @@
 #include "protocol/Commands.hpp"
 #include "protocol/Emitter.hpp"
 #include "rcore/Camera.hpp"
+#include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
 #include "rmath/Vector3.hpp"
 #include "rmodels/Model.hpp"
@@ -363,6 +364,14 @@ void PlayerInspectorUI::handleEvent() {
     AInspectorUI::handleEvent();
     if (!isVisible()) {
         return;
+    }
+
+    if (_targetPlayerId != -1) {
+        if (raylib::rcore::Event::isKeyPressed(KEY_LEFT)) {
+            getDispatcher().dispatch(events::RequestCyclePlayer{.direction = -1, .currentPlayerId = _targetPlayerId});
+        } else if (raylib::rcore::Event::isKeyPressed(KEY_RIGHT)) {
+            getDispatcher().dispatch(events::RequestCyclePlayer{.direction = 1, .currentPlayerId = _targetPlayerId});
+        }
     }
 
     if (_firstPersonBtn) {
