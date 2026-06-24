@@ -34,6 +34,8 @@ class ISessionManager {
     [[nodiscard]] virtual bool tryPopMessage(NetworkEvent& event) = 0;
     virtual void sendMessage(int clientId, std::string_view message) = 0;
     virtual void disconnectClient(int clientId) = 0;
+
+    [[nodiscard]] virtual bool isWriting(int clientId) const = 0;
 };
 
 }  // namespace zappy::shared::network

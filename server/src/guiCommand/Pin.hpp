@@ -7,11 +7,12 @@
 
 #pragma once
 #include "IGuiCommand.hpp"
+#include "protocol/Commands.hpp"
 
 namespace zappy::server::guiCommand {
 class Pin : public IGuiCommand {
   public:
-    explicit Pin(int id);
+    explicit Pin(shared::protocol::client::Pin cmd);
     Pin() = delete;
     Pin(const Pin& other) = delete;
     Pin& operator=(const Pin& other) = delete;

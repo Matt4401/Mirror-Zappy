@@ -37,11 +37,11 @@ void Take::execute(game::World& world, game::Player& player) {
         player.addResponse("ko\n");
         return;
     }
-    player.addItem(item);
     world.addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pgt{
         .playerId = static_cast<int>(player.id()),
         .resourceId = static_cast<int>(item),
     }));
+    player.addItem(item);
     const auto inventory = player.inventory();
     world.addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pin{
         .playerId = static_cast<int>(player.id()),
