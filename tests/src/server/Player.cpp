@@ -115,6 +115,7 @@ TEST(PlayerTest, foodDecreasedPlayer) {
                   .deraumere = static_cast<int>(inventory.at(static_cast<std::uint8_t>(ItemType::Deraumere))),
                   .sibur = static_cast<int>(inventory.at(static_cast<std::uint8_t>(ItemType::Sibur))),
                   .mendiane = static_cast<int>(inventory.at(static_cast<std::uint8_t>(ItemType::Mendiane))),
+                  .phiras = static_cast<int>(inventory.at(static_cast<std::uint8_t>(ItemType::Phiras))),
                   .thystame = static_cast<int>(inventory.at(static_cast<std::uint8_t>(ItemType::Thystame))),
               }));
 }

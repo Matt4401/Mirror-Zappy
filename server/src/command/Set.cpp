@@ -43,6 +43,7 @@ void Set::execute(game::World& world, game::Player& player) {
         .resourceId = static_cast<int>(item),
     }));
     const auto inventory = player.inventory();
+    player.addResponse("ok\n");
     world.addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pin{
         .playerId = static_cast<int>(player.id()),
         .x = static_cast<int>(x),
@@ -52,8 +53,8 @@ void Set::execute(game::World& world, game::Player& player) {
         .deraumere = static_cast<int>(inventory.at(static_cast<std::uint8_t>(game::ItemType::Deraumere))),
         .sibur = static_cast<int>(inventory.at(static_cast<std::uint8_t>(game::ItemType::Sibur))),
         .mendiane = static_cast<int>(inventory.at(static_cast<std::uint8_t>(game::ItemType::Mendiane))),
+        .phiras = static_cast<int>(inventory.at(static_cast<std::uint8_t>(game::ItemType::Phiras))),
         .thystame = static_cast<int>(inventory.at(static_cast<std::uint8_t>(game::ItemType::Thystame))),
     }));
-    player.addResponse("ok\n");
 }
 }  // namespace zappy::server::command
