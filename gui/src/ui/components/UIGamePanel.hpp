@@ -81,6 +81,7 @@ class UIGamePanel : public IUIComponent {
     [[nodiscard]] raylib::rmath::Vector2 getSize() const { return _size; }
     [[nodiscard]] float getCurrentHeight() const { return _currentHeight; }
     [[nodiscard]] static constexpr float getHeaderHeight() { return DefaultHeaderHeight; }
+    [[nodiscard]] static constexpr float getPadding() { return Padding; }
 
   protected:
     void setBasePosition(float x, float y) {
@@ -91,6 +92,8 @@ class UIGamePanel : public IUIComponent {
         _size.setX(width);
         _size.setY(height);
     }
+    [[nodiscard]] float getScrollOffset() const { return _scrollOffset; }
+    void setMaxScroll(float maxScroll) { _maxScroll = maxScroll; }
 
   private:
     void updateTextPosition();
