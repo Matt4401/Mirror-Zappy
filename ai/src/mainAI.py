@@ -32,7 +32,7 @@ def mainAI():
     print(f"Logger is ok: {player_id}")
 
     try:
-        trantorian = Trantorian(port, host, team_name)
+        trantorian = Trantorian(port, host, team_name, player_id)
         print("Trantorian ok")
         tick_manager = TickManager(10)
         fsm = FiniteStateMachine(SurviveState, trantorian, tick_manager)

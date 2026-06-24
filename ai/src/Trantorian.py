@@ -1,82 +1,30 @@
 from src.Connection import Connection
 from src.PlayerState import PlayerState
 from src.SendCommand import SendCommand
-from src.util.VisionManager import VisionManager
 from src.ParseCommand import ParseCommand
+
+# from .util.BroadcastMessage import BroadcastMessage
+# from .util.BroadcastManager import BroadcastManager
+from .fsm.Constant import ELEVATION_REQUIREMENTS
 import threading
 import math
-
-ELEVATION_REQUIREMENTS = {
-    2: {
-        "player": 1,
-        "linemate": 1,
-        "deraumere": 0,
-        "sibur": 0,
-        "phiras": 0,
-        "thystame": 0,
-    },
-    3: {
-        "player": 2,
-        "linemate": 1,
-        "deraumere": 1,
-        "sibur": 1,
-        "phiras": 0,
-        "thystame": 0,
-    },
-    4: {
-        "player": 2,
-        "linemate": 2,
-        "deraumere": 0,
-        "sibur": 1,
-        "phiras": 2,
-        "thystame": 0,
-    },
-    5: {
-        "player": 4,
-        "linemate": 1,
-        "deraumere": 2,
-        "sibur": 1,
-        "phiras": 3,
-        "thystame": 0,
-    },
-    6: {
-        "player": 4,
-        "linemate": 1,
-        "deraumere": 2,
-        "sibur": 3,
-        "phiras": 0,
-        "thystame": 1,
-    },
-    7: {
-        "player": 6,
-        "linemate": 1,
-        "deraumere": 2,
-        "sibur": 3,
-        "phiras": 1,
-        "thystame": 0,
-    },
-    8: {
-        "player": 6,
-        "linemate": 2,
-        "deraumere": 2,
-        "sibur": 2,
-        "phiras": 2,
-        "thystame": 1,
-    },
-}
+import logging
 
 
 class Trantorian:
-    def __init__(self, port, host, team_name):
+    def __init__(self, port, host, team_name, player_id):
         self.thread = threading.Lock()
         self.answer_list = []
         self.data_lock = threading.Lock()
         self.team_name = team_name
+        self.player_id = player_id
         self.connection = Connection(host, port, team_name)
         self.player_state = PlayerState(team_name)
         self.send_command = SendCommand(self.connection)
-        self.vision = VisionManager()
         self.parser = ParseCommand(self.player_state.inventory)
+        self.logger = logging.getLogger(player_id)
+        # self.broadcast_message = BroadcastMessage(self.player_state)
+        # self.broadcast_manager = BroadcastManager(self.broadcast_message, self.player_state.team_name)
 
     def move_to_tile(self, index):
         if index == 0:
@@ -138,6 +86,7 @@ class Trantorian:
                 except ValueError as e:
                     print(f"erro while parse inventory : {e}")
                 return False
+            return None
         else:
             print(f"Timeout server didn't answer to the inventory cmd: {cmd_id})")
             return False
