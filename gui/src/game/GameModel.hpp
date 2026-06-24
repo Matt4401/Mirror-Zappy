@@ -14,6 +14,7 @@
 #include "rcore/Camera.hpp"
 #include "rmath/Vector3.hpp"
 #include "rmodels/Model.hpp"
+#include "rmodels/Shader.hpp"
 #include "rtextures/Texture2D.hpp"
 
 namespace zappy::gui::game {
@@ -23,7 +24,7 @@ class GameModel {
     static constexpr auto PLAYER_MODEL_RESOURCE = "assets/models/player.gltf";
     static constexpr auto EGG_MODEL_RESOURCE = "assets/minecraft_dragon_egg/scene.gltf";
     static constexpr auto EGG_SCALE = 0.6F;
-    static constexpr auto ARMOR_SCALE = 2.0F;
+    static constexpr auto ARMOR_SCALE = 2.1F;
 
     GameModel(raylib::rcore::Camera& camera);
     ~GameModel() = default;
@@ -51,5 +52,6 @@ class GameModel {
         raylib::rmodels::Model{"assets/models/armor/gold.gltf"},
         raylib::rmodels::Model{"assets/models/armor/diamond.gltf"},
         raylib::rmodels::Model{"assets/models/armor/netherite.gltf"}};
+    raylib::rmodels::Shader _alphaDiscardShader;
 };
 }  // namespace zappy::gui::game
