@@ -14,6 +14,7 @@
 #include "rtext/Font.hpp"
 #include "ui/UIManager.hpp"
 #include "ui/components/UIGridManager.hpp"
+#include "ui/menus/EventLogUI.hpp"
 #include "ui/menus/PauseMenu.hpp"
 #include "ui/menus/PlayerInspectorUI.hpp"
 #include "ui/menus/TileInspectorUI.hpp"
@@ -37,6 +38,7 @@ class GameHUD {
     [[nodiscard]] std::shared_ptr<menus::PauseMenu> getPauseMenu() const { return _pauseMenu; }
     [[nodiscard]] std::shared_ptr<menus::PlayerInspectorUI> getPlayerInspector() const { return _playerInspector; }
     [[nodiscard]] std::shared_ptr<menus::WorldControlUI> getWorldControl() const { return _worldControl; }
+    [[nodiscard]] std::shared_ptr<menus::EventLogUI> getEventLog() const { return _eventLog; }
 
   private:
     std::reference_wrapper<events::EventDispatcher> _dispatcher;
@@ -46,6 +48,7 @@ class GameHUD {
     std::shared_ptr<menus::PlayerInspectorUI> _playerInspector;
     std::shared_ptr<menus::TileInspectorUI> _tileInspector;
     std::shared_ptr<menus::WorldControlUI> _worldControl;
+    std::shared_ptr<menus::EventLogUI> _eventLog;
 
     static constexpr int WorldControlWidthCols = 26;
     static constexpr int WorldControlX = (components::UIGridManager::GridCols - WorldControlWidthCols) / 2;
