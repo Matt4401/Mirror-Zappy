@@ -7,6 +7,7 @@
 
 #include "Core.hpp"
 
+#include <algorithm>
 #include <chrono>
 #include <cstddef>
 #include <exception>
@@ -261,6 +262,22 @@ void Core::flushPlayerResponses() {
         for (const auto& message : it->second) {
             _sessionManager->sendMessage(clientId, message);
         }
+    }
+
+    auto deadPlayers = _world->collectDeadPlayers();
+    for (const auto& deadPlayerId : deadPlayers) {
+        const auto clientIt =
+            std::ranges::find_if(_clientToPlayer.begin(), _clientToPlayer.end(),
+                                 [deadPlayerId](const auto& pair) { return pair.second == deadPlayerId; });
+        if (clientIt != _clientToPlayer.end()) {
+            const int clientId = clientIt->first;
+            if (_sessionManager->isWriting(clientId)) {
+                continue;
+            }
+            _sessionManager->disconnectClient(clientId);
+            _clientToPlayer.erase(clientIt);
+        }
+        _world->removePlayer(deadPlayerId);
     }
 }
 

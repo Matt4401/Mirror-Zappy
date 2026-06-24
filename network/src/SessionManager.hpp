@@ -32,6 +32,7 @@ class SessionManager : public zappy::shared::network::ISessionManager {
     void sendMessage(int clientId, std::string_view message) override;
 
     void disconnectClient(int clientId) override;
+    [[nodiscard]] bool isWriting(int clientId) const override;
 
   private:
     void acceptNewConnection();

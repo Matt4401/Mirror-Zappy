@@ -99,6 +99,19 @@ void SessionManager::disconnectClient(const int clientId) {
     _eventQueue.push({.type = EventType::CLIENT_DISCONNECTED, .clientId = clientId, .message = ""});
 }
 
+bool SessionManager::isWriting(const int clientId) const {
+    if (!_clients.contains(clientId)) {
+        return false;
+    }
+    const auto it = std::ranges::find_if(_pollFds.begin(), _pollFds.end(),
+                                         [clientId](const struct pollfd& pfd) { return pfd.fd == clientId; });
+
+    if (it == _pollFds.end()) {
+        return false;
+    }
+    return (it->events & POLLOUT) != 0;
+}
+
 void SessionManager::handleServerEvent(const short revents) {
     if ((revents & POLLIN) != 0) {
         acceptNewConnection();

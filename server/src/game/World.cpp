@@ -227,6 +227,17 @@ std::size_t World::removePlayer(const std::size_t id) {
     return id;
 }
 
+std::vector<std::size_t> World::collectDeadPlayers() const {
+    std::vector<std::size_t> deadIds;
+
+    for (const auto& player : _playerList | std::views::values) {
+        if (player->isDead()) {
+            deadIds.emplace_back(player->id());
+        }
+    }
+    return deadIds;
+}
+
 std::size_t World::getAvailableSlotInTeam(std::string_view teamName) const {
     const auto team = _teamList.find(std::string(teamName));
 
