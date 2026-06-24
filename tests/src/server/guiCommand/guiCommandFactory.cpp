@@ -83,7 +83,7 @@ TEST(GuiCommandFactoryTest, CreateTnaCommand) {
 
 TEST(GuiCommandFactoryTest, CreateSstCommand) {
     const zappy::server::command::CommandFactory factory;
-    std::string rawCommand = "sst 10";
+    std::string rawCommand = "sst 10       ";
     auto command = factory.createGuiCommand(rawCommand);
 
     EXPECT_NE(command, nullptr);

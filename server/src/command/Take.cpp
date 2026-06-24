@@ -32,6 +32,7 @@ bool Take::start(game::World& world, game::Player& player) {
 }
 void Take::execute(game::World& world, game::Player& player) {
     const game::ItemType item = game::mapItemString().at(_arg);
+    auto [x, y] = player.position();
     if (!world.removeItemOnGround(item, player.position())) {
         player.addResponse("ko\n");
         return;
@@ -40,6 +41,18 @@ void Take::execute(game::World& world, game::Player& player) {
     world.addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pgt{
         .playerId = static_cast<int>(player.id()),
         .resourceId = static_cast<int>(item),
+    }));
+    const auto inventory = player.inventory();
+    world.addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pin{
+        .playerId = static_cast<int>(player.id()),
+        .x = static_cast<int>(x),
+        .y = static_cast<int>(y),
+        .food = static_cast<int>(inventory.at(static_cast<std::uint8_t>(game::ItemType::Food))),
+        .linemate = static_cast<int>(inventory.at(static_cast<std::uint8_t>(game::ItemType::Linemate))),
+        .deraumere = static_cast<int>(inventory.at(static_cast<std::uint8_t>(game::ItemType::Deraumere))),
+        .sibur = static_cast<int>(inventory.at(static_cast<std::uint8_t>(game::ItemType::Sibur))),
+        .mendiane = static_cast<int>(inventory.at(static_cast<std::uint8_t>(game::ItemType::Mendiane))),
+        .thystame = static_cast<int>(inventory.at(static_cast<std::uint8_t>(game::ItemType::Thystame))),
     }));
     player.addResponse("ok\n");
 }

@@ -18,6 +18,8 @@
 #include "command/ICommand.hpp"
 #include "exception/TooMuchCmd.hpp"
 #include "game/World.hpp"
+#include "protocol/Commands.hpp"
+#include "protocol/Emitter.hpp"
 
 namespace {
 constexpr bool hasEnoughResources(const zappy::server::game::InventoryArray& groundInv,
@@ -69,6 +71,18 @@ void Player::update(World& world) {
         if (_inventory.at(static_cast<std::uint8_t>(ItemType::Food)) > 0) {
             _lifeTick = kNbLifeTickFood;
             _inventory.at(static_cast<std::uint8_t>(ItemType::Food))--;
+            world.addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pin{
+                .playerId = static_cast<int>(_id),
+                .x = static_cast<int>(_pos.x),
+                .y = static_cast<int>(_pos.y),
+                .food = static_cast<int>(_inventory.at(static_cast<std::uint8_t>(ItemType::Food))),
+                .linemate = static_cast<int>(_inventory.at(static_cast<std::uint8_t>(ItemType::Linemate))),
+                .deraumere = static_cast<int>(_inventory.at(static_cast<std::uint8_t>(ItemType::Deraumere))),
+                .sibur = static_cast<int>(_inventory.at(static_cast<std::uint8_t>(ItemType::Sibur))),
+                .mendiane = static_cast<int>(_inventory.at(static_cast<std::uint8_t>(ItemType::Mendiane))),
+                .thystame = static_cast<int>(_inventory.at(static_cast<std::uint8_t>(ItemType::Thystame))),
+            }));
+
         } else {
             world.removePlayer(_id);
             return;
