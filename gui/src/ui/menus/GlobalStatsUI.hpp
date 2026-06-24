@@ -16,6 +16,7 @@
 
 #include "Color.hpp"
 #include "events/EventDispatcher.hpp"
+#include "protocol/Commands.hpp"
 #include "rtext/Font.hpp"
 #include "ui/components/UIGamePanel.hpp"
 #include "ui/components/UIText.hpp"
