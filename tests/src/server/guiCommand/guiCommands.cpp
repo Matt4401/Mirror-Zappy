@@ -20,6 +20,7 @@
 #include "guiCommand/Sgt.hpp"
 #include "guiCommand/Tna.hpp"
 #include "protocol/Commands.hpp"
+#include "strategy/ServerStrategy.hpp"
 
 const auto createDummyConfig = []() {
     return zappy::parser::ServerConfig{
