@@ -480,7 +480,7 @@ void World::checkGameEnd() {
         std::uint8_t playerAtMaxLevel = 0;
         for (const auto& playerId : team->listPlayerId()) {
             const auto& player = _playerList.at(playerId);
-            if (player->level() == kNbLevel + 1) {
+            if (!player->isDead() && player->level() == kNbLevel + 1) {
                 playerAtMaxLevel++;
             }
         }
