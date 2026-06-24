@@ -21,6 +21,7 @@
 #include "graphics/AssetManager.hpp"
 #include "rmath/Vector3.hpp"
 #include "rtextures/Texture2D.hpp"
+#include "Color.hpp"
 
 namespace zappy::gui::game {
 void Team::draw(const GameModel& gameModel) const {
@@ -32,7 +33,8 @@ void Team::draw(const GameModel& gameModel) const {
         gameModel.drawPlayer(player.position(), player.orientation(), tex);
     }
     for (const auto& egg : _eggs) {
-        gameModel.drawEgg(egg.position());
+        const auto tint = raylib::Color::lerp(raylib::Color::White(), _teamColor, GameModel::EGG_TINT_STRENGTH);
+        gameModel.drawEgg(egg.position(), tint);
     }
 }
 

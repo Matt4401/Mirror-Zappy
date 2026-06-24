@@ -9,6 +9,7 @@
 #include <functional>
 #include <memory>
 
+#include "Color.hpp"
 #include "Player.hpp"
 #include "rcore/Camera.hpp"
 #include "rmath/Vector3.hpp"
@@ -22,6 +23,7 @@ class GameModel {
     static constexpr auto PLAYER_MODEL_RESOURCE = "assets/jeffrey/scene.gltf";
     static constexpr auto EGG_MODEL_RESOURCE = "assets/minecraft_dragon_egg/scene.gltf";
     static constexpr auto EGG_SCALE = 0.6F;
+    static constexpr auto EGG_TINT_STRENGTH = 0.75F;
 
     GameModel(raylib::rcore::Camera& camera);
     ~GameModel() = default;
@@ -32,7 +34,7 @@ class GameModel {
 
     void drawPlayer(raylib::rmath::Vector3 position, Player::cardinalPoint orientation,
                     const std::shared_ptr<raylib::rtextures::Texture2D>& texture = nullptr) const;
-    void drawEgg(raylib::rmath::Vector3 position) const;
+    void drawEgg(raylib::rmath::Vector3 position, raylib::Color tint) const;
 
   protected:
   private:

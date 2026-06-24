@@ -20,6 +20,7 @@
 #include "gui/src/game/Player.hpp"
 #include "gui/src/game/Team.hpp"
 #include "protocol/Commands.hpp"
+#include "rmath/Vector3.hpp"
 
 namespace zappy::gui::graphics::scene {
 struct Incantation {
@@ -69,6 +70,11 @@ class PlayerManager {
     void movePlayers(int serverFrequency);
 
   private:
+    struct InitialEgg {
+        int id{0};
+        raylib::rmath::Vector3 position;
+    };
+
     [[nodiscard]] std::optional<std::reference_wrapper<game::Player>> playerById(int id);
     [[nodiscard]] std::optional<std::reference_wrapper<game::Team>> teamForPlayer(int playerId);
     [[nodiscard]] game::Team& ensureTeamExist(const std::string& name);
@@ -76,10 +82,12 @@ class PlayerManager {
     [[nodiscard]] static game::Player::cardinalPoint orientationFromProtocol(int orientation);
 
     void updatePlayerPosition(game::Player& player, Tile3DPosition tilePosition) const;
+    void redistributeInitialEggs();
     void removeEgg(int eggId);
 
     TileManager& _tileManager;
     std::vector<game::Team> _teams;
     std::vector<Incantation> _activeIncantations;
+    std::vector<InitialEgg> _initialEggs;
 };
 }  // namespace zappy::gui::graphics::scene

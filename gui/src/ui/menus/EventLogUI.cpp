@@ -113,6 +113,11 @@ void EventLogUI::initEventSubscriptions() {
                                     {" was starved to death", raylib::Color::Red()}});
                     },
                     [this](const shared::protocol::server::Enw& arg) {
+                        if (arg.playerId < 0) {
+                            addLogLine({{"Egg #" + std::to_string(arg.eggId), raylib::Color::Blue()},
+                                        {" spawned", raylib::Color::Black()}});
+                            return;
+                        }
                         addLogLine({{getPlayerName(arg.playerId), raylib::Color::Blue()},
                                     {" laid ", raylib::Color::Black()},
                                     {"Egg #" + std::to_string(arg.eggId), raylib::Color::Maroon()},

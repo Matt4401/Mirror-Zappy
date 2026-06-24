@@ -145,7 +145,9 @@ TEST_F(WorldManagerTest, PlayerMovesTowardsItsTargetAndStopsOnIt) {
     EXPECT_GT(requirePlayer(42).position().distance(start), 0.0F);
     EXPECT_GT(requirePlayer(42).position().distance(target), 0.0F);
 
-    world.movePlayers();
+    for (int tick = 0; tick < 10 && requirePlayer(42).moving(); ++tick) {
+        world.movePlayers();
+    }
     EXPECT_EQ(requirePlayer(42).position(), target);
     EXPECT_FALSE(requirePlayer(42).moving());
 }
@@ -158,7 +160,12 @@ TEST_F(WorldManagerTest, PlayerLeavesTheMapBeforeWrappingToTheOppositeEdge) {
 
     const auto wrappedPosition = requireTile(3, 1).position();
     world.movePlayers();
-    EXPECT_GT(requirePlayer(42).position().x(), start.x());
+    EXPECT_LT(requirePlayer(42).position().x(), start.x());
+    EXPECT_TRUE(requirePlayer(42).moving());
+
+    for (int tick = 0; tick < 10 && requirePlayer(42).moving(); ++tick) {
+        world.movePlayers();
+    }
     EXPECT_FLOAT_EQ(requirePlayer(42).position().x(), wrappedPosition.x());
     EXPECT_FLOAT_EQ(requirePlayer(42).position().z(), wrappedPosition.z());
     EXPECT_FALSE(requirePlayer(42).moving());

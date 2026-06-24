@@ -7,7 +7,6 @@
 
 #include "Map.hpp"
 
-#include <algorithm>
 #include <functional>
 #include <limits>
 #include <memory>

@@ -58,9 +58,9 @@ void GameModel::drawPlayer(raylib::rmath::Vector3 position, Player::cardinalPoin
                                  raylib::Color::White());
     }
 }
-void GameModel::drawEgg(raylib::rmath::Vector3 position) const {
+void GameModel::drawEgg(raylib::rmath::Vector3 position, const raylib::Color tint) const {
     if (_camera.get().isVisibleFromCamera(position)) {
-        _eggModel.drawModel(position, EGG_SCALE, raylib::Color::White());
+        _eggModel.drawModel(position, EGG_SCALE, tint);
     }
 }
 }  // namespace zappy::gui::game
