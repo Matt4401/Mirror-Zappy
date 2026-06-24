@@ -132,6 +132,47 @@ TEST_F(WorldManagerTest, PpoUpdatesPlayerPositionAndOrientation) {
     EXPECT_EQ(player.orientation(), game::Player::cardinalPoint::WEST);
 }
 
+TEST_F(WorldManagerTest, PlayerMovesTowardsItsTargetAndStopsOnIt) {
+    static constexpr float TestDeltaTime = 0.01F;
+    createPlayer();
+    const auto start = requirePlayer(42).position();
+
+    dispatcher.dispatch(shared::protocol::server::Ppo{.playerId = 42, .x = 3, .y = 2, .orientation = 4});
+
+    const auto target = requirePlayer(42).futurePosition();
+    EXPECT_TRUE(requirePlayer(42).moving());
+
+    world.movePlayers(TestDeltaTime);
+    EXPECT_GT(requirePlayer(42).position().distance(start), 0.0F);
+    EXPECT_GT(requirePlayer(42).position().distance(target), 0.0F);
+
+    for (int tick = 0; tick < 100 && requirePlayer(42).moving(); ++tick) {
+        world.movePlayers(TestDeltaTime);
+    }
+    EXPECT_EQ(requirePlayer(42).position(), target);
+    EXPECT_FALSE(requirePlayer(42).moving());
+}
+
+TEST_F(WorldManagerTest, PlayerLeavesTheMapBeforeWrappingToTheOppositeEdge) {
+    static constexpr float TestDeltaTime = 0.01F;
+    createPlayer(42, 0, 1);
+    const auto start = requirePlayer(42).position();
+
+    dispatcher.dispatch(shared::protocol::server::Ppo{.playerId = 42, .x = 3, .y = 1, .orientation = 4});
+
+    const auto wrappedPosition = requireTile(3, 1).position();
+    world.movePlayers(TestDeltaTime);
+    EXPECT_LT(requirePlayer(42).position().x(), start.x());
+    EXPECT_TRUE(requirePlayer(42).moving());
+
+    for (int tick = 0; tick < 100 && requirePlayer(42).moving(); ++tick) {
+        world.movePlayers(TestDeltaTime);
+    }
+    EXPECT_FLOAT_EQ(requirePlayer(42).position().x(), wrappedPosition.x());
+    EXPECT_FLOAT_EQ(requirePlayer(42).position().z(), wrappedPosition.z());
+    EXPECT_FALSE(requirePlayer(42).moving());
+}
+
 TEST_F(WorldManagerTest, PlayerNameCanBeUpdatedByGuiEvent) {
     createPlayer();
 
@@ -185,7 +226,7 @@ TEST_F(WorldManagerTest, PicAndPieTrackIncantationAndUpgradeParticipantsOnSucces
     ASSERT_EQ(world.activeIncantations().size(), 1);
     EXPECT_EQ(world.activeIncantations().front().playerIds.size(), 2);
 
-    dispatcher.dispatch(shared::protocol::server::Pie{.x = 1, .y = 1, .incantationResult = 1});
+    dispatcher.dispatch(shared::protocol::server::Pie{.x = 1, .y = 1, .incantationResult = true});
 
     EXPECT_TRUE(world.activeIncantations().empty());
     EXPECT_EQ(requirePlayer(42).level(), 2);
@@ -196,7 +237,7 @@ TEST_F(WorldManagerTest, FailedPieClearsIncantationWithoutChangingLevel) {
     createPlayer();
     dispatcher.dispatch(shared::protocol::server::Pic{.x = 1, .y = 1, .level = 1, .playerIds = {42}});
 
-    dispatcher.dispatch(shared::protocol::server::Pie{.x = 1, .y = 1, .incantationResult = 0});
+    dispatcher.dispatch(shared::protocol::server::Pie{.x = 1, .y = 1, .incantationResult = false});
 
     EXPECT_TRUE(world.activeIncantations().empty());
     EXPECT_EQ(requirePlayer(42).level(), 1);

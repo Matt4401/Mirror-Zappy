@@ -12,6 +12,7 @@
 #include <memory>
 
 #include "Color.hpp"
+#include "Player.hpp"
 #include "rcore/Camera.hpp"
 #include "rmath/Vector3.hpp"
 #include "rtextures/Texture2D.hpp"
@@ -31,7 +32,21 @@ GameModel::GameModel(raylib::rcore::Camera& camera) : _camera(camera) {
     }
 }
 
-void GameModel::drawPlayer(raylib::rmath::Vector3 position,
+float GameModel::getRotationAngle(Player::cardinalPoint orientation) {
+    switch (orientation) {
+        case Player::cardinalPoint::NORTH:
+            return 180.0F;
+        case Player::cardinalPoint::EAST:
+            return 90.0F;
+        case Player::cardinalPoint::SOUTH:
+            return 0.0F;
+        case Player::cardinalPoint::WEST:
+            return 270.0F;
+    }
+    return 0.0F;
+}
+
+void GameModel::drawPlayer(raylib::rmath::Vector3 position, Player::cardinalPoint orientation,
                            const std::shared_ptr<raylib::rtextures::Texture2D>& texture) const {
     if (_camera.get().isVisibleFromCamera(position)) {
         if (texture && texture->valid()) {
@@ -39,12 +54,13 @@ void GameModel::drawPlayer(raylib::rmath::Vector3 position,
         } else if (_defaultPlayerTexture && _defaultPlayerTexture->valid()) {
             _playerModel.setMaterialTexture(0, MATERIAL_MAP_ALBEDO, *_defaultPlayerTexture);
         }
-        _playerModel.drawModel(position, PLAYER_SCALE, raylib::Color::White());
+        _playerModel.drawModelEx(position, {0.0F, 1.0F, 0.0F}, getRotationAngle(orientation), PLAYER_SCALE,
+                                 raylib::Color::White());
     }
 }
-void GameModel::drawEgg(raylib::rmath::Vector3 position) const {
+void GameModel::drawEgg(raylib::rmath::Vector3 position, const raylib::Color tint) const {
     if (_camera.get().isVisibleFromCamera(position)) {
-        _eggModel.drawModel(position, EGG_SCALE, raylib::Color::White());
+        _eggModel.drawModel(position, EGG_SCALE, tint);
     }
 }
 }  // namespace zappy::gui::game

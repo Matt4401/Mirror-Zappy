@@ -47,6 +47,7 @@ class Team {
     [[nodiscard]] const std::vector<Player>& players() const { return _players; }
     [[nodiscard]] const std::vector<Egg>& eggs() const { return _eggs; }
     [[nodiscard]] raylib::Color color() const { return _teamColor; }
+    void movePlayers(int serverFrequency, float deltaTime);
 
   protected:
   private:

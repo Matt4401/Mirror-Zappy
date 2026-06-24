@@ -26,6 +26,7 @@ namespace zappy::server {
 class Core {
   public:
     explicit Core(std::span<char*> args);
+    explicit Core(parser::ServerConfig config);
     ~Core() = default;
 
     Core(const Core& other) = delete;
