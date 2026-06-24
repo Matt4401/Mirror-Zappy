@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 
 #include "rtext/Font.hpp"
@@ -25,11 +26,11 @@ class AssetManager {
 
     static AssetManager& getInstance();
 
-    bool loadFont(const std::string& id, const std::string& path);
-    bool loadTexture(const std::string& id, const std::string& path);
+    bool loadFont(std::string_view id, std::string_view path);
+    bool loadTexture(std::string_view id, std::string_view path);
 
-    std::shared_ptr<raylib::rtext::Font> getFont(const std::string& id);
-    std::shared_ptr<raylib::rtextures::Texture2D> getTexture(const std::string& id);
+    std::shared_ptr<raylib::rtext::Font> getFont(std::string_view id);
+    std::shared_ptr<raylib::rtextures::Texture2D> getTexture(std::string_view id);
     void clear();
 
   private:
