@@ -128,7 +128,7 @@ TEST(GuiCommandFactoryTest, CreatePlvCommand) {
     auto command = factory.createGuiCommand(rawCommand);
 
     EXPECT_NE(command, nullptr);
-    rawCommand = "pin invalid_param";
+    rawCommand = "plv invalid_param";
     command = factory.createGuiCommand(rawCommand);
     ASSERT_NE(command, nullptr);
     const auto& sbpCommand = dynamic_cast<zappy::server::guiCommand::Sbp*>(command.get());
