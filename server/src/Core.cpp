@@ -44,6 +44,11 @@ Core::Core(const std::span<char*> args) : _args(args) {
     }
 }
 
+Core::Core(parser::ServerConfig config)
+    : _config(std::move(config)),
+      _world(std::make_unique<game::World>(_config)),
+      _timeUnit(static_cast<int>(1.0F / static_cast<float>(_config.freq) * 1000)) {}
+
 int Core::run() {
     try {
         loop();
