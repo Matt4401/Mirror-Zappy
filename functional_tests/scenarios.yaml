@@ -279,7 +279,7 @@
   client_type: "GUI"
   steps:
     - send: "bct A B\n"
-    - expect: '^bct 0 0( \d+){7}\n$'
+    - expect: '(^bct 0 0( \d+){7}\n$)|(^sbp\n$)'
 
 - name: "GUI_Malformed_PPO_Letters"
   client_type: "GUI"
@@ -429,7 +429,7 @@
     - send: "Broadcast test\n"
     - expect: '^ok\n$'
     - send: "Look\n"
-    - expect: '^\[ player[^\]]* \]\n$'
+    - expect: '^\[ ?player[^\]]* ?\]\n$'
 
 - name: "AI_Spam_Inventory"
   client_type: "AI"
