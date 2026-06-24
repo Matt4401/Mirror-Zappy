@@ -3,11 +3,13 @@ from ..AState import AState
 
 class GatherState(AState):
     def execute(self):
+        self.trantorian.logger.info("===========Entering Gather state===========")
         next_level = self.trantorian.player_state.level + 1
         needed_dict = self.trantorian.get_missing_resources_for(next_level)
         needed_stones = list(needed_dict.keys())
 
         if not needed_stones:
+            self.trantorian.logger.info("[Gather]: Player already get all his needed stones")
             return
 
         visible = None
@@ -18,19 +20,14 @@ class GatherState(AState):
                 break
 
         if not visible:
-            self.trantorian.send_command.forward()
-            cmd_id = self.trantorian.send_command.look()
-            raw_response = self.trantorian.connection.get_command_response(cmd_id)
-            if raw_response:
-                parsed_tiles = self.trantorian.parser.parse_look(raw_response)
-                self.trantorian.player_state.vision.update_tiles(parsed_tiles)
+            self.trantorian.logger.info("[Gather]: Not stones in vision, go forward and look")
+            self.trantorian.forward()
+            self.trantorian.look()
         else:
+            self.trantorian.logger.info("[Gather]: Stones visibles, go to the tile and take it")
             stone, tile_index = visible
             self.trantorian.move_to_tile(tile_index)
-            self.trantorian.send_command.take_object(stone)
+            self.trantorian.take_object(stone)
             self.trantorian.refresh_inventory()
-            cmd_id = self.trantorian.send_command.look()
-            raw_response = self.trantorian.connection.get_command_response(cmd_id)
-            if raw_response:
-                parsed_tiles = self.trantorian.parser.parse_look(raw_response)
-                self.trantorian.player_state.vision.update_tiles(parsed_tiles)
+            self.trantorian.look()
+

@@ -3,7 +3,9 @@ from ..Constant import ELEVATION_REQUIREMENTS
 
 
 class EvolveState(AState):
+
     def execute(self):
+        self.trantorian.logger.info("===========Entering Evolve state===========")
         level = self.trantorian.player_state.level
         req = ELEVATION_REQUIREMENTS.get(level + 1, {})
 
@@ -11,12 +13,13 @@ class EvolveState(AState):
             if resource == "player":
                 continue
             for _ in range(amount):
-                self.trantorian.send_command.set_object(resource)
+                self.trantorian.set_object_down(resource)
 
-        resp = self.trantorian.send_command.start_incantation()
-
-        if resp and "Current level" in resp:
-            self.trantorian.player_state.upgrade_level()
-            self.trantorian.vision.current_level += 1
-            inv_resp = self.trantorian.send_command.inventory()
-            self.trantorian.player_state.inventory.update_inventory(*inv_resp)
+        result = self.trantorian.start_incantation()
+        if result:
+            success, response = result
+            if success and "Current level" in response:
+                self.trantorian.logger.warning("[Evolve]: Incantation successful, leveling up!")
+                self.trantorian.player_state.upgrade_level()
+                self.trantorian.player_state.vision.current_level += 1
+                self.trantorian.refresh_inventory()
