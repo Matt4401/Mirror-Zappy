@@ -26,20 +26,90 @@ class Trantorian:
         # self.broadcast_message = BroadcastMessage(self.player_state)
         # self.broadcast_manager = BroadcastManager(self.broadcast_message, self.player_state.team_name)
 
+    def wait_for_response(self, cmd_id, timeout=5.0):
+        if cmd_id in (None, 84):
+            return None
+        return self.connection.get_command_response(cmd_id, timeout=timeout)
+
+    def invalidate_vision(self):
+        self.player_state.vision.reset_on_turn()
+        # self.player_state.vision = []
+        # self.player_state.vision.current_level = self.player_state.level
+
+    def turn(self, cmd_fn, direction_delta):
+        cmd_id = cmd_fn()
+        result = self.wait_for_response(cmd_id)
+        if result and result[0]:
+            new_direction = ((self.player_state.get_direction() - 1 + direction_delta) % 8) + 1
+            self.player_state.update_direction(new_direction)
+            self.invalidate_vision()
+        return result
+
+    def forward(self):
+        cmd_id = self.send_command.forward()
+        result = self.wait_for_response(cmd_id)
+        if result and result[0]:
+            self.player_state.vision.shift_on_forward()
+        return result
+
+    def turn_right(self):
+        return self.turn(self.send_command.right, 1)
+
+    def turn_left(self):
+        return self.turn(self.send_command.left, -1)
+
+    def look(self):
+        cmd_id = self.send_command.look()
+        result = self.wait_for_response(cmd_id)
+        if result:
+            success, response_str = result
+            if success:
+                self.player_state.vision.update_tiles(self.parser.parse_look(response_str))
+        return result
+
+    def inventory(self):
+        cmd_id = self.send_command.inventory()
+        result = self.wait_for_response(cmd_id)
+        if result:
+            success, response_str = result
+            if success:
+                self.parser.parse_inventory(response_str)
+        return result
+
+    def take_object(self, obj):
+        cmd_id = self.send_command.take_object(obj)
+        result = self.wait_for_response(cmd_id)
+        if result and result[0]:
+            self.invalidate_vision()
+        return result
+
+    def set_object_down(self, obj):
+        cmd_id = self.send_command.set_object_down(obj)
+        result = self.wait_for_response(cmd_id)
+        if result and result[0]:
+            self.invalidate_vision()
+        return result
+
+    def start_incantation(self):
+        cmd_id = self.send_command.start_incantation()
+        return self._wait_for_response(cmd_id)
+
     def move_to_tile(self, index):
         if index == 0:
             return
-        n = int(math.sqrt(index))
-        start_of_level = n * n
-        dx = index - (start_of_level + n)
-        for _ in range(n):
-            self.send_command.forward()
+        row = int(math.sqrt(index))
+        start_of_level = row * row
+        dx = index - (start_of_level + row)
+        for _ in range(row):
+            self.forward()
         if dx < 0:
+            self.turn_left()
             for _ in range(abs(dx)):
-                self.send_command.left()
+                self.forward()
         elif dx > 0:
+            self.turn_right()
             for _ in range(dx):
-                self.send_command.right()
+                self.forward()
 
     def has_enough_resources_for(self, target_level: int) -> bool:
         if target_level not in ELEVATION_REQUIREMENTS:
@@ -72,11 +142,10 @@ class Trantorian:
         return missing
 
     def refresh_inventory(self):
-        cmd_id = self.send_command.inventory()
-        if cmd_id == 84:
+        result = self.inventory()
+        if result is None:
             return False
 
-        result = self.connection.get_command_response(cmd_id)
         if result:
             success, response_str = result
             if success:
@@ -85,8 +154,8 @@ class Trantorian:
                     return True
                 except ValueError as e:
                     print(f"erro while parse inventory : {e}")
-                return False
+                    return False
             return None
         else:
-            print(f"Timeout server didn't answer to the inventory cmd: {cmd_id})")
+            print("Timeout server didn't answer to the inventory cmd")
             return False
