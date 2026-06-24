@@ -186,15 +186,7 @@ void Core::handleHandshake(int clientId, std::string_view teamName) {
     _clientStates[clientId] = ClientState::IN_GAME;
     _sessionManager->sendMessage(clientId, std::format("{}\n{} {}\n", _world->getAvailableSlotInTeam(teamName),
                                                        _world->sizeMap().x, _world->sizeMap().y));
-    const auto& playerList = _world->playerList();
-    _world->addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pnw{
-        .playerId = static_cast<int>(playerIdOpt.value()),
-        .x = static_cast<int>(playerList.at(playerIdOpt.value())->position().x),
-        .y = static_cast<int>(playerList.at(playerIdOpt.value())->position().y),
-        .orientation = static_cast<int>(playerList.at(playerIdOpt.value())->orientation()),
-        .level = 1,
-        .teamName = std::string{teamName},
-    }));
+    sendGuiNewGamePlayerData(playerIdOpt.value());
 }
 
 void Core::handleInGameMessage(int clientId, std::string_view message) {
@@ -318,6 +310,39 @@ void Core::sendGuiInitialState(int clientId) {
                                                    .x = static_cast<int>(egg.position.x),
                                                    .y = static_cast<int>(egg.position.y)}));
     }
+}
+
+void Core::sendGuiNewGamePlayerData(std::size_t playerId) {
+    const auto& playerList = _world->playerList();
+
+    _world->addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pnw{
+        .playerId = static_cast<int>(playerId),
+        .x = static_cast<int>(playerList.at(playerId)->position().x),
+        .y = static_cast<int>(playerList.at(playerId)->position().y),
+        .orientation = static_cast<int>(playerList.at(playerId)->orientation()),
+        .level = 1,
+        .teamName = std::string{_world->getPlayerTeam(playerId)},
+    }));
+    _world->addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pin{
+        .playerId = static_cast<int>(playerId),
+        .x = static_cast<int>(playerList.at(playerId)->position().x),
+        .y = static_cast<int>(playerList.at(playerId)->position().y),
+        .food =
+            static_cast<int>(playerList.at(playerId)->inventory().at(static_cast<std::size_t>(game::ItemType::Food))),
+        .linemate = static_cast<int>(
+            playerList.at(playerId)->inventory().at(static_cast<std::size_t>(game::ItemType::Linemate))),
+        .deraumere = static_cast<int>(
+            playerList.at(playerId)->inventory().at(static_cast<std::size_t>(game::ItemType::Deraumere))),
+        .sibur =
+            static_cast<int>(playerList.at(playerId)->inventory().at(static_cast<std::size_t>(game::ItemType::Sibur))),
+        .mendiane = static_cast<int>(
+            playerList.at(playerId)->inventory().at(static_cast<std::size_t>(game::ItemType::Mendiane))),
+        .phiras =
+            static_cast<int>(playerList.at(playerId)->inventory().at(static_cast<std::size_t>(game::ItemType::Phiras))),
+        .thystame = static_cast<int>(
+            playerList.at(playerId)->inventory().at(static_cast<std::size_t>(game::ItemType::Thystame)))}));
+    _world->addGuiEvent(
+        shared::protocol::Emitter::build(shared::protocol::server::Ebo{.eggId = static_cast<int>(playerId)}));
 }
 
 void Core::sendGuiNewPlayerData(int clientId, std::size_t playerId) {
