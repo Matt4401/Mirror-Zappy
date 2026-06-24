@@ -27,6 +27,7 @@ class TickManager:
 
     def _should_inventory(self) -> bool:
         return self.tick % INVENTORY_INTERVAL == 0
+        # return True
 
     def _should_look(self) -> bool:
         return self.tick % LOOK_INTERVAL == 0

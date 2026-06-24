@@ -1,13 +1,12 @@
 from src.util.InventoryClass import Inventory
 from .util.VisionManager import VisionManager
-import random
 
 
 class PlayerState:
     def __init__(self, team_name):
         self.level = 1
         self.team_name = team_name
-        self.direction = random.randint(1, 8)
+        self.direction = 1
         self.inventory = Inventory()
         self.vision = VisionManager()
 

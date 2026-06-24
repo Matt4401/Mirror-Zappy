@@ -3,13 +3,13 @@ class SendCommand:
         self.connection = connection
 
     def forward(self):
-        self.connection.send_command("Forward")
+        return self.connection.send_command("Forward")
 
     def right(self):
-        self.connection.send_command("Right")
+        return self.connection.send_command("Right")
 
     def left(self):
-        self.connection.send_command("Left")
+        return self.connection.send_command("Left")
 
     def look(self):
         return self.connection.send_command("Look")
@@ -18,22 +18,22 @@ class SendCommand:
         return self.connection.send_command("Inventory")
 
     def broadcast(self, txt):
-        self.connection.send_command("Broadcast <" + txt + ">")
+        return self.connection.send_command("Broadcast " + txt)
 
     def available_team_slots(self):
-        self.connection.send_command("Connect_nbr")
+        return self.connection.send_command("Connect_nbr")
 
     def fork(self):
-        self.connection.send_command("Fork")
+        return self.connection.send_command("Fork")
 
     def eject(self):
-        self.connection.send_command("Eject")
+        return self.connection.send_command("Eject")
 
     def take_object(self, obj):
-        self.connection.send_command("Take <" + obj + ">")
+        return self.connection.send_command("Take " + obj)
 
     def set_object_down(self, obj):
-        self.connection.send_command("Set <" + obj + ">")
+        return self.connection.send_command("Set " + obj)
 
     def start_incantation(self):
-        self.connection.send_command("Incantation")
+        return self.connection.send_command("Incantation")
