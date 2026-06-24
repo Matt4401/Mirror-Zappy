@@ -224,6 +224,7 @@ std::size_t World::removePlayer(const std::size_t id) {
     removePlayerFromTeam(id);
     erasePlayerFromTile(getTileIndex(player->position()), id);
     _playerList.erase(it);
+    addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pdi{.playerId = static_cast<int>(id)}));
     return id;
 }
 
