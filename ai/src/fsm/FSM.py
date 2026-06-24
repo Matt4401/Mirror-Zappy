@@ -21,7 +21,6 @@ class FiniteStateMachine:
         self.trantorian.logger.warning("===========Start FSM process===========")
         while True:
             meta_cmds = self.tick_manager.tick_update()
-            print(f"{meta_cmds} NDZEBJDEZ JDBEZHJ")
             self.send_auto_cmds(meta_cmds)
             self.process_pending_commands()
             self.update_state()
@@ -45,7 +44,7 @@ class FiniteStateMachine:
                         self.trantorian.parser.parse_inventory(response)
                     elif cmd_type == "look":
                         tiles = self.trantorian.parser.parse_look(response)
-                        self.trantorian.vision.update_tiles(tiles)
+                        self.trantorian.player_state.vision.update_tiles(tiles)
                     completed.append(cmd_id)
                 except Exception as e:
                     print(f"Eror with {cmd_type}: {e}")
@@ -56,14 +55,18 @@ class FiniteStateMachine:
                 del self.pending_commands[cmd_id]
 
     def send_auto_cmds(self, meta_cmds: list[str]):
+        if self.pending_commands:
+            return
+
         for cmd in meta_cmds:
             if cmd == "Inventory":
                 self.trantorian.logger.info("[FSM]: Auto command Inventory call")
                 cmd_id = self.trantorian.send_command.inventory()
                 self.pending_commands[cmd_id] = "inventory"
+                # self.trantorian.refresh_inventory()
 
             elif cmd == "Look":
-                self.trantorian.logger.info("[Auto]: command Look call")
+                self.trantorian.logger.info("[FSM]: command Look call")
                 cmd_id = self.trantorian.send_command.look()
                 self.pending_commands[cmd_id] = "look"
 
