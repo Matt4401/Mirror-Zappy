@@ -4,7 +4,7 @@ import pytest
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
 
-from ai.src.InventoryClass import Inventory
+from ai.src.util.InventoryClass import Inventory
 from ai.src.ParseCommand import ParseCommand
 
 

@@ -20,11 +20,13 @@ void Tile3D::draw(const raylib::rmodels::Model& model) const {
     model.drawModel(_position, TILE_SCALE, raylib::Color::White());
 }
 
-raylib::rcore::BoundingBox Tile3D::boundingBox() const {
-    raylib::rmath::Vector3 const min{_position.x() - (TILE_SIZE / 2.0F), _position.y() - 0.5F,
-                                     _position.z() - (TILE_SIZE / 2.0F)};
-    raylib::rmath::Vector3 const max{_position.x() + (TILE_SIZE / 2.0F), _position.y() + 0.5F,
-                                     _position.z() + (TILE_SIZE / 2.0F)};
+raylib::rcore::BoundingBox Tile3D::boundingBox(const raylib::rcore::BoundingBox& modelBB) const {
+    raylib::rmath::Vector3 const min{_position.x() + (modelBB.min().x() * TILE_SCALE),
+                                     _position.y() + (modelBB.min().y() * TILE_SCALE),
+                                     _position.z() + (modelBB.min().z() * TILE_SCALE)};
+    raylib::rmath::Vector3 const max{_position.x() + (modelBB.max().x() * TILE_SCALE),
+                                     _position.y() + (modelBB.max().y() * TILE_SCALE),
+                                     _position.z() + (modelBB.max().z() * TILE_SCALE)};
     return {min, max};
 }
 
