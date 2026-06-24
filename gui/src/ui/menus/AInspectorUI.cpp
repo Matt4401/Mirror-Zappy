@@ -34,6 +34,8 @@ constexpr float InvCellSize = 70.0F;
 constexpr float InvCellSpacing = 80.0F;
 constexpr float InvCellTextOffsetX = 10.0F;
 constexpr float InvCellTextOffsetY = 50.0F;
+constexpr float InvCellIconOffsetX = 18.0F;
+constexpr float InvCellIconOffsetY = 13.0F;
 constexpr float InfoFontSize = 16.0F;
 constexpr float HeaderFontSize = 20.0F;
 
@@ -42,7 +44,7 @@ constexpr float CloseBtnFontSize = 16.0F;
 constexpr float CloseBtnXOffset = 45.0F;
 constexpr float CloseBtnYOffset = 8.0F;
 
-constexpr float InvIconSize = 30.0F;
+constexpr float InvIconSize = 40.0F;
 
 constexpr int ElementCount = 7;
 }  // namespace
@@ -83,8 +85,7 @@ void AInspectorUI::buildInventoryPanel() {
         text->setColor(raylib::Color::White());
         _inventoryTexts.push_back(text);
 
-        auto img = std::make_shared<components::UIImage>(
-            "assets/images/ui/id.png");  // TODO: Replace with actual inventory item image
+        auto img = std::make_shared<components::UIImage>(_inventoryFilesPaths.at(i));
         img->setSize(InvIconSize, InvIconSize);
         _inventoryImages.push_back(img);
     }
@@ -108,11 +109,11 @@ void AInspectorUI::drawInventoryPanel(float& currentY, float startX, float panel
                                                   raylib::Color(200, 200, 200, 255));
 
         invText->setPosition(cellX + InvCellTextOffsetX, cellY + InvCellTextOffsetY);
-        invText->draw();
 
         auto img = _inventoryImages.at(i);
-        img->setPosition(cellX + InvCellTextOffsetX, cellY + InvCellTextOffsetY);
+        img->setPosition(cellX + InvCellIconOffsetX, cellY + InvCellIconOffsetY);
         img->draw();
+        invText->draw();
     }
     currentY += InvCellSpacing * 3.0F;
 }

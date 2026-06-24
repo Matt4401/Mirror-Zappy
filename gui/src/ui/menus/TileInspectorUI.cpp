@@ -47,8 +47,10 @@ constexpr float FoodTextOffset = 50.0F;
 constexpr float GridCellSize = 70.0F;
 constexpr float GridCellSpacing = 80.0F;
 constexpr float GridTotalWidth = 230.0F;
-constexpr float GridIconOffsetX = 10.0F;
-constexpr float GridIconOffsetY = 50.0F;
+constexpr float GridIconOffsetX = 18.0F;
+constexpr float GridIconOffsetY = 13.0F;
+constexpr float GridTextOffsetX = 10.0F;
+constexpr float GridTextOffsetY = 50.0F;
 
 constexpr float FoodIconDrawOffset = 5.0F;
 constexpr float BoxMarginAdjustment = 10.0F;
@@ -107,7 +109,7 @@ void TileInspectorUI::buildScannerPanel() {
     _scannerInfo->setFontSize(static_cast<int>(InfoFontSize));
     _scannerInfo->setColor(raylib::Color::DarkGray());
 
-    _foodIcon = std::make_shared<components::UIImage>("assets/images/ui/food.png");
+    _foodIcon = std::make_shared<components::UIImage>("assets/images/ui/Food.png");
     _foodIcon->setSize(FoodIconSize, FoodIconSize);
 }
 
@@ -146,7 +148,7 @@ void TileInspectorUI::onPicReceived(const shared::protocol::server::Pic& cmd) {
 
 void TileInspectorUI::onPieReceived(const shared::protocol::server::Pie& cmd) {
     if (cmd.x == _targetGridPosition.x && cmd.y == _targetGridPosition.y) {
-        _scannerInfo->setText("No ritual active\nResult: " + std::to_string(cmd.incantationResult));
+        _scannerInfo->setText("No ritual active\nResult: " + std::to_string(static_cast<int>(cmd.incantationResult)));
     }
 }
 
@@ -200,12 +202,12 @@ void TileInspectorUI::drawTileInventoryPanel(float& currentY, float startX, floa
         raylib::rshapes::Shapes::drawRectangleRec(
             {.x = cellX, .y = cellY, .width = GridCellSize, .height = GridCellSize}, BoxBgColor);
 
-        invText->setPosition(cellX + GridIconOffsetX, cellY + GridIconOffsetY);
-        invText->draw();
+        invText->setPosition(cellX + GridTextOffsetX, cellY + GridTextOffsetY);
 
         auto img = getInventoryImages().at(i);
         img->setPosition(cellX + GridIconOffsetX, cellY + GridIconOffsetY);
         img->draw();
+        invText->draw();
     }
     currentY += GridCellSpacing * DoubleSpacingMultiplier;
 }
