@@ -179,6 +179,9 @@ class Connection:
                                         event_type="elevation", message=msg_data
                                     )
                                 )
+                            if msg_data.get("message", "").startswith("Current level"):
+                                with self.response_lock:
+                                    self.command_responses.append(msg_data["message"])
                         else:
                             with self.response_lock:
                                 self.command_responses.append(msg_data["content"])
@@ -210,7 +213,7 @@ class Connection:
     def send_raw_command(self, cmd):
         try:
             with self.socket_lock:
-                self.socket.send((cmd + self.message_delimiter).encode())
+                self.socket.sendall((cmd + self.message_delimiter).encode())
             return True
         except Exception as e:
             print(f"Failed to send command: {e}")
@@ -285,12 +288,13 @@ class Connection:
                         )
                         continue
                     first_cmd_id = next(iter(self.active_requests.keys()))
+                    del self.active_requests[first_cmd_id]
                     success = response_str.lower() != "ko"
                     cmd_response = CommandResponse(
                         command=response_str, id=first_cmd_id, success=success
                     )
-                    with self.response_lock:
-                        self.response_buffer[first_cmd_id] = cmd_response
+                with self.response_lock:
+                    self.response_buffer[first_cmd_id] = cmd_response
             except IndexError:
                 break
             except Exception as e:
