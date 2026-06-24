@@ -114,11 +114,16 @@ void Player::tryStartNextCommand(World& world, bool isMidTick) {
         if (!_currentCommand->start(world, *this)) {
             _buffersResponses.emplace_back("ko\n");
             _currentCommand = nullptr;
-        } else {
-            _cmdTick = _currentCommand->requiredTicks();
-            _isNewCommand = isMidTick;
-            return;
+            continue;
         }
+        _cmdTick = _currentCommand->requiredTicks();
+        _isNewCommand = isMidTick;
+        if (_cmdTick == 0) {
+            _currentCommand->execute(world, *this);
+            _currentCommand = nullptr;
+            continue;
+        }
+        return;
     }
 }
 

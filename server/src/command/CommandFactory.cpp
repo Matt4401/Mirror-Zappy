@@ -20,6 +20,7 @@
 #include "Set.hpp"
 #include "Take.hpp"
 #include "command/Broadcast.hpp"
+#include "command/ConnectNbr.hpp"
 #include "command/Fork.hpp"
 #include "command/Forward.hpp"
 #include "command/ICommand.hpp"
@@ -75,6 +76,7 @@ void CommandFactory::registerCommands() {
         return nullptr;
     });
     _creators.emplace("Fork", [](std::string_view) { return std::make_unique<Fork>(); });
+    _creators.emplace("Connect_nbr", [](std::string_view) { return std::make_unique<ConnectNbr>(); });
     _creators.emplace("Look", [](std::string_view) { return std::make_unique<Look>(); });
 }
 

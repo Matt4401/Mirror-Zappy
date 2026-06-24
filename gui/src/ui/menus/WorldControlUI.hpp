@@ -82,8 +82,8 @@ class WorldControlUI : public components::UIGamePanel {
 
     static constexpr float SliderWidth = 200.0F;
     static constexpr float SliderHeight = 20.0F;
-    static constexpr float SliderMin = 2.0F;
-    static constexpr float SliderMax = 1000.0F;
+    static constexpr float SliderMin = 1.0F;
+    static constexpr float SliderMax = 1500.0F;
     static constexpr float SliderDefault = 100.0F;
 
     static constexpr float InitialOffsetX = 130.0F;
