@@ -35,7 +35,7 @@ add_custom_target(tests_functional
         COMMAND bash run_tests.sh -v
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/functional_tests
         DEPENDS zappy_server
-        COMMENT "Lancement des tests fonctionnels Zappy..."
+        COMMENT "Starting zappy functional tests..."
         USES_TERMINAL
 )
 

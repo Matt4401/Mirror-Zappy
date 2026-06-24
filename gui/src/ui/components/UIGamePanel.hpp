@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <vector>
@@ -72,6 +73,8 @@ class UIGamePanel : public IUIComponent {
     [[nodiscard]] bool isCollapsed() const { return _isCollapsed; }
     void setCollapsed(bool collapsed) { _isCollapsed = collapsed; }
 
+    void scrollToBottom();
+
     void setTitle(const std::string& title);
 
     void setNextPanel(const std::shared_ptr<UIGamePanel>& panel, float gapPixels = 0.0F);
@@ -79,6 +82,7 @@ class UIGamePanel : public IUIComponent {
     [[nodiscard]] raylib::rmath::Vector2 getSize() const { return _size; }
     [[nodiscard]] float getCurrentHeight() const { return _currentHeight; }
     [[nodiscard]] static constexpr float getHeaderHeight() { return DefaultHeaderHeight; }
+    [[nodiscard]] static constexpr float getPadding() { return Padding; }
 
   protected:
     void setBasePosition(float x, float y) {
@@ -88,6 +92,11 @@ class UIGamePanel : public IUIComponent {
     void setBaseSize(float width, float height) {
         _size.setX(width);
         _size.setY(height);
+    }
+    [[nodiscard]] float getScrollOffset() const { return _scrollOffset; }
+    void setMaxScroll(float maxScroll) {
+        _maxScroll = maxScroll;
+        _scrollOffset = std::clamp(_scrollOffset, 0.0F, _maxScroll);
     }
 
   private:

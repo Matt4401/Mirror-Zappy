@@ -36,11 +36,25 @@ void Set::execute(game::World& world, game::Player& player) {
         player.addResponse("ko\n");
         return;
     }
+    auto [x, y] = player.position();
     world.addItemOnGround(item, player.position());
     world.addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pdr{
         .playerId = static_cast<int>(player.id()),
         .resourceId = static_cast<int>(item),
     }));
+    const auto inventory = player.inventory();
     player.addResponse("ok\n");
+    world.addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pin{
+        .playerId = static_cast<int>(player.id()),
+        .x = static_cast<int>(x),
+        .y = static_cast<int>(y),
+        .food = static_cast<int>(inventory.at(static_cast<std::uint8_t>(game::ItemType::Food))),
+        .linemate = static_cast<int>(inventory.at(static_cast<std::uint8_t>(game::ItemType::Linemate))),
+        .deraumere = static_cast<int>(inventory.at(static_cast<std::uint8_t>(game::ItemType::Deraumere))),
+        .sibur = static_cast<int>(inventory.at(static_cast<std::uint8_t>(game::ItemType::Sibur))),
+        .mendiane = static_cast<int>(inventory.at(static_cast<std::uint8_t>(game::ItemType::Mendiane))),
+        .phiras = static_cast<int>(inventory.at(static_cast<std::uint8_t>(game::ItemType::Phiras))),
+        .thystame = static_cast<int>(inventory.at(static_cast<std::uint8_t>(game::ItemType::Thystame))),
+    }));
 }
 }  // namespace zappy::server::command

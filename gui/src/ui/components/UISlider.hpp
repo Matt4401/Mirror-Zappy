@@ -38,6 +38,7 @@ class UISlider : public IUIComponent {
     [[nodiscard]] bool isHovered() const override { return _isHovered || _isDragging; }
 
     void setOnValueChanged(std::function<void(float)> callback);
+    void setOnValueConfirmed(std::function<void(float)> callback);
     void setValue(float value);
     [[nodiscard]] float getValue() const;
 
@@ -58,6 +59,7 @@ class UISlider : public IUIComponent {
     float _handleX{0.0F};
 
     std::function<void(float)> _onValueChanged;
+    std::function<void(float)> _onValueConfirmed;
 
     static constexpr int MouseLeftButton = 0;
     static constexpr float HandleWidthRatio = 0.05F;
