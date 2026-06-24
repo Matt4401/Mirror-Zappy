@@ -132,7 +132,8 @@ TEST(PinCommandTest, PinCmd) {
 
     const auto& player = world.playerList().at(playerIdOpt.value());
     const auto& inventory = player->inventory();
-    zappy::server::guiCommand::Pin command{static_cast<int>(playerIdOpt.value())};
+    zappy::server::guiCommand::Pin command{
+        zappy::shared::protocol::client::Pin{.playerId = static_cast<int>(playerIdOpt.value())}};
 
     const std::string response = command.execute(core).message;
     auto [x, y] = player->position();

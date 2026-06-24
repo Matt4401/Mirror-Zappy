@@ -217,7 +217,8 @@ std::size_t World::removePlayer(const std::size_t id) {
     removePlayerFromTeam(id);
     erasePlayerFromTile(getTileIndex(player->position()), id);
     addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pdi{.playerId = static_cast<int>(id)}));
-    return player->id();
+    _playerList.erase(id);
+    return id;
 }
 
 std::size_t World::getAvailableSlotInTeam(std::string_view teamName) const {
