@@ -16,6 +16,8 @@ namespace zappy::server::command {
 class Incantation : public ACommand {
   public:
     Incantation();
+    static std::vector<std::size_t> playersWithSameLevelOnTile(game::Position position, int level,
+                                                               const game::World& world);
     ~Incantation() override = default;
     Incantation(const Incantation& other) = delete;
     Incantation& operator=(const Incantation& other) = delete;

@@ -214,8 +214,8 @@ int Player::level() const { return _level; }
 
 void Player::levelUp() { _level++; }
 
-bool Player::checkCondition(const std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)>& resources,
-                            const std::size_t nbPlayer) const {
+bool Player::checkIncantationRequirements(
+    const std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)>& resources, const std::size_t nbPlayer) const {
     auto condition = getCondition().at(_level - 1);
     return condition.nbPlayer <= nbPlayer && hasEnoughResources(resources, condition.resources);
 }
