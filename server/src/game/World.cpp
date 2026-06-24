@@ -298,14 +298,14 @@ int World::getNextExecutionTick() const {
     return nextTick;
 }
 
-void World::addItemOnGround(ItemType item, const Position pos) {
-    _tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(item))++;
+void World::addItemOnGround(ItemType item, const Position pos, const std::size_t nbItem) {
+    _tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(item)) += nbItem;
 }
 
-bool World::removeItemOnGround(ItemType item, const Position pos) {
+bool World::removeItemOnGround(ItemType item, const Position pos, const std::size_t nbItem) {
     auto& resources = _tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(item));
-    if (resources > 0) {
-        resources--;
+    if (resources >= nbItem) {
+        resources -= nbItem;
         return true;
     }
     return false;
@@ -414,5 +414,7 @@ void World::clearAllResourcesAndEggs() {
     }
 }
 const std::unordered_map<std::size_t, Egg>& World::vecEggs() const { return _vecEggs; }
+
+Tile World::tile(const Position position) const { return _tiles.at(getTileIndex(position)); }
 
 }  // namespace zappy::server::game

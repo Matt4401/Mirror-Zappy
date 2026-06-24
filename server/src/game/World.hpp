@@ -36,6 +36,24 @@ struct Tile {
     std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> resources;
 };
 
+struct Condition {
+    std::size_t nbPlayer;
+    std::array<std::size_t, static_cast<std::uint8_t>(ItemType::COUNT)> resources;
+};
+
+using InventoryArray = std::array<std::size_t, static_cast<std::uint8_t>(ItemType::COUNT)>;
+
+inline std::array<Condition, kNbLevel> getCondition() {
+    static constexpr std::array kCondition = {Condition{.nbPlayer = 1, .resources = {0, 1, 0, 0, 0, 0, 0}},
+                                              Condition{.nbPlayer = 2, .resources = {0, 1, 1, 1, 0, 0, 0}},
+                                              Condition{.nbPlayer = 2, .resources = {0, 2, 0, 1, 0, 2, 0}},
+                                              Condition{.nbPlayer = 4, .resources = {0, 1, 1, 2, 0, 1, 0}},
+                                              Condition{.nbPlayer = 4, .resources = {0, 1, 2, 1, 3, 0, 0}},
+                                              Condition{.nbPlayer = 6, .resources = {0, 1, 2, 3, 0, 1, 0}},
+                                              Condition{.nbPlayer = 6, .resources = {0, 2, 2, 2, 2, 2, 1}}};
+    return kCondition;
+}
+
 class World {
   public:
     explicit World(const parser::ServerConfig& config);
@@ -71,8 +89,8 @@ class World {
     bool isEggOnTile(const Position& position) const;
 
     const std::unordered_map<std::size_t, std::unique_ptr<Player>>& playerList() const;
-    void addItemOnGround(ItemType item, Position pos);
-    bool removeItemOnGround(ItemType item, Position pos);
+    void addItemOnGround(ItemType item, Position pos, std::size_t nbItem = 1);
+    bool removeItemOnGround(ItemType item, Position pos, std::size_t nbItem = 1);
 
     [[nodiscard]] int getNextExecutionTick() const;
     [[nodiscard]] std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> resourcesAt(Position pos) const;
@@ -84,6 +102,7 @@ class World {
 
     void layEgg(const Player& player);
     const std::unordered_map<std::size_t, Egg>& vecEggs() const;
+    [[nodiscard]] Tile tile(Position position) const;
 
   private:
     std::unordered_map<std::string, std::unique_ptr<Team>> _teamList;
