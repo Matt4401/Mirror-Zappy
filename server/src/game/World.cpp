@@ -299,6 +299,9 @@ int World::getNextExecutionTick() const {
     int nextTick = -1;
 
     for (const auto& player : _playerList | std::ranges::views::values) {
+        if (player->isDead()) {
+            continue;
+        }
         int playerNextEvent = static_cast<int>(player->nbLifeTick());
 
         if (player->cmdTick() > 0 && player->cmdTick() < playerNextEvent) {
