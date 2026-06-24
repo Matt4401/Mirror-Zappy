@@ -19,6 +19,7 @@
 #include "guiCommand/Mct.hpp"
 #include "guiCommand/Msz.hpp"
 #include "guiCommand/Pin.hpp"
+#include "guiCommand/Plv.hpp"
 #include "guiCommand/Sgt.hpp"
 #include "guiCommand/Tna.hpp"
 #include "protocol/Commands.hpp"
@@ -164,4 +165,36 @@ TEST(PinCommandTest, PinCmd) {
         std::to_string(inventory.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Phiras))) + " " +
         std::to_string(inventory.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Thystame))) + "\n";
     ASSERT_EQ(response, expectedResponse);
+}
+
+TEST(PlvCommandTest, ExecuteReturnsProperlyFormattedTileContent) {
+    auto args = createDummyArgs();
+    zappy::server::Core core{std::span(args)};
+
+    // NOLINTNEXTLINE
+    auto& world = const_cast<zappy::server::game::World&>(core.world());
+
+    auto playerIdOpt = world.spawnPlayer("teamA");
+
+    ASSERT_TRUE(playerIdOpt.has_value());
+
+    if (!playerIdOpt.has_value()) {
+        return;
+    }
+    zappy::server::guiCommand::Plv command{
+        zappy::shared::protocol::client::Plv{.playerId = static_cast<int>(playerIdOpt.value())}};
+
+    const std::string response = command.execute(core).message;
+    const std::string expectedResponse = "plv #" + std::to_string(playerIdOpt.value()) + " " + std::to_string(1) + "\n";
+    EXPECT_EQ(response, expectedResponse);
+}
+
+TEST(PlvCommandTest, ExecuteFailsSafelyOnOutOfBounds) {
+    auto args = createDummyArgs();
+    zappy::server::Core core{std::span(args)};
+
+    zappy::server::guiCommand::Plv command{zappy::shared::protocol::client::Plv{.playerId = 100}};
+    const std::string response = command.execute(core).message;
+
+    EXPECT_TRUE(response == "sbp\n");
 }

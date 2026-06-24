@@ -66,7 +66,6 @@ TEST_F(IncantationTest, StartSucceedsWithResources) {
     EXPECT_NE(guiEvents.back().find("pic"), std::string::npos);
 }
 
-// 4. Test de l'exécution finale (Niveau 1 -> 2) : Réponse, LevelUp et Consommation des Stones
 TEST_F(IncantationTest, ExecuteSuccessAndReplies) {
     game::World world{config};
     auto playerIdOpt = world.spawnPlayer("Team1");
