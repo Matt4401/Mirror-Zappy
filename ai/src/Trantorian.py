@@ -40,7 +40,9 @@ class Trantorian:
         cmd_id = cmd_fn()
         result = self.wait_for_response(cmd_id)
         if result and result[0]:
-            new_direction = ((self.player_state.get_direction() - 1 + direction_delta) % 8) + 1
+            new_direction = (
+                (self.player_state.get_direction() - 1 + direction_delta) % 8
+            ) + 1
             self.player_state.update_direction(new_direction)
             self.invalidate_vision()
         return result
@@ -64,7 +66,9 @@ class Trantorian:
         if result:
             success, response_str = result
             if success:
-                self.player_state.vision.update_tiles(self.parser.parse_look(response_str))
+                self.player_state.vision.update_tiles(
+                    self.parser.parse_look(response_str)
+                )
         return result
 
     def inventory(self):
@@ -92,7 +96,7 @@ class Trantorian:
 
     def start_incantation(self):
         cmd_id = self.send_command.start_incantation()
-        return self._wait_for_response(cmd_id)
+        return self.wait_for_response(cmd_id)
 
     def move_to_tile(self, index):
         if index == 0:

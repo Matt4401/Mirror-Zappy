@@ -47,13 +47,13 @@ class FiniteStateMachine:
                         try:
                             self.trantorian.parser.parse_inventory(response)
                         except ValueError as e:
-                            print(f"erro while parse inventory : {e}")
+                            print(f"error while parse inventory : {e}")
                     elif cmd_type == "look":
                         tiles = self.trantorian.parser.parse_look(response)
                         self.trantorian.player_state.vision.update_tiles(tiles)
                     completed.append(cmd_id)
                 except Exception as e:
-                    print(f"Eror with {cmd_type}: {e}")
+                    print(f"Error with {cmd_type}: {e}")
                     completed.append(cmd_id)
 
         for cmd_id in completed:
@@ -131,3 +131,38 @@ class FiniteStateMachine:
 
     def execute_state(self):
         self.state.execute()
+
+    def process_broadcast_events(self):
+        while True:
+            if len(self.trantorian.broadcast_queue) > 0:
+                event = self.trantorian.get_next_broadcast()
+
+    def process_server_events(self):
+        while True:
+            if len(self.trantorian.connection.event_queue) < 0:
+                continue
+            event = self.trantorian.connection.get_next_event()
+            if event is None:
+                break
+            if event.event_type == "dead":
+                self.trantorian.logger.warning("dead")
+                self.trantorian.connection.running = False
+                return
+            elif event.event_type == "eject":
+                direction = event.data.get("direction")
+                cmd_id = self.trantorian.send_command.look()
+                self.pending_commands[cmd_id] = "look"
+
+            elif event.event_type == "elevation":
+                msg = event.data.get("message", "")
+                self.trantorian.logger.info(f" event -> {msg}")
+                if "Elevation underway" in msg:
+                    pass
+                elif "Current level" in msg:
+                    match = re.search(r"Current level:\s*(\d+)", msg)
+                    if match:
+                        new_level = int(match.group(1))
+                        self.trantorian.player_state.level = new_level
+                        self.trantorian.logger.info(f"up level  {new_level}")
+                        cmd_id = self.trantorian.send_command.look()
+                        self.pending_commands[cmd_id] = "look"

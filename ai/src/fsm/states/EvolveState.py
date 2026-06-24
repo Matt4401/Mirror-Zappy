@@ -3,7 +3,6 @@ from ..Constant import ELEVATION_REQUIREMENTS
 
 
 class EvolveState(AState):
-
     def execute(self):
         self.trantorian.logger.info("===========Entering Evolve state===========")
         level = self.trantorian.player_state.level
@@ -19,7 +18,9 @@ class EvolveState(AState):
         if result:
             success, response = result
             if success and "Current level" in response:
-                self.trantorian.logger.warning("[Evolve]: Incantation successful, leveling up!")
+                self.trantorian.logger.warning(
+                    "[Evolve]: Incantation successful, leveling up!"
+                )
                 self.trantorian.player_state.upgrade_level()
                 self.trantorian.player_state.vision.current_level += 1
                 self.trantorian.refresh_inventory()
