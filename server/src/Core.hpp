@@ -62,6 +62,8 @@ class Core {
     void flushGuiResponses();
     void sendGuiInitialState(int clientId);
 
+    void sendGuiNewPlayerData(int clientId, std::size_t playerId);
+
     parser::ServerConfig _config;
     std::unique_ptr<shared::network::ISessionManager> _sessionManager;
     std::unique_ptr<game::World> _world;

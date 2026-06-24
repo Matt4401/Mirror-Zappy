@@ -175,6 +175,12 @@ void World::updatePositionOnMap(const std::size_t id, const Position& oldPositio
 
     erasePlayerFromTile(oldTileIndex, id);
     _tiles.at(newTileIndex).players.emplace_back(id);
+    addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Ppo{
+        .playerId = static_cast<int>(id),
+        .x = static_cast<int>(newPosition.x),
+        .y = static_cast<int>(newPosition.y),
+        .orientation = static_cast<int>(_playerList.at(id)->orientation()),
+    }));
 }
 
 void World::update() {
@@ -206,22 +212,12 @@ std::unordered_map<std::size_t, std::vector<std::string>> World::getAllResponses
 
 std::size_t World::removePlayer(const std::size_t id) {
     const auto& player = _playerList.at(id);
+
     player->kill();
     removePlayerFromTeam(id);
     erasePlayerFromTile(getTileIndex(player->position()), id);
+    addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pdi{.playerId = static_cast<int>(id)}));
     return player->id();
-}
-
-std::vector<std::size_t> World::collectAndKillDeadPlayers() const {
-    std::vector<std::size_t> deadIds;
-
-    for (const auto& val : _playerList | std::views::values) {
-        if (val->nbLifeTick() == 0) {
-            val->kill();
-            deadIds.emplace_back(val->id());
-        }
-    }
-    return deadIds;
 }
 
 std::size_t World::getAvailableSlotInTeam(std::string_view teamName) const {
@@ -255,7 +251,10 @@ void World::eject(const std::size_t id) {
     for (const auto idEgg : vecEggPush) {
         _vecEggs.erase(idEgg);
         eraseEggFromTile(position, idEgg);
+        addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Edi{.eggId = static_cast<int>(idEgg)}));
     }
+    addGuiEvent(shared::protocol::Emitter::build(
+        shared::protocol::server::Pex{.playerId = static_cast<int>(pushingPlayer->id())}));
     pushingPlayer->addResponse("ok\n");
 }
 
@@ -300,15 +299,49 @@ int World::getNextExecutionTick() const {
 
 void World::addItemOnGround(ItemType item, const Position pos, const std::size_t nbItem) {
     _tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(item)) += nbItem;
+    addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Bct{
+        .x = static_cast<int>(pos.x),
+        .y = static_cast<int>(pos.y),
+        .food = static_cast<int>(_tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(ItemType::Food))),
+        .linemate =
+            static_cast<int>(_tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(ItemType::Linemate))),
+        .deraumere =
+            static_cast<int>(_tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(ItemType::Deraumere))),
+        .sibur =
+            static_cast<int>(_tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(ItemType::Sibur))),
+        .mendiane =
+            static_cast<int>(_tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(ItemType::Mendiane))),
+        .phiras =
+            static_cast<int>(_tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(ItemType::Phiras))),
+        .thystame =
+            static_cast<int>(_tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(ItemType::Thystame))),
+    }));
 }
 
 bool World::removeItemOnGround(ItemType item, const Position pos, const std::size_t nbItem) {
     auto& resources = _tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(item));
-    if (resources >= nbItem) {
-        resources -= nbItem;
-        return true;
+    if (resources < nbItem) {
+        return false;
     }
-    return false;
+    resources -= nbItem;
+    addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Bct{
+        .x = static_cast<int>(pos.x),
+        .y = static_cast<int>(pos.y),
+        .food = static_cast<int>(_tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(ItemType::Food))),
+        .linemate =
+            static_cast<int>(_tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(ItemType::Linemate))),
+        .deraumere =
+            static_cast<int>(_tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(ItemType::Deraumere))),
+        .sibur =
+            static_cast<int>(_tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(ItemType::Sibur))),
+        .mendiane =
+            static_cast<int>(_tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(ItemType::Mendiane))),
+        .phiras =
+            static_cast<int>(_tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(ItemType::Phiras))),
+        .thystame =
+            static_cast<int>(_tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(ItemType::Thystame))),
+    }));
+    return true;
 }
 
 std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> World::resourcesAt(const Position position) const {
