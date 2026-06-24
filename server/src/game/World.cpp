@@ -247,14 +247,14 @@ void World::eject(const std::size_t id) {
         const auto [newX, newY] = pushedPlayer->position();
         updatePositionOnMap(pushedPlayer->id(), {.x = oldX, .y = oldY}, {.x = newX, .y = newY});
         pushedPlayer->addResponse("eject: " + cardinalPointToStr().at(orientation) + "\n");
-        addGuiEvent(shared::protocol::Emitter::build(
-            shared::protocol::server::Pex{.playerId = static_cast<int>(pushedPlayer->id())}));
     }
     for (const auto idEgg : vecEggPush) {
         _vecEggs.erase(idEgg);
         eraseEggFromTile(position, idEgg);
         addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Edi{.eggId = static_cast<int>(idEgg)}));
     }
+    addGuiEvent(shared::protocol::Emitter::build(
+        shared::protocol::server::Pex{.playerId = static_cast<int>(pushingPlayer->id())}));
     pushingPlayer->addResponse("ok\n");
 }
 
