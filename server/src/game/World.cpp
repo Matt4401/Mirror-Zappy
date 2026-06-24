@@ -309,6 +309,23 @@ int World::getNextExecutionTick() const {
 
 void World::addItemOnGround(ItemType item, const Position pos, const std::size_t nbItem) {
     _tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(item)) += nbItem;
+    addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Bct{
+        .x = static_cast<int>(pos.x),
+        .y = static_cast<int>(pos.y),
+        .food = static_cast<int>(_tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(ItemType::Food))),
+        .linemate =
+            static_cast<int>(_tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(ItemType::Linemate))),
+        .deraumere =
+            static_cast<int>(_tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(ItemType::Deraumere))),
+        .sibur =
+            static_cast<int>(_tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(ItemType::Sibur))),
+        .mendiane =
+            static_cast<int>(_tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(ItemType::Mendiane))),
+        .phiras =
+            static_cast<int>(_tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(ItemType::Phiras))),
+        .thystame =
+            static_cast<int>(_tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(ItemType::Thystame))),
+    }));
 }
 
 bool World::removeItemOnGround(ItemType item, const Position pos, const std::size_t nbItem) {
