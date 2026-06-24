@@ -60,9 +60,11 @@ class Connection:
         self.event_lock = threading.Lock()
         self.next_command_id = 0
         self.reader_thread = None
+        self.on_event_received = None
         self.event_thread = None
         self.connect(host, port)
         self.do_handshake()
+        self.start()
 
     def connect(self, host, port):
         try:
@@ -327,3 +329,16 @@ class Connection:
             self.disconnect()
         except socket.error as e:
             print(f"Error while disconnecting '{e}'")
+
+    def get_command_response(self, cmd_id, timeout=5.0):
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            with self.response_lock:
+                if cmd_id in self.response_buffer:
+                    cmd_response = self.response_buffer.pop(cmd_id)
+                    with self.command_lock:
+                        if cmd_id in self.active_requests:
+                            del self.active_requests[cmd_id]
+                    return cmd_response.command
+            time.sleep(0.005)
+        return None

@@ -1,3 +1,4 @@
+import time
 from .Constant import SURVIVAL_THRESHOLD
 
 # from .states.AttackState import AttackState
@@ -22,29 +23,32 @@ class FiniteStateMachine:
             self.send_auto_cmds(meta_cmds)
             self.update_state()
             self.execute_state()
+            time.sleep(0.01)
 
     def send_auto_cmds(self, meta_cmds: list[str]):
         for cmd in meta_cmds:
             if cmd == "Inventory":
-                resp = self.trantorian.connexion.send_command("Inventory")
-                self.trantorian.inventory.update(resp)
+                resp = self.trantorian.send_command.inventory
 
             elif cmd == "Look":
-                resp = self.trantorian.connexion.send_command("Look")
-                self.trantorian.vision.update(resp)
+                resp = self.trantorian.send_command.look
+                self.trantorian.vision.update_tiles(resp)
 
             elif cmd is None:
                 return
                 # lancer un broad cast
 
     def update_state(self):
-        food = self.trantorian.inventory.get_food()
+        self.trantorian.refresh_inventory()
+        food = self.trantorian.player_state.inventory.get_food()
 
         if food < SURVIVAL_THRESHOLD:
             self.transition_to(SurviveState)
             return
 
-        if self.trantorian.has_enough_resources_for(self.trantorian.player_state.level + 1):
+        if self.trantorian.has_enough_resources_for(
+            self.trantorian.player_state.level + 1
+        ):
             self.transition_to(EvolveState)
 
         else:
