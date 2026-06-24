@@ -27,9 +27,9 @@ struct Position {
     std::size_t y;
 };
 
-using CoordinateMove = std::pair<int, int>;
-
 enum class ItemType : uint8_t { Food, Linemate, Deraumere, Sibur, Mendiane, Phiras, Thystame, COUNT };
+
+using CoordinateMove = std::pair<int, int>;
 
 constexpr std::array<std::string, static_cast<std::size_t>(ItemType::COUNT)> kInventoryOrder = {
     "food", "linemate", "deraumere", "sibur", "mendiane", "phiras", "thystame"};
@@ -45,6 +45,7 @@ constexpr std::array<CoordinateMove, 4> leftTile = {{{1, 0}, {0, -1}, {-1, 0}, {
 static constexpr std::size_t kNbLifeTickFood = 126;
 static constexpr std::size_t kNbStartFood = 10;
 static constexpr std::uint8_t kMaxNbCmd = 10;
+static constexpr int kNbLevel = 7;
 
 static std::unordered_map<std::string, ItemType> mapItemString() {
     static const std::unordered_map<std::string, ItemType> kMapItemString = {
@@ -96,6 +97,10 @@ class Player {
 
     [[nodiscard]] bool hasCommands() const;
     void tryStartNextCommand(World& world, bool isMidTick = false);
+    [[nodiscard]] int level() const;
+    void levelUp();
+    [[nodiscard]] bool checkIncantationRequirements(
+        const std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)>& resources, std::size_t nbPlayer) const;
 
   private:
     std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> _inventory{};
@@ -109,7 +114,7 @@ class Player {
     bool _isDead{false};
     std::size_t _id;
     bool _isNewCommand{false};
-    std::uint8_t _level{1};
+    int _level{1};
 
     Position getNthDiagonalLeftPosition(std::size_t n, Position mapLimit);
     Position getLeftTile(Position ogPos, const Position& mapLimit);

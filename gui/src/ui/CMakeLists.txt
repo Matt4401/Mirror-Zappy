@@ -9,11 +9,14 @@ add_library(zappy_gui_ui
         components/UIImage.cpp
         components/UISlider.cpp
         components/UITextbox.cpp
+        components/EventLogRow.cpp
         menus/PauseMenu.cpp
         menus/PlayerInspectorUI.cpp
         menus/AInspectorUI.cpp
         menus/TileInspectorUI.cpp
         menus/WorldControlUI.cpp
+        menus/EventLogUI.cpp
+        menus/GlobalStatsUI.cpp
         hud/GameHUD.cpp
 )
 target_sources(zappy_gui_ui PUBLIC
@@ -31,11 +34,14 @@ target_sources(zappy_gui_ui PUBLIC
         components/UIImage.hpp
         components/UISlider.hpp
         components/UITextbox.hpp
+        components/EventLogRow.hpp
         menus/PauseMenu.hpp
         menus/PlayerInspectorUI.hpp
         menus/AInspectorUI.hpp
         menus/TileInspectorUI.hpp
         menus/WorldControlUI.hpp
+        menus/EventLogUI.hpp
+        menus/GlobalStatsUI.hpp
         hud/GameHUD.hpp
 )
 target_include_directories(zappy_gui_ui PUBLIC

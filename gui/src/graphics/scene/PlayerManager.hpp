@@ -8,6 +8,7 @@
 #pragma once
 
 #include <array>
+#include <cstddef>
 #include <functional>
 #include <optional>
 #include <string>
@@ -19,18 +20,19 @@
 #include "gui/src/game/Player.hpp"
 #include "gui/src/game/Team.hpp"
 #include "protocol/Commands.hpp"
+#include "rmath/Vector3.hpp"
 
 namespace zappy::gui::graphics::scene {
 struct Incantation {
     int x{0};
     int y{0};
     int level{0};
-    std::vector<int> playerIds;
+    std::vector<std::size_t> playerIds;
 };
 
 class PlayerManager {
   public:
-    static constexpr auto DefaultPlayerOffsetY = 1.4F;
+    static constexpr auto DefaultPlayerOffsetY = 1.0F;
     static constexpr std::array<raylib::Color, 8> TeamColors = {
         raylib::Color::Red(),    raylib::Color::Blue(),   raylib::Color::Green(),   raylib::Color::Yellow(),
         raylib::Color::Purple(), raylib::Color::Orange(), raylib::Color::SkyBlue(), raylib::Color::Pink(),
@@ -61,11 +63,18 @@ class PlayerManager {
     void handleEggLaid(const shared::protocol::server::Enw& command);
     void handleEggRemoved(const shared::protocol::server::Ebo& command);
     void handleEggRemoved(const shared::protocol::server::Edi& command);
-    void handleExpulsionAnimation(const shared::protocol::server::Pex& command) {}  // TODO
-    void handleBroadcastAnimation(const shared::protocol::server::Pbc& command) {}  // TODO
-    void handleEggDropAnimation(const shared::protocol::server::Pfk& command) {}    // TODO
+    void handleExpulsionAnimation(const shared::protocol::server::Pex& /*command*/) {}  // TODO
+    void handleBroadcastAnimation(const shared::protocol::server::Pbc& /*command*/) {}  // TODO
+    void handleEggDropAnimation(const shared::protocol::server::Pfk& /*command*/) {}    // TODO
+
+    void movePlayers(int serverFrequency, float deltaTime);
 
   private:
+    struct InitialEgg {
+        int id{0};
+        raylib::rmath::Vector3 position;
+    };
+
     [[nodiscard]] std::optional<std::reference_wrapper<game::Player>> playerById(int id);
     [[nodiscard]] std::optional<std::reference_wrapper<game::Team>> teamForPlayer(int playerId);
     [[nodiscard]] game::Team& ensureTeamExist(const std::string& name);
@@ -73,10 +82,14 @@ class PlayerManager {
     [[nodiscard]] static game::Player::cardinalPoint orientationFromProtocol(int orientation);
 
     void updatePlayerPosition(game::Player& player, Tile3DPosition tilePosition) const;
+    void redistributeInitialEggs();
     void removeEgg(int eggId);
+    [[nodiscard]] bool wrapPositionIfNeeded(const game::Player& player, Tile3DPosition tilePosition,
+                                            raylib::rmath::Vector3& exitPosition) const;
 
     TileManager& _tileManager;
     std::vector<game::Team> _teams;
     std::vector<Incantation> _activeIncantations;
+    std::vector<InitialEgg> _initialEggs;
 };
 }  // namespace zappy::gui::graphics::scene

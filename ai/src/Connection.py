@@ -54,6 +54,7 @@ class Connection:
         self.event_queue = deque()
         self.command_responses = deque()
         self.response_buffer: Dict[int, CommandResponse] = {}
+        self.response_events: Dict[int, threading.Event] = {}
         self.socket_lock = threading.Lock()
         self.command_lock = threading.Lock()
         self.response_lock = threading.Lock()
@@ -152,6 +153,8 @@ class Connection:
                         if not line:
                             continue
                         msg_type, msg_data = self.parse_server_message(line)
+                        if msg_type == "dead":
+                            self.running = False
                         if msg_type == "broadcast":
                             with self.broadcast_lock:
                                 self.broadcast_queue.append(
@@ -198,7 +201,6 @@ class Connection:
 
     def send_command(self, cmd):
         if not self.running:
-            print("Cannot send: connection is not active")
             return 84
         with self.command_lock:
             self.next_command_id += 1
@@ -254,8 +256,8 @@ class Connection:
     def send_cmd_buffer(self):
         with self.command_lock:
             while (
-                    len(self.active_requests) < self.MAX_PENDING_COMMANDS
-                    and len(self.command_queue) > 0
+                len(self.active_requests) < self.MAX_PENDING_COMMANDS
+                and len(self.command_queue) > 0
             ):
                 cmd_request = self.command_queue.popleft()
                 if self.send_raw_command(cmd_request.command):
@@ -344,9 +346,6 @@ class Connection:
             with self.response_lock:
                 if cmd_id in self.response_buffer:
                     cmd_response = self.response_buffer.pop(cmd_id)
-                    with self.command_lock:
-                        if cmd_id in self.active_requests:
-                            del self.active_requests[cmd_id]
                     return cmd_response.success, cmd_response.command
             time.sleep(0.005)
         return None

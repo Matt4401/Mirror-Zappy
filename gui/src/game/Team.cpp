@@ -15,6 +15,7 @@
 #include <string>
 #include <vector>
 
+#include "Color.hpp"
 #include "Egg.hpp"
 #include "GameModel.hpp"
 #include "Player.hpp"
@@ -29,10 +30,11 @@ void Team::draw(const GameModel& gameModel) const {
         if (!player.textureId().empty()) {
             tex = graphics::AssetManager::getInstance().getTexture(player.textureId());
         }
-        gameModel.drawPlayer(player.position(), tex);
+        gameModel.drawPlayer(player.position(), player.orientation(), tex, player.level());
     }
     for (const auto& egg : _eggs) {
-        gameModel.drawEgg(egg.position());
+        const auto tint = raylib::Color::lerp(raylib::Color::White(), _teamColor, GameModel::EGG_TINT_STRENGTH);
+        gameModel.drawEgg(egg.position(), tint);
     }
 }
 
@@ -82,5 +84,13 @@ void Team::addEgg(int id, int playerId, const raylib::rmath::Vector3& position) 
 
 void Team::removeEgg(int id) {
     std::erase_if(_eggs, [id](const Egg& egg) { return egg.id() == id; });
+}
+
+void Team::movePlayers(const int serverFrequency, const float deltaTime) {
+    for (auto& player : _players) {
+        if (player.moving()) {
+            player.move(serverFrequency, deltaTime);
+        }
+    }
 }
 }  // namespace zappy::gui::game

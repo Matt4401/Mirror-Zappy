@@ -7,6 +7,7 @@
 
 #include "TileInspectorUI.hpp"
 
+#include <algorithm>
 #include <cstddef>
 #include <functional>
 #include <memory>
@@ -28,42 +29,6 @@
 #include "rtext/Font.hpp"
 
 namespace zappy::gui::ui::menus {
-
-namespace {
-constexpr float HeaderFontSize = 20.0F;
-constexpr float InfoFontSize = 16.0F;
-constexpr float BaseYOffset = 60.0F;
-constexpr float ElementSpacingSmall = 30.0F;
-constexpr float ElementSpacingMedium = 40.0F;
-constexpr float ElementSpacingLarge = 60.0F;
-
-constexpr float FoodBoxWidth = 100.0F;
-constexpr float FoodBoxHeight = 40.0F;
-constexpr float FoodIconOffset = 10.0F;
-constexpr float FoodIconSize = 30.0F;
-constexpr float FoodTextOffset = 50.0F;
-
-constexpr float GridCellSize = 70.0F;
-constexpr float GridCellSpacing = 80.0F;
-constexpr float GridTotalWidth = 230.0F;
-constexpr float GridIconOffsetX = 10.0F;
-constexpr float GridIconOffsetY = 50.0F;
-
-constexpr float FoodIconDrawOffset = 5.0F;
-constexpr float BoxMarginAdjustment = 10.0F;
-constexpr float DoubleSpacingMultiplier = 2.0F;
-
-constexpr size_t InventoryStartIndex = 1;
-constexpr size_t InventoryEndIndex = 6;
-constexpr int GridColumns = 3;
-constexpr size_t TotalInventoryItems = 7;
-constexpr size_t ExpectedEventTokens = 5;
-
-constexpr float CenterDivisor = 2.0F;
-
-constexpr raylib::Color BoxBgColor(200, 200, 200, 255);
-}  // namespace
-
 TileInspectorUI::TileInspectorUI(float x, float y, float width, events::EventDispatcher& dispatcher,
                                  const std::shared_ptr<raylib::rtext::Font>& font,
                                  std::function<void(const std::string&)> onSendCommand)
@@ -73,8 +38,8 @@ TileInspectorUI::TileInspectorUI(float x, float y, float width, events::EventDis
 
     getEventTokens().push_back(
         getDispatcher().subscribe<events::TileClicked>([this](const events::TileClicked& e) { onTileClicked(e); }));
-    getEventTokens().push_back(getDispatcher().subscribe<events::PlayerClicked>(
-        [this](const events::PlayerClicked& /*e*/) { setVisible(false); }));
+    getEventTokens().push_back(
+        getDispatcher().subscribe<events::PlayerClicked>([](const events::PlayerClicked& /*e*/) {}));
     getEventTokens().push_back(getDispatcher().subscribe<shared::protocol::server::Bct>(
         [this](const shared::protocol::server::Bct& cmd) { onBctReceived(cmd); }));
     getEventTokens().push_back(getDispatcher().subscribe<shared::protocol::server::Pic>(
@@ -106,7 +71,7 @@ void TileInspectorUI::buildScannerPanel() {
     _scannerInfo->setFontSize(static_cast<int>(InfoFontSize));
     _scannerInfo->setColor(raylib::Color::DarkGray());
 
-    _foodIcon = std::make_shared<components::UIImage>("assets/images/ui/food.png");
+    _foodIcon = std::make_shared<components::UIImage>("assets/images/ui/Food.png");
     _foodIcon->setSize(FoodIconSize, FoodIconSize);
 }
 
@@ -145,7 +110,7 @@ void TileInspectorUI::onPicReceived(const shared::protocol::server::Pic& cmd) {
 
 void TileInspectorUI::onPieReceived(const shared::protocol::server::Pie& cmd) {
     if (cmd.x == _targetGridPosition.x && cmd.y == _targetGridPosition.y) {
-        _scannerInfo->setText("No ritual active\nResult: " + std::to_string(cmd.incantationResult));
+        _scannerInfo->setText("No ritual active\nResult: " + std::to_string(static_cast<int>(cmd.incantationResult)));
     }
 }
 
@@ -199,12 +164,12 @@ void TileInspectorUI::drawTileInventoryPanel(float& currentY, float startX, floa
         raylib::rshapes::Shapes::drawRectangleRec(
             {.x = cellX, .y = cellY, .width = GridCellSize, .height = GridCellSize}, BoxBgColor);
 
-        invText->setPosition(cellX + GridIconOffsetX, cellY + GridIconOffsetY);
-        invText->draw();
+        invText->setPosition(cellX + GridTextOffsetX, cellY + GridTextOffsetY);
 
         auto img = getInventoryImages().at(i);
         img->setPosition(cellX + GridIconOffsetX, cellY + GridIconOffsetY);
         img->draw();
+        invText->draw();
     }
     currentY += GridCellSpacing * DoubleSpacingMultiplier;
 }
@@ -220,12 +185,18 @@ void TileInspectorUI::draw() {
     float const startX = this->getPosition().x();
 
     float const headerH = components::UIGamePanel::getHeaderHeight();
+    float const padding = components::UIGamePanel::getPadding();
     float const currentH = this->getCurrentHeight();
-    raylib::rcore::Window::beginScissorMode(static_cast<int>(startX),
-                                            static_cast<int>(this->getPosition().y() + headerH),
-                                            static_cast<int>(panelW), static_cast<int>(currentH - headerH));
 
-    float currentY = this->getPosition().y() + BaseYOffset;
+    float const innerX = startX + padding;
+    float const innerY = this->getPosition().y() + headerH;
+    float const innerW = panelW - (2.0F * padding);
+    float const innerH = currentH - headerH - padding;
+
+    raylib::rcore::Window::beginScissorMode(static_cast<int>(innerX), static_cast<int>(innerY),
+                                            static_cast<int>(innerW), static_cast<int>(innerH));
+
+    float currentY = this->getPosition().y() + BaseYOffset - getScrollOffset();
 
     if (_posText) {
         float const posTextW = _posText->getWidth();
@@ -245,6 +216,11 @@ void TileInspectorUI::draw() {
     currentY += ElementSpacingLarge;
 
     drawTileInventoryPanel(currentY, startX, panelW);
+
+    float const contentBottomWithoutScroll = currentY + getScrollOffset();
+    float const innerBottom = this->getPosition().y() + currentH - padding;
+    float const calculatedMaxScroll = std::max(0.0F, contentBottomWithoutScroll - innerBottom + 20.0F);
+    setMaxScroll(calculatedMaxScroll);
 
     raylib::rcore::Window::endScissorMode();
 }

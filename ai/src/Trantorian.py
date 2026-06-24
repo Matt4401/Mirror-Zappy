@@ -2,6 +2,7 @@ from src.Connection import Connection
 from src.PlayerState import PlayerState
 from src.SendCommand import SendCommand
 from src.ParseCommand import ParseCommand
+
 # from .util.BroadcastMessage import BroadcastMessage
 # from .util.BroadcastManager import BroadcastManager
 from .fsm.Constant import ELEVATION_REQUIREMENTS
@@ -39,7 +40,9 @@ class Trantorian:
         cmd_id = cmd_fn()
         result = self.wait_for_response(cmd_id)
         if result and result[0]:
-            new_direction = ((self.player_state.get_direction() - 1 + direction_delta) % 8) + 1
+            new_direction = (
+                (self.player_state.get_direction() - 1 + direction_delta) % 8
+            ) + 1
             self.player_state.update_direction(new_direction)
             self.invalidate_vision()
         return result
@@ -63,7 +66,9 @@ class Trantorian:
         if result:
             success, response_str = result
             if success:
-                self.player_state.vision.update_tiles(self.parser.parse_look(response_str))
+                self.player_state.vision.update_tiles(
+                    self.parser.parse_look(response_str)
+                )
         return result
 
     def inventory(self):

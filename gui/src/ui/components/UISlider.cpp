@@ -112,8 +112,8 @@ void UISlider::handleEvent() {
 
     if (_isDragging && raylib::rcore::Event::isMouseButtonReleased(MouseLeftButton)) {
         _isDragging = false;
-        if (_onValueChanged) {
-            _onValueChanged(_value);
+        if (_onValueConfirmed) {
+            _onValueConfirmed(_value);
         }
     }
 }
@@ -134,6 +134,8 @@ bool UISlider::isVisible() const { return _isVisible; }
 void UISlider::setVisible(bool visible) { _isVisible = visible; }
 
 void UISlider::setOnValueChanged(std::function<void(float)> callback) { _onValueChanged = std::move(callback); }
+
+void UISlider::setOnValueConfirmed(std::function<void(float)> callback) { _onValueConfirmed = std::move(callback); }
 
 void UISlider::setValue(float value) {
     if (_isDragging) {

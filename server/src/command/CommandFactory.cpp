@@ -16,9 +16,11 @@
 
 #include "Eject.hpp"
 #include "Inventory.hpp"
+#include "Look.hpp"
 #include "Set.hpp"
 #include "Take.hpp"
 #include "command/Broadcast.hpp"
+#include "command/ConnectNbr.hpp"
 #include "command/Fork.hpp"
 #include "command/Forward.hpp"
 #include "command/ICommand.hpp"
@@ -28,6 +30,7 @@
 #include "guiCommand/IGuiCommand.hpp"
 #include "guiCommand/Mct.hpp"
 #include "guiCommand/Msz.hpp"
+#include "guiCommand/Pin.hpp"
 #include "guiCommand/Sbp.hpp"
 #include "guiCommand/Sgt.hpp"
 #include "guiCommand/Sst.hpp"
@@ -73,6 +76,8 @@ void CommandFactory::registerCommands() {
         return nullptr;
     });
     _creators.emplace("Fork", [](std::string_view) { return std::make_unique<Fork>(); });
+    _creators.emplace("Connect_nbr", [](std::string_view) { return std::make_unique<ConnectNbr>(); });
+    _creators.emplace("Look", [](std::string_view) { return std::make_unique<Look>(); });
 }
 
 void CommandFactory::registerGuiCommands() {
@@ -93,6 +98,9 @@ void CommandFactory::registerGuiCommands() {
     });
     _guiCreators.emplace("sst", [](std::string_view rawCommand) {
         return parseAndCreateGuiCommand<shared::protocol::client::Sst, guiCommand::Sst>(rawCommand);
+    });
+    _guiCreators.emplace("pin", [](std::string_view rawCommand) -> std::unique_ptr<guiCommand::IGuiCommand> {
+        return parseAndCreateGuiCommand<shared::protocol::client::Pin, guiCommand::Pin>(rawCommand);
     });
 }
 

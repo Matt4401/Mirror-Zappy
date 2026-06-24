@@ -10,7 +10,6 @@
 #include <raylib.h>
 
 #include <memory>
-#include <string>
 
 #include "AssetManager.hpp"
 #include "events/EventDispatcher.hpp"
@@ -107,6 +106,7 @@ void Render::handleInput() {
 void Render::update() {
     _event.update();
     handleInput();
+    _worldManager.movePlayers(raylib::rcore::Window::frameTime());
 
     _uiManager.update();
     _uiManager.handleEvent();

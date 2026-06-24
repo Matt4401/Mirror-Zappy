@@ -11,9 +11,12 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <string_view>
+#include <utility>
 
 #include "Color.hpp"
 #include "graphics/AssetManager.hpp"
+#include "rtextures/Texture2D.hpp"
 
 namespace zappy::gui::ui::components {
 
@@ -28,6 +31,13 @@ UIImage::UIImage(const std::string& path) : _path(path) {
         }
     } catch (const std::exception& e) {
         std::cerr << "[UIImage] Error loading texture: " << e.what() << std::endl;
+    }
+}
+
+UIImage::UIImage(std::shared_ptr<raylib::rtextures::Texture2D> texture, const std::string_view assetId)
+    : _texture(std::move(texture)), _path(assetId) {
+    if (_texture && _texture->valid()) {
+        _size = {static_cast<float>(_texture->width()), static_cast<float>(_texture->height())};
     }
 }
 
