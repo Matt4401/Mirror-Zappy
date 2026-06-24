@@ -10,7 +10,9 @@
 #include <cstdint>
 
 #include "Core.hpp"
+#include "IGuiCommand.hpp"
 #include "game/Player.hpp"
+#include "protocol/Commands.hpp"
 #include "protocol/Emitter.hpp"
 
 namespace zappy::server::guiCommand {
@@ -18,7 +20,7 @@ namespace zappy::server::guiCommand {
 Pin::Pin(const int id) : _id(id) {}
 
 GuiResponse Pin::execute(Core& core) {
-    GuiResponse response;
+    const GuiResponse response;
     const auto& player = core.world().playerList().at(_id);
     const auto [x, y] = player->position();
     const auto inventory = player->inventory();
