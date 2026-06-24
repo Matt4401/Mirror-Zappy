@@ -48,7 +48,6 @@ constexpr float FoodMax = 126.0F;
 
 constexpr float PrimaryIconSize = 28.0F;
 constexpr float PosIconSize = 20.0F;
-constexpr float InfoFontSize = 16.0F;
 
 constexpr float BaseYOffset = 60.0F;
 constexpr float NameBoxHeight = 30.0F;
