@@ -9,6 +9,7 @@
 #include <functional>
 #include <memory>
 
+#include "Player.hpp"
 #include "rcore/Camera.hpp"
 #include "rmath/Vector3.hpp"
 #include "rmodels/Model.hpp"
@@ -17,7 +18,7 @@
 namespace zappy::gui::game {
 class GameModel {
   public:
-    static constexpr auto PLAYER_SCALE = 0.1F;
+    static constexpr raylib::rmath::Vector3 PLAYER_SCALE = {0.1F, 0.1F, 0.1F};
     static constexpr auto PLAYER_MODEL_RESOURCE = "assets/jeffrey/scene.gltf";
     static constexpr auto EGG_MODEL_RESOURCE = "assets/minecraft_dragon_egg/scene.gltf";
     static constexpr auto EGG_SCALE = 0.6F;
@@ -29,12 +30,13 @@ class GameModel {
     GameModel(GameModel&& other) noexcept = default;
     GameModel& operator=(GameModel&& other) noexcept = default;
 
-    void drawPlayer(raylib::rmath::Vector3 position,
+    void drawPlayer(raylib::rmath::Vector3 position, Player::cardinalPoint orientation,
                     const std::shared_ptr<raylib::rtextures::Texture2D>& texture = nullptr) const;
     void drawEgg(raylib::rmath::Vector3 position) const;
 
   protected:
   private:
+    static float getRotationAngle(Player::cardinalPoint orientation);
     std::reference_wrapper<raylib::rcore::Camera> _camera;
     mutable raylib::rmodels::Model _playerModel{PLAYER_MODEL_RESOURCE};
     std::shared_ptr<raylib::rtextures::Texture2D> _defaultPlayerTexture;

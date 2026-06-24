@@ -29,7 +29,7 @@ void Team::draw(const GameModel& gameModel) const {
         if (!player.textureId().empty()) {
             tex = graphics::AssetManager::getInstance().getTexture(player.textureId());
         }
-        gameModel.drawPlayer(player.position(), tex);
+        gameModel.drawPlayer(player.position(), player.orientation(), tex);
     }
     for (const auto& egg : _eggs) {
         gameModel.drawEgg(egg.position());
@@ -82,5 +82,13 @@ void Team::addEgg(int id, int playerId, const raylib::rmath::Vector3& position) 
 
 void Team::removeEgg(int id) {
     std::erase_if(_eggs, [id](const Egg& egg) { return egg.id() == id; });
+}
+
+void Team::movePlayers(const int serverFrequency) {
+    for (auto& player : _players) {
+        if (player.moving()) {
+            player.move(serverFrequency);
+        }
+    }
 }
 }  // namespace zappy::gui::game

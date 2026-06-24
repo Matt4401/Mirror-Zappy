@@ -200,9 +200,35 @@ std::optional<std::reference_wrapper<game::Team>> PlayerManager::teamForPlayer(c
 }
 
 void PlayerManager::updatePlayerPosition(game::Player& player, const Tile3DPosition tilePosition) const {
-    auto position = _tileManager.tilePosition(tilePosition);
-    position.setY(Tile3D::TILE_SIZE * DefaultPlayerOffsetY);
-    player.setPosition(position);
+    auto destination = _tileManager.tilePosition(tilePosition);
+    destination.setY(Tile3D::TILE_SIZE * DefaultPlayerOffsetY);
+
+    const auto currentTile = player.tilePosition();
+    auto exitPosition = player.position();
+    bool wraps = false;
+    if (_tileManager.width() > 1 && currentTile.y == tilePosition.y && currentTile.x == 0 &&
+        tilePosition.x == _tileManager.width() - 1) {
+        exitPosition.setX(exitPosition.x() - Tile3D::TILE_SIZE);
+        wraps = true;
+    } else if (_tileManager.width() > 1 && currentTile.y == tilePosition.y &&
+               currentTile.x == _tileManager.width() - 1 && tilePosition.x == 0) {
+        exitPosition.setX(exitPosition.x() + Tile3D::TILE_SIZE);
+        wraps = true;
+    } else if (_tileManager.height() > 1 && currentTile.x == tilePosition.x && currentTile.y == 0 &&
+               tilePosition.y == _tileManager.height() - 1) {
+        exitPosition.setZ(exitPosition.z() - Tile3D::TILE_SIZE);
+        wraps = true;
+    } else if (_tileManager.height() > 1 && currentTile.x == tilePosition.x &&
+               currentTile.y == _tileManager.height() - 1 && tilePosition.y == 0) {
+        exitPosition.setZ(exitPosition.z() + Tile3D::TILE_SIZE);
+        wraps = true;
+    }
+
+    if (wraps) {
+        player.setWrappedFuturePosition(exitPosition, destination);
+    } else {
+        player.setFuturePosition(destination);
+    }
     player.setTilePosition(tilePosition);
 }
 
@@ -224,6 +250,12 @@ game::Player::cardinalPoint PlayerManager::orientationFromProtocol(const int ori
 void PlayerManager::removeEgg(const int eggId) {
     for (auto& team : _teams) {
         team.removeEgg(eggId);
+    }
+}
+
+void PlayerManager::movePlayers(const int serverFrequency) {
+    for (auto& team : _teams) {
+        team.movePlayers(serverFrequency);
     }
 }
 }  // namespace zappy::gui::graphics::scene

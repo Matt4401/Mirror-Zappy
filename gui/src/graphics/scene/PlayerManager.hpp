@@ -66,6 +66,8 @@ class PlayerManager {
     void handleBroadcastAnimation(const shared::protocol::server::Pbc& command) {}  // TODO
     void handleEggDropAnimation(const shared::protocol::server::Pfk& command) {}    // TODO
 
+    void movePlayers(int serverFrequency);
+
   private:
     [[nodiscard]] std::optional<std::reference_wrapper<game::Player>> playerById(int id);
     [[nodiscard]] std::optional<std::reference_wrapper<game::Team>> teamForPlayer(int playerId);

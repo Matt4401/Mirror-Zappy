@@ -132,6 +132,38 @@ TEST_F(WorldManagerTest, PpoUpdatesPlayerPositionAndOrientation) {
     EXPECT_EQ(player.orientation(), game::Player::cardinalPoint::WEST);
 }
 
+TEST_F(WorldManagerTest, PlayerMovesTowardsItsTargetAndStopsOnIt) {
+    createPlayer();
+    const auto start = requirePlayer(42).position();
+
+    dispatcher.dispatch(shared::protocol::server::Ppo{.playerId = 42, .x = 3, .y = 2, .orientation = 4});
+
+    const auto target = requirePlayer(42).futurePosition();
+    EXPECT_TRUE(requirePlayer(42).moving());
+
+    world.movePlayers();
+    EXPECT_GT(requirePlayer(42).position().distance(start), 0.0F);
+    EXPECT_GT(requirePlayer(42).position().distance(target), 0.0F);
+
+    world.movePlayers();
+    EXPECT_EQ(requirePlayer(42).position(), target);
+    EXPECT_FALSE(requirePlayer(42).moving());
+}
+
+TEST_F(WorldManagerTest, PlayerLeavesTheMapBeforeWrappingToTheOppositeEdge) {
+    createPlayer(42, 0, 1);
+    const auto start = requirePlayer(42).position();
+
+    dispatcher.dispatch(shared::protocol::server::Ppo{.playerId = 42, .x = 3, .y = 1, .orientation = 4});
+
+    const auto wrappedPosition = requireTile(3, 1).position();
+    world.movePlayers();
+    EXPECT_GT(requirePlayer(42).position().x(), start.x());
+    EXPECT_FLOAT_EQ(requirePlayer(42).position().x(), wrappedPosition.x());
+    EXPECT_FLOAT_EQ(requirePlayer(42).position().z(), wrappedPosition.z());
+    EXPECT_FALSE(requirePlayer(42).moving());
+}
+
 TEST_F(WorldManagerTest, PlayerNameCanBeUpdatedByGuiEvent) {
     createPlayer();
 

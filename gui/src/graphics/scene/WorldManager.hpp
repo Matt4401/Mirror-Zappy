@@ -48,6 +48,8 @@ class WorldManager {
     }
     void updatePlayerName(int id, const std::string& name) { _playerManager.updatePlayerName(id, name); }
 
+    void movePlayers() { _playerManager.movePlayers(_timeUnit); }
+
   private:
     void handleTimeUnit(const shared::protocol::server::Sgt& command);
     void handleTimeUnit(const shared::protocol::server::Sst& command);

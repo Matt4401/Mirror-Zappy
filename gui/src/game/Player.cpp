@@ -27,7 +27,32 @@ raylib::rcore::BoundingBox Player::boundingBox() const {
 }
 
 Player::Player(int id, raylib::rmath::Vector3 position, std::string name, cardinalPoint orientation, std::size_t level)
-    : _id(id), _position(position), _name(std::move(name)), _orientation(orientation), _level(level) {}
+    : _id(id),
+      _position(position),
+      _futurePosition(position),
+      _name(std::move(name)),
+      _orientation(orientation),
+      _level(level) {}
 
 void Player::setTilePosition(const graphics::scene::Tile3DPosition tilePosition) { _tilePosition = tilePosition; }
+
+void Player::move(const int serverFrequency) {
+    if (!_isMoving || serverFrequency <= 0) {
+        return;
+    }
+
+    const float deltaTime = static_cast<float>(serverFrequency) / DELTA_SERVER_FREQUENCY;
+    const float movement = PLAYER_SPEED * deltaTime;
+    if (_position.distance(_futurePosition) <= movement) {
+        _position = _futurePosition;
+        if (_wrappedPosition.has_value()) {
+            _position = _wrappedPosition.value();
+            _futurePosition = _position;
+            _wrappedPosition.reset();
+        }
+        _isMoving = false;
+        return;
+    }
+    _position = _position.movedTowards(_futurePosition, movement);
+}
 }  // namespace zappy::gui::game

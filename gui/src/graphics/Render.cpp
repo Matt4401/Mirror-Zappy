@@ -107,6 +107,7 @@ void Render::handleInput() {
 void Render::update() {
     _event.update();
     handleInput();
+    _worldManager.movePlayers();
 
     _uiManager.update();
     _uiManager.handleEvent();
