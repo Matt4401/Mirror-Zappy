@@ -25,7 +25,7 @@ struct Incantation {
     int x{0};
     int y{0};
     int level{0};
-    std::vector<int> playerIds;
+    std::vector<std::size_t> playerIds;
 };
 
 class PlayerManager {
