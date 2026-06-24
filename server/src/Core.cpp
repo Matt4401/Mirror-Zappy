@@ -8,6 +8,7 @@
 #include "Core.hpp"
 
 #include <chrono>
+#include <cstddef>
 #include <exception>
 #include <format>
 #include <iostream>
@@ -23,6 +24,7 @@
 #include "SessionManager.hpp"
 #include "command/Unknown.hpp"
 #include "exception/Exception.hpp"
+#include "game/Player.hpp"
 #include "game/World.hpp"
 #include "guiCommand/Mct.hpp"
 #include "guiCommand/Tna.hpp"
@@ -285,21 +287,7 @@ void Core::sendGuiInitialState(int clientId) {
     _sessionManager->sendMessage(clientId, mct.execute(*this).message);
     _sessionManager->sendMessage(clientId, tna.execute(*this).message);
     for (const auto& [playerId, player] : _world->playerList()) {
-        _sessionManager->sendMessage(clientId, shared::protocol::Emitter::build(shared::protocol::server::Pnw{
-                                                   .playerId = static_cast<int>(playerId),
-                                                   .x = static_cast<int>(player->position().x),
-                                                   .y = static_cast<int>(player->position().y),
-                                                   .orientation = static_cast<int>(player->orientation()),
-                                                   .level = player->level(),
-                                                   .teamName = world().getPlayerTeam(playerId)}));
-        // TODO: Uncomment this when the inventory is implemented
-        // _sessionManager->sendMessage(clientId, shared::protocol::Emitter::build(shared::protocol::server::Pin{
-        //                                            .playerId = static_cast<int>(playerId),
-        //                                            .x = static_cast<int>(player->position().x),
-        //                                            .y = static_cast<int>(player->position().y),
-        //                                            .inventory = player->inventory()}));
-        _sessionManager->sendMessage(clientId, shared::protocol::Emitter::build(shared::protocol::server::Plv{
-                                                   .playerId = static_cast<int>(playerId), .level = player->level()}));
+        sendGuiNewPlayerData(clientId, playerId);
     }
     for (const auto& [eggId, egg] : eggs) {
         _sessionManager->sendMessage(clientId, shared::protocol::Emitter::build(shared::protocol::server::Enw{
@@ -308,6 +296,37 @@ void Core::sendGuiInitialState(int clientId) {
                                                    .x = static_cast<int>(egg.position.x),
                                                    .y = static_cast<int>(egg.position.y)}));
     }
+}
+
+void Core::sendGuiNewPlayerData(int clientId, std::size_t playerId) {
+    const auto& playerIt = _world->playerList().find(playerId);
+    if (playerIt == _world->playerList().end()) {
+        return;
+    }
+    const auto& player = playerIt->second;
+
+    _sessionManager->sendMessage(clientId, shared::protocol::Emitter::build(shared::protocol::server::Pnw{
+                                               .playerId = static_cast<int>(playerId),
+                                               .x = static_cast<int>(player->position().x),
+                                               .y = static_cast<int>(player->position().y),
+                                               .orientation = static_cast<int>(player->orientation()),
+                                               .level = player->level(),
+                                               .teamName = world().getPlayerTeam(playerId)}));
+    _sessionManager->sendMessage(
+        clientId,
+        shared::protocol::Emitter::build(shared::protocol::server::Pin{
+            .playerId = static_cast<int>(playerId),
+            .x = static_cast<int>(player->position().x),
+            .y = static_cast<int>(player->position().y),
+            .food = static_cast<int>(player->inventory().at(static_cast<std::size_t>(game::ItemType::Food))),
+            .linemate = static_cast<int>(player->inventory().at(static_cast<std::size_t>(game::ItemType::Linemate))),
+            .deraumere = static_cast<int>(player->inventory().at(static_cast<std::size_t>(game::ItemType::Deraumere))),
+            .sibur = static_cast<int>(player->inventory().at(static_cast<std::size_t>(game::ItemType::Sibur))),
+            .mendiane = static_cast<int>(player->inventory().at(static_cast<std::size_t>(game::ItemType::Mendiane))),
+            .phiras = static_cast<int>(player->inventory().at(static_cast<std::size_t>(game::ItemType::Phiras))),
+            .thystame = static_cast<int>(player->inventory().at(static_cast<std::size_t>(game::ItemType::Thystame)))}));
+    _sessionManager->sendMessage(clientId, shared::protocol::Emitter::build(shared::protocol::server::Plv{
+                                               .playerId = static_cast<int>(playerId), .level = player->level()}));
 }
 
 }  // namespace zappy::server
