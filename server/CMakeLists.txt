@@ -32,8 +32,8 @@ add_library(zappy_server_objects OBJECT
         src/command/Left.hpp
         src/command/Right.cpp
         src/command/Right.hpp
-        src/command/Connect_nbr.cpp
-        src/command/Connect_nbr.hpp
+        src/command/ConnectNbr.cpp
+        src/command/ConnectNbr.hpp
         src/game/Team.cpp
         src/game/Team.hpp
         src/command/Broadcast.cpp

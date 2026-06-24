@@ -19,7 +19,7 @@
 #include "Set.hpp"
 #include "Take.hpp"
 #include "command/Broadcast.hpp"
-#include "command/Connect_nbr.hpp"
+#include "command/ConnectNbr.hpp"
 #include "command/Fork.hpp"
 #include "command/Forward.hpp"
 #include "command/ICommand.hpp"
