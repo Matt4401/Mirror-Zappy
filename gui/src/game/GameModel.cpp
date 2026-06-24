@@ -9,7 +9,6 @@
 
 #include <raylib.h>
 
-#include <cstddef>
 #include <memory>
 
 #include "Color.hpp"
@@ -59,8 +58,8 @@ float GameModel::getRotationAngle(Player::cardinalPoint orientation) {
     return 0.0F;
 }
 
-    void drawPlayer(raylib::rmath::Vector3 position, Player::cardinalPoint orientation,
-                    const std::shared_ptr<raylib::rtextures::Texture2D>& texture, std::size_t level) const
+void GameModel::drawPlayer(raylib::rmath::Vector3 position, Player::cardinalPoint orientation,
+                           const std::shared_ptr<raylib::rtextures::Texture2D>& texture, std::size_t level) const {
     if (_camera.get().isVisibleFromCamera(position)) {
         if (texture && texture->valid()) {
             _playerModel.setMaterialTexture(0, MATERIAL_MAP_ALBEDO, *texture);
@@ -70,7 +69,8 @@ float GameModel::getRotationAngle(Player::cardinalPoint orientation) {
         _playerModel.drawModelEx(position, {0.0F, 1.0F, 0.0F}, getRotationAngle(orientation), PLAYER_SCALE,
                                  raylib::Color::White());
         if (level > 1 && level <= 8) {
-            _armorModels.at(level - 2).drawModel(position, ARMOR_SCALE, raylib::Color::White());
+            _armorModels.at(level - 2).drawModelEx(position, {0.0F, 1.0F, 0.0F}, getRotationAngle(orientation),
+                                                   {ARMOR_SCALE, ARMOR_SCALE, ARMOR_SCALE}, raylib::Color::White());
         }
     }
 }
