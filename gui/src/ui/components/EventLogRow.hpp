@@ -36,6 +36,7 @@ class EventLogRow : public IUIComponent {
     void handleEvent() override;
 
     void setPosition(float x, float y) override;
+    void setPosition(float x, float y, float width);
     void setSize(float width, float height) override;
     [[nodiscard]] bool isVisible() const override;
     void setVisible(bool visible) override;

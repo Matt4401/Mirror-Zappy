@@ -46,20 +46,28 @@ void EventLogRow::update() {
 
 void EventLogRow::handleEvent() {}
 
-void EventLogRow::setPosition(float x, float y) {
+void EventLogRow::setPosition(float x, float y, float width) {
     _position.setX(x);
     _position.setY(y);
 
     float currentX = x;
+    float currentY = y;
     for (auto& t : _texts) {
-        t->setPosition(currentX, y);
+        if (width > 0.0F && currentX + t->getWidth() > x + width && currentX > x) {
+            currentX = x;
+            currentY += FontSize + 4.0F;
+        }
+        t->setPosition(currentX, currentY);
         currentX += t->getWidth();
     }
 }
 
+void EventLogRow::setPosition(float x, float y) { setPosition(x, y, _size.x()); }
+
 void EventLogRow::setSize(float width, float height) {
     _size.setX(width);
     _size.setY(height);
+    setPosition(_position.x(), _position.y(), width);
 }
 
 bool EventLogRow::isVisible() const { return _isVisible; }
