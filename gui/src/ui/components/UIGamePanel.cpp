@@ -73,10 +73,11 @@ void UIGamePanel::draw() {
 
     _mainPanel->draw();
 
+    int const scissorW = static_cast<int>(std::max(0.0F, _size.x() - (2.0F * Padding)));
+    int const scissorH = static_cast<int>(std::max(0.0F, _currentHeight - DefaultHeaderHeight - Padding));
+
     raylib::rcore::Window::beginScissorMode(static_cast<int>(_position.x() + Padding),
-                                            static_cast<int>(_position.y() + DefaultHeaderHeight),
-                                            static_cast<int>(_size.x() - (2.0F * Padding)),
-                                            static_cast<int>(_currentHeight - DefaultHeaderHeight - Padding));
+                                            static_cast<int>(_position.y() + DefaultHeaderHeight), scissorW, scissorH);
 
     if (!_isConfigMode) {
         for (auto& child : _contentChildren) {

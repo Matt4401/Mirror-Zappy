@@ -72,6 +72,11 @@ void WorldControlUI::initSpeedControls() {
         std::stringstream ss;
         ss << std::fixed << std::setprecision(0) << value;
         _speedValueText->setText(ss.str());
+    });
+
+    _speedSlider->setOnValueConfirmed([this](float value) {
+        std::stringstream ss;
+        ss << std::fixed << std::setprecision(0) << value;
 
         if (_onSendCommand) {
             _onSendCommand("sst " + ss.str() + "\n");
@@ -113,11 +118,20 @@ void WorldControlUI::initEventSubscriptions() {
             ss << std::fixed << std::setprecision(0) << _serverFreq;
             _speedValueText->setText(ss.str());
         }));
+    _eventTokens.push_back(
+        _dispatcher.get().subscribe<shared::protocol::server::Sst>([this](const shared::protocol::server::Sst& cmd) {
+            _serverFreq = static_cast<float>(cmd.timeUnit);
+            _speedSlider->setValue(_serverFreq);
+            std::stringstream ss;
+            ss << std::fixed << std::setprecision(0) << _serverFreq;
+            _speedValueText->setText(ss.str());
+        }));
 }
 
 WorldControlUI::~WorldControlUI() {
     for (auto token : _eventTokens) {
         _dispatcher.get().unsubscribe<shared::protocol::server::Sgt>(token);
+        _dispatcher.get().unsubscribe<shared::protocol::server::Sst>(token);
     }
 }
 

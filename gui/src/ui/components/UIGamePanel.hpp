@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <vector>
@@ -93,7 +94,10 @@ class UIGamePanel : public IUIComponent {
         _size.setY(height);
     }
     [[nodiscard]] float getScrollOffset() const { return _scrollOffset; }
-    void setMaxScroll(float maxScroll) { _maxScroll = maxScroll; }
+    void setMaxScroll(float maxScroll) {
+        _maxScroll = maxScroll;
+        _scrollOffset = std::clamp(_scrollOffset, 0.0F, _maxScroll);
+    }
 
   private:
     void updateTextPosition();
