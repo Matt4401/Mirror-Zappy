@@ -29,44 +29,6 @@
 #include "rtext/Font.hpp"
 
 namespace zappy::gui::ui::menus {
-
-namespace {
-constexpr float HeaderFontSize = 20.0F;
-constexpr float InfoFontSize = 16.0F;
-constexpr float BaseYOffset = 60.0F;
-constexpr float ElementSpacingSmall = 30.0F;
-constexpr float ElementSpacingMedium = 40.0F;
-constexpr float ElementSpacingLarge = 60.0F;
-
-constexpr float FoodBoxWidth = 100.0F;
-constexpr float FoodBoxHeight = 40.0F;
-constexpr float FoodIconOffset = 10.0F;
-constexpr float FoodIconSize = 30.0F;
-constexpr float FoodTextOffset = 50.0F;
-
-constexpr float GridCellSize = 70.0F;
-constexpr float GridCellSpacing = 80.0F;
-constexpr float GridTotalWidth = 230.0F;
-constexpr float GridIconOffsetX = 18.0F;
-constexpr float GridIconOffsetY = 13.0F;
-constexpr float GridTextOffsetX = 10.0F;
-constexpr float GridTextOffsetY = 50.0F;
-
-constexpr float FoodIconDrawOffset = 5.0F;
-constexpr float BoxMarginAdjustment = 10.0F;
-constexpr float DoubleSpacingMultiplier = 2.0F;
-
-constexpr size_t InventoryStartIndex = 1;
-constexpr size_t InventoryEndIndex = 6;
-constexpr int GridColumns = 3;
-constexpr size_t TotalInventoryItems = 7;
-constexpr size_t ExpectedEventTokens = 5;
-
-constexpr float CenterDivisor = 2.0F;
-
-constexpr raylib::Color BoxBgColor(200, 200, 200, 255);
-}  // namespace
-
 TileInspectorUI::TileInspectorUI(float x, float y, float width, events::EventDispatcher& dispatcher,
                                  const std::shared_ptr<raylib::rtext::Font>& font,
                                  std::function<void(const std::string&)> onSendCommand)

@@ -10,7 +10,6 @@
 #include <raylib.h>
 
 #include <memory>
-#include <string>
 
 #include "AssetManager.hpp"
 #include "events/EventDispatcher.hpp"
