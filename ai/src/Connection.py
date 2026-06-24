@@ -14,8 +14,8 @@ class BroadcastMessage:
 
 
 class ServerEvent:
-    def __init__(self, type, message):
-        self.event_type = type
+    def __init__(self, event_type, message):
+        self.event_type = event_type
         self.data = message
 
 
@@ -32,9 +32,10 @@ class CommandRequest:
 
 
 class CommandResponse:
-    def __init__(self, command, id):
+    def __init__(self, command, id, success):
         self.command = command
         self.id = id
+        self.success = success
 
 
 class Connection:
@@ -162,19 +163,21 @@ class Connection:
                         elif msg_type == "eject":
                             with self.event_lock:
                                 self.event_queue.append(
-                                    ServerEvent(event_type="eject", data=msg_data)
+                                    ServerEvent(event_type="eject", message=msg_data)
                                 )
                             if self.on_event_received:
                                 self.on_event_received("eject", msg_data)
                         elif msg_type == "dead":
                             with self.event_lock:
                                 self.event_queue.append(
-                                    ServerEvent(event_type="dead", data=msg_data)
+                                    ServerEvent(event_type="dead", message=msg_data)
                                 )
                         elif msg_type == "elevation":
                             with self.event_lock:
                                 self.event_queue.append(
-                                    ServerEvent(event_type="elevation", data=msg_data)
+                                    ServerEvent(
+                                        event_type="elevation", message=msg_data
+                                    )
                                 )
                         else:
                             with self.response_lock:
@@ -282,8 +285,9 @@ class Connection:
                         )
                         continue
                     first_cmd_id = next(iter(self.active_requests.keys()))
+                    success = response_str.lower() != "ko"
                     cmd_response = CommandResponse(
-                        command=response_str, id=first_cmd_id
+                        command=response_str, id=first_cmd_id, success=success
                     )
                     with self.response_lock:
                         self.response_buffer[first_cmd_id] = cmd_response
@@ -339,6 +343,6 @@ class Connection:
                     with self.command_lock:
                         if cmd_id in self.active_requests:
                             del self.active_requests[cmd_id]
-                    return cmd_response.command
+                    return cmd_response.success, cmd_response.command
             time.sleep(0.005)
         return None

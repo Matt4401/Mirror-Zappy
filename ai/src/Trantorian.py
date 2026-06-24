@@ -127,13 +127,16 @@ class Trantorian:
         cmd_id = self.send_command.inventory()
         if cmd_id == 84:
             return False
-        raw_response = self.connection.get_command_response(cmd_id)
-        if raw_response:
-            try:
-                self.parser.parse_inventory(raw_response)
-                return True
-            except ValueError as e:
-                print(f"erro while parse inventory : {e}")
+
+        result = self.connection.get_command_response(cmd_id)
+        if result:
+            success, response_str = result
+            if success:
+                try:
+                    self.parser.parse_inventory(response_str)
+                    return True
+                except ValueError as e:
+                    print(f"erro while parse inventory : {e}")
                 return False
         else:
             print(f"Timeout server didn't answer to the inventory cmd: {cmd_id})")

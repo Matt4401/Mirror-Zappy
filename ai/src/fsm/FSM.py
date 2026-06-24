@@ -16,30 +16,58 @@ class FiniteStateMachine:
         self.trantorian = trantorian
         self.tick_manager = tick_manager
         self.sender = []
+        self.pending_commands = {}
 
     def run(self):
         while True:
             meta_cmds = self.tick_manager.tick_update()
             self.send_auto_cmds(meta_cmds)
+            self.process_pending_commands()
             self.update_state()
             self.execute_state()
             time.sleep(0.01)
 
+    def process_pending_commands(self):
+        completed = []
+
+        for cmd_id, cmd_type in list(self.pending_commands.items()):
+            result = self.trantorian.connection.get_command_response(
+                cmd_id, timeout=0.1
+            )
+            if result is not None:
+                success, response = result
+                try:
+                    if not success:
+                        completed.append(cmd_id)
+                        continue
+                    if cmd_type == "inventory":
+                        self.trantorian.parser.parse_inventory(response)
+                    elif cmd_type == "look":
+                        tiles = self.trantorian.parser.parse_look(response)
+                        self.trantorian.vision.update_tiles(tiles)
+                    completed.append(cmd_id)
+                except Exception as e:
+                    print(f"Eror with {cmd_type}: {e}")
+                    completed.append(cmd_id)
+
+        for cmd_id in completed:
+            if cmd_id in self.pending_commands:
+                del self.pending_commands[cmd_id]
+
     def send_auto_cmds(self, meta_cmds: list[str]):
         for cmd in meta_cmds:
             if cmd == "Inventory":
-                resp = self.trantorian.send_command.inventory
-
+                cmd_id = self.trantorian.send_command.inventory()
+                self.pending_commands[cmd_id] = "inventory"
             elif cmd == "Look":
-                resp = self.trantorian.send_command.look
-                self.trantorian.vision.update_tiles(resp)
-
+                cmd_id = self.trantorian.send_command.look()
+                self.pending_commands[cmd_id] = "look"
             elif cmd is None:
                 return
                 # lancer un broad cast
 
     def update_state(self):
-        self.trantorian.refresh_inventory()
+        # self.trantorian.refresh_inventory()
         food = self.trantorian.player_state.inventory.get_food()
 
         if food < SURVIVAL_THRESHOLD:
