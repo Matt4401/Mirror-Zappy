@@ -36,13 +36,14 @@ Player::Player(int id, raylib::rmath::Vector3 position, std::string name, cardin
 
 void Player::setTilePosition(const graphics::scene::Tile3DPosition tilePosition) { _tilePosition = tilePosition; }
 
-void Player::move(const int serverFrequency) {
-    if (!_isMoving || serverFrequency <= 0) {
+void Player::move(const int serverFrequency, const float deltaTime) {
+    if (!_isMoving || serverFrequency <= 0 || deltaTime <= 0.0F) {
         return;
     }
 
-    const float deltaTime = static_cast<float>(serverFrequency) / DELTA_SERVER_FREQUENCY;
-    const float movement = PLAYER_SPEED * deltaTime;
+    const float serverSpeed = static_cast<float>(serverFrequency) / DELTA_SERVER_FREQUENCY;
+    const float movement = PLAYER_SPEED * serverSpeed * deltaTime;
+
     if (_position.distance(_futurePosition) <= movement) {
         _position = _futurePosition;
         if (_wrappedPosition.has_value()) {
@@ -54,5 +55,24 @@ void Player::move(const int serverFrequency) {
         return;
     }
     _position = _position.movedTowards(_futurePosition, movement);
+}
+
+void Player::setPosition(const raylib::rmath::Vector3& position) {
+    _position = position;
+    _futurePosition = position;
+    _wrappedPosition.reset();
+    _isMoving = false;
+}
+
+void Player::setFuturePosition(const raylib::rmath::Vector3& position) {
+    _futurePosition = position;
+    _isMoving = _position != _futurePosition;
+}
+
+void Player::setWrappedFuturePosition(const raylib::rmath::Vector3& exitPosition,
+                                      const raylib::rmath::Vector3& wrappedPosition) {
+    _futurePosition = exitPosition;
+    _wrappedPosition = wrappedPosition;
+    _isMoving = true;
 }
 }  // namespace zappy::gui::game

@@ -48,7 +48,7 @@ class WorldManager {
     }
     void updatePlayerName(int id, const std::string& name) { _playerManager.updatePlayerName(id, name); }
 
-    void movePlayers() { _playerManager.movePlayers(_timeUnit); }
+    void movePlayers(float deltaTime) { _playerManager.movePlayers(_timeUnit, deltaTime); }
 
   private:
     void handleTimeUnit(const shared::protocol::server::Sgt& command);

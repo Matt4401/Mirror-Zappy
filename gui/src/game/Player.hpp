@@ -21,8 +21,8 @@ namespace zappy::gui::game {
 class Player {
   public:
     enum class cardinalPoint : std::uint8_t { NORTH = 1, EAST = 2, SOUTH = 3, WEST = 4 };
-    static constexpr float PLAYER_SPEED = 5.0F;
-    static constexpr int DELTA_SERVER_FREQUENCY = 150;
+    static constexpr float PLAYER_SPEED = 20.0F;
+    static constexpr int DELTA_SERVER_FREQUENCY = 20;
 
     Player(int id, raylib::rmath::Vector3 position, std::string name, cardinalPoint orientation, std::size_t level = 1);
     ~Player() = default;
@@ -40,23 +40,10 @@ class Player {
     [[nodiscard]] graphics::scene::Tile3DPosition tilePosition() const { return _tilePosition; }
     [[nodiscard]] const game::ItemBag& itemBag() const { return _itemBag; }
     [[nodiscard]] game::ItemBag& itemBag() { return _itemBag; }
-    void setPosition(const raylib::rmath::Vector3& position) {
-        _position = position;
-        _futurePosition = position;
-        _wrappedPosition.reset();
-        _isMoving = false;
-    }
-    void setFuturePosition(const raylib::rmath::Vector3& position) {
-        _futurePosition = position;
-        _wrappedPosition.reset();
-        _isMoving = _position != _futurePosition;
-    }
+    void setPosition(const raylib::rmath::Vector3& position);
+    void setFuturePosition(const raylib::rmath::Vector3& position);
     void setWrappedFuturePosition(const raylib::rmath::Vector3& exitPosition,
-                                  const raylib::rmath::Vector3& wrappedPosition) {
-        _futurePosition = exitPosition;
-        _wrappedPosition = wrappedPosition;
-        _isMoving = _position != _futurePosition;
-    }
+                                  const raylib::rmath::Vector3& wrappedPosition);
     [[nodiscard]] const raylib::rmath::Vector3& futurePosition() const { return _futurePosition; }
     void setTilePosition(graphics::scene::Tile3DPosition tilePosition);
     void setOrientation(cardinalPoint orientation) { _orientation = orientation; }
@@ -65,7 +52,7 @@ class Player {
     [[nodiscard]] std::string textureId() const { return _textureId; }
     [[nodiscard]] raylib::rcore::BoundingBox boundingBox() const;
     [[nodiscard]] bool moving() const { return _isMoving; }
-    void move(int serverFrequency);
+    void move(int serverFrequency, float deltaTime);
 
   protected:
   private:

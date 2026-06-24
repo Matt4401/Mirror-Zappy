@@ -67,7 +67,7 @@ class PlayerManager {
     void handleBroadcastAnimation(const shared::protocol::server::Pbc& command) {}  // TODO
     void handleEggDropAnimation(const shared::protocol::server::Pfk& command) {}    // TODO
 
-    void movePlayers(int serverFrequency);
+    void movePlayers(int serverFrequency, float deltaTime);
 
   private:
     struct InitialEgg {

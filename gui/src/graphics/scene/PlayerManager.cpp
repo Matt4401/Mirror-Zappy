@@ -274,16 +274,16 @@ void PlayerManager::redistributeInitialEggs() {
 
     const auto eggCount = _initialEggs.size();
     const auto teamCount = _teams.size();
-    for (std::size_t index = 0; index < eggCount; ++index) {
+    for (std::size_t index = 0; index < eggCount; index++) {
         const auto teamIndex = (index * teamCount) / eggCount;
         const auto& egg = _initialEggs.at(index);
         _teams.at(teamIndex).addEgg(egg.id, -1, egg.position);
     }
 }
 
-void PlayerManager::movePlayers(const int serverFrequency) {
+void PlayerManager::movePlayers(const int serverFrequency, const float deltaTime) {
     for (auto& team : _teams) {
-        team.movePlayers(serverFrequency);
+        team.movePlayers(serverFrequency, deltaTime);
     }
 }
 }  // namespace zappy::gui::graphics::scene

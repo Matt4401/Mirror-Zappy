@@ -86,10 +86,10 @@ void Team::removeEgg(int id) {
     std::erase_if(_eggs, [id](const Egg& egg) { return egg.id() == id; });
 }
 
-void Team::movePlayers(const int serverFrequency) {
+void Team::movePlayers(const int serverFrequency, const float deltaTime) {
     for (auto& player : _players) {
         if (player.moving()) {
-            player.move(serverFrequency);
+            player.move(serverFrequency, deltaTime);
         }
     }
 }
