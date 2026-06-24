@@ -28,6 +28,8 @@ class FiniteStateMachine:
             self.update_state()
             self.execute_state()
             time.sleep(0.01)
+            if self.trantorian.connection.running == False:
+                break
 
     def process_pending_commands(self):
         completed = []
@@ -43,7 +45,10 @@ class FiniteStateMachine:
                         completed.append(cmd_id)
                         continue
                     if cmd_type == "inventory":
-                        self.trantorian.parser.parse_inventory(response)
+                        try:
+                            self.trantorian.parser.parse_inventory(response)
+                        except ValueError as e:
+                            print(f"erro while parse inventory : {e}")
                     elif cmd_type == "look":
                         tiles = self.trantorian.parser.parse_look(response)
                         self.trantorian.vision.update_tiles(tiles)

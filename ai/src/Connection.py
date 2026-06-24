@@ -152,6 +152,8 @@ class Connection:
                         if not line:
                             continue
                         msg_type, msg_data = self.parse_server_message(line)
+                        if msg_type == "dead":
+                            self.running = False
                         if msg_type == "broadcast":
                             with self.broadcast_lock:
                                 self.broadcast_queue.append(
@@ -195,7 +197,6 @@ class Connection:
 
     def send_command(self, cmd):
         if not self.running:
-            print("Cannot send: connection is not active")
             return 84
         with self.command_lock:
             self.next_command_id += 1
