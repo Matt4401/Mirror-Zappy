@@ -48,6 +48,7 @@ std::string EventLogUI::getPlayerName(int playerId) const {
 
 namespace {
 template <class... Ts>
+// NOLINTNEXTLINE (misc-multiple-inheritance)
 struct overloaded : Ts... {
     using Ts::operator()...;
 };
