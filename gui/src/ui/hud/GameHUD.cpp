@@ -15,6 +15,7 @@
 #include "components/UIGridManager.hpp"
 #include "events/GuiEvents.hpp"
 #include "menus/EventLogUI.hpp"
+#include "menus/GlobalStatsUI.hpp"
 #include "menus/PauseMenu.hpp"
 #include "menus/PlayerInspectorUI.hpp"
 #include "menus/TileInspectorUI.hpp"
@@ -41,7 +42,10 @@ GameHUD::GameHUD(events::EventDispatcher& dispatcher, const std::shared_ptr<rayl
     _gridManager->addPanel(_worldControl, WorldControlX, WorldControlY, WorldControlWidthCols, WorldControlHeightCols);
 
     _eventLog = std::make_shared<menus::EventLogUI>(0.0F, 0.0F, 400.0F, 300.0F, _dispatcher.get(), _font);
-    _gridManager->addPanel(_eventLog, 2, 16, 12, 15);
+    _gridManager->addPanel(_eventLog, 2, 17, 12, 15);
+
+    _globalStats = std::make_shared<menus::GlobalStatsUI>(0.0F, 0.0F, 400.0F, 300.0F, _dispatcher.get(), _font);
+    _gridManager->addPanel(_globalStats, 2, 2, 12, 13);
 
     _pauseMenu = std::make_shared<menus::PauseMenu>(_dispatcher.get(), _font);
 }
