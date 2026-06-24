@@ -67,6 +67,10 @@ void Incantation::execute(game::World& world, game::Player& player) {
         }
         player.levelUp();
         isSuccess = true;
+        world.addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Plv{
+            .playerId = static_cast<int>(player.id()),
+            .level = player.level(),
+        }));
     } else {
         player.addResponse("ko\n");
         isSuccess = false;
