@@ -140,28 +140,89 @@ void WorldControlUI::updateChildrenPositions() {
         _foldBtn->setPosition(getPosition().x() + ((getSize().x() - FoldBtnWidth) / 2.0F), getPosition().y());
     }
 
+    float const padding = components::UIGamePanel::getPadding();
+    float const innerX = getPosition().x() + padding;
+    float const innerWidth = getSize().x() - (2.0F * padding);
+
+    float const timeTitleW = _timeTitle ? _timeTitle->getWidth() : TimeTitleWidth;
+    float const timeDropW = _timeDropdown ? _timeDropdown->getSize().x() : TimeDropdownWidth;
+    float const timeGroupWidth = timeTitleW + 10.0F + timeDropW;
+
+    float const speedTitleW = _speedTitle ? _speedTitle->getWidth() : SpeedTitleWidth;
+    float const speedSliderW = SliderWidth;
+    float const speedValW = _speedValueText ? _speedValueText->getWidth() : 40.0F;
+    float const speedGroupWidth = speedTitleW + 10.0F + speedSliderW + 10.0F + speedValW;
+
+    float const totalNeededWidth = timeGroupWidth + 40.0F + speedGroupWidth;
+
+    if (innerWidth >= totalNeededWidth) {
+        updateSingleRowLayout(innerX, innerWidth, timeTitleW, timeDropW, speedTitleW, speedSliderW);
+    } else {
+        updateTwoRowsLayout(innerX, innerWidth, timeTitleW, timeDropW, speedTitleW, speedSliderW);
+    }
+}
+
+void WorldControlUI::updateSingleRowLayout(float innerX, float innerWidth, float timeTitleW, float timeDropW,
+                                           float speedTitleW, float speedSliderW) {
+    float const timeGroupWidth = timeTitleW + 10.0F + timeDropW;
+    float const speedValW = _speedValueText ? _speedValueText->getWidth() : 40.0F;
+    float const speedGroupWidth = speedTitleW + 10.0F + speedSliderW + 10.0F + speedValW;
+    float const totalNeededWidth = timeGroupWidth + 40.0F + speedGroupWidth;
+
     float const currentY = getPosition().y() + FoldBtnHeight + ((ContentHeight - DropdownHeight) / 2.0F);
-    float currentX = getPosition().x() + InitialOffsetX;
+    float currentX = innerX + ((innerWidth - totalNeededWidth) / 2.0F);
 
     if (_timeTitle) {
         _timeTitle->setPosition(currentX, currentY + TitleOffsetY);
-        currentX += TimeTitleWidth;
+        currentX += timeTitleW + 10.0F;
     }
     if (_timeDropdown) {
         _timeDropdown->setPosition(currentX, currentY);
-        currentX += TimeDropdownWidth;
+        currentX += timeDropW + 40.0F;
     }
 
     if (_speedTitle) {
         _speedTitle->setPosition(currentX, currentY + TitleOffsetY);
-        currentX += SpeedTitleWidth;
+        currentX += speedTitleW + 10.0F;
     }
     if (_speedSlider) {
         _speedSlider->setPosition(currentX, currentY + SliderOffsetY);
-        currentX += SpeedSliderWidth;
+        currentX += speedSliderW + 10.0F;
     }
     if (_speedValueText) {
         _speedValueText->setPosition(currentX, currentY + TitleOffsetY);
+    }
+}
+
+void WorldControlUI::updateTwoRowsLayout(float innerX, float innerWidth, float timeTitleW, float timeDropW,
+                                         float speedTitleW, float speedSliderW) {
+    float const timeGroupWidth = timeTitleW + 10.0F + timeDropW;
+    float const speedValW = _speedValueText ? _speedValueText->getWidth() : 40.0F;
+    float const speedGroupWidth = speedTitleW + 10.0F + speedSliderW + 10.0F + speedValW;
+
+    float const row1Y = getPosition().y() + FoldBtnHeight + 5.0F;
+    float const row2Y = getPosition().y() + FoldBtnHeight + 32.0F;
+
+    float row1X = innerX + ((innerWidth - timeGroupWidth) / 2.0F);
+    if (_timeTitle) {
+        _timeTitle->setPosition(row1X, row1Y + TitleOffsetY);
+        row1X += timeTitleW + 10.0F;
+    }
+    if (_timeDropdown) {
+        _timeDropdown->setPosition(row1X, row1Y);
+    }
+
+    float row2X = innerX + ((innerWidth - speedGroupWidth) / 2.0F);
+    if (_speedTitle) {
+        _speedTitle->setPosition(row2X, row2Y + TitleOffsetY);
+        row2X += speedTitleW + 10.0F;
+    }
+    if (_speedSlider) {
+        _speedSlider->setPosition(row2X, row2Y + SliderOffsetY);
+        row2X += speedSliderW + 10.0F;
+    }
+    if (_speedValueText) {
+        _speedValueText->setPosition(row2X, row2Y + TitleOffsetY);
     }
 }
 

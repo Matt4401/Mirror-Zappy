@@ -49,6 +49,10 @@ class WorldControlUI : public components::UIGamePanel {
     void initEventSubscriptions();
 
     void updateChildrenPositions();
+    void updateSingleRowLayout(float innerX, float innerWidth, float timeTitleW, float timeDropW, float speedTitleW,
+                               float speedSliderW);
+    void updateTwoRowsLayout(float innerX, float innerWidth, float timeTitleW, float timeDropW, float speedTitleW,
+                             float speedSliderW);
 
     std::reference_wrapper<events::EventDispatcher> _dispatcher;
     std::shared_ptr<raylib::rtext::Font> _font;
