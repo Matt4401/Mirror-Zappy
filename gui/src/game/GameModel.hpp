@@ -28,7 +28,7 @@ class GameModel {
     static constexpr auto EGG_SCALE = 0.6F;
     static constexpr auto EGG_TINT_STRENGTH = 0.75F;
     static constexpr auto ARMOR_SCALE = 2.1F;
- 
+
     GameModel(raylib::rcore::Camera& camera);
     ~GameModel() = default;
     GameModel(const GameModel& other) = delete;
@@ -37,7 +37,8 @@ class GameModel {
     GameModel& operator=(GameModel&& other) noexcept = default;
 
     void drawPlayer(raylib::rmath::Vector3 position, Player::cardinalPoint orientation,
-                    const std::shared_ptr<raylib::rtextures::Texture2D>& texture = nullptr, std::size_t level = 1) const;
+                    const std::shared_ptr<raylib::rtextures::Texture2D>& texture = nullptr,
+                    std::size_t level = 1) const;
     void drawEgg(raylib::rmath::Vector3 position, raylib::Color tint) const;
 
   protected:
