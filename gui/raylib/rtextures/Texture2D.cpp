@@ -11,6 +11,8 @@
 
 #include "Color.hpp"
 #include "Image.hpp"
+#include "rmath/Rectangle.hpp"  // NOLINT
+#include "rmath/Vector2.hpp"    // NOLINT
 
 namespace zappy::gui::raylib::rtextures {
 void Texture2D::drawCoverPanned(int width, int height, float horizontalPan, zappy::gui::raylib::Color tint) const {
