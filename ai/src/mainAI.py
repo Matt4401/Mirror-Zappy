@@ -1,33 +1,48 @@
 import sys
 import argparse
 from src.Trantorian import Trantorian
-from util.IdGenerator import generate_id
-from util.InitLogger import PlayerLogger
+from src.util.IdGenerator import generate_id
+from src.util.InitLogger import PlayerLogger
+from src.fsm.TickManager import TickManager
+from src.fsm.FSM import FiniteStateMachine
+from src.fsm.states.SurviveState import SurviveState
 
 
 def mainAI():
     parser = argparse.ArgumentParser(
         usage="./zappy_ai -p port -n name -h machine", add_help=False
     )
-    parser.add_value_provider = False
-    parser.add_argument("--help", action="help", help="Show this help message -> exit")
+    parser.add_argument("--help", action="help", help="Show this help message and exit")
     parser.add_argument("-p", type=int, required=True, metavar="port")
     parser.add_argument("-n", type=str, required=True, metavar="name")
-    parser.add_argument("-h", type=str, required=True, metavar="machine")
+    parser.add_argument(
+        "-h", type=str, required=True, metavar="machine", dest="machine"
+    )
 
     try:
         args = parser.parse_args()
     except SystemExit:
         sys.exit(84)
-    port = args.p  # noqa: F841
-    name = args.n  # noqa: F841
-    machine = args.h
+    port = args.p
+    team_name = args.n
+    host = args.machine
 
-    # TEMPORARY !!!!!!!!
-    team_name = "test"
     player_id = generate_id(team_name)
-
     PlayerLogger.setup_logging(player_id)
+    print(f"Logger is ok: {player_id}")
 
-    main_class = Trantorian(port, machine, name)  # noqa: F841
-    main_class.run()
+    try:
+        trantorian = Trantorian(port, host, team_name, player_id)
+        print("Trantorian ok")
+        tick_manager = TickManager(10)
+        fsm = FiniteStateMachine(SurviveState, trantorian, tick_manager)
+        print("fsm ok")
+        fsm.run()
+
+    except KeyboardInterrupt:
+        trantorian.connection.disconnect()
+        sys.exit(0)
+
+
+if __name__ == "__main__":
+    mainAI()

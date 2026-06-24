@@ -3,17 +3,28 @@ from ..AState import AState
 
 class SurviveState(AState):
     def execute(self):
-        closest_food_idx = self.trantorian.vision.get_tile_index_of("food")
+        self.trantorian.logger.info("===========Entering Survive state===========")
+        closest_food_idx = self.trantorian.player_state.vision.get_tile_index_of("food")
 
         if closest_food_idx is not None:
+            self.trantorian.logger.info(
+                "[Survive]: Food visible, go to the tile and take it"
+            )
             self.trantorian.move_to_tile(closest_food_idx)
-            self.trantorian.send_command.take_object("food")
-            self.trantorian.send_command.inventory()
+            self.trantorian.take_object("food")
+            self.trantorian.refresh_inventory()
+            self.trantorian.look()
 
         else:
-            self.trantorian.send_command.look()
+            self.trantorian.logger.info(
+                "[Survive]: No food visible, go forward and look"
+            )
+            self.trantorian.look()
 
-        closest_food_idx = self.trantorian.vision.get_tile_index_of("food")
+        closest_food_idx = self.trantorian.player_state.vision.get_tile_index_of("food")
         if closest_food_idx is None:
-            self.trantorian.send_command.forward()
-            self.trantorian.send_command.look()
+            self.trantorian.logger.info(
+                "[Survive]: No food visible, go forward and look"
+            )
+            self.trantorian.forward()
+            self.trantorian.look()
