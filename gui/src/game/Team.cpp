@@ -15,13 +15,13 @@
 #include <string>
 #include <vector>
 
+#include "Color.hpp"
 #include "Egg.hpp"
 #include "GameModel.hpp"
 #include "Player.hpp"
 #include "graphics/AssetManager.hpp"
 #include "rmath/Vector3.hpp"
 #include "rtextures/Texture2D.hpp"
-#include "Color.hpp"
 
 namespace zappy::gui::game {
 void Team::draw(const GameModel& gameModel) const {

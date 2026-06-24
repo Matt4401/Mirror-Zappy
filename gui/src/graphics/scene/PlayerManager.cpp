@@ -9,12 +9,12 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <optional>
 #include <string>
-#include <cmath>
-#include <cstdint>
 
 #include "Color.hpp"
 #include "Tile3D.hpp"

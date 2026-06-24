@@ -224,7 +224,7 @@ TEST_F(WorldManagerTest, PicAndPieTrackIncantationAndUpgradeParticipantsOnSucces
     ASSERT_EQ(world.activeIncantations().size(), 1);
     EXPECT_EQ(world.activeIncantations().front().playerIds.size(), 2);
 
-    dispatcher.dispatch(shared::protocol::server::Pie{.x = 1, .y = 1, .incantationResult = 1});
+    dispatcher.dispatch(shared::protocol::server::Pie{.x = 1, .y = 1, .incantationResult = true});
 
     EXPECT_TRUE(world.activeIncantations().empty());
     EXPECT_EQ(requirePlayer(42).level(), 2);
@@ -235,7 +235,7 @@ TEST_F(WorldManagerTest, FailedPieClearsIncantationWithoutChangingLevel) {
     createPlayer();
     dispatcher.dispatch(shared::protocol::server::Pic{.x = 1, .y = 1, .level = 1, .playerIds = {42}});
 
-    dispatcher.dispatch(shared::protocol::server::Pie{.x = 1, .y = 1, .incantationResult = 0});
+    dispatcher.dispatch(shared::protocol::server::Pie{.x = 1, .y = 1, .incantationResult = false});
 
     EXPECT_TRUE(world.activeIncantations().empty());
     EXPECT_EQ(requirePlayer(42).level(), 1);
