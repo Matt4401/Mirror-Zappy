@@ -16,6 +16,7 @@ add_library(zappy_gui_ui
         menus/TileInspectorUI.cpp
         menus/WorldControlUI.cpp
         menus/EventLogUI.cpp
+        menus/GlobalStatsUI.cpp
         hud/GameHUD.cpp
 )
 target_sources(zappy_gui_ui PUBLIC
@@ -40,6 +41,7 @@ target_sources(zappy_gui_ui PUBLIC
         menus/TileInspectorUI.hpp
         menus/WorldControlUI.hpp
         menus/EventLogUI.hpp
+        menus/GlobalStatsUI.hpp
         hud/GameHUD.hpp
 )
 target_include_directories(zappy_gui_ui PUBLIC
