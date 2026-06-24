@@ -18,6 +18,8 @@
 #include "command/ICommand.hpp"
 #include "exception/TooMuchCmd.hpp"
 #include "game/World.hpp"
+#include "protocol/Commands.hpp"
+#include "protocol/Emitter.hpp"
 
 namespace {
 constexpr bool hasEnoughResources(const zappy::server::game::InventoryArray& groundInv,
@@ -34,16 +36,13 @@ constexpr bool hasEnoughResources(const zappy::server::game::InventoryArray& gro
 namespace zappy::server::game {
 
 Player::Player(const std::size_t id, const std::size_t x, const std::size_t y, const cardinalPoint orient)
-    : _orientation(orient), _lifeTick(kNbStartFood * kNbLifeTickFood), _pos({.x = x, .y = y}), _id(id) {
+    : _orientation(orient), _lifeTick(kNbLifeTickFood), _pos({.x = x, .y = y}), _id(id) {
     _inventory.fill(0);
     setItem(ItemType::Food, kNbStartFood);
 }
 
 void Player::addItem(ItemType item, const std::size_t quantity) {
     _inventory.at(static_cast<std::uint8_t>(item)) += quantity;
-    if (item == ItemType::Food) {
-        _lifeTick += kNbLifeTickFood * quantity;
-    }
 }
 
 bool Player::subItem(ItemType item, const std::size_t quantity) {
@@ -67,8 +66,30 @@ void Player::pushCommand(std::unique_ptr<command::ICommand> command) {
 }
 
 void Player::update(World& world) {
-    _lifeTick--;
+    if (_lifeTick > 0) {
+        _lifeTick--;
+    }
+    if (_lifeTick <= 0) {
+        if (_inventory.at(static_cast<std::uint8_t>(ItemType::Food)) > 0) {
+            _lifeTick = kNbLifeTickFood;
+            _inventory.at(static_cast<std::uint8_t>(ItemType::Food))--;
+            world.addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pin{
+                .playerId = static_cast<int>(_id),
+                .x = static_cast<int>(_pos.x),
+                .y = static_cast<int>(_pos.y),
+                .food = static_cast<int>(_inventory.at(static_cast<std::uint8_t>(ItemType::Food))),
+                .linemate = static_cast<int>(_inventory.at(static_cast<std::uint8_t>(ItemType::Linemate))),
+                .deraumere = static_cast<int>(_inventory.at(static_cast<std::uint8_t>(ItemType::Deraumere))),
+                .sibur = static_cast<int>(_inventory.at(static_cast<std::uint8_t>(ItemType::Sibur))),
+                .mendiane = static_cast<int>(_inventory.at(static_cast<std::uint8_t>(ItemType::Mendiane))),
+                .thystame = static_cast<int>(_inventory.at(static_cast<std::uint8_t>(ItemType::Thystame))),
+            }));
 
+        } else {
+            world.removePlayer(_id);
+            return;
+        }
+    }
     if (_isNewCommand) {
         _isNewCommand = false;
     } else if (_cmdTick > 0) {
@@ -210,7 +231,11 @@ Position Player::getNthDiagonalLeftPosition(const std::size_t n, const Position 
 
 int Player::level() const { return _level; }
 
-void Player::levelUp() { _level++; }
+void Player::levelUp() {
+    if (_level <= kNbLevel) {
+        _level++;
+    }
+}
 
 bool Player::checkIncantationRequirements(
     const std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)>& resources, const std::size_t nbPlayer) const {
