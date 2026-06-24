@@ -80,6 +80,7 @@ class World {
     void pushCommandToPlayer(std::size_t playerId, std::unique_ptr<command::ICommand> command);
     void removePlayerFromTeam(std::size_t id) const;
     void updatePositionOnMap(std::size_t id, const Position& oldPosition, const Position& newPosition);
+    std::vector<std::size_t> collectDeadPlayers() const;
 
     std::size_t removePlayer(std::size_t id);
     std::size_t getAvailableSlotInTeam(std::string_view teamName) const;

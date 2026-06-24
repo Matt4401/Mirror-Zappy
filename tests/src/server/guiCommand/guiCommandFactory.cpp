@@ -129,6 +129,16 @@ TEST(GuiCommandFactoryTest, CreatePlvCommand) {
 
     EXPECT_NE(command, nullptr);
     rawCommand = "plv invalid_param";
+}
+
+TEST(GuiCommandFactoryTest, CreatePpoCommand) {
+    const zappy::server::command::CommandFactory factory;
+
+    std::string rawCommand = "ppo 1";
+    auto command = factory.createGuiCommand(rawCommand);
+
+    EXPECT_NE(command, nullptr);
+    rawCommand = "ppo invalid_param";
     command = factory.createGuiCommand(rawCommand);
     ASSERT_NE(command, nullptr);
     const auto& sbpCommand = dynamic_cast<zappy::server::guiCommand::Sbp*>(command.get());
