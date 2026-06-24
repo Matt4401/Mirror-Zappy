@@ -3,25 +3,22 @@ from ..AState import AState
 
 class SurviveState(AState):
     def execute(self):
+        self.trantorian.logger.info("===========Entering Survive state===========")
         closest_food_idx = self.trantorian.player_state.vision.get_tile_index_of("food")
 
         if closest_food_idx is not None:
+            self.trantorian.logger.info("[Survive]: Food visible, go to the tile and take it")
             self.trantorian.move_to_tile(closest_food_idx)
-            self.trantorian.send_command.take_object("food")
+            self.trantorian.take_object("food")
             self.trantorian.refresh_inventory()
+            self.trantorian.look()
 
         else:
-            cmd_id = self.trantorian.send_command.look()
-            raw_response = self.trantorian.connection.get_command_response(cmd_id)
-            if raw_response:
-                parsed_tiles = self.trantorian.parser.parse_look(raw_response)
-                self.trantorian.player_state.vision.update_tiles(parsed_tiles)
+            self.trantorian.logger.info("[Survive]: No food visible, go forward and look")
+            self.trantorian.look()
 
         closest_food_idx = self.trantorian.player_state.vision.get_tile_index_of("food")
         if closest_food_idx is None:
-            self.trantorian.send_command.forward()
-            cmd_id = self.trantorian.send_command.look()
-            raw_response = self.trantorian.connection.get_command_response(cmd_id)
-            if raw_response:
-                parsed_tiles = self.trantorian.parser.parse_look(raw_response)
-                self.trantorian.player_state.vision.update_tiles(parsed_tiles)
+            self.trantorian.logger.info("[Survive]: No food visible, go forward and look")
+            self.trantorian.forward()
+            self.trantorian.look()
