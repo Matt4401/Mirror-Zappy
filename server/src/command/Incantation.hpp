@@ -7,6 +7,9 @@
 
 #pragma once
 
+#include <cstddef>
+#include <vector>
+
 #include "ACommand.hpp"
 #include "game/Player.hpp"
 #include "game/World.hpp"
