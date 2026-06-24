@@ -10,6 +10,7 @@
 #include <raylib.h>
 
 #include <cstdint>
+#include <stdexcept>
 
 namespace zappy::gui::raylib::rcore {
 Window::Window(const char* title, uint32_t flags) {
@@ -22,6 +23,9 @@ Window::Window(const char* title, uint32_t flags) {
         _width = GetMonitorWidth(_monitor);
         _height = GetMonitorHeight(_monitor);
         InitWindow(DEFAULT_WIDTH, DEFAULT_HEIGHT, title);
+        if (!IsWindowReady()) {
+            throw std::runtime_error("Failed to initialize window");
+        }
         DisableCursor();
         ToggleFullscreen();
     }
