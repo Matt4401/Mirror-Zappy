@@ -8,6 +8,7 @@
 #include "Map.hpp"
 
 #include <algorithm>
+#include <cstddef>
 #include <functional>
 #include <iterator>
 #include <limits>
@@ -165,17 +166,16 @@ void Map::handleRequestCyclePlayer(const events::RequestCyclePlayer& e) {
     auto it = std::ranges::find_if(allPlayers,
                                    [&e](const auto& pair) { return pair.second.get().id() == e.currentPlayerId; });
 
-    int currentIndex = 0;
+    std::size_t currentIndex = 0;
     if (it != allPlayers.end()) {
-        currentIndex = static_cast<int>(std::distance(allPlayers.begin(), it));
+        currentIndex = static_cast<std::size_t>(std::distance(allPlayers.begin(), it));
     }
 
-    int nextIndex = currentIndex + e.direction;
-    if (nextIndex < 0) {
-        nextIndex = static_cast<int>(allPlayers.size()) - 1;
-    }
-    if (nextIndex >= static_cast<int>(allPlayers.size())) {
-        nextIndex = 0;
+    std::size_t nextIndex = currentIndex;
+    if (e.direction < 0) {
+        nextIndex = (currentIndex == 0) ? allPlayers.size() - 1 : currentIndex - 1;
+    } else if (e.direction > 0) {
+        nextIndex = (currentIndex + 1 >= allPlayers.size()) ? 0 : currentIndex + 1;
     }
 
     dispatchClickedPlayer(allPlayers.at(nextIndex).first.get(), allPlayers.at(nextIndex).second.get());
