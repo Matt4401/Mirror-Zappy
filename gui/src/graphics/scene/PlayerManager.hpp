@@ -31,7 +31,7 @@ struct Incantation {
 
 class PlayerManager {
   public:
-    static constexpr auto DefaultPlayerOffsetY = 1.4F;
+    static constexpr auto DefaultPlayerOffsetY = 1.0F;
     static constexpr std::array<raylib::Color, 8> TeamColors = {
         raylib::Color::Red(),    raylib::Color::Blue(),   raylib::Color::Green(),   raylib::Color::Yellow(),
         raylib::Color::Purple(), raylib::Color::Orange(), raylib::Color::SkyBlue(), raylib::Color::Pink(),
@@ -62,9 +62,9 @@ class PlayerManager {
     void handleEggLaid(const shared::protocol::server::Enw& command);
     void handleEggRemoved(const shared::protocol::server::Ebo& command);
     void handleEggRemoved(const shared::protocol::server::Edi& command);
-    void handleExpulsionAnimation(const shared::protocol::server::Pex& command) {}  // TODO
-    void handleBroadcastAnimation(const shared::protocol::server::Pbc& command) {}  // TODO
-    void handleEggDropAnimation(const shared::protocol::server::Pfk& command) {}    // TODO
+    void handleExpulsionAnimation(const shared::protocol::server::Pex& /*command*/) {}  // TODO
+    void handleBroadcastAnimation(const shared::protocol::server::Pbc& /*command*/) {}  // TODO
+    void handleEggDropAnimation(const shared::protocol::server::Pfk& /*command*/) {}    // TODO
 
   private:
     [[nodiscard]] std::optional<std::reference_wrapper<game::Player>> playerById(int id);
