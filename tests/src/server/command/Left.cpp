@@ -38,6 +38,8 @@ TEST(LeftTest, CheckTurnMovement) {
         .freq = 100,
     };
     game::World world{config};
+    // NOLINTNEXTLINE
+    const auto id = world.spawnPlayer("test");
 
     left->execute(world, player);
     const auto newOrient = player.orientation();
@@ -60,6 +62,8 @@ TEST(LeftTest, CheckTurnMovementBordure) {
         .freq = 100,
     };
     game::World world{config};
+    // NOLINTNEXTLINE
+    const auto id = world.spawnPlayer("test");
     auto [maxX, maxY] = world.sizeMap();
     game::Player player{0, maxX - 1, maxY - 1, game::cardinalPoint::NORTH};
 

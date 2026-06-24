@@ -82,7 +82,6 @@ class World {
     void updatePositionOnMap(std::size_t id, const Position& oldPosition, const Position& newPosition);
 
     std::size_t removePlayer(std::size_t id);
-    std::vector<std::size_t> collectAndKillDeadPlayers() const;
     std::size_t getAvailableSlotInTeam(std::string_view teamName) const;
     void eject(std::size_t id);
     bool hasEjectableTargetOnTile(const Position& position, std::size_t id) const;

@@ -136,7 +136,6 @@ TEST_F(WorldTest, UpdatePositionOnMapMovesPlayer) {
     const Position oldPos{.x = 0, .y = 0};
     const Position newPos{.x = 5, .y = 5};
 
-    // Cette méthode ne devrait pas crash
     ASSERT_NO_THROW(world.updatePositionOnMap(playerId.value(), oldPos, newPos));
 }
 
@@ -192,16 +191,6 @@ TEST_F(WorldTest, RandomCardinalPointReturnsValidOrientation) {
         ASSERT_GE(static_cast<uint8_t>(orientation), 0);
         ASSERT_LT(static_cast<uint8_t>(orientation), static_cast<uint8_t>(cardinalPoint::COUNT));
     }
-}
-
-TEST_F(WorldTest, CollectAndKillDeadPlayersReturnsEmptyWhenNoDeaths) {
-    World world{config};
-
-    [[maybe_unused]] auto p = world.spawnPlayer("team1");
-
-    const auto deadPlayers = world.collectAndKillDeadPlayers();
-
-    ASSERT_TRUE(deadPlayers.empty());
 }
 
 TEST_F(WorldTest, SpawnMultiplePlayersInSameTeam) {
