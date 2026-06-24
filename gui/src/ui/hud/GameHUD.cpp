@@ -10,6 +10,7 @@
 #include <memory>
 #include <string>
 
+#include "Camera.hpp"
 #include "EventDispatcher.hpp"
 #include "UIManager.hpp"
 #include "components/UICompass.hpp"
