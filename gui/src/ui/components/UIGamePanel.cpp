@@ -73,9 +73,11 @@ void UIGamePanel::draw() {
 
     _mainPanel->draw();
 
-    raylib::rcore::Window::beginScissorMode(
-        static_cast<int>(_position.x()), static_cast<int>(_position.y() + DefaultHeaderHeight),
-        static_cast<int>(_size.x()), static_cast<int>(_currentHeight - DefaultHeaderHeight));
+    int const scissorW = static_cast<int>(std::max(0.0F, _size.x() - (2.0F * Padding)));
+    int const scissorH = static_cast<int>(std::max(0.0F, _currentHeight - DefaultHeaderHeight - Padding));
+
+    raylib::rcore::Window::beginScissorMode(static_cast<int>(_position.x() + Padding),
+                                            static_cast<int>(_position.y() + DefaultHeaderHeight), scissorW, scissorH);
 
     if (!_isConfigMode) {
         for (auto& child : _contentChildren) {
@@ -257,20 +259,33 @@ void UIGamePanel::updateTextPosition() {
     }
 
     auto font = graphics::AssetManager::getInstance().getFont(DefaultFontName);
-    int const fontSize = font && font->valid() ? font->baseSize() : DefaultFontSize;
+    int fontSize = font && font->valid() ? font->baseSize() : DefaultFontSize;
     raylib::rtext::Font const defaultFont;
-    float const textWidth =
-        raylib::rtext::Text::measureText(font && font->valid() ? *font : defaultFont, _titleText->text(),
-                                         static_cast<float>(fontSize), TextSpacing)
-            .x();
-    auto const textHeight = static_cast<float>(fontSize);
 
+    float const maxWidth = _size.x() * 0.70F;
+    float textWidth = raylib::rtext::Text::measureText(font && font->valid() ? *font : defaultFont, _titleText->text(),
+                                                       static_cast<float>(fontSize), TextSpacing)
+                          .x();
+
+    while (textWidth > maxWidth && fontSize > 8) {
+        fontSize--;
+        textWidth = raylib::rtext::Text::measureText(font && font->valid() ? *font : defaultFont, _titleText->text(),
+                                                     static_cast<float>(fontSize), TextSpacing)
+                        .x();
+    }
+
+    _titleText->setFontSize(static_cast<float>(fontSize));
+
+    auto const textHeight = static_cast<float>(fontSize);
     _titleText->setPosition(_position.x() + ((_size.x() - textWidth) / 2.0F),
                             _position.y() + ((DefaultHeaderHeight - textHeight) / 2.0F));
 }
 
 void UIGamePanel::updateChildrenLayout() {
-    if (_contentChildren.empty() || _customLayout) {
+    if (_customLayout) {
+        return;
+    }
+    if (_contentChildren.empty()) {
         _maxScroll = 0.0F;
         _scrollOffset = 0.0F;
         return;
