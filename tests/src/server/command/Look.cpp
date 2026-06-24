@@ -9,6 +9,7 @@
 #include <gtest/gtest.h>
 
 #include <memory>
+#include <string>
 #include <vector>
 
 #include "command/ICommand.hpp"
@@ -50,7 +51,7 @@ TEST_F(LookTest, ExecuteLookLevel1EmptyMap) {
 
     auto responses = player.responses();
     ASSERT_FALSE(responses.empty());
-    static constexpr std::string expectedStart = "[ player,,,]\n";
+    static constexpr std::string expectedStart = "[player,,,]\n";
     ASSERT_EQ(responses.front(), expectedStart);
 }
 
@@ -78,7 +79,7 @@ TEST_F(LookTest, ExecuteLookWhithSomeItem) {
 
     auto responses = player.responses();
     ASSERT_FALSE(responses.empty());
-    const std::string expectedStart = "[ player,, food linemate,]\n";
+    const std::string expectedStart = "[player,, food linemate,]\n";
 
     ASSERT_EQ(responses.front(), expectedStart);
 }

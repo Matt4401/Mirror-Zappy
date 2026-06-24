@@ -406,6 +406,7 @@ std::string World::resourcesName(const ItemType item) {
     }
     return "";
 }
+
 std::string World::transformResourcesToStr(const Tile& tile) {
     std::string str{};
 
@@ -435,6 +436,9 @@ std::string World::visionOfPlayer(const std::vector<Position>& Positions) const 
         }
         const auto& tile = _tiles.at(getTileIndex(Positions.at(i)));
         str += transformResourcesToStr(tile);
+    }
+    if (str.size() > 1 && str.at(1) == ' ') {
+        str.erase(1, 1);
     }
     str += "]\n";
     return str;
