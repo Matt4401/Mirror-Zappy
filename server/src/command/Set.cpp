@@ -37,11 +37,11 @@ void Set::execute(game::World& world, game::Player& player) {
         return;
     }
     auto [x, y] = player.position();
-    world.addItemOnGround(item, player.position());
     world.addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pdr{
         .playerId = static_cast<int>(player.id()),
         .resourceId = static_cast<int>(item),
     }));
+    world.addItemOnGround(item, player.position());
     const auto inventory = player.inventory();
     player.addResponse("ok\n");
     world.addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pin{
