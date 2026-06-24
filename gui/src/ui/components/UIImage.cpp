@@ -12,9 +12,11 @@
 #include <memory>
 #include <string>
 #include <string_view>
+#include <utility>
 
 #include "Color.hpp"
 #include "graphics/AssetManager.hpp"
+#include "rtextures/Texture2D.hpp"
 
 namespace zappy::gui::ui::components {
 
