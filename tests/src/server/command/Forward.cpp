@@ -36,6 +36,8 @@ TEST(ForwardTest, CheckMovement) {
         .freq = 100,
     };
     game::World world{config};
+    // NOLINTNEXTLINE
+    const auto id = world.spawnPlayer("test");
 
     forward->execute(world, player);
     auto [fst, snd] = player.position();
@@ -54,6 +56,8 @@ TEST(ForwardTest, CheckMovementBordure) {
         .freq = 100,
     };
     game::World world{config};
+    // NOLINTNEXTLINE
+    const auto id = world.spawnPlayer("test");
 
     auto [maxX, maxY] = world.sizeMap();
     game::Player player{0, maxX - 1, maxY - 1, game::cardinalPoint::NORTH};
