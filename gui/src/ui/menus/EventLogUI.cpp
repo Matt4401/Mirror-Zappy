@@ -9,7 +9,6 @@
 
 #include <memory>
 #include <string>
-#include <type_traits>
 #include <utility>
 #include <variant>
 #include <vector>
@@ -47,6 +46,15 @@ std::string EventLogUI::getPlayerName(int playerId) const {
     return "Player #" + std::to_string(playerId);
 }
 
+namespace {
+template <class... Ts>
+struct overloaded : Ts... {
+    using Ts::operator()...;
+};
+template <class... Ts>
+overloaded(Ts...) -> overloaded<Ts...>;
+}  // namespace
+
 void EventLogUI::initEventSubscriptions() {
     _playerNameToken = _dispatcher.subscribe<events::PlayerNameChanged>(
         [this](const events::PlayerNameChanged& e) { _playerNames[e.playerId] = e.newName; });
@@ -54,69 +62,80 @@ void EventLogUI::initEventSubscriptions() {
     _serverCmdToken =
         _dispatcher.subscribe<shared::protocol::ServerCommand>([this](const shared::protocol::ServerCommand& cmd) {
             std::visit(
-                [this](auto&& arg) {
-                    using T = std::decay_t<decltype(arg)>;
-
-                    if constexpr (std::is_same_v<T, shared::protocol::server::Pnw>) {
+                overloaded{
+                    [this](const shared::protocol::server::Pnw& arg) {
                         addLogLine({{getPlayerName(arg.playerId), raylib::Color::Blue()},
                                     {" joined team ", raylib::Color::Black()},
                                     {arg.teamName, raylib::Color::Maroon()}});
-                    } else if constexpr (std::is_same_v<T, shared::protocol::server::Pex>) {
+                    },
+                    [this](const shared::protocol::server::Pex& arg) {
                         addLogLine({{getPlayerName(arg.playerId), raylib::Color::Blue()},
                                     {" used ", raylib::Color::Black()},
                                     {"expulsion", raylib::Color::Red()},
                                     {"!", raylib::Color::Black()}});
-                    } else if constexpr (std::is_same_v<T, shared::protocol::server::Pbc>) {
+                    },
+                    [this](const shared::protocol::server::Pbc& arg) {
                         addLogLine({{getPlayerName(arg.playerId), raylib::Color::Blue()},
                                     {" broadcasts: ", raylib::Color::Black()},
                                     {arg.message, raylib::Color::DarkGray()}});
-                    } else if constexpr (std::is_same_v<T, shared::protocol::server::Pic>) {
+                    },
+                    [this](const shared::protocol::server::Pic& arg) {
                         addLogLine({{"Incantation started at ", raylib::Color::Black()},
                                     {std::to_string(arg.x) + "," + std::to_string(arg.y), raylib::Color::DarkGray()},
                                     {" for level ", raylib::Color::Black()},
                                     {std::to_string(arg.level), raylib::Color::Maroon()},
                                     {"!", raylib::Color::Black()}});
-                    } else if constexpr (std::is_same_v<T, shared::protocol::server::Pie>) {
+                    },
+                    [this](const shared::protocol::server::Pie& arg) {
                         addLogLine({{"Incantation at ", raylib::Color::Black()},
                                     {std::to_string(arg.x) + "," + std::to_string(arg.y), raylib::Color::DarkGray()},
                                     {" finished. Result: ", raylib::Color::Black()},
-                                    {std::to_string(arg.incantationResult),
+                                    {arg.incantationResult ? "success" : "failure",
                                      arg.incantationResult ? raylib::Color::DarkGreen() : raylib::Color::Red()}});
-                    } else if constexpr (std::is_same_v<T, shared::protocol::server::Pfk>) {
+                    },
+                    [this](const shared::protocol::server::Pfk& arg) {
                         addLogLine({{getPlayerName(arg.playerId), raylib::Color::Blue()},
-                                    {" is laying an egg!", raylib::Color::DarkGray()}});
-                    } else if constexpr (std::is_same_v<T, shared::protocol::server::Pdr>) {
+                                    {" is laying an egg !", raylib::Color::DarkGray()}});
+                    },
+                    [this](const shared::protocol::server::Pdr& arg) {
                         addLogLine({{getPlayerName(arg.playerId), raylib::Color::Blue()},
                                     {" dropping ", raylib::Color::Black()},
                                     {getResourceName(arg.resourceId), getResourceColor(arg.resourceId)}});
-                    } else if constexpr (std::is_same_v<T, shared::protocol::server::Pgt>) {
+                    },
+                    [this](const shared::protocol::server::Pgt& arg) {
                         addLogLine({{getPlayerName(arg.playerId), raylib::Color::Blue()},
                                     {" picking up ", raylib::Color::Black()},
                                     {getResourceName(arg.resourceId), getResourceColor(arg.resourceId)}});
-                    } else if constexpr (std::is_same_v<T, shared::protocol::server::Pdi>) {
+                    },
+                    [this](const shared::protocol::server::Pdi& arg) {
                         addLogLine({{getPlayerName(arg.playerId), raylib::Color::Blue()},
                                     {" was starved to death", raylib::Color::Red()}});
-                    } else if constexpr (std::is_same_v<T, shared::protocol::server::Enw>) {
+                    },
+                    [this](const shared::protocol::server::Enw& arg) {
                         addLogLine({{getPlayerName(arg.playerId), raylib::Color::Blue()},
                                     {" laid ", raylib::Color::Black()},
                                     {"Egg #" + std::to_string(arg.eggId), raylib::Color::Maroon()},
-                                    {"!", raylib::Color::Black()}});
-                    } else if constexpr (std::is_same_v<T, shared::protocol::server::Ebo>) {
+                                    {" !", raylib::Color::Black()}});
+                    },
+                    [this](const shared::protocol::server::Ebo& arg) {
                         addLogLine({{"Egg #", raylib::Color::Black()},
                                     {std::to_string(arg.eggId), raylib::Color::DarkBrown()},
                                     {" hatched", raylib::Color::DarkGreen()}});
-                    } else if constexpr (std::is_same_v<T, shared::protocol::server::Edi>) {
+                    },
+                    [this](const shared::protocol::server::Edi& arg) {
                         addLogLine({{"Egg #", raylib::Color::Black()},
                                     {std::to_string(arg.eggId), raylib::Color::DarkBrown()},
                                     {" died of starvation", raylib::Color::Red()}});
-                    } else if constexpr (std::is_same_v<T, shared::protocol::server::Seg>) {
+                    },
+                    [this](const shared::protocol::server::Seg& arg) {
                         addLogLine({{"Game Over! Team ", raylib::Color::Red()},
                                     {arg.teamName, raylib::Color::Maroon()},
                                     {" won!", raylib::Color::Red()}});
-                    } else if constexpr (std::is_same_v<T, shared::protocol::server::Smg>) {
+                    },
+                    [this](const shared::protocol::server::Smg& arg) {
                         addLogLine({{"Server: ", raylib::Color::Maroon()}, {arg.message, raylib::Color::DarkGray()}});
-                    }
-                },
+                    },
+                    [](const auto& /*unused*/) {}},
                 cmd);
         });
 }
