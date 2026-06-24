@@ -23,7 +23,7 @@ namespace zappy::gui::ui::components {
 class EventLogRow : public IUIComponent {
   public:
     EventLogRow(const std::vector<std::pair<std::string, raylib::Color>>& segments,
-                std::shared_ptr<raylib::rtext::Font> font);
+                const std::shared_ptr<raylib::rtext::Font>& font);
     ~EventLogRow() override = default;
 
     EventLogRow(const EventLogRow& other) = delete;

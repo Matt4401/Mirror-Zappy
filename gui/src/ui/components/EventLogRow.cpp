@@ -19,7 +19,7 @@
 namespace zappy::gui::ui::components {
 
 EventLogRow::EventLogRow(const std::vector<std::pair<std::string, raylib::Color>>& segments,
-                         std::shared_ptr<raylib::rtext::Font> font) {
+                         const std::shared_ptr<raylib::rtext::Font>& font) {
     for (const auto& [text, color] : segments) {
         auto uiText = std::make_shared<components::UIText>(text, font);
         uiText->setColor(color);
