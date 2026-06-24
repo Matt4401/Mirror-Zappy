@@ -55,73 +55,87 @@ GlobalStatsUI::~GlobalStatsUI() {
     }
 }
 
+void GlobalStatsUI::onTnaReceived(const shared::protocol::server::Tna& cmd) { ensureTeamExists(cmd.teamName); }
+
+void GlobalStatsUI::onPnwReceived(const shared::protocol::server::Pnw& cmd) {
+    _players[cmd.playerId] = PlayerInfo{.teamName = cmd.teamName, .level = cmd.level};
+    _totalPlayers++;
+
+    TeamStat& team = ensureTeamExists(cmd.teamName);
+    team.population++;
+    if (cmd.level >= VictoryLevel) {
+        team.level8Count++;
+    }
+}
+
+void GlobalStatsUI::onPlvReceived(const shared::protocol::server::Plv& cmd) {
+    if (auto it = _players.find(cmd.playerId); it != _players.end()) {
+        if (cmd.level >= VictoryLevel && it->second.level < VictoryLevel) {
+            TeamStat& team = ensureTeamExists(it->second.teamName);
+            team.level8Count++;
+        }
+        it->second.level = cmd.level;
+    }
+}
+
+void GlobalStatsUI::onPdiReceived(const shared::protocol::server::Pdi& cmd) {
+    if (auto it = _players.find(cmd.playerId); it != _players.end()) {
+        TeamStat& team = ensureTeamExists(it->second.teamName);
+        team.population--;
+        if (it->second.level >= VictoryLevel) {
+            team.level8Count--;
+        }
+        _players.erase(it);
+        _totalPlayers--;
+    }
+}
+
+void GlobalStatsUI::onEnwReceived(const shared::protocol::server::Enw& cmd) {
+    _eggs.insert(cmd.eggId);
+    _totalEggs++;
+}
+
+void GlobalStatsUI::onEboReceived(const shared::protocol::server::Ebo& cmd) {
+    if (_eggs.contains(cmd.eggId)) {
+        _eggs.erase(cmd.eggId);
+        _totalEggs--;
+    }
+}
+
+void GlobalStatsUI::onEdiReceived(const shared::protocol::server::Edi& cmd) {
+    if (_eggs.contains(cmd.eggId)) {
+        _eggs.erase(cmd.eggId);
+        _totalEggs--;
+    }
+}
+
 void GlobalStatsUI::initEventSubscriptions() {
     auto tnaToken = _dispatcher.get().subscribe<shared::protocol::server::Tna>(
-        [this](const shared::protocol::server::Tna& cmd) { ensureTeamExists(cmd.teamName); });
+        [this](const shared::protocol::server::Tna& cmd) { onTnaReceived(cmd); });
     _eventTokens.push_back(tnaToken);
 
-    auto pnwToken =
-        _dispatcher.get().subscribe<shared::protocol::server::Pnw>([this](const shared::protocol::server::Pnw& cmd) {
-            _players[cmd.playerId] = PlayerInfo{.teamName = cmd.teamName, .level = cmd.level};
-            _totalPlayers++;
-
-            TeamStat& team = ensureTeamExists(cmd.teamName);
-            team.population++;
-            if (cmd.level >= VictoryLevel) {
-                team.level8Count++;
-            }
-        });
+    auto pnwToken = _dispatcher.get().subscribe<shared::protocol::server::Pnw>(
+        [this](const shared::protocol::server::Pnw& cmd) { onPnwReceived(cmd); });
     _eventTokens.push_back(pnwToken);
 
-    auto plvToken =
-        _dispatcher.get().subscribe<shared::protocol::server::Plv>([this](const shared::protocol::server::Plv& cmd) {
-            if (auto it = _players.find(cmd.playerId); it != _players.end()) {
-                if (cmd.level >= VictoryLevel && it->second.level < VictoryLevel) {
-                    TeamStat& team = ensureTeamExists(it->second.teamName);
-                    team.level8Count++;
-                }
-                it->second.level = cmd.level;
-            }
-        });
+    auto plvToken = _dispatcher.get().subscribe<shared::protocol::server::Plv>(
+        [this](const shared::protocol::server::Plv& cmd) { onPlvReceived(cmd); });
     _eventTokens.push_back(plvToken);
 
-    auto pdiToken =
-        _dispatcher.get().subscribe<shared::protocol::server::Pdi>([this](const shared::protocol::server::Pdi& cmd) {
-            if (auto it = _players.find(cmd.playerId); it != _players.end()) {
-                TeamStat& team = ensureTeamExists(it->second.teamName);
-                team.population--;
-                if (it->second.level >= VictoryLevel) {
-                    team.level8Count--;
-                }
-                _players.erase(it);
-                _totalPlayers--;
-            }
-        });
+    auto pdiToken = _dispatcher.get().subscribe<shared::protocol::server::Pdi>(
+        [this](const shared::protocol::server::Pdi& cmd) { onPdiReceived(cmd); });
     _eventTokens.push_back(pdiToken);
 
-    auto enwToken =
-        _dispatcher.get().subscribe<shared::protocol::server::Enw>([this](const shared::protocol::server::Enw& cmd) {
-            _eggs.insert(cmd.eggId);
-            _totalEggs++;
-        });
+    auto enwToken = _dispatcher.get().subscribe<shared::protocol::server::Enw>(
+        [this](const shared::protocol::server::Enw& cmd) { onEnwReceived(cmd); });
     _eventTokens.push_back(enwToken);
 
-    auto eboToken =
-        _dispatcher.get().subscribe<shared::protocol::server::Ebo>([this](const shared::protocol::server::Ebo& cmd) {
-            if (_eggs.contains(cmd.eggId)) {
-                _eggs.erase(cmd.eggId);
-                _totalEggs--;
-            }
-        });
+    auto eboToken = _dispatcher.get().subscribe<shared::protocol::server::Ebo>(
+        [this](const shared::protocol::server::Ebo& cmd) { onEboReceived(cmd); });
     _eventTokens.push_back(eboToken);
 
-    auto ediToken =
-        _dispatcher.get().subscribe<shared::protocol::server::Edi>([this](const shared::protocol::server::Edi& cmd) {
-            if (_eggs.contains(cmd.eggId)) {
-                _eggs.erase(cmd.eggId);
-                _totalEggs--;
-            }
-        });
+    auto ediToken = _dispatcher.get().subscribe<shared::protocol::server::Edi>(
+        [this](const shared::protocol::server::Edi& cmd) { onEdiReceived(cmd); });
     _eventTokens.push_back(ediToken);
 }
 

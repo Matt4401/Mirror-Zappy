@@ -51,6 +51,14 @@ class GlobalStatsUI : public components::UIGamePanel {
 
     void initEventSubscriptions();
 
+    void onTnaReceived(const shared::protocol::server::Tna& cmd);
+    void onPnwReceived(const shared::protocol::server::Pnw& cmd);
+    void onPlvReceived(const shared::protocol::server::Plv& cmd);
+    void onPdiReceived(const shared::protocol::server::Pdi& cmd);
+    void onEnwReceived(const shared::protocol::server::Enw& cmd);
+    void onEboReceived(const shared::protocol::server::Ebo& cmd);
+    void onEdiReceived(const shared::protocol::server::Edi& cmd);
+
     TeamStat& ensureTeamExists(const std::string& teamName);
     raylib::Color nextTeamColor() const;
 
