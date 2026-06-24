@@ -6,6 +6,7 @@ from .states.ReproduceState import ReproduceState
 from .states.EvolveState import EvolveState
 from .states.GatherState import GatherState
 from .states.SurviveState import SurviveState
+from .states.HelpTeamMatesState import HelpTeamMatesState
 from .AState import AState
 from .TickManager import TickManager
 
@@ -47,7 +48,7 @@ class FiniteStateMachine:
                         self.trantorian.player_state.vision.update_tiles(tiles)
                     completed.append(cmd_id)
                 except Exception as e:
-                    print(f"Eror with {cmd_type}: {e}")
+                    print(f"Error with {cmd_type}: {e}")
                     completed.append(cmd_id)
 
         for cmd_id in completed:
@@ -83,6 +84,9 @@ class FiniteStateMachine:
         if food < SURVIVAL_THRESHOLD:
             self.trantorian.logger.warning("[FSM]: Food is low, transitioning to SurviveState")
             self.transition_to(SurviveState)
+            return
+        if self.trantorian.player_state.level == 8:
+            self.transition_to(HelpTeamMatesState)
             return
 
         if self.trantorian.has_enough_resources_for(
