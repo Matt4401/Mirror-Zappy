@@ -73,8 +73,8 @@ TileInspectorUI::TileInspectorUI(float x, float y, float width, events::EventDis
 
     getEventTokens().push_back(
         getDispatcher().subscribe<events::TileClicked>([this](const events::TileClicked& e) { onTileClicked(e); }));
-    getEventTokens().push_back(getDispatcher().subscribe<events::PlayerClicked>(
-        [this](const events::PlayerClicked& /*e*/) { setVisible(false); }));
+    getEventTokens().push_back(
+        getDispatcher().subscribe<events::PlayerClicked>([](const events::PlayerClicked& /*e*/) {}));
     getEventTokens().push_back(getDispatcher().subscribe<shared::protocol::server::Bct>(
         [this](const shared::protocol::server::Bct& cmd) { onBctReceived(cmd); }));
     getEventTokens().push_back(getDispatcher().subscribe<shared::protocol::server::Pic>(
@@ -220,12 +220,18 @@ void TileInspectorUI::draw() {
     float const startX = this->getPosition().x();
 
     float const headerH = components::UIGamePanel::getHeaderHeight();
+    float const padding = components::UIGamePanel::getPadding();
     float const currentH = this->getCurrentHeight();
-    raylib::rcore::Window::beginScissorMode(static_cast<int>(startX),
-                                            static_cast<int>(this->getPosition().y() + headerH),
-                                            static_cast<int>(panelW), static_cast<int>(currentH - headerH));
 
-    float currentY = this->getPosition().y() + BaseYOffset;
+    float const innerX = startX + padding;
+    float const innerY = this->getPosition().y() + headerH;
+    float const innerW = panelW - (2.0F * padding);
+    float const innerH = currentH - headerH - padding;
+
+    raylib::rcore::Window::beginScissorMode(static_cast<int>(innerX), static_cast<int>(innerY),
+                                            static_cast<int>(innerW), static_cast<int>(innerH));
+
+    float currentY = this->getPosition().y() + BaseYOffset - getScrollOffset();
 
     if (_posText) {
         float const posTextW = _posText->getWidth();
@@ -245,6 +251,10 @@ void TileInspectorUI::draw() {
     currentY += ElementSpacingLarge;
 
     drawTileInventoryPanel(currentY, startX, panelW);
+
+    float const totalContentHeight = (currentY + getScrollOffset()) - this->getPosition().y();
+    float const calculatedMaxScroll = std::max(0.0F, totalContentHeight - currentH + 20.0F);
+    setMaxScroll(calculatedMaxScroll);
 
     raylib::rcore::Window::endScissorMode();
 }
