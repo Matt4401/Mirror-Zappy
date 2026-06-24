@@ -330,11 +330,28 @@ void World::addItemOnGround(ItemType item, const Position pos, const std::size_t
 
 bool World::removeItemOnGround(ItemType item, const Position pos, const std::size_t nbItem) {
     auto& resources = _tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(item));
-    if (resources >= nbItem) {
-        resources -= nbItem;
-        return true;
+    if (resources < nbItem) {
+        return false;
     }
-    return false;
+    resources -= nbItem;
+    addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Bct{
+        .x = static_cast<int>(pos.x),
+        .y = static_cast<int>(pos.y),
+        .food = static_cast<int>(_tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(ItemType::Food))),
+        .linemate =
+            static_cast<int>(_tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(ItemType::Linemate))),
+        .deraumere =
+            static_cast<int>(_tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(ItemType::Deraumere))),
+        .sibur =
+            static_cast<int>(_tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(ItemType::Sibur))),
+        .mendiane =
+            static_cast<int>(_tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(ItemType::Mendiane))),
+        .phiras =
+            static_cast<int>(_tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(ItemType::Phiras))),
+        .thystame =
+            static_cast<int>(_tiles.at(getTileIndex(pos)).resources.at(static_cast<std::uint8_t>(ItemType::Thystame))),
+    }));
+    return true;
 }
 
 std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> World::resourcesAt(const Position position) const {
