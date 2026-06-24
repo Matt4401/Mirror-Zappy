@@ -150,8 +150,7 @@ TEST(PinCommandTest, PinCmd) {
 }
 
 TEST(PlvCommandTest, ExecuteReturnsProperlyFormattedTileContent) {
-    auto args = createDummyArgs();
-    zappy::server::Core core{std::span(args)};
+    zappy::server::Core core{createDummyConfig()};
 
     // NOLINTNEXTLINE
     auto& world = const_cast<zappy::server::game::World&>(core.world());
@@ -172,8 +171,7 @@ TEST(PlvCommandTest, ExecuteReturnsProperlyFormattedTileContent) {
 }
 
 TEST(PlvCommandTest, ExecuteFailsSafelyOnOutOfBounds) {
-    auto args = createDummyArgs();
-    zappy::server::Core core{std::span(args)};
+    zappy::server::Core core{createDummyConfig()};
 
     zappy::server::guiCommand::Plv command{zappy::shared::protocol::client::Plv{.playerId = 100}};
     const std::string response = command.execute(core).message;
