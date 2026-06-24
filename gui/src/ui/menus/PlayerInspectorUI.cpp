@@ -85,7 +85,7 @@ constexpr float HeartsToInventorySpacing = 40.0F;
 constexpr int MaxHearts = 10;
 constexpr int MaxXp = 8;
 
-constexpr float InvToBtnSpacing = 180.0F;
+constexpr float InvToBtnSpacing = 30.0F;
 
 constexpr float CameraPosX = 0.0F;
 constexpr float CameraPosY = 4.0F;
@@ -123,8 +123,7 @@ PlayerInspectorUI::PlayerInspectorUI(float x, float y, float width, events::Even
 
     getEventTokens().push_back(getDispatcher().subscribe<events::PlayerClicked>(
         [this](const events::PlayerClicked& e) { onPlayerClicked(e); }));
-    getEventTokens().push_back(getDispatcher().subscribe<events::TileClicked>(
-        [this](const events::TileClicked& /*e*/) { setVisible(false); }));
+    getEventTokens().push_back(getDispatcher().subscribe<events::TileClicked>([](const events::TileClicked& /*e*/) {}));
     getEventTokens().push_back(getDispatcher().subscribe<shared::protocol::server::Pin>(
         [this](const shared::protocol::server::Pin& cmd) { onPinReceived(cmd); }));
     getEventTokens().push_back(getDispatcher().subscribe<shared::protocol::server::Plv>(
@@ -205,7 +204,7 @@ void PlayerInspectorUI::buildInfoPanel() {
         }
     });
 
-    _teamText = std::make_shared<components::UIText>("Team: None", getFont());
+    _teamText = std::make_shared<components::UIText>("None", getFont());
     _teamText->setFontSize(static_cast<int>(InfoFontSize));
     _teamText->setColor(raylib::Color::DarkGray());
 
@@ -249,7 +248,7 @@ void PlayerInspectorUI::onPlayerClicked(const events::PlayerClicked& event) {
         _idText->setText("ID: " + std::to_string(event.playerId));
     }
     if (_teamText) {
-        _teamText->setText("Team: " + event.teamName);
+        _teamText->setText(event.teamName);
         _teamText->setColor(event.teamColor);
     }
     if (_previewModel) {
@@ -514,12 +513,18 @@ void PlayerInspectorUI::draw() {
     float const startX = this->getPosition().x();
 
     float const headerH = components::UIGamePanel::getHeaderHeight();
+    float const padding = components::UIGamePanel::getPadding();
     float const currentH = this->getCurrentHeight();
-    raylib::rcore::Window::beginScissorMode(static_cast<int>(startX),
-                                            static_cast<int>(this->getPosition().y() + headerH),
-                                            static_cast<int>(panelW), static_cast<int>(currentH - headerH));
 
-    float currentY = this->getPosition().y() + BaseYOffset;
+    float const innerX = startX + padding;
+    float const innerY = this->getPosition().y() + headerH;
+    float const innerW = panelW - (2.0F * padding);
+    float const innerH = currentH - headerH - padding;
+
+    raylib::rcore::Window::beginScissorMode(static_cast<int>(innerX), static_cast<int>(innerY),
+                                            static_cast<int>(innerW), static_cast<int>(innerH));
+
+    float currentY = this->getPosition().y() + BaseYOffset - getScrollOffset();
 
     drawHeader(currentY, startX, panelW);
     drawStatsBlock(currentY, startX, panelW);
@@ -528,6 +533,10 @@ void PlayerInspectorUI::draw() {
     drawInventoryPanel(currentY, startX, panelW);
     currentY += InvToBtnSpacing;
     drawActionButtons(currentY, startX, panelW);
+
+    float const totalContentHeight = (currentY + getScrollOffset()) - this->getPosition().y();
+    float const calculatedMaxScroll = std::max(0.0F, totalContentHeight - currentH + 20.0F);
+    setMaxScroll(calculatedMaxScroll);
 
     raylib::rcore::Window::endScissorMode();
 }
