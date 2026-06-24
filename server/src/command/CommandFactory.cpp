@@ -98,12 +98,7 @@ void CommandFactory::registerGuiCommands() {
         return parseAndCreateGuiCommand<shared::protocol::client::Sst, guiCommand::Sst>(rawCommand);
     });
     _guiCreators.emplace("pin", [](std::string_view rawCommand) -> std::unique_ptr<guiCommand::IGuiCommand> {
-        auto parsedCmd = shared::protocol::Parser::parseClientCommand(rawCommand);
-
-        if (const auto* pinParams = std::get_if<shared::protocol::client::Pin>(&parsedCmd)) {
-            return std::make_unique<guiCommand::Pin>(pinParams->playerId);
-        }
-        return std::make_unique<guiCommand::Sbp>();
+        return parseAndCreateGuiCommand<shared::protocol::client::Pin, guiCommand::Pin>(rawCommand);
     });
 }
 
