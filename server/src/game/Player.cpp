@@ -34,16 +34,13 @@ constexpr bool hasEnoughResources(const zappy::server::game::InventoryArray& gro
 namespace zappy::server::game {
 
 Player::Player(const std::size_t id, const std::size_t x, const std::size_t y, const cardinalPoint orient)
-    : _orientation(orient), _lifeTick(kNbStartFood * kNbLifeTickFood), _pos({.x = x, .y = y}), _id(id) {
+    : _orientation(orient), _lifeTick(kNbLifeTickFood), _pos({.x = x, .y = y}), _id(id) {
     _inventory.fill(0);
     setItem(ItemType::Food, kNbStartFood);
 }
 
 void Player::addItem(ItemType item, const std::size_t quantity) {
     _inventory.at(static_cast<std::uint8_t>(item)) += quantity;
-    if (item == ItemType::Food) {
-        _lifeTick += kNbLifeTickFood * quantity;
-    }
 }
 
 bool Player::subItem(ItemType item, const std::size_t quantity) {
@@ -74,6 +71,7 @@ void Player::update(World& world) {
             _inventory.at(static_cast<std::uint8_t>(ItemType::Food))--;
         } else {
             world.removePlayer(_id);
+            return;
         }
     }
     if (_isNewCommand) {
@@ -212,7 +210,11 @@ Position Player::getNthDiagonalLeftPosition(const std::size_t n, const Position 
 
 int Player::level() const { return _level; }
 
-void Player::levelUp() { _level++; }
+void Player::levelUp() {
+    if (_level <= < kNbLevel) {
+        _level++;
+    }
+}
 
 bool Player::checkIncantationRequirements(
     const std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)>& resources, const std::size_t nbPlayer) const {
