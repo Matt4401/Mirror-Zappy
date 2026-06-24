@@ -14,6 +14,7 @@
 #include <utility>
 
 #include "Color.hpp"
+#include "rcore/BoundingBox.hpp"
 #include "rcore/Matrix.hpp"
 #include "rmath/Vector3.hpp"
 #include "rmodels/Mesh.hpp"
@@ -45,6 +46,10 @@ class Model {
     [[nodiscard]] bool valid() const { return IsModelValid(_model); }
     [[nodiscard]] ::Model model() const { return _model; }
     [[nodiscard]] ::Model& model() { return _model; }
+
+    [[nodiscard]] rcore::BoundingBox getBoundingBox() const {
+        return rcore::BoundingBox{::GetModelBoundingBox(_model)};
+    }
 
     void setMaterialShader(int materialIndex, const Shader& shader) const {
         std::span<::Material> const materials{_model.materials, static_cast<std::size_t>(_model.materialCount)};

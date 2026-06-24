@@ -14,7 +14,7 @@
 
 namespace zappy::server::guiCommand {
 
-Sst::Sst(int timeUnit) : _timeUnit(timeUnit) {}
+Sst::Sst(shared::protocol::client::Sst cmd) : _timeUnit(cmd.timeUnit) {}
 
 GuiResponse Sst::execute(Core& core) {
     if (_timeUnit <= 0) {

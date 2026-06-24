@@ -25,8 +25,8 @@ namespace zappy::gui::ui::menus {
 
 class WorldControlUI : public components::UIGamePanel {
   public:
-    WorldControlUI(float x, float width, std::shared_ptr<events::EventDispatcher> dispatcher,
-                   std::shared_ptr<raylib::rtext::Font> font, std::function<void(const std::string&)> onSendCommand);
+    WorldControlUI(float x, float width, events::EventDispatcher& dispatcher, std::shared_ptr<raylib::rtext::Font> font,
+                   std::function<void(const std::string&)> onSendCommand);
     ~WorldControlUI() override;
 
     WorldControlUI(const WorldControlUI& other) = delete;
@@ -50,7 +50,7 @@ class WorldControlUI : public components::UIGamePanel {
 
     void updateChildrenPositions();
 
-    std::shared_ptr<events::EventDispatcher> _dispatcher;
+    std::reference_wrapper<events::EventDispatcher> _dispatcher;
     std::shared_ptr<raylib::rtext::Font> _font;
     std::function<void(const std::string&)> _onSendCommand;
     std::vector<events::EventDispatcher::EventToken> _eventTokens;

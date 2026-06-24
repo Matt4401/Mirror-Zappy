@@ -7,8 +7,10 @@
 
 #include "ItemBag.hpp"
 
+#include <algorithm>
 #include <cstddef>
 #include <memory>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -33,5 +35,26 @@ void ItemBag::removeItem(std::size_t index) {
         return;
     }
     _items.erase(_items.begin() + static_cast<std::vector<Item>::difference_type>(index));
+}
+
+std::size_t ItemBag::quantity(const std::string_view name) const {
+    for (const auto& item : _items) {
+        if (item.object->name() == name) {
+            return item.quantity;
+        }
+    }
+    return 0;
+}
+
+void ItemBag::removeItem(const std::string_view name, const std::size_t quantity) {
+    auto item = std::ranges::find_if(_items, [name](const Item& item) { return item.object->name() == name; });
+
+    if (item != _items.end()) {
+        if (item->quantity <= quantity) {
+            _items.erase(item);
+        } else {
+            item->quantity -= quantity;
+        }
+    }
 }
 }  // namespace zappy::gui::game

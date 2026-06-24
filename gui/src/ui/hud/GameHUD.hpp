@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <functional>
 #include <memory>
 
 #include "events/EventDispatcher.hpp"
@@ -22,7 +23,7 @@ namespace zappy::gui::ui::hud {
 
 class GameHUD {
   public:
-    GameHUD(std::shared_ptr<events::EventDispatcher> dispatcher, const std::shared_ptr<raylib::rtext::Font>& font);
+    GameHUD(events::EventDispatcher& dispatcher, const std::shared_ptr<raylib::rtext::Font>& font);
     ~GameHUD() = default;
 
     GameHUD(const GameHUD& other) = delete;
@@ -38,7 +39,7 @@ class GameHUD {
     [[nodiscard]] std::shared_ptr<menus::WorldControlUI> getWorldControl() const { return _worldControl; }
 
   private:
-    std::shared_ptr<events::EventDispatcher> _dispatcher;
+    std::reference_wrapper<events::EventDispatcher> _dispatcher;
     std::shared_ptr<raylib::rtext::Font> _font;
     std::shared_ptr<components::UIGridManager> _gridManager;
     std::shared_ptr<menus::PauseMenu> _pauseMenu;

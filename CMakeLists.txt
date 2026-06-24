@@ -29,7 +29,7 @@ add_custom_command(
         DEPENDS ${CMAKE_SOURCE_DIR}/ai/zappy_ai.py
 )
 
-add_custom_target(prepare_script ALL DEPENDS ${CMAKE_SOURCE_DIR}/zappy_ai)
+add_custom_target(zappy_ai ALL DEPENDS ${CMAKE_SOURCE_DIR}/zappy_ai)
 
 add_custom_target(tests_functional
         COMMAND bash run_tests.sh -v

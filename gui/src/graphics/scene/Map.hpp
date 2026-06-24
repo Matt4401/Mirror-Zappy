@@ -8,12 +8,11 @@
 #pragma once
 #include <functional>
 #include <map>
-#include <memory>
 #include <string>
 #include <utility>
-#include <vector>
 
 #include "Tile3D.hpp"
+#include "WorldManager.hpp"
 #include "events/EventDispatcher.hpp"
 #include "game/GameModel.hpp"
 #include "game/Player.hpp"
@@ -39,18 +38,17 @@ class Map {
     static constexpr const char* MENDIANE_MODEL_RESOURCE = "assets/orange-ore/scene.gltf";
     static constexpr const char* FOOD_TEXTURE_RESOURCE = "assets/food.glb";
 
-    Map(int width, int height, std::shared_ptr<raylib::rcore::Camera> camera,
-        std::shared_ptr<events::EventDispatcher> dispatcher = nullptr);
+    Map(raylib::rcore::Camera& camera, WorldManager& worldManager, events::EventDispatcher& dispatcher);
     ~Map();
     Map(const Map& other) = delete;
     Map& operator=(const Map& other) = delete;
     Map(Map&& other) = delete;
     Map& operator=(Map&& other) = delete;
 
-    void resize(int width, int height);
-
     void draw() const;
     void handleEvent();
+
+    void clearHoveredTile() { _hoveredTile = nullptr; }
 
   protected:
   private:
@@ -58,13 +56,11 @@ class Map {
     void dispatchClickedPlayer(const game::Team& team, const game::Player& player) const;
     void dispatchClickedTile(const Tile3D& tile) const;
 
-    std::shared_ptr<raylib::rcore::Camera> _camera;
-    std::shared_ptr<events::EventDispatcher> _dispatcher;
-    std::vector<Tile3D> _tiles;
-    std::vector<game::Team> _teams;
+    const Tile3D* _hoveredTile{nullptr};
+    std::reference_wrapper<raylib::rcore::Camera> _camera;
+    std::reference_wrapper<events::EventDispatcher> _dispatcher;
+    std::reference_wrapper<WorldManager> _worldManager;
     game::GameModel _gameModel;
-    int _width{0};
-    int _height{0};
     std::map<std::string, ItemFunc> _itemDrawFunctions;
     raylib::rmodels::Model _tileModel{TILE_MODEL_RESOURCE};
     raylib::rmodels::Model _deraumereModel{DERAUMERE_MODEL_RESOURCE};

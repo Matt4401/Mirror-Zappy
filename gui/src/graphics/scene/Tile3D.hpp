@@ -13,12 +13,19 @@
 #include "rmodels/Model.hpp"
 
 namespace zappy::gui::graphics::scene {
+struct Tile3DPosition {
+    int x{0};
+    int y{0};
+
+    bool operator==(const Tile3DPosition& other) const = default;
+};
+
 class Tile3D {
   public:
     static constexpr float TILE_SIZE = 4.0F;
     static constexpr float TILE_SCALE = 2.0F;
 
-    explicit Tile3D(int gridX = 0, int gridY = 0, raylib::rmath::Vector3 position = {0.0F, 0.0F, 0.0F});
+    explicit Tile3D(Tile3DPosition gridPosition = {}, raylib::rmath::Vector3 position = {0.0F, 0.0F, 0.0F});
     ~Tile3D() = default;
     Tile3D(const Tile3D& other) = delete;
     Tile3D& operator=(const Tile3D& other) = delete;
@@ -28,16 +35,14 @@ class Tile3D {
     void draw(const raylib::rmodels::Model& model) const;
 
     [[nodiscard]] raylib::rmath::Vector3 position() const { return _position; }
-    [[nodiscard]] int gridX() const { return _gridX; }
-    [[nodiscard]] int gridY() const { return _gridY; }
-    [[nodiscard]] raylib::rcore::BoundingBox boundingBox() const;
+    [[nodiscard]] raylib::rcore::BoundingBox boundingBox(const raylib::rcore::BoundingBox& modelBB) const;
+    [[nodiscard]] Tile3DPosition gridPosition() const { return _gridPosition; }
     [[nodiscard]] const game::ItemBag& itemBag() const { return _itemBag; }
     [[nodiscard]] game::ItemBag& itemBag() { return _itemBag; }
 
   protected:
   private:
-    int _gridX{0};
-    int _gridY{0};
+    Tile3DPosition _gridPosition;
     raylib::rmath::Vector3 _position;
     game::ItemBag _itemBag;
 };

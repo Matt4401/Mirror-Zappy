@@ -37,6 +37,8 @@ class CommandFactory {
 
     void registerCommands();
     void registerGuiCommands();
+    template <typename ParsedCommandType, typename GuiCommandType>
+    static std::unique_ptr<guiCommand::IGuiCommand> parseAndCreateGuiCommand(std::string_view rawCommand);
 
     std::unordered_map<std::string, CommandCreator> _creators;
     std::unordered_map<std::string, GuiCommandCreator> _guiCreators;

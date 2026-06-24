@@ -94,6 +94,19 @@ TEST(GuiCommandFactoryTest, CreateSstCommand) {
     EXPECT_NE(sbpCommand, nullptr);
 }
 
+TEST(GuiCommandFactoryTest, CreateSgtCommand) {
+    const zappy::server::command::CommandFactory factory;
+    std::string rawCommand = "sgt 10 ";
+    auto command = factory.createGuiCommand(rawCommand);
+
+    EXPECT_NE(command, nullptr);
+    rawCommand = "sgt invalid_param";
+    command = factory.createGuiCommand(rawCommand);
+    ASSERT_NE(command, nullptr);
+    const auto& sbpCommand = dynamic_cast<zappy::server::guiCommand::Sbp*>(command.get());
+    EXPECT_NE(sbpCommand, nullptr);
+}
+
 TEST(GuiCommandFactoryTest, CreatePinCommand) {
     const zappy::server::command::CommandFactory factory;
 
