@@ -58,8 +58,11 @@ GlobalStatsUI::~GlobalStatsUI() {
 void GlobalStatsUI::onTnaReceived(const shared::protocol::server::Tna& cmd) { ensureTeamExists(cmd.teamName); }
 
 void GlobalStatsUI::onPnwReceived(const shared::protocol::server::Pnw& cmd) {
+    if (_players.contains(cmd.playerId)) {
+        return;
+    }
     _players[cmd.playerId] = PlayerInfo{.teamName = cmd.teamName, .level = cmd.level};
-    _totalPlayers++;
+    _totalPlayers = static_cast<int>(_players.size());
 
     TeamStat& team = ensureTeamExists(cmd.teamName);
     team.population++;
@@ -91,21 +94,20 @@ void GlobalStatsUI::onPdiReceived(const shared::protocol::server::Pdi& cmd) {
 }
 
 void GlobalStatsUI::onEnwReceived(const shared::protocol::server::Enw& cmd) {
-    _eggs.insert(cmd.eggId);
-    _totalEggs++;
+    if (_eggs.insert(cmd.eggId).second) {
+        _totalEggs = static_cast<int>(_eggs.size());
+    }
 }
 
 void GlobalStatsUI::onEboReceived(const shared::protocol::server::Ebo& cmd) {
-    if (_eggs.contains(cmd.eggId)) {
-        _eggs.erase(cmd.eggId);
-        _totalEggs--;
+    if (_eggs.erase(cmd.eggId) > 0) {
+        _totalEggs = static_cast<int>(_eggs.size());
     }
 }
 
 void GlobalStatsUI::onEdiReceived(const shared::protocol::server::Edi& cmd) {
-    if (_eggs.contains(cmd.eggId)) {
-        _eggs.erase(cmd.eggId);
-        _totalEggs--;
+    if (_eggs.erase(cmd.eggId) > 0) {
+        _totalEggs = static_cast<int>(_eggs.size());
     }
 }
 
