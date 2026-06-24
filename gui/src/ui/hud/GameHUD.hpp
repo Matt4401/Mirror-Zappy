@@ -11,8 +11,10 @@
 #include <memory>
 
 #include "events/EventDispatcher.hpp"
+#include "rcore/Camera.hpp"
 #include "rtext/Font.hpp"
 #include "ui/UIManager.hpp"
+#include "ui/components/UICompass.hpp"
 #include "ui/components/UIGridManager.hpp"
 #include "ui/menus/EventLogUI.hpp"
 #include "ui/menus/GlobalStatsUI.hpp"
@@ -25,7 +27,8 @@ namespace zappy::gui::ui::hud {
 
 class GameHUD {
   public:
-    GameHUD(events::EventDispatcher& dispatcher, const std::shared_ptr<raylib::rtext::Font>& font);
+    GameHUD(events::EventDispatcher& dispatcher, const std::shared_ptr<raylib::rtext::Font>& font,
+            raylib::rcore::Camera& camera);
     ~GameHUD() = default;
 
     GameHUD(const GameHUD& other) = delete;
@@ -46,6 +49,7 @@ class GameHUD {
     std::reference_wrapper<events::EventDispatcher> _dispatcher;
     std::shared_ptr<raylib::rtext::Font> _font;
     std::shared_ptr<components::UIGridManager> _gridManager;
+    std::shared_ptr<components::UICompass> _compass;
     std::shared_ptr<menus::PauseMenu> _pauseMenu;
     std::shared_ptr<menus::PlayerInspectorUI> _playerInspector;
     std::shared_ptr<menus::TileInspectorUI> _tileInspector;

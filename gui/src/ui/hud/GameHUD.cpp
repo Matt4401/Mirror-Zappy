@@ -12,6 +12,7 @@
 
 #include "EventDispatcher.hpp"
 #include "UIManager.hpp"
+#include "components/UICompass.hpp"
 #include "components/UIGridManager.hpp"
 #include "events/GuiEvents.hpp"
 #include "menus/EventLogUI.hpp"
@@ -24,7 +25,8 @@
 
 namespace zappy::gui::ui::hud {
 
-GameHUD::GameHUD(events::EventDispatcher& dispatcher, const std::shared_ptr<raylib::rtext::Font>& font)
+GameHUD::GameHUD(events::EventDispatcher& dispatcher, const std::shared_ptr<raylib::rtext::Font>& font,
+                 raylib::rcore::Camera& camera)
     : _dispatcher(dispatcher), _font(font) {
     _gridManager = std::make_shared<components::UIGridManager>();
 
@@ -48,9 +50,12 @@ GameHUD::GameHUD(events::EventDispatcher& dispatcher, const std::shared_ptr<rayl
     _gridManager->addPanel(_globalStats, 2, 2, 12, 13);
 
     _pauseMenu = std::make_shared<menus::PauseMenu>(_dispatcher.get(), _font);
+
+    _compass = std::make_shared<components::UICompass>(0.0F, 0.0F, 0.0F, 0.0F, camera, _font);
 }
 
 void GameHUD::registerToUIManager(UIManager& uiManager) {
+    uiManager.addComponent(_compass);
     uiManager.addComponent(_gridManager);
     uiManager.addComponent(_pauseMenu);
 }
