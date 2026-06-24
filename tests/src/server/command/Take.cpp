@@ -52,13 +52,23 @@ TEST(TakeTest, CheckStartValidItemButEmptyTile) {
         .freq = 100,
     };
     game::World world{config};
-    game::Player player{0, 5, 5, game::cardinalPoint::NORTH};
+
+    auto playerIdOpt = world.spawnPlayer("test");
+    ASSERT_TRUE(playerIdOpt.has_value());
+
+    if (!playerIdOpt.has_value()) {
+        return;
+    }
+
+    auto& player = *world.playerList().at(playerIdOpt.value());
+
+    constexpr auto targetPos = game::Position{.x = 5, .y = 5};
+    world.updatePositionOnMap(player.id(), player.position(), targetPos);
+    player.setPosition(targetPos);
+
+    world.clearAllResourcesAndEggs();
 
     Take take{"food"};
-
-    while (world.resourcesAt(player.position()).at(static_cast<std::uint8_t>(game::ItemType::Food)) != 0) {
-        world.removeItemOnGround(game::ItemType::Food, player.position());
-    }
 
     ASSERT_FALSE(take.start(world, player));
 }

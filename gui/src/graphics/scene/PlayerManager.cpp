@@ -9,7 +9,9 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <optional>
 #include <string>
@@ -105,8 +107,8 @@ void PlayerManager::handleIncantationEnd(const shared::protocol::server::Pie& co
     if (incantation == _activeIncantations.end()) {
         return;
     }
-    if (command.incantationResult != 0) {
-        for (const int playerId : incantation->playerIds) {
+    if (command.incantationResult) {
+        for (const uint8_t playerId : incantation->playerIds) {
             if (const auto player = playerById(playerId); player.has_value()) {
                 const auto nextLevel = static_cast<std::size_t>(incantation->level) + 1U;
                 player->get().setLevel(std::max(player->get().level(), nextLevel));
@@ -153,13 +155,18 @@ void PlayerManager::handleEggLaid(const shared::protocol::server::Enw& command) 
     if (!_tileManager.contains(tilePosition)) {
         return;
     }
-    const auto team = teamForPlayer(command.playerId);
-    if (!team.has_value()) {
-        return;
-    }
     auto position = _tileManager.tilePosition(tilePosition);
     position.setY(Tile3D::TILE_SIZE);
-    team->get().addEgg(command.eggId, command.playerId, position);
+
+    if (command.playerId < 0) {
+        std::erase_if(_initialEggs, [&command](const InitialEgg& egg) { return egg.id == command.eggId; });
+        _initialEggs.push_back({.id = command.eggId, .position = position});
+        redistributeInitialEggs();
+        return;
+    }
+    if (const auto team = teamForPlayer(command.playerId); team.has_value()) {
+        team->get().addEgg(command.eggId, command.playerId, position);
+    }
 }
 
 void PlayerManager::handleEggRemoved(const shared::protocol::server::Ebo& command) { removeEgg(command.eggId); }
@@ -200,10 +207,45 @@ std::optional<std::reference_wrapper<game::Team>> PlayerManager::teamForPlayer(c
 }
 
 void PlayerManager::updatePlayerPosition(game::Player& player, const Tile3DPosition tilePosition) const {
-    auto position = _tileManager.tilePosition(tilePosition);
-    position.setY(Tile3D::TILE_SIZE * DefaultPlayerOffsetY);
-    player.setPosition(position);
+    auto destination = _tileManager.tilePosition(tilePosition);
+    destination.setY(Tile3D::TILE_SIZE * DefaultPlayerOffsetY);
+
+    auto exitPosition = player.position();
+    const bool wraps = wrapPositionIfNeeded(player, tilePosition, exitPosition);
+
+    if (wraps) {
+        player.setWrappedFuturePosition(exitPosition, destination);
+    } else {
+        player.setFuturePosition(destination);
+    }
     player.setTilePosition(tilePosition);
+}
+
+bool PlayerManager::wrapPositionIfNeeded(const game::Player& player, const Tile3DPosition tilePosition,
+                                         raylib::rmath::Vector3& exitPosition) const {
+    const auto currentTile = player.tilePosition();
+
+    if (_tileManager.width() > 1 && currentTile.y == tilePosition.y && currentTile.x == 0 &&
+        tilePosition.x == _tileManager.width() - 1) {
+        exitPosition.setX(exitPosition.x() - Tile3D::TILE_SIZE);
+        return true;
+    }
+    if (_tileManager.width() > 1 && currentTile.y == tilePosition.y && currentTile.x == _tileManager.width() - 1 &&
+        tilePosition.x == 0) {
+        exitPosition.setX(exitPosition.x() + Tile3D::TILE_SIZE);
+        return true;
+    }
+    if (_tileManager.height() > 1 && currentTile.x == tilePosition.x && currentTile.y == 0 &&
+        tilePosition.y == _tileManager.height() - 1) {
+        exitPosition.setZ(exitPosition.z() - Tile3D::TILE_SIZE);
+        return true;
+    }
+    if (_tileManager.height() > 1 && currentTile.x == tilePosition.x && currentTile.y == _tileManager.height() - 1 &&
+        tilePosition.y == 0) {
+        exitPosition.setZ(exitPosition.z() + Tile3D::TILE_SIZE);
+        return true;
+    }
+    return false;
 }
 
 game::Team& PlayerManager::ensureTeamExist(const std::string& name) {
@@ -222,8 +264,35 @@ game::Player::cardinalPoint PlayerManager::orientationFromProtocol(const int ori
 }
 
 void PlayerManager::removeEgg(const int eggId) {
+    std::erase_if(_initialEggs, [eggId](const InitialEgg& egg) { return egg.id == eggId; });
     for (auto& team : _teams) {
         team.removeEgg(eggId);
+    }
+}
+
+void PlayerManager::redistributeInitialEggs() {
+    if (_teams.empty()) {
+        return;
+    }
+    std::ranges::sort(_initialEggs, {}, &InitialEgg::id);
+    for (const auto& egg : _initialEggs) {
+        for (auto& team : _teams) {
+            team.removeEgg(egg.id);
+        }
+    }
+
+    const auto eggCount = _initialEggs.size();
+    const auto teamCount = _teams.size();
+    for (std::size_t index = 0; index < eggCount; index++) {
+        const auto teamIndex = (index * teamCount) / eggCount;
+        const auto& egg = _initialEggs.at(index);
+        _teams.at(teamIndex).addEgg(egg.id, -1, egg.position);
+    }
+}
+
+void PlayerManager::movePlayers(const int serverFrequency, const float deltaTime) {
+    for (auto& team : _teams) {
+        team.movePlayers(serverFrequency, deltaTime);
     }
 }
 }  // namespace zappy::gui::graphics::scene

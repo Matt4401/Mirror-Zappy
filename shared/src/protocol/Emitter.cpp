@@ -7,6 +7,7 @@
 
 #include "protocol/Emitter.hpp"
 
+#include <cstddef>
 #include <string>
 #include <variant>
 
@@ -58,7 +59,7 @@ std::string Emitter::build(const ServerCommand& cmd) {
                    [](const server::Pic& c) {
                        std::string s =
                            "pic " + std::to_string(c.x) + " " + std::to_string(c.y) + " " + std::to_string(c.level);
-                       for (int const p : c.playerIds) {
+                       for (std::size_t const p : c.playerIds) {
                            s += " #" + std::to_string(p);
                        }
                        return s + "\n";

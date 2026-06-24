@@ -9,43 +9,32 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <span>
 #include <string>
-#include <vector>
 
 #include "Core.hpp"
 #include "game/Player.hpp"
 #include "guiCommand/Bct.hpp"
 #include "guiCommand/Mct.hpp"
 #include "guiCommand/Msz.hpp"
+#include "guiCommand/Pin.hpp"
 #include "guiCommand/Sgt.hpp"
 #include "guiCommand/Tna.hpp"
 #include "protocol/Commands.hpp"
+#include "strategy/ServerStrategy.hpp"
 
-// NOLINTBEGIN
-const auto createDummyArgs = []() {
-    static char arg0[] = "./zappy_server";
-    static char arg1[] = "-p";
-    static char arg2[] = "4242";
-    static char arg3[] = "-x";
-    static char arg4[] = "10";
-    static char arg5[] = "-y";
-    static char arg6[] = "20";
-    static char arg7[] = "-n";
-    static char arg8[] = "teamA";
-    static char arg9[] = "teamB";
-    static char arg10[] = "-c";
-    static char arg11[] = "5";
-    static char arg12[] = "-f";
-    static char arg13[] = "50";
-
-    return std::vector<char*>{arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13};
+const auto createDummyConfig = []() {
+    return zappy::parser::ServerConfig{
+        .port = 4242,
+        .width = 10,
+        .height = 20,
+        .teamNames = {"teamA", "teamB"},
+        .clientLimit = 5,
+        .freq = 50,
+    };
 };
-// NOLINTEND
 
 TEST(MszCommandTest, ExecuteReturnsCorrectDimensions) {
-    auto args = createDummyArgs();
-    zappy::server::Core core{std::span<char*>(args)};
+    zappy::server::Core core{createDummyConfig()};
 
     zappy::server::guiCommand::Msz command{};
     const std::string response = command.execute(core).message;
@@ -54,8 +43,7 @@ TEST(MszCommandTest, ExecuteReturnsCorrectDimensions) {
 }
 
 TEST(SgtCommandTest, ExecuteReturnsCorrectFrequency) {
-    auto args = createDummyArgs();
-    zappy::server::Core core{std::span<char*>(args)};
+    zappy::server::Core core{createDummyConfig()};
 
     zappy::server::guiCommand::Sgt command{};
     const std::string response = command.execute(core).message;
@@ -64,8 +52,7 @@ TEST(SgtCommandTest, ExecuteReturnsCorrectFrequency) {
 }
 
 TEST(BctCommandTest, ExecuteReturnsProperlyFormattedTileContent) {
-    auto args = createDummyArgs();
-    zappy::server::Core core{std::span(args)};
+    zappy::server::Core core{createDummyConfig()};
 
     zappy::server::guiCommand::Bct command{zappy::shared::protocol::client::Bct{.x = 5, .y = 5}};
     const std::string response = command.execute(core).message;
@@ -85,8 +72,7 @@ TEST(BctCommandTest, ExecuteReturnsProperlyFormattedTileContent) {
 }
 
 TEST(BctCommandTest, ExecuteFailsSafelyOnOutOfBounds) {
-    auto args = createDummyArgs();
-    zappy::server::Core core{std::span(args)};
+    zappy::server::Core core{createDummyConfig()};
 
     zappy::server::guiCommand::Bct command{zappy::shared::protocol::client::Bct{.x = 100, .y = 100}};
     const std::string response = command.execute(core).message;
@@ -95,8 +81,7 @@ TEST(BctCommandTest, ExecuteFailsSafelyOnOutOfBounds) {
 }
 
 TEST(MctCommandTest, ExecuteReturnsAllTileContents) {
-    auto args = createDummyArgs();
-    zappy::server::Core core{std::span(args)};
+    zappy::server::Core core{createDummyConfig()};
 
     zappy::server::guiCommand::Mct command{};
     const std::string response = command.execute(core).message;
@@ -122,11 +107,43 @@ TEST(MctCommandTest, ExecuteReturnsAllTileContents) {
 }
 
 TEST(TnaCommandTest, ExecuteReturnsTeamNames) {
-    auto args = createDummyArgs();
-    zappy::server::Core core{std::span<char*>(args)};
+    zappy::server::Core core{createDummyConfig()};
 
     zappy::server::guiCommand::Tna command{};
     const std::string response = command.execute(core).message;
 
     EXPECT_EQ(response, "tna teamA\ntna teamB\n");
+}
+
+TEST(PinCommandTest, PinCmd) {
+    zappy::server::Core core{createDummyConfig()};
+
+    // NOLINTNEXTLINE
+    auto& world = const_cast<zappy::server::game::World&>(core.world());
+
+    auto playerIdOpt = world.spawnPlayer("teamA");
+
+    ASSERT_TRUE(playerIdOpt.has_value());
+
+    if (!playerIdOpt.has_value()) {
+        return;
+    }
+
+    const auto& player = world.playerList().at(playerIdOpt.value());
+    const auto& inventory = player->inventory();
+    zappy::server::guiCommand::Pin command{static_cast<int>(playerIdOpt.value())};
+
+    const std::string response = command.execute(core).message;
+    auto [x, y] = player->position();
+    std::string expectedResponse;
+    expectedResponse +=
+        "pin #" + std::to_string(playerIdOpt.value()) + " " + std::to_string(x) + " " + std::to_string(y) + " " +
+        std::to_string(inventory.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Food))) + " " +
+        std::to_string(inventory.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Linemate))) + " " +
+        std::to_string(inventory.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Deraumere))) + " " +
+        std::to_string(inventory.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Sibur))) + " " +
+        std::to_string(inventory.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Mendiane))) + " " +
+        std::to_string(inventory.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Phiras))) + " " +
+        std::to_string(inventory.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Thystame))) + "\n";
+    ASSERT_EQ(response, expectedResponse);
 }

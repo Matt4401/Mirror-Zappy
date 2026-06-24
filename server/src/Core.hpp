@@ -26,6 +26,7 @@ namespace zappy::server {
 class Core {
   public:
     explicit Core(std::span<char*> args);
+    explicit Core(parser::ServerConfig config);
     ~Core() = default;
 
     Core(const Core& other) = delete;
@@ -61,6 +62,8 @@ class Core {
     void flushPlayerResponses();
     void flushGuiResponses();
     void sendGuiInitialState(int clientId);
+
+    void sendGuiNewPlayerData(int clientId, std::size_t playerId);
 
     parser::ServerConfig _config;
     std::unique_ptr<shared::network::ISessionManager> _sessionManager;

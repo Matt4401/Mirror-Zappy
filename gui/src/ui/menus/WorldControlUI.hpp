@@ -49,6 +49,10 @@ class WorldControlUI : public components::UIGamePanel {
     void initEventSubscriptions();
 
     void updateChildrenPositions();
+    void updateSingleRowLayout(float innerX, float innerWidth, float timeTitleW, float timeDropW, float speedTitleW,
+                               float speedSliderW);
+    void updateTwoRowsLayout(float innerX, float innerWidth, float timeTitleW, float timeDropW, float speedTitleW,
+                             float speedSliderW);
 
     std::reference_wrapper<events::EventDispatcher> _dispatcher;
     std::shared_ptr<raylib::rtext::Font> _font;
@@ -82,8 +86,8 @@ class WorldControlUI : public components::UIGamePanel {
 
     static constexpr float SliderWidth = 200.0F;
     static constexpr float SliderHeight = 20.0F;
-    static constexpr float SliderMin = 2.0F;
-    static constexpr float SliderMax = 1000.0F;
+    static constexpr float SliderMin = 1.0F;
+    static constexpr float SliderMax = 500.0F;
     static constexpr float SliderDefault = 100.0F;
 
     static constexpr float InitialOffsetX = 130.0F;
