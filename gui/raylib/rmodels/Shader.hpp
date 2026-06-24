@@ -17,7 +17,7 @@ class Shader {
   public:
     Shader() = default;
     Shader(const std::string& vsFile, const std::string& fsFile)
-        : _shader{LoadShader(vsFile.c_str(), fsFile.c_str())} {}
+        : _shader{LoadShader(vsFile.empty() ? nullptr : vsFile.c_str(), fsFile.empty() ? nullptr : fsFile.c_str())} {}
     explicit Shader(::Shader shader) : _shader(shader) {}
     ~Shader() { reset(); }
 
