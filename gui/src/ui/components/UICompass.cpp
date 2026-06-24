@@ -24,15 +24,6 @@
 
 namespace zappy::gui::ui::components {
 
-namespace {
-constexpr float CompassFovDeg = 120.0F;
-constexpr int MajorTickSpacingDeg = 15;
-constexpr float TickHeightMajor = 15.0F;
-constexpr float TickHeightMinor = 8.0F;
-constexpr float MarkerSize = 10.0F;
-constexpr int FontSize = 16;
-}  // namespace
-
 UICompass::UICompass(float x, float y, float width, float height, raylib::rcore::Camera& camera,
                      const std::shared_ptr<raylib::rtext::Font>& font)
     : _x(x), _y(y), _width(width), _height(height), _camera(camera), _font(font) {}
@@ -43,8 +34,8 @@ void UICompass::draw() {
     }
 
     raylib::rmath::Rectangle const rec{.x = _x, .y = _y, .width = _width, .height = _height};
-    raylib::rshapes::Shapes::drawRectangleRec(rec, raylib::Color(30, 30, 30, 200));
-    raylib::rshapes::Shapes::drawRectangleLinesEx(rec, 1.0F, raylib::Color::Gray());
+    raylib::rshapes::Shapes::drawRectangleRec(rec, BackgroundColor);
+    raylib::rshapes::Shapes::drawRectangleLinesEx(rec, OutlineThick, raylib::Color::Gray());
 
     auto target = _camera.get().target();
     auto pos = _camera.get().position();
@@ -83,8 +74,8 @@ void UICompass::draw() {
         bool const isCardinal = (normalizedDeg % 90 == 0);
         float const tickH = isCardinal ? TickHeightMajor : TickHeightMinor;
 
-        float const tickY = _y + _height - tickH - 2.0F;
-        raylib::rshapes::Shapes::drawLineEx({tickX, tickY}, {tickX, tickY + tickH}, 2.0F, raylib::Color::White());
+        float const tickY = _y + _height - tickH - TickOffsetY;
+        raylib::rshapes::Shapes::drawLineEx({tickX, tickY}, {tickX, tickY + tickH}, TickThick, raylib::Color::White());
 
         if (isCardinal) {
             std::string label;
@@ -101,17 +92,13 @@ void UICompass::draw() {
             if (!label.empty() && _font && _font->valid()) {
                 float const textW = _font->measureTextEx(label, FontSize, 1.0F).x();
                 float const textX = tickX - (textW / 2.0F);
-                float const textY = _y + 5.0F;
+                float const textY = _y + TextOffsetY;
                 _font->drawTextEx(label, {textX, textY}, FontSize, 1.0F, raylib::Color::White());
             }
         }
     }
 
     raylib::rcore::Window::endScissorMode();
-
-    raylib::rshapes::Shapes::drawTriangle({centerX - (MarkerSize / 2.0F), _y + _height},
-                                          {centerX, _y + _height - MarkerSize},
-                                          {centerX + (MarkerSize / 2.0F), _y + _height}, raylib::Color::Red());
 }
 
 void UICompass::update() {
@@ -121,10 +108,10 @@ void UICompass::update() {
 
     auto const screenW = static_cast<float>(raylib::rcore::Window::screenWidth());
 
-    _width = std::clamp(screenW * 0.3F, 300.0F, 800.0F);
-    _height = 40.0F;
+    _width = std::clamp(screenW * ScreenWidthRatio, MinWidth, MaxWidth);
+    _height = DefaultHeight;
     _x = (screenW - _width) / 2.0F;
-    _y = 15.0F;
+    _y = DefaultYPos;
 }
 
 void UICompass::handleEvent() {}

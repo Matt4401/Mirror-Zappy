@@ -10,6 +10,7 @@
 #include <functional>
 #include <memory>
 
+#include "Color.hpp"
 #include "rcore/Camera.hpp"
 #include "rtext/Font.hpp"
 #include "ui/IUIComponent.hpp"
@@ -44,6 +45,25 @@ class UICompass : public IUIComponent {
     float _width;
     float _height;
     bool _isVisible{true};
+
+    static constexpr float DefaultHeight = 40.0F;
+    static constexpr float DefaultYPos = 15.0F;
+    static constexpr float ScreenWidthRatio = 0.3F;
+    static constexpr float MinWidth = 300.0F;
+    static constexpr float MaxWidth = 800.0F;
+
+    static constexpr float CompassFovDeg = 120.0F;
+    static constexpr int MajorTickSpacingDeg = 15;
+    static constexpr float TickHeightMajor = 15.0F;
+    static constexpr float TickHeightMinor = 8.0F;
+    static constexpr float MarkerSize = 10.0F;
+    static constexpr int FontSize = 16;
+
+    static constexpr raylib::Color BackgroundColor{30, 30, 30, 200};
+    static constexpr float OutlineThick = 1.0F;
+    static constexpr float TickThick = 2.0F;
+    static constexpr float TextOffsetY = 5.0F;
+    static constexpr float TickOffsetY = 2.0F;
 
     std::reference_wrapper<raylib::rcore::Camera> _camera;
     std::shared_ptr<raylib::rtext::Font> _font;
