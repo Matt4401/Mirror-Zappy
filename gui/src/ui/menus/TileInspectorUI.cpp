@@ -7,6 +7,7 @@
 
 #include "TileInspectorUI.hpp"
 
+#include <algorithm>
 #include <cstddef>
 #include <functional>
 #include <memory>
@@ -252,8 +253,9 @@ void TileInspectorUI::draw() {
 
     drawTileInventoryPanel(currentY, startX, panelW);
 
-    float const totalContentHeight = (currentY + getScrollOffset()) - this->getPosition().y();
-    float const calculatedMaxScroll = std::max(0.0F, totalContentHeight - currentH + 20.0F);
+    float const contentBottomWithoutScroll = currentY + getScrollOffset();
+    float const innerBottom = this->getPosition().y() + currentH - padding;
+    float const calculatedMaxScroll = std::max(0.0F, contentBottomWithoutScroll - innerBottom + 20.0F);
     setMaxScroll(calculatedMaxScroll);
 
     raylib::rcore::Window::endScissorMode();

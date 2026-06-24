@@ -85,7 +85,7 @@ constexpr float HeartsToInventorySpacing = 40.0F;
 constexpr int MaxHearts = 10;
 constexpr int MaxXp = 8;
 
-constexpr float InvToBtnSpacing = 30.0F;
+constexpr float InvToBtnSpacing = 20.0F;
 
 constexpr float CameraPosX = 0.0F;
 constexpr float CameraPosY = 4.0F;
@@ -485,6 +485,7 @@ void PlayerInspectorUI::drawActionButtons(float& currentY, float startX, float p
         float const btnX = startX + ((panelW - FirstPersonBtnWidth) / 2.0F);
         _firstPersonBtn->setPosition(btnX, currentY);
         _firstPersonBtn->draw();
+        currentY += FirstPersonBtnHeight;
     }
 }
 
@@ -534,8 +535,9 @@ void PlayerInspectorUI::draw() {
     currentY += InvToBtnSpacing;
     drawActionButtons(currentY, startX, panelW);
 
-    float const totalContentHeight = (currentY + getScrollOffset()) - this->getPosition().y();
-    float const calculatedMaxScroll = std::max(0.0F, totalContentHeight - currentH + 20.0F);
+    float const contentBottomWithoutScroll = currentY + getScrollOffset();
+    float const innerBottom = this->getPosition().y() + currentH - padding;
+    float const calculatedMaxScroll = std::max(0.0F, contentBottomWithoutScroll - innerBottom + 20.0F);
     setMaxScroll(calculatedMaxScroll);
 
     raylib::rcore::Window::endScissorMode();
