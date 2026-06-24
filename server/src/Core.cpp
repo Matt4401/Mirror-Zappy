@@ -68,6 +68,8 @@ void Core::setup() {
     _timeUnit = static_cast<int>(1.0F / static_cast<float>(_config.freq) * 1000);
 }
 
+void Core::stop() { _isRunning = false; }
+
 void Core::loop() {
     auto nextTickTarget = std::chrono::steady_clock::now() + std::chrono::milliseconds{_timeUnit};
 
