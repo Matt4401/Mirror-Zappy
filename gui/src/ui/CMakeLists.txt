@@ -9,6 +9,7 @@ add_library(zappy_gui_ui
         components/UIImage.cpp
         components/UISlider.cpp
         components/UITextbox.cpp
+        components/UICompass.cpp
         components/EventLogRow.cpp
         menus/PauseMenu.cpp
         menus/PlayerInspectorUI.cpp
@@ -34,6 +35,7 @@ target_sources(zappy_gui_ui PUBLIC
         components/UIImage.hpp
         components/UISlider.hpp
         components/UITextbox.hpp
+        components/UICompass.hpp
         components/EventLogRow.hpp
         menus/PauseMenu.hpp
         menus/PlayerInspectorUI.hpp
