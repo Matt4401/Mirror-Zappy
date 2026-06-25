@@ -1,6 +1,5 @@
 import copy
 import yaml
-import shutil
 import logging.config
 from pathlib import Path
 
@@ -15,7 +14,7 @@ class PlayerLogger:
         dossier_players.mkdir(parents=True, exist_ok=True)
         path_file_log = dossier_players / f"player_{player_id}.log"
 
-        template_handler = config["handlers"].get("player_file_template", None)
+        template_handler = config["handlers"].pop("player_file_template", None)
         if template_handler:
             config["handlers"][name_handler] = copy.deepcopy(template_handler)
             config["handlers"][name_handler]["class"] = (
@@ -26,10 +25,7 @@ class PlayerLogger:
         config["loggers"][name_logger] = copy.deepcopy(
             config["loggers"]["player_template"]
         )
-        config["loggers"][name_logger]["handlers"] = [
-            "console",
-            name_handler,
-        ]
+        config["loggers"][name_logger]["handlers"].append(name_handler)
 
     @staticmethod
     def setup_logging(player_id: str):
@@ -37,12 +33,6 @@ class PlayerLogger:
         ROOT_PROJECT = PATH_UTIL.parent.parent.parent
         FOLDER_LOGS = ROOT_PROJECT / "logs"
         FOLDER_LOGS.mkdir(parents=True, exist_ok=True)
-
-        if FOLDER_LOGS.exists():
-            shutil.rmtree(FOLDER_LOGS)
-        FOLDER_LOGS.mkdir(
-            parents=True, exist_ok=True
-        )
 
         with open(PATH_UTIL / "logger_config.yaml", "r") as f:
             config = yaml.safe_load(f)
