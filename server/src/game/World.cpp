@@ -126,8 +126,6 @@ std::optional<size_t> World::spawnPlayer(const std::string_view teamName) {
         std::make_unique<Player>(egg.value().id, egg.value().position.x, egg.value().position.y, randomCardinalPoint());
     const auto& newPlayer = _playerList.at(egg.value().id);
     _tiles.at(getTileIndex(newPlayer->position().x, newPlayer->position().y)).players.emplace_back(newPlayer->id());
-    addGuiEvent(
-        shared::protocol::Emitter::build(shared::protocol::server::Ebo{.eggId = static_cast<int>(newPlayer->id())}));
     return newPlayer->id();
 }
 [[nodiscard]] Position World::getTilePosition(const std::size_t position1D) const {
@@ -184,14 +182,21 @@ void World::updatePositionOnMap(const std::size_t id, const Position& oldPositio
 }
 
 void World::update() {
+    if (_isGameEnd) {
+        return;
+    }
     respawnTicks++;
     if (respawnTicks == kNbTicksToRespawn) {
         addItemsToMap();
         respawnTicks = 0;
     }
     for (const auto& player : _playerList | std::views::values) {
+        if (player->isDead()) {
+            continue;
+        }
         player->update(*this);
     }
+    checkGameEnd();
 }
 
 void World::removeFromMap(const std::size_t id) {
@@ -211,13 +216,29 @@ std::unordered_map<std::size_t, std::vector<std::string>> World::getAllResponses
 }
 
 std::size_t World::removePlayer(const std::size_t id) {
-    const auto& player = _playerList.at(id);
+    auto it = _playerList.find(id);
+    if (it == _playerList.end()) {
+        return 0;
+    }
+    const auto& player = it->second;
 
     player->kill();
     removePlayerFromTeam(id);
     erasePlayerFromTile(getTileIndex(player->position()), id);
+    _playerList.erase(it);
     addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pdi{.playerId = static_cast<int>(id)}));
-    return player->id();
+    return id;
+}
+
+std::vector<std::size_t> World::collectDeadPlayers() const {
+    std::vector<std::size_t> deadIds;
+
+    for (const auto& player : _playerList | std::views::values) {
+        if (player->isDead()) {
+            deadIds.emplace_back(player->id());
+        }
+    }
+    return deadIds;
 }
 
 std::size_t World::getAvailableSlotInTeam(std::string_view teamName) const {
@@ -282,6 +303,9 @@ int World::getNextExecutionTick() const {
     int nextTick = -1;
 
     for (const auto& player : _playerList | std::ranges::views::values) {
+        if (player->isDead()) {
+            continue;
+        }
         int playerNextEvent = static_cast<int>(player->nbLifeTick());
 
         if (player->cmdTick() > 0 && player->cmdTick() < playerNextEvent) {
@@ -405,6 +429,7 @@ std::string World::resourcesName(const ItemType item) {
     }
     return "";
 }
+
 std::string World::transformResourcesToStr(const Tile& tile) {
     std::string str{};
 
@@ -435,6 +460,9 @@ std::string World::visionOfPlayer(const std::vector<Position>& Positions) const 
         const auto& tile = _tiles.at(getTileIndex(Positions.at(i)));
         str += transformResourcesToStr(tile);
     }
+    if (str.size() > 1 && str.at(1) == ' ') {
+        str.erase(1, 1);
+    }
     str += "]\n";
     return str;
 }
@@ -446,6 +474,24 @@ void World::clearAllResourcesAndEggs() {
         tile.eggs.clear();
     }
 }
+
+void World::checkGameEnd() {
+    for (const auto& [teamName, team] : _teamList) {
+        std::uint8_t playerAtMaxLevel = 0;
+        for (const auto& playerId : team->listPlayerId()) {
+            const auto& player = _playerList.at(playerId);
+            if (!player->isDead() && player->level() == kNbLevel + 1) {
+                playerAtMaxLevel++;
+            }
+        }
+        if (playerAtMaxLevel >= kNbPlayerToWin) {
+            _isGameEnd = true;
+            addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Seg{.teamName = teamName}));
+            return;
+        }
+    }
+}
+
 const std::unordered_map<std::size_t, Egg>& World::vecEggs() const { return _vecEggs; }
 
 Tile World::tile(const Position position) const { return _tiles.at(getTileIndex(position)); }

@@ -14,8 +14,8 @@ class BroadcastMessage:
 
 
 class ServerEvent:
-    def __init__(self, type, message):
-        self.event_type = type
+    def __init__(self, event_type, message):
+        self.event_type = event_type
         self.data = message
 
 
@@ -32,9 +32,10 @@ class CommandRequest:
 
 
 class CommandResponse:
-    def __init__(self, command, id):
+    def __init__(self, command, id, success):
         self.command = command
         self.id = id
+        self.success = success
 
 
 class Connection:
@@ -53,6 +54,7 @@ class Connection:
         self.event_queue = deque()
         self.command_responses = deque()
         self.response_buffer: Dict[int, CommandResponse] = {}
+        self.response_events: Dict[int, threading.Event] = {}
         self.socket_lock = threading.Lock()
         self.command_lock = threading.Lock()
         self.response_lock = threading.Lock()
@@ -60,9 +62,11 @@ class Connection:
         self.event_lock = threading.Lock()
         self.next_command_id = 0
         self.reader_thread = None
+        self.on_event_received = None
         self.event_thread = None
         self.connect(host, port)
         self.do_handshake()
+        self.start()
 
     def connect(self, host, port):
         try:
@@ -149,6 +153,8 @@ class Connection:
                         if not line:
                             continue
                         msg_type, msg_data = self.parse_server_message(line)
+                        if msg_type == "dead":
+                            self.running = False
                         if msg_type == "broadcast":
                             with self.broadcast_lock:
                                 self.broadcast_queue.append(
@@ -160,20 +166,25 @@ class Connection:
                         elif msg_type == "eject":
                             with self.event_lock:
                                 self.event_queue.append(
-                                    ServerEvent(event_type="eject", data=msg_data)
+                                    ServerEvent(event_type="eject", message=msg_data)
                                 )
                             if self.on_event_received:
                                 self.on_event_received("eject", msg_data)
                         elif msg_type == "dead":
                             with self.event_lock:
                                 self.event_queue.append(
-                                    ServerEvent(event_type="dead", data=msg_data)
+                                    ServerEvent(event_type="dead", message=msg_data)
                                 )
                         elif msg_type == "elevation":
                             with self.event_lock:
                                 self.event_queue.append(
-                                    ServerEvent(event_type="elevation", data=msg_data)
+                                    ServerEvent(
+                                        event_type="elevation", message=msg_data
+                                    )
                                 )
+                            if msg_data.get("message", "").startswith("Current level"):
+                                with self.response_lock:
+                                    self.command_responses.append(msg_data["message"])
                         else:
                             with self.response_lock:
                                 self.command_responses.append(msg_data["content"])
@@ -190,7 +201,6 @@ class Connection:
 
     def send_command(self, cmd):
         if not self.running:
-            print("Cannot send: connection is not active")
             return 84
         with self.command_lock:
             self.next_command_id += 1
@@ -205,7 +215,7 @@ class Connection:
     def send_raw_command(self, cmd):
         try:
             with self.socket_lock:
-                self.socket.send((cmd + self.message_delimiter).encode())
+                self.socket.sendall((cmd + self.message_delimiter).encode())
             return True
         except Exception as e:
             print(f"Failed to send command: {e}")
@@ -280,11 +290,13 @@ class Connection:
                         )
                         continue
                     first_cmd_id = next(iter(self.active_requests.keys()))
+                    del self.active_requests[first_cmd_id]
+                    success = response_str.lower() != "ko"
                     cmd_response = CommandResponse(
-                        command=response_str, id=first_cmd_id
+                        command=response_str, id=first_cmd_id, success=success
                     )
-                    with self.response_lock:
-                        self.response_buffer[first_cmd_id] = cmd_response
+                with self.response_lock:
+                    self.response_buffer[first_cmd_id] = cmd_response
             except IndexError:
                 break
             except Exception as e:
@@ -327,3 +339,16 @@ class Connection:
             self.disconnect()
         except socket.error as e:
             print(f"Error while disconnecting '{e}'")
+
+    def get_command_response(self, cmd_id, timeout=5.0):
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            with self.response_lock:
+                if cmd_id in self.response_buffer:
+                    cmd_response = self.response_buffer.pop(cmd_id)
+                    with self.command_lock:
+                        if cmd_id in self.active_requests:
+                            del self.active_requests[cmd_id]
+                    return cmd_response.success, cmd_response.command
+            time.sleep(0.005)
+        return None

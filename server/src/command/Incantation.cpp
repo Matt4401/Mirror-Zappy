@@ -122,6 +122,10 @@ void Incantation::execute(game::World& world, game::Player& player) {
             tmpPlayer->setIncating(false);
         }
         isSuccess = true;
+        world.addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Plv{
+            .playerId = static_cast<int>(player.id()),
+            .level = player.level(),
+        }));
     } else {
         for (auto playerId : _vecPlayerIds) {
             const auto& tmpPlayer = world.playerList().at(playerId);

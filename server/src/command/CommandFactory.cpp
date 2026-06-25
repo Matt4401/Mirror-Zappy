@@ -32,6 +32,8 @@
 #include "guiCommand/Mct.hpp"
 #include "guiCommand/Msz.hpp"
 #include "guiCommand/Pin.hpp"
+#include "guiCommand/Plv.hpp"
+#include "guiCommand/Ppo.hpp"
 #include "guiCommand/Sbp.hpp"
 #include "guiCommand/Sgt.hpp"
 #include "guiCommand/Sst.hpp"
@@ -103,6 +105,12 @@ void CommandFactory::registerGuiCommands() {
     });
     _guiCreators.emplace("pin", [](std::string_view rawCommand) -> std::unique_ptr<guiCommand::IGuiCommand> {
         return parseAndCreateGuiCommand<shared::protocol::client::Pin, guiCommand::Pin>(rawCommand);
+    });
+    _guiCreators.emplace("plv", [](std::string_view rawCommand) -> std::unique_ptr<guiCommand::IGuiCommand> {
+        return parseAndCreateGuiCommand<shared::protocol::client::Plv, guiCommand::Plv>(rawCommand);
+    });
+    _guiCreators.emplace("ppo", [](std::string_view rawCommand) -> std::unique_ptr<guiCommand::IGuiCommand> {
+        return parseAndCreateGuiCommand<shared::protocol::client::Ppo, guiCommand::Ppo>(rawCommand);
     });
 }
 

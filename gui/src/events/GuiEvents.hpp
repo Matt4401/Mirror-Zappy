@@ -37,6 +37,11 @@ struct TileClicked {
     int y{0};
 };
 
+struct RequestCyclePlayer {
+    int direction{0};
+    int currentPlayerId{-1};
+};
+
 enum class TimeMode : std::uint8_t { MORNING, AFTERNOON, EVENING, NIGHT, CYCLE };
 
 struct TimeOfDayChanged {

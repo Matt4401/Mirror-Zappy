@@ -10,6 +10,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <string_view>
 
 #include "rtext/Font.hpp"
 #include "rtextures/Texture2D.hpp"
@@ -21,41 +22,44 @@ AssetManager& AssetManager::getInstance() {
     return instance;
 }
 
-bool AssetManager::loadFont(const std::string& id, const std::string& path) {
-    if (_fonts.contains(id)) {
+bool AssetManager::loadFont(const std::string_view id, const std::string_view path) {
+    const std::string assetId{id};
+    if (_fonts.contains(assetId)) {
         return true;
     }
-    auto font = std::make_shared<raylib::rtext::Font>(path);
+    auto font = std::make_shared<raylib::rtext::Font>(std::string{path});
     if (!font->valid()) {
         std::cerr << "Failed to load font: " << path << std::endl;
         return false;
     }
-    _fonts.insert_or_assign(id, font);
+    _fonts.insert_or_assign(assetId, font);
     return true;
 }
 
-bool AssetManager::loadTexture(const std::string& id, const std::string& path) {
-    if (_textures.contains(id)) {
+bool AssetManager::loadTexture(const std::string_view id, const std::string_view path) {
+    const std::string assetId{id};
+    if (_textures.contains(assetId)) {
         return true;
     }
-    auto texture = std::make_shared<raylib::rtextures::Texture2D>(path);
+    auto texture = std::make_shared<raylib::rtextures::Texture2D>(std::string{path});
     if (!texture->valid()) {
         std::cerr << "Failed to load texture: " << path << std::endl;
         return false;
     }
-    _textures.insert_or_assign(id, texture);
+    _textures.insert_or_assign(assetId, texture);
     return true;
 }
 
-std::shared_ptr<raylib::rtext::Font> AssetManager::getFont(const std::string& id) {
-    if (_fonts.contains(id)) {
-        return _fonts.at(id);
+std::shared_ptr<raylib::rtext::Font> AssetManager::getFont(const std::string_view id) {
+    const std::string assetId{id};
+    if (_fonts.contains(assetId)) {
+        return _fonts.at(assetId);
     }
     return nullptr;
 }
 
-std::shared_ptr<raylib::rtextures::Texture2D> AssetManager::getTexture(const std::string& id) {
-    auto it = _textures.find(id);
+std::shared_ptr<raylib::rtextures::Texture2D> AssetManager::getTexture(const std::string_view id) {
+    auto it = _textures.find(std::string{id});
     if (it != _textures.end()) {
         return it->second;
     }

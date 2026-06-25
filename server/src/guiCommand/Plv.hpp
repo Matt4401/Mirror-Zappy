@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2026
 ** zappy
 ** File description:
-** Pin
+** Plv
 */
 
 #pragma once
@@ -10,15 +10,15 @@
 #include "protocol/Commands.hpp"
 
 namespace zappy::server::guiCommand {
-class Pin : public IGuiCommand {
+class Plv : public IGuiCommand {
   public:
-    explicit Pin(shared::protocol::client::Pin cmd);
-    Pin() = delete;
-    Pin(const Pin& other) = delete;
-    Pin& operator=(const Pin& other) = delete;
-    Pin(Pin&& other) = delete;
-    Pin& operator=(Pin&& other) = delete;
-    ~Pin() override = default;
+    explicit Plv(shared::protocol::client::Plv cmd);
+    Plv() = delete;
+    Plv(const Plv& other) = delete;
+    Plv& operator=(const Plv& other) = delete;
+    Plv(Plv&& other) = delete;
+    Plv& operator=(Plv&& other) = delete;
+    ~Plv() override = default;
 
     GuiResponse execute(Core& core) override;
 

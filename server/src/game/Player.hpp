@@ -103,6 +103,8 @@ class Player {
         const std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)>& resources) const;
     void setIncating(bool isIncanting);
 
+    [[nodiscard]] bool isDead() const;
+
   private:
     std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> _inventory{};
     cardinalPoint _orientation;
