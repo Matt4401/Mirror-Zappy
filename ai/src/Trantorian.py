@@ -3,8 +3,7 @@ from src.PlayerState import PlayerState
 from src.SendCommand import SendCommand
 from src.ParseCommand import ParseCommand
 
-# from .util.BroadcastMessage import BroadcastMessage
-# from .util.BroadcastManager import BroadcastManager
+from .util.BroadcastMessageManager import BroadcastMessageManager
 from .fsm.Constant import ELEVATION_REQUIREMENTS
 import threading
 import math
@@ -23,8 +22,7 @@ class Trantorian:
         self.send_command = SendCommand(self.connection)
         self.parser = ParseCommand(self.player_state.inventory)
         self.logger = logging.getLogger(f"player_{player_id}")
-        # self.broadcast_message = BroadcastMessage(self.player_state)
-        # self.broadcast_manager = BroadcastManager(self.broadcast_message, self.player_state.team_name)
+        self.broadcast_manager = BroadcastMessageManager(self.player_state)
 
     def wait_for_response(self, cmd_id, timeout=5.0):
         if cmd_id in (None, 84):

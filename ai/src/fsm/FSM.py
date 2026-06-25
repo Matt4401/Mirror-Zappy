@@ -17,13 +17,14 @@ class FiniteStateMachine:
         self.tick_manager = tick_manager
         self.sender = []
         self.pending_commands = {}
+        self.received_broadcasts = []
 
     def run(self):
         self.trantorian.logger.warning("===========Start FSM process===========")
         while True:
             meta_cmds = self.tick_manager.tick_update()
             self.send_auto_cmds(meta_cmds)
-            # self.process_broadcasts()
+            self.process_broadcasts()
             self.process_pending_commands()
             self.eat_current_tile_food()
             self.update_state()
@@ -44,15 +45,22 @@ class FiniteStateMachine:
         self.trantorian.take_object("food")
         self.trantorian.refresh_inventory()
 
-    # def process_broadcasts(self): ne pas utiliser pour le moment car class pas push
-    #     if not hasattr(self.trantorian, "broadcast_manager"):
-    #         return
-    #
-    #     broadcasts = self.trantorian.connection.get_broadcasts()
-    #     for broadcast in broadcasts:
-    #         self.trantorian.broadcast_manager.handle_raw(
-    #             broadcast, self.tick_manager.tick
-    #         )
+    def process_broadcasts(self):
+        if not hasattr(self.trantorian, "broadcast_manager"):
+            return
+        broadcasts = self.trantorian.connection.get_broadcasts()
+        for broadcast in broadcasts:
+            decoded = self.trantorian.broadcast_manager.read_broadcast(broadcast.message)
+            if decoded is not None:
+                level, state = decoded
+                self.trantorian.logger.info(f"[FSM] Broadcast décodé de niveau {level}: {state}")
+                self.trantorian.received_broadcasts.append({
+                    "level": level,
+                    "state": state
+                    #"direction": broadcast.direction,
+                    #"tick": self.tick_manager.tick,
+                    #"urgent_food": self.urgentfood
+                })
 
     def process_pending_commands(self):
         completed = []
@@ -97,11 +105,11 @@ class FiniteStateMachine:
                 cmd_id = self.trantorian.send_command.look()
                 self.pending_commands[cmd_id] = "look"
 
-            # elif cmd is None and hasattr(self.trantorian, "broadcast_manager"):
-            #     self.trantorian.logger.info("[FSM]: Auto command Broadcast call")
-            #     msg = self.trantorian.broadcast_manager.build_message()
-            #     cmd_id = self.trantorian.send_command.broadcast(msg)
-            #     self.pending_commands[cmd_id] = "broadcast"
+            elif cmd is None and hasattr(self.trantorian, "broadcast_manager"):
+                 self.trantorian.logger.info("[FSM]: Auto command Broadcast call")
+                 msg = self.trantorian.broadcast_manager.build_message(self.state) ## ici rajouter le state courrant
+                 cmd_id = self.trantorian.send_command.broadcast(msg)
+                 self.pending_commands[cmd_id] = "broadcast"
 
     def update_state(self):
         food = self.trantorian.player_state.inventory.get_food()
@@ -156,11 +164,6 @@ class FiniteStateMachine:
 
     def execute_state(self):
         self.state.execute()
-
-    def process_broadcast_events(self):
-        while True:
-            if len(self.trantorian.broadcast_queue) > 0:
-                event = self.trantorian.get_next_broadcast()
 
     def process_server_events(self):
         while True:

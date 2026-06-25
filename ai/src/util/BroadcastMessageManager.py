@@ -4,8 +4,8 @@ class BroadcastMessageManager:
         self.team = player_state.team_name
         self.key = sum(ord(letter) for letter in self.team)
 
-    def create_message(self, command):
-        content = f"{self.player_state.level} {command}"
+    def create_message(self, state):
+        content = f"{self.player_state.level} {state}"
         encrypted_content = self.code(content)
         return f"{self.team}_{encrypted_content}"
 
