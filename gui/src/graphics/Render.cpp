@@ -31,8 +31,8 @@ Render::Render(events::EventDispatcher& dispatcher)
 
     AssetManager::getInstance().loadFont(DefaultFontName, "assets/fonts/Minecraft.ttf");
 
-    _gameHUD =
-        std::make_shared<ui::hud::GameHUD>(_dispatcher.get(), AssetManager::getInstance().getFont(DefaultFontName));
+    _gameHUD = std::make_shared<ui::hud::GameHUD>(_dispatcher.get(),
+                                                  AssetManager::getInstance().getFont(DefaultFontName), _camera);
     _gameHUD->registerToUIManager(_uiManager);
 
     if (auto pauseMenu = _gameHUD->getPauseMenu()) {
