@@ -21,7 +21,9 @@ class ParseCommand:
         ]
         missing = [k for k in required if k not in data_dict]
         if missing:
-            raise ValueError(f"Missing inventory fields: {', '.join(missing)}. Received raw: '{data}'")
+            raise ValueError(
+                f"Missing inventory fields: {', '.join(missing)}. Received raw: '{data}'"
+            )
         linemate = data_dict["linemate"]
         deraumere = data_dict["deraumere"]
         sibur = data_dict["sibur"]

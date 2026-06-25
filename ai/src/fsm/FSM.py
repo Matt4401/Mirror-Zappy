@@ -18,7 +18,6 @@ class FiniteStateMachine:
         self.sender = []
         self.pending_commands = {}
 
-
     def run(self):
         self.trantorian.logger.warning("===========Start FSM process===========")
         while True:
