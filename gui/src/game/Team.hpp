@@ -45,6 +45,7 @@ class Team {
     void removeEgg(int id);
     [[nodiscard]] const std::string& name() const { return _name; }
     [[nodiscard]] const std::vector<Player>& players() const { return _players; }
+    [[nodiscard]] std::vector<Player>& players() { return _players; }
     [[nodiscard]] const std::vector<Egg>& eggs() const { return _eggs; }
     [[nodiscard]] raylib::Color color() const { return _teamColor; }
     void movePlayers(int serverFrequency, float deltaTime);

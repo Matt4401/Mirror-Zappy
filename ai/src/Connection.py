@@ -54,6 +54,7 @@ class Connection:
         self.event_queue = deque()
         self.command_responses = deque()
         self.response_buffer: Dict[int, CommandResponse] = {}
+        self.response_events: Dict[int, threading.Event] = {}
         self.socket_lock = threading.Lock()
         self.command_lock = threading.Lock()
         self.response_lock = threading.Lock()
@@ -152,6 +153,8 @@ class Connection:
                         if not line:
                             continue
                         msg_type, msg_data = self.parse_server_message(line)
+                        if msg_type == "dead":
+                            self.running = False
                         if msg_type == "broadcast":
                             with self.broadcast_lock:
                                 self.broadcast_queue.append(
@@ -198,7 +201,6 @@ class Connection:
 
     def send_command(self, cmd):
         if not self.running:
-            print("Cannot send: connection is not active")
             return 84
         with self.command_lock:
             self.next_command_id += 1
@@ -350,3 +352,4 @@ class Connection:
                     return cmd_response.success, cmd_response.command
             time.sleep(0.005)
         return None
+

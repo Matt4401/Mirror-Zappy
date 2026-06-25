@@ -17,6 +17,8 @@
 #include "guiCommand/Mct.hpp"
 #include "guiCommand/Msz.hpp"
 #include "guiCommand/Pin.hpp"
+#include "guiCommand/Plv.hpp"
+#include "guiCommand/Ppo.hpp"
 #include "guiCommand/Sgt.hpp"
 #include "guiCommand/Tna.hpp"
 #include "protocol/Commands.hpp"
@@ -131,7 +133,8 @@ TEST(PinCommandTest, PinCmd) {
 
     const auto& player = world.playerList().at(playerIdOpt.value());
     const auto& inventory = player->inventory();
-    zappy::server::guiCommand::Pin command{static_cast<int>(playerIdOpt.value())};
+    zappy::server::guiCommand::Pin command{
+        zappy::shared::protocol::client::Pin{.playerId = static_cast<int>(playerIdOpt.value())}};
 
     const std::string response = command.execute(core).message;
     auto [x, y] = player->position();
@@ -146,4 +149,71 @@ TEST(PinCommandTest, PinCmd) {
         std::to_string(inventory.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Phiras))) + " " +
         std::to_string(inventory.at(static_cast<std::uint8_t>(zappy::server::game::ItemType::Thystame))) + "\n";
     ASSERT_EQ(response, expectedResponse);
+}
+
+TEST(PlvCommandTest, ExecuteReturnsProperlyFormattedTileContent) {
+    zappy::server::Core core{createDummyConfig()};
+
+    // NOLINTNEXTLINE
+    auto& world = const_cast<zappy::server::game::World&>(core.world());
+
+    auto playerIdOpt = world.spawnPlayer("teamA");
+
+    ASSERT_TRUE(playerIdOpt.has_value());
+
+    if (!playerIdOpt.has_value()) {
+        return;
+    }
+
+    zappy::server::guiCommand::Plv command{
+        zappy::shared::protocol::client::Plv{.playerId = static_cast<int>(playerIdOpt.value())}};
+
+    const std::string response = command.execute(core).message;
+    const std::string expectedResponse = "plv #" + std::to_string(playerIdOpt.value()) + " " + std::to_string(1) + "\n";
+    EXPECT_EQ(response, expectedResponse);
+}
+
+TEST(PlvCommandTest, ExecuteFailsSafelyOnOutOfBounds) {
+    zappy::server::Core core{createDummyConfig()};
+
+    zappy::server::guiCommand::Plv command{zappy::shared::protocol::client::Plv{.playerId = 100}};
+    const std::string response = command.execute(core).message;
+
+    EXPECT_TRUE(response == "sbp\n");
+}
+
+TEST(PpoCommandTest, PpoCmd) {
+    zappy::server::Core core{createDummyConfig()};
+
+    // NOLINTNEXTLINE
+    auto& world = const_cast<zappy::server::game::World&>(core.world());
+
+    auto playerIdOpt = world.spawnPlayer("teamA");
+
+    ASSERT_TRUE(playerIdOpt.has_value());
+
+    if (!playerIdOpt.has_value()) {
+        return;
+    }
+
+    const auto& player = world.playerList().at(playerIdOpt.value());
+    zappy::server::guiCommand::Ppo command{
+        zappy::shared::protocol::client::Ppo{.playerId = static_cast<int>(playerIdOpt.value())}};
+
+    const std::string response = command.execute(core).message;
+    auto [x, y] = player->position();
+    std::string expectedResponse;
+    expectedResponse += "ppo #" + std::to_string(playerIdOpt.value()) + " " + std::to_string(x) + " " +
+                        std::to_string(y) + " " + std::to_string(static_cast<int>(player->orientation())) + "\n";
+    ASSERT_EQ(response, expectedResponse);
+}
+
+TEST(PpoCommandTest, PpoCmdFailsOnInvalidPlayer) {
+    zappy::server::Core core{createDummyConfig()};
+
+    zappy::server::guiCommand::Ppo command{zappy::shared::protocol::client::Ppo{.playerId = 9999}};
+
+    const std::string response = command.execute(core).message;
+
+    ASSERT_EQ(response, "sbp\n");
 }

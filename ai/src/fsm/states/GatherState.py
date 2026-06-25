@@ -9,7 +9,9 @@ class GatherState(AState):
         needed_stones = list(needed_dict.keys())
 
         if not needed_stones:
-            self.trantorian.logger.info("[Gather]: Player already get all his needed stones")
+            self.trantorian.logger.info(
+                "[Gather]: Player already get all his needed stones"
+            )
             return
 
         visible = None
@@ -30,4 +32,3 @@ class GatherState(AState):
             self.trantorian.take_object(stone)
             self.trantorian.refresh_inventory()
             self.trantorian.look()
-

@@ -20,9 +20,10 @@ raylib::rcore::BoundingBox Player::boundingBox() const {
     static constexpr float PICK_RADIUS = 0.8F;
     static constexpr float PICK_HEIGHT = 2.4F;
 
+    const auto pos = position();
     return {
-        {_position.x() - PICK_RADIUS, _position.y() - PICK_RADIUS, _position.z() - PICK_RADIUS},
-        {_position.x() + PICK_RADIUS, _position.y() + PICK_HEIGHT, _position.z() + PICK_RADIUS},
+        {pos.x() - PICK_RADIUS, pos.y() - PICK_RADIUS, pos.z() - PICK_RADIUS},
+        {pos.x() + PICK_RADIUS, pos.y() + PICK_HEIGHT, pos.z() + PICK_RADIUS},
     };
 }
 
@@ -37,24 +38,34 @@ Player::Player(int id, raylib::rmath::Vector3 position, std::string name, cardin
 void Player::setTilePosition(const graphics::scene::Tile3DPosition tilePosition) { _tilePosition = tilePosition; }
 
 void Player::move(const int serverFrequency, const float deltaTime) {
-    if (!_isMoving || serverFrequency <= 0 || deltaTime <= 0.0F) {
+    if ((!_isMoving && _offset == _targetOffset) || serverFrequency <= 0 || deltaTime <= 0.0F) {
         return;
     }
 
     const float serverSpeed = static_cast<float>(serverFrequency) / DELTA_SERVER_FREQUENCY;
     const float movement = PLAYER_SPEED * serverSpeed * deltaTime;
 
-    if (_position.distance(_futurePosition) <= movement) {
-        _position = _futurePosition;
-        if (_wrappedPosition.has_value()) {
-            _position = _wrappedPosition.value();
-            _futurePosition = _position;
-            _wrappedPosition.reset();
+    if (_isMoving) {
+        if (_position.distance(_futurePosition) <= movement) {
+            _position = _futurePosition;
+            if (_wrappedPosition.has_value()) {
+                _position = _wrappedPosition.value();
+                _futurePosition = _position;
+                _wrappedPosition.reset();
+            }
+            _isMoving = false;
+        } else {
+            _position = _position.movedTowards(_futurePosition, movement);
         }
-        _isMoving = false;
-        return;
     }
-    _position = _position.movedTowards(_futurePosition, movement);
+
+    if (_offset != _targetOffset) {
+        if (_offset.distance(_targetOffset) <= movement) {
+            _offset = _targetOffset;
+        } else {
+            _offset = _offset.movedTowards(_targetOffset, movement);
+        }
+    }
 }
 
 void Player::setPosition(const raylib::rmath::Vector3& position) {
