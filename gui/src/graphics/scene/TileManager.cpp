@@ -29,8 +29,8 @@ void TileManager::handleMapSize(const shared::protocol::server::Msz& command) {
     _tiles.clear();
     _tiles.reserve(static_cast<std::size_t>(_width) * static_cast<std::size_t>(_height));
 
-    for (int y = 0; y < _height; ++y) {
-        for (int x = 0; x < _width; ++x) {
+    for (int y = 0; y < _height; y++) {
+        for (int x = 0; x < _width; x++) {
             const Tile3DPosition position{.x = x, .y = y};
             _tiles.emplace_back(position, tilePosition(position));
         }

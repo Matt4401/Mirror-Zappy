@@ -12,15 +12,13 @@
 #include <memory>
 
 #include "AssetManager.hpp"
+#include "FirstPerson.hpp"
 #include "events/EventDispatcher.hpp"
-#include "events/GuiEvents.hpp"
-#include "game/Player.hpp"
 #include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
 #include "scene/Tile3D.hpp"
 #include "scene/WorldManager.hpp"
-#include "ui/components/UIButton.hpp"
 #include "ui/hud/GameHUD.hpp"
 
 namespace zappy::gui::graphics {
@@ -38,14 +36,19 @@ Render::Render(events::EventDispatcher& dispatcher)
                                                   AssetManager::getInstance().getFont(DefaultFontName), _camera);
     _gameHUD->registerToUIManager(_uiManager);
 
-    _exitFirstPersonButton =
-        std::make_shared<ui::components::UIButton>(0.0F, ExitViewButtonTop, ExitViewButtonWidth, ExitViewButtonHeight,
-                                                   "Exit view", AssetManager::getInstance().getFont(DefaultFontName));
-    _exitFirstPersonButton->setFontSize(ExitViewButtonFontSize);
-    _exitFirstPersonButton->setVisible(false);
-    _exitFirstPersonButton->setOnClick([this]() { exitFirstPersonView(); });
-    _uiManager.addComponent(_exitFirstPersonButton);
-    updateExitFirstPersonButtonPosition();
+    _firstPerson = std::make_unique<FirstPerson>(_dispatcher.get(), _camera, _worldManager, _uiManager,
+                                                 AssetManager::getInstance().getFont(DefaultFontName), [this]() {
+                                                     if (_firstPerson && _firstPerson->active()) {
+                                                         _uiMode = false;
+                                                         _updateMode = UpdateMode::All;
+                                                     }
+                                                     updateCursorState();
+                                                 });
+
+    _keyHandlers = {
+        {EscapeKey, [this]() { handleEscapeKey(); }},
+        {LeftAltKey, [this]() { handleAltKey(); }},
+    };
 
     if (auto pauseMenu = _gameHUD->getPauseMenu()) {
         pauseMenu->setOnExit([this]() { _isExiting = true; });
@@ -60,15 +63,10 @@ Render::Render(events::EventDispatcher& dispatcher)
             pauseMenu->setVisible(false);
         });
     }
-
-    _firstPersonToken = _dispatcher.get().subscribe<events::PlayerFirstPersonRequested>(
-        [this](const events::PlayerFirstPersonRequested& event) { handleFirstPersonRequest(event); });
 }
 
 Render::~Render() {
-    if (_firstPersonToken != 0) {
-        _dispatcher.get().unsubscribe<events::PlayerFirstPersonRequested>(_firstPersonToken);
-    }
+    _firstPerson.reset();
     _gameHUD.reset();
     _uiManager.clear();
     AssetManager::getInstance().clear();
@@ -86,7 +84,7 @@ void Render::renderFrame() {
 }
 
 void Render::updateCursorState() const {
-    if (_firstPersonPlayerId.has_value() ||
+    if ((_firstPerson && _firstPerson->active()) ||
         (_gameHUD && _gameHUD->getPauseMenu() && _gameHUD->getPauseMenu()->isVisible()) || _uiMode) {
         raylib::rcore::Window::enableCursor();
     } else {
@@ -95,93 +93,49 @@ void Render::updateCursorState() const {
 }
 
 void Render::handleInput() {
-    if (raylib::rcore::Event::isKeyPressed(EscapeKey)) {
-        if (_firstPersonPlayerId.has_value()) {
-            exitFirstPersonView();
-        } else if (_gameHUD && ((_gameHUD->getGridManager() && _gameHUD->getGridManager()->isConfigMode()) ||
-                                (_gameHUD->getWorldControl() && _gameHUD->getWorldControl()->isConfigMode()))) {
-            if (auto grid = _gameHUD->getGridManager()) {
-                grid->setConfigMode(false);
-            }
-            if (auto worldControl = _gameHUD->getWorldControl()) {
-                worldControl->setConfigMode(false);
-            }
-            _uiMode = false;
-            _updateMode = UpdateMode::All;
-        } else if (_gameHUD && _gameHUD->getPauseMenu()) {
-            bool const pauseVisible = !_gameHUD->getPauseMenu()->isVisible();
-            _gameHUD->getPauseMenu()->setVisible(pauseVisible);
-            _updateMode = pauseVisible ? UpdateMode::PauseMenuOnly : UpdateMode::All;
+    for (const auto& [key, handler] : _keyHandlers) {
+        if (raylib::rcore::Event::isKeyPressed(key)) {
+            handler();
         }
+    }
+}
+
+void Render::handleEscapeKey() {
+    if (_firstPerson && _firstPerson->active()) {
+        _firstPerson->exit();
+    } else if (_gameHUD && ((_gameHUD->getGridManager() && _gameHUD->getGridManager()->isConfigMode()) ||
+                            (_gameHUD->getWorldControl() && _gameHUD->getWorldControl()->isConfigMode()))) {
+        if (auto grid = _gameHUD->getGridManager()) {
+            grid->setConfigMode(false);
+        }
+        if (auto worldControl = _gameHUD->getWorldControl()) {
+            worldControl->setConfigMode(false);
+        }
+        _uiMode = false;
+        _updateMode = UpdateMode::All;
+    } else if (_gameHUD && _gameHUD->getPauseMenu()) {
+        bool const pauseVisible = !_gameHUD->getPauseMenu()->isVisible();
+        _gameHUD->getPauseMenu()->setVisible(pauseVisible);
+        _updateMode = pauseVisible ? UpdateMode::PauseMenuOnly : UpdateMode::All;
+    }
+    updateCursorState();
+}
+
+void Render::handleAltKey() {
+    if ((!_firstPerson || !_firstPerson->active()) &&
+        (!_gameHUD || !_gameHUD->getGridManager() || !_gameHUD->getGridManager()->isConfigMode())) {
+        _uiMode = !_uiMode;
         updateCursorState();
     }
-
-    if (raylib::rcore::Event::isKeyPressed(LeftAltKey)) {
-        if (!_firstPersonPlayerId.has_value() &&
-            (!_gameHUD || !_gameHUD->getGridManager() || !_gameHUD->getGridManager()->isConfigMode())) {
-            _uiMode = !_uiMode;
-            updateCursorState();
-        }
-    }
-}
-
-void Render::handleFirstPersonRequest(const events::PlayerFirstPersonRequested& event) {
-    if (!_worldManager.playerById(event.playerId).has_value()) {
-        return;
-    }
-
-    _firstPersonPlayerId = event.playerId;
-    _uiMode = false;
-    _updateMode = UpdateMode::All;
-    if (_exitFirstPersonButton) {
-        _exitFirstPersonButton->setVisible(true);
-    }
-    updateFirstPersonCamera();
-    updateCursorState();
-}
-
-void Render::updateFirstPersonCamera() {
-    if (!_firstPersonPlayerId.has_value()) {
-        return;
-    }
-    const auto player = _worldManager.playerById(*_firstPersonPlayerId);
-    if (!player.has_value()) {
-        exitFirstPersonView();
-        return;
-    }
-
-    const auto direction = player->get().renderDirection();
-    const auto eyePosition = player->get().position() + raylib::rmath::Vector3{0.0F, FirstPersonEyeHeight, 0.0F};
-
-    _camera.setPosition(eyePosition);
-    _camera.setTarget(eyePosition + (direction * FirstPersonLookDistance));
-    _camera.setUp({0.0F, 1.0F, 0.0F});
-    _camera.setFovy(FirstPersonFovY);
-    _camera.setProjection(PerspectiveProjection);
-}
-
-void Render::exitFirstPersonView() {
-    _firstPersonPlayerId.reset();
-    if (_exitFirstPersonButton) {
-        _exitFirstPersonButton->setVisible(false);
-    }
-    updateCursorState();
-}
-
-void Render::updateExitFirstPersonButtonPosition() const {
-    if (!_exitFirstPersonButton) {
-        return;
-    }
-    const float buttonX = (static_cast<float>(raylib::rcore::Window::screenWidth()) - ExitViewButtonWidth) / 2.0F;
-    _exitFirstPersonButton->setPosition(buttonX, ExitViewButtonTop);
 }
 
 void Render::update() {
     _event.update();
     handleInput();
     _worldManager.movePlayers(raylib::rcore::Window::frameTime());
-    updateExitFirstPersonButtonPosition();
-    updateFirstPersonCamera();
+    if (_firstPerson) {
+        _firstPerson->update();
+    }
 
     _uiManager.update();
     _uiManager.handleEvent();
@@ -190,7 +144,7 @@ void Render::update() {
         return;
     }
 
-    if (!_uiMode && !_firstPersonPlayerId.has_value()) {
+    if (!_uiMode && (!_firstPerson || !_firstPerson->active())) {
         _camera.updateCamera(CAMERA_FREE);
         if (_camera.position().y() < scene::Tile3D::TILE_SIZE * 1.3F) {
             _camera.setPosition({_camera.position().x(), scene::Tile3D::TILE_SIZE * 1.3F, _camera.position().z()});
@@ -199,7 +153,7 @@ void Render::update() {
         }
     }
 
-    if (_uiMode && !_firstPersonPlayerId.has_value()) {
+    if (_uiMode && (!_firstPerson || !_firstPerson->active())) {
         if (!_uiManager.isHovered()) {
             _map.handleEvent();
         } else {
