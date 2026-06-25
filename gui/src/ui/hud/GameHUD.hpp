@@ -9,6 +9,7 @@
 
 #include <functional>
 #include <memory>
+#include <string>
 
 #include "events/EventDispatcher.hpp"
 #include "rcore/Camera.hpp"
@@ -46,6 +47,8 @@ class GameHUD {
     [[nodiscard]] std::shared_ptr<menus::GlobalStatsUI> getGlobalStats() const { return _globalStats; }
 
   private:
+    static std::function<void(const std::string&)> makeSendCommand(events::EventDispatcher& dispatcher);
+
     std::reference_wrapper<events::EventDispatcher> _dispatcher;
     std::shared_ptr<raylib::rtext::Font> _font;
     std::shared_ptr<components::UIGridManager> _gridManager;
