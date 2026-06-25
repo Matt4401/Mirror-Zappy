@@ -14,6 +14,8 @@ class HelpTeamMatesState(AState):
     def execute(self):
         while len(self.trantorian.broadcast_queue) > 0:
             event = self.trantorian.get_next_broadcast()
+            if event == None:
+                break
             direction = event.direction
             raw_message = event.message
             decoded = self.broadcast_decoder.read_broadcast(raw_message)
