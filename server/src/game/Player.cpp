@@ -254,6 +254,6 @@ bool Player::checkIncantationRequirements(
     return hasEnoughResources(resources, condition.resources);
 }
 
-void Player::setIncating(const bool isIncanting) { _isIncanting = isIncanting; }
+void Player::setIncanting(const bool isIncanting) { _isIncanting = isIncanting; }
 
 }  // namespace zappy::server::game

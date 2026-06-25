@@ -81,7 +81,9 @@ bool Incantation::start(game::World& world, game::Player& player) {
         for (auto playerId : _vecPlayerIds) {
             const auto& tmpPlayer = world.playerList().at(playerId);
             tmpPlayer->addResponse("Elevation underway\n");
-            tmpPlayer->setIncating(true);
+            if (tmpPlayer->id() != player.id()) {
+                tmpPlayer->setIncanting(true);
+            }
         }
         return true;
     }
@@ -119,7 +121,7 @@ void Incantation::execute(game::World& world, game::Player& player) {
             const auto& tmpPlayer = world.playerList().at(playerId);
             tmpPlayer->levelUp();
             tmpPlayer->addResponse("Current level: " + std::to_string(tmpPlayer->level()) + "\n");
-            tmpPlayer->setIncating(false);
+            tmpPlayer->setIncanting(false);
         }
         isSuccess = true;
         world.addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Plv{
@@ -128,8 +130,12 @@ void Incantation::execute(game::World& world, game::Player& player) {
         }));
     } else {
         for (auto playerId : _vecPlayerIds) {
-            const auto& tmpPlayer = world.playerList().at(playerId);
-            tmpPlayer->addResponse("ko\n");
+            auto it = world.playerList().find(playerId);
+            if (it == world.playerList().end()) {
+                continue;
+            }
+            it->second->addResponse("ko\n");
+            it->second->setIncanting(false);
         }
         isSuccess = false;
     }

@@ -101,7 +101,7 @@ class Player {
     void levelUp();
     [[nodiscard]] bool checkIncantationRequirements(
         const std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)>& resources) const;
-    void setIncating(bool isIncanting);
+    void setIncanting(bool isIncanting);
 
     [[nodiscard]] bool isDead() const;
 
