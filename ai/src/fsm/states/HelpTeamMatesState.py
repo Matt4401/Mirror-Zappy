@@ -21,6 +21,8 @@ class HelpTeamMatesState(AState):
             decoded = self.broadcast_decoder.read_broadcast(raw_message)
             if decoded is not None:
                 level, command = decoded
+                if level == 8:
+                    break
                 self.target_direction = direction
                 self.trantorian.logger.info(f"[HelpTeamMates] Wer found a team mate")
                 break
