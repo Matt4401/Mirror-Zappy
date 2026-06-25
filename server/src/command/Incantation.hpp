@@ -26,11 +26,13 @@ class Incantation : public ACommand {
     Incantation& operator=(Incantation&& other) = delete;
 
     bool start(game::World& world, game::Player& player) override;
+    [[nodiscard]] bool checkIfPlayersNotDead(const game::World& world) const;
     void execute(game::World& world, game::Player& player) override;
 
   private:
+    std::vector<std::size_t> _vecPlayerIds;
+
     static constexpr int kTimeLimit = 300;
-    static std::vector<std::size_t> playersWithSameLevelOnTile(game::Position position, int level,
-                                                               const game::World& world);
+    bool trySelectParticipantsByFood(game::Position position, int level, const game::World& world, size_t ogId);
 };
 }  // namespace zappy::server::command

@@ -93,6 +93,9 @@ void Player::update(World& world) {
             return;
         }
     }
+    if (_isIncanting) {
+        return;
+    }
     if (_isNewCommand) {
         _isNewCommand = false;
     } else if (_cmdTick > 0) {
@@ -187,7 +190,7 @@ bool Player::hasCommands() const { return _currentCommand != nullptr || !_comman
 void Player::setPosition(const Position pos) { _pos = pos; }
 
 Position Player::getLeftTile(const Position ogPos, const Position& mapLimit) {
-    auto [fst, snd] = leftTile.at(static_cast<uint8_t>(_orientation));
+    auto [fst, snd] = leftTile.at(static_cast<std::uint8_t>(_orientation));
     const std::size_t width = mapLimit.x;
     const std::size_t height = mapLimit.y;
     Position newPos{};
@@ -198,7 +201,7 @@ Position Player::getLeftTile(const Position ogPos, const Position& mapLimit) {
     return newPos;
 }
 
-std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> Player::inventory() const { return _inventory; }
+std::array<std::size_t, static_cast<std::uint8_t>(ItemType::COUNT)> Player::inventory() const { return _inventory; }
 
 std::vector<Position> Player::getLookPos(const Position mapLimit) {
     std::vector pos{{Position{.x = _pos.x, .y = _pos.y}}};
@@ -246,9 +249,11 @@ void Player::levelUp() {
 }
 
 bool Player::checkIncantationRequirements(
-    const std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)>& resources, const std::size_t nbPlayer) const {
+    const std::array<std::size_t, static_cast<std::uint8_t>(ItemType::COUNT)>& resources) const {
     auto condition = getCondition().at(_level - 1);
-    return condition.nbPlayer <= nbPlayer && hasEnoughResources(resources, condition.resources);
+    return hasEnoughResources(resources, condition.resources);
 }
+
+void Player::setIncanting(const bool isIncanting) { _isIncanting = isIncanting; }
 
 }  // namespace zappy::server::game

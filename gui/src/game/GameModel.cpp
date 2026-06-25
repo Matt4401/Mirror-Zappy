@@ -48,13 +48,13 @@ GameModel::GameModel(raylib::rcore::Camera& camera)
 float GameModel::getRotationAngle(Player::cardinalPoint orientation) {
     switch (orientation) {
         case Player::cardinalPoint::NORTH:
-            return 180.0F;
-        case Player::cardinalPoint::EAST:
-            return 90.0F;
-        case Player::cardinalPoint::SOUTH:
             return 0.0F;
-        case Player::cardinalPoint::WEST:
+        case Player::cardinalPoint::EAST:
             return 270.0F;
+        case Player::cardinalPoint::SOUTH:
+            return 180.0F;
+        case Player::cardinalPoint::WEST:
+            return 90.0F;
     }
     return 0.0F;
 }

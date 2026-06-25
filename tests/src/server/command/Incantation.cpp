@@ -82,11 +82,15 @@ TEST_F(IncantationTest, ExecuteSuccessAndReplies) {
 
     const std::unique_ptr<ICommand> incantation = std::make_unique<Incantation>();
 
+    ASSERT_TRUE(incantation->start(world, player));
+
     incantation->execute(world, player);
 
     auto responses = player.responses();
     ASSERT_FALSE(responses.empty());
-    EXPECT_EQ(responses.front(), "ok\n");
+    ASSERT_EQ(responses.size(), 2);
+    EXPECT_EQ(responses.front(), "Elevation underway\n");
+    EXPECT_EQ(responses.back(), "Current level: 2\n");
 
     auto guiEvents = world.getAndClearGuiEvents();
     ASSERT_FALSE(guiEvents.empty());
@@ -131,12 +135,19 @@ TEST_F(IncantationTest, MultiPlayerRequirementLevel2To3) {
 
     incantation->execute(world, p1);
 
-    ASSERT_FALSE(incantation->start(world, p2));
-
-    incantation->execute(world, p2);
-
     EXPECT_EQ(p1.level(), 3);
-    EXPECT_EQ(p2.level(), 2);
+    EXPECT_EQ(p2.level(), 3);
+
+    auto p1Responses = p1.responses();
+    ASSERT_FALSE(p1Responses.empty());
+    ASSERT_EQ(p1Responses.size(), 2);
+    EXPECT_EQ(p1Responses.front(), "Elevation underway\n");
+    EXPECT_EQ(p1Responses.back(), "Current level: 3\n");
+    auto p2Responses = p2.responses();
+    ASSERT_FALSE(p2Responses.empty());
+    ASSERT_EQ(p2Responses.size(), 2);
+    EXPECT_EQ(p2Responses.front(), "Elevation underway\n");
+    EXPECT_EQ(p2Responses.back(), "Current level: 3\n");
 
     auto resourcesAfter = world.resourcesAt(sharedPos);
     EXPECT_EQ(resourcesAfter.at(static_cast<std::uint8_t>(game::ItemType::Linemate)), 0);

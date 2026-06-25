@@ -188,8 +188,8 @@ TEST_F(WorldTest, RandomCardinalPointReturnsValidOrientation) {
     for (int i = 0; i < 100; ++i) {
         const auto orientation = World::randomCardinalPoint();
 
-        ASSERT_GE(static_cast<uint8_t>(orientation), 0);
-        ASSERT_LT(static_cast<uint8_t>(orientation), static_cast<uint8_t>(cardinalPoint::COUNT));
+        ASSERT_GE(static_cast<std::uint8_t>(orientation), 0);
+        ASSERT_LT(static_cast<std::uint8_t>(orientation), static_cast<std::uint8_t>(cardinalPoint::COUNT));
     }
 }
 
@@ -356,26 +356,26 @@ TEST_F(WorldTest, UpdateWithNoCommandsDoesNotGenerateResponses) {
 TEST_F(WorldTest, CheckSpawnQuantities) {
     World world{config};
 
-    std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> totalSpawned{};
+    std::array<std::size_t, static_cast<std::uint8_t>(ItemType::COUNT)> totalSpawned{};
     totalSpawned.fill(0);
 
     for (std::size_t x = 0; x < 10; ++x) {
         for (std::size_t y = 0; y < 10; ++y) {
             auto tileRes = world.resourcesAt(game::Position{.x = x, .y = y});
 
-            for (std::uint8_t i = 0; i < static_cast<uint8_t>(ItemType::COUNT); ++i) {
+            for (std::uint8_t i = 0; i < static_cast<std::uint8_t>(ItemType::COUNT); ++i) {
                 totalSpawned.at(i) += tileRes.at(i);
             }
         }
     }
 
-    EXPECT_EQ(totalSpawned.at(static_cast<uint8_t>(ItemType::Food)), 50);
-    EXPECT_EQ(totalSpawned.at(static_cast<uint8_t>(ItemType::Linemate)), 30);
-    EXPECT_EQ(totalSpawned.at(static_cast<uint8_t>(ItemType::Deraumere)), 15);
-    EXPECT_EQ(totalSpawned.at(static_cast<uint8_t>(ItemType::Sibur)), 10);
-    EXPECT_EQ(totalSpawned.at(static_cast<uint8_t>(ItemType::Mendiane)), 10);
-    EXPECT_EQ(totalSpawned.at(static_cast<uint8_t>(ItemType::Phiras)), 8);
-    EXPECT_EQ(totalSpawned.at(static_cast<uint8_t>(ItemType::Thystame)), 5);
+    EXPECT_EQ(totalSpawned.at(static_cast<std::uint8_t>(ItemType::Food)), 50);
+    EXPECT_EQ(totalSpawned.at(static_cast<std::uint8_t>(ItemType::Linemate)), 30);
+    EXPECT_EQ(totalSpawned.at(static_cast<std::uint8_t>(ItemType::Deraumere)), 15);
+    EXPECT_EQ(totalSpawned.at(static_cast<std::uint8_t>(ItemType::Sibur)), 10);
+    EXPECT_EQ(totalSpawned.at(static_cast<std::uint8_t>(ItemType::Mendiane)), 10);
+    EXPECT_EQ(totalSpawned.at(static_cast<std::uint8_t>(ItemType::Phiras)), 8);
+    EXPECT_EQ(totalSpawned.at(static_cast<std::uint8_t>(ItemType::Thystame)), 5);
 }
 
 TEST(WorldResourcesTest, CheckZeroSizeMapDoesNotCrash) {
