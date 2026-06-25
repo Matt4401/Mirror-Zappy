@@ -15,6 +15,7 @@ class FiniteStateMachine:
         self.state = default_state
         self.trantorian = trantorian
         self.tick_manager = tick_manager
+        self.sender = []
         self.pending_commands = {}
 
     def run(self):

@@ -1,5 +1,6 @@
 from ..AState import AState
-from src.util.BroadcastMessage import BroadcastMessage
+from src.util.BroadcastMessageManager import BroadcastMessageManager
+from src.Connection import BroadcastMessage
 
 
 class HelpTeamMatesState(AState):
