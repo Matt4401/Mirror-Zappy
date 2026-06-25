@@ -46,6 +46,26 @@
     - send: "sst -5\n"
     - expect: '^sbp\n$'
 
+- name: "GUI_Time_Set_SST_Valid"
+  client_type: "GUI"
+  steps:
+    - send: "sst 100\n"
+    - expect: '(^sst 100\n$)|(^sgt 100\n$)'
+
+- name: "GUI_Time_Set_SST_Valid_Then_Get"
+  client_type: "GUI"
+  steps:
+    - send: "sst 200\n"
+    - expect: '(^sst 200\n$)|(^sgt 200\n$)'
+    - send: "sgt\n"
+    - expect: '^sgt 200\n$'
+
+- name: "GUI_time_Set_0_SST"
+  client_type: "GUI"
+  steps:
+    - send: "sst 0\n"
+    - expect: '^sbp\n$'
+
 - name: "GUI_Player_Position_Bad_Param"
   client_type: "GUI"
   steps:

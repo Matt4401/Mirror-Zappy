@@ -85,7 +85,6 @@ class World {
     std::size_t removePlayer(std::size_t id);
     std::size_t getAvailableSlotInTeam(std::string_view teamName) const;
     void eject(std::size_t id);
-    bool hasEjectableTargetOnTile(const Position& position, std::size_t id) const;
     bool isEggOnTile(const Position& position) const;
 
     const std::unordered_map<std::size_t, std::unique_ptr<Player>>& playerList() const;
