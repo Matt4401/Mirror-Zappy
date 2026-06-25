@@ -149,7 +149,7 @@ void Player::turnToOrientation(const cardinalPoint orientation) {
 }
 
 raylib::rmath::Vector3 Player::renderDirection() const {
-    const float radians = _renderRotationAngle * DegreesToRadians;
+    const float radians = _renderRotationAngle * raylib::rmath::Vector3::DegreesToRadians;
     return {std::sin(radians), 0.0F, std::cos(radians)};
 }
 }  // namespace zappy::gui::game

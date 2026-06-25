@@ -26,11 +26,10 @@ class Player {
     static constexpr float DegreesPerQuarterTurn = 90.0F;
     static constexpr float FullTurnDegrees = 360.0F;
     static constexpr float HalfTurnDegrees = 180.0F;
-    static constexpr float SouthAngle = 0.0F;
-    static constexpr float EastAngle = 90.0F;
-    static constexpr float NorthAngle = 180.0F;
-    static constexpr float WestAngle = 270.0F;
-    static constexpr float DegreesToRadians = 0.017453292519943295769F;
+    static constexpr float SouthAngle = 180.0F;
+    static constexpr float EastAngle = 270.0F;
+    static constexpr float NorthAngle = 0.0F;
+    static constexpr float WestAngle = 90.0F;
 
     Player(int id, raylib::rmath::Vector3 position, std::string name, cardinalPoint orientation, std::size_t level = 1);
     ~Player() = default;
@@ -90,8 +89,8 @@ class Player {
     std::optional<raylib::rmath::Vector3> _wrappedPosition;
     std::string _name;
     cardinalPoint _orientation{cardinalPoint::NORTH};
-    float _renderRotationAngle{180.0F};
-    float _targetRotationAngle{180.0F};
+    float _renderRotationAngle{0.0F};
+    float _targetRotationAngle{0.0F};
     std::size_t _level{1};
     std::size_t _life{10};
     std::string _textureId;

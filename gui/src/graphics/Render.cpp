@@ -36,14 +36,13 @@ Render::Render(events::EventDispatcher& dispatcher)
                                                   AssetManager::getInstance().getFont(DefaultFontName), _camera);
     _gameHUD->registerToUIManager(_uiManager);
 
-    _firstPerson = std::make_unique<FirstPerson>(_dispatcher.get(), _camera, _worldManager, _uiManager,
-                                                 AssetManager::getInstance().getFont(DefaultFontName), [this]() {
-                                                     if (_firstPerson && _firstPerson->active()) {
-                                                         _uiMode = false;
-                                                         _updateMode = UpdateMode::All;
-                                                     }
-                                                     updateCursorState();
-                                                 });
+    _firstPerson = std::make_unique<FirstPerson>(_dispatcher.get(), _camera, _worldManager, [this]() {
+        if (_firstPerson && _firstPerson->active()) {
+            _uiMode = false;
+            _updateMode = UpdateMode::All;
+        }
+        updateCursorState();
+    });
 
     _keyHandlers = {
         {EscapeKey, [this]() { handleEscapeKey(); }},

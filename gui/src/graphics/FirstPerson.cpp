@@ -8,35 +8,21 @@
 #include "FirstPerson.hpp"
 
 #include <functional>
-#include <memory>
 #include <utility>
 
 #include "events/EventDispatcher.hpp"
 #include "events/GuiEvents.hpp"
 #include "rcore/Camera.hpp"
-#include "rcore/Window.hpp"
 #include "rmath/Vector3.hpp"
-#include "rtext/Font.hpp"
 #include "scene/WorldManager.hpp"
-#include "ui/UIManager.hpp"
-#include "ui/components/UIButton.hpp"
 
 namespace zappy::gui::graphics {
 FirstPerson::FirstPerson(events::EventDispatcher& dispatcher, raylib::rcore::Camera& camera,
-                         scene::WorldManager& worldManager, ui::UIManager& uiManager,
-                         const std::shared_ptr<raylib::rtext::Font>& font, std::function<void()> onStateChanged)
+                         scene::WorldManager& worldManager, std::function<void()> onStateChanged)
     : _dispatcher(dispatcher),
       _camera(camera),
       _worldManager(worldManager),
-      _exitButton(std::make_shared<ui::components::UIButton>(0.0F, ExitButtonTop, ExitButtonWidth, ExitButtonHeight,
-                                                             "Exit view", font)),
       _onStateChanged(std::move(onStateChanged)) {
-    _exitButton->setFontSize(ExitButtonFontSize);
-    _exitButton->setVisible(false);
-    _exitButton->setOnClick([this]() { exit(); });
-    uiManager.addComponent(_exitButton);
-    updateButtonPosition();
-
     _eventToken = _dispatcher.get().subscribe<events::PlayerFirstPersonRequested>(
         [this](const events::PlayerFirstPersonRequested& event) { handleRequest(event); });
 }
@@ -53,17 +39,11 @@ void FirstPerson::handleRequest(const events::PlayerFirstPersonRequested& event)
     }
 
     _playerId = event.playerId;
-    if (_exitButton) {
-        _exitButton->setVisible(true);
-    }
     updateCamera();
     notifyStateChanged();
 }
 
-void FirstPerson::update() {
-    updateButtonPosition();
-    updateCamera();
-}
+void FirstPerson::update() { updateCamera(); }
 
 void FirstPerson::updateCamera() {
     if (!_playerId.has_value()) {
@@ -90,18 +70,8 @@ void FirstPerson::exit() {
         return;
     }
     _playerId.reset();
-    if (_exitButton) {
-        _exitButton->setVisible(false);
-    }
     notifyStateChanged();
-}
-
-void FirstPerson::updateButtonPosition() const {
-    if (!_exitButton) {
-        return;
-    }
-    const float buttonX = (static_cast<float>(raylib::rcore::Window::screenWidth()) - ExitButtonWidth) / 2.0F;
-    _exitButton->setPosition(buttonX, ExitButtonTop);
+    _camera.get().setFovy(60.0F);
 }
 
 void FirstPerson::notifyStateChanged() const {
