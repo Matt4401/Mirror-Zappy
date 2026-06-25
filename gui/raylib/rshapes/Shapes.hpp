@@ -40,6 +40,14 @@ class Shapes {
         ::DrawLine(startPosX, startPosY, endPosX, endPosY, color.color());
     }
 
+    static void drawLineEx(rmath::Vector2 startPos, rmath::Vector2 endPos, float thick, Color color) {
+        ::DrawLineEx(startPos.vector(), endPos.vector(), thick, color.color());
+    }
+
+    static void drawTriangle(rmath::Vector2 v1, rmath::Vector2 v2, rmath::Vector2 v3, Color color) {
+        ::DrawTriangle(v1.vector(), v2.vector(), v3.vector(), color.color());
+    }
+
     static bool checkCollisionPointRec(rmath::Vector2 point, rmath::Rectangle rec) {
         return ::CheckCollisionPointRec(point.vector(),
                                         {.x = rec.x, .y = rec.y, .width = rec.width, .height = rec.height});
