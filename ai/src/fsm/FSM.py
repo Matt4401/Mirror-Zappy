@@ -93,11 +93,11 @@ class FiniteStateMachine:
                 cmd_id = self.trantorian.send_command.look()
                 self.pending_commands[cmd_id] = "look"
 
-            elif cmd is None and hasattr(self.trantorian, "broadcast_manager"):
-                self.trantorian.logger.info("[FSM]: Auto command Broadcast call")
-                msg = self.trantorian.broadcast_manager.build_message()
-                cmd_id = self.trantorian.send_command.broadcast(msg)
-                self.pending_commands[cmd_id] = "broadcast"
+            # elif cmd is None and hasattr(self.trantorian, "broadcast_manager"):
+            #     self.trantorian.logger.info("[FSM]: Auto command Broadcast call")
+            #     msg = self.trantorian.broadcast_manager.build_message()
+            #     cmd_id = self.trantorian.send_command.broadcast(msg)
+            #     self.pending_commands[cmd_id] = "broadcast"
 
     def update_state(self):
         food = self.trantorian.player_state.inventory.get_food()
