@@ -178,7 +178,7 @@ pre-commit configuration hooks, and code review workflows.
 
 ## Documentation
 
-The full technical documentation is available online at **[INSERT_LINK_WHEN_AVAILABLE]**.
+The full technical documentation is available online at **[https://matt4401.github.io/Mirror-Zappy/]**.
 
 Architecture diagrams and source files are also located in the `docs/` folder. To serve the documentation locally:
 
