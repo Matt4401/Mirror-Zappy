@@ -8,10 +8,10 @@
 #include "World.hpp"
 
 #include <array>
-#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <numeric>
 #include <optional>
 #include <random>
 #include <ranges>
@@ -54,11 +54,14 @@ void World::addItemsToMap() {
 
     for (const auto& [itemType, density] : densityItem()) {
         const auto quantity = static_cast<std::size_t>(static_cast<double>(totalTiles) * density);
+        const auto currentQuantity =
+            std::accumulate(_tiles.begin(), _tiles.end(), 0, [itemType](std::size_t sum, const Tile& tile) {
+                return sum + tile.resources.at(static_cast<std::uint8_t>(itemType));
+            });
 
-        for (std::size_t i = 0; i < quantity; ++i) {
+        for (std::size_t i = 0; i < quantity - currentQuantity; i++) {
             const std::size_t randomTileIndex = dist(e);
-            const auto itemIdx = static_cast<std::uint8_t>(itemType);
-            _tiles.at(randomTileIndex).resources.at(itemIdx) += 1;
+            addItemOnGround(itemType, getTilePosition(randomTileIndex), 1);
         }
     }
 }
