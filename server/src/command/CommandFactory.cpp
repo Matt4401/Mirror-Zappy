@@ -15,6 +15,7 @@
 #include <vector>
 
 #include "Eject.hpp"
+#include "Incantation.hpp"
 #include "Inventory.hpp"
 #include "Look.hpp"
 #include "Set.hpp"
@@ -78,6 +79,7 @@ void CommandFactory::registerCommands() {
     _creators.emplace("Fork", [](std::string_view) { return std::make_unique<Fork>(); });
     _creators.emplace("Connect_nbr", [](std::string_view) { return std::make_unique<ConnectNbr>(); });
     _creators.emplace("Look", [](std::string_view) { return std::make_unique<Look>(); });
+    _creators.emplace("Incantation", [](std::string_view) { return std::make_unique<Incantation>(); });
 }
 
 void CommandFactory::registerGuiCommands() {

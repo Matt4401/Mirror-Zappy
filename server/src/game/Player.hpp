@@ -100,7 +100,8 @@ class Player {
     [[nodiscard]] int level() const;
     void levelUp();
     [[nodiscard]] bool checkIncantationRequirements(
-        const std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)>& resources, std::size_t nbPlayer) const;
+        const std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)>& resources) const;
+    void setIncating(bool isIncanting);
 
   private:
     std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> _inventory{};
@@ -115,6 +116,7 @@ class Player {
     std::size_t _id;
     bool _isNewCommand{false};
     int _level{1};
+    bool _isIncanting{false};
 
     Position getNthDiagonalLeftPosition(std::size_t n, Position mapLimit);
     Position getLeftTile(Position ogPos, const Position& mapLimit);

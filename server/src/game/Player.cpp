@@ -90,6 +90,9 @@ void Player::update(World& world) {
             return;
         }
     }
+    if (_isIncanting) {
+        return;
+    }
     if (_isNewCommand) {
         _isNewCommand = false;
     } else if (_cmdTick > 0) {
@@ -238,9 +241,11 @@ void Player::levelUp() {
 }
 
 bool Player::checkIncantationRequirements(
-    const std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)>& resources, const std::size_t nbPlayer) const {
+    const std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)>& resources) const {
     auto condition = getCondition().at(_level - 1);
-    return condition.nbPlayer <= nbPlayer && hasEnoughResources(resources, condition.resources);
+    return hasEnoughResources(resources, condition.resources);
 }
+
+void Player::setIncating(const bool isIncanting) { _isIncanting = isIncanting; }
 
 }  // namespace zappy::server::game

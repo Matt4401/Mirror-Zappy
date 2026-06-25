@@ -7,8 +7,12 @@
 
 #include "Incantation.hpp"
 
+#include <algorithm>
 #include <array>
 #include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <string>
 #include <vector>
 
 #include "ACommand.hpp"
@@ -21,41 +25,87 @@ namespace zappy::server::command {
 
 Incantation::Incantation() : ACommand(kTimeLimit) {}
 
-std::vector<std::size_t> Incantation::playersWithSameLevelOnTile(const game::Position position, const int level,
-                                                                 const game::World& world) {
+bool Incantation::playersWithSameLevelOnTileWithMoreFood(const game::Position position, const int level,
+                                                         const game::World& world, const std::size_t ogId) {
+    const auto [nbPlayer, resources] = game::getCondition().at(level - 1);
+    if (nbPlayer <= 1) {
+        return true;
+    }
+
     const auto tile = world.tile(position);
     const auto& playerList = world.playerList();
-    const auto playerIds = tile.players;
-    std::vector<std::size_t> vecPlayerId{};
-    for (const auto& playerId : playerIds) {
-        if (playerList.find(playerId)->second->level() == level) {
-            vecPlayerId.push_back(playerId);
+    std::vector<std::size_t> candidates;
+    for (const auto& playerId : tile.players) {
+        if (playerId == ogId) {
+            continue;
+        }
+
+        const auto it = playerList.find(playerId);
+        if (it != playerList.end() && it->second->level() == level) {
+            candidates.push_back(playerId);
         }
     }
-    return vecPlayerId;
+    if (candidates.size() + 1 < nbPlayer) {
+        return false;
+    }
+
+    std::sort(candidates.begin(), candidates.end(), [&playerList](const std::size_t a, const std::size_t b) {
+        auto foodA = playerList.at(a)->inventory().at(static_cast<std::uint8_t>(game::ItemType::Food));
+        auto foodB = playerList.at(b)->inventory().at(static_cast<std::uint8_t>(game::ItemType::Food));
+        return foodA > foodB;
+    });
+
+    for (std::size_t i = 0; i < nbPlayer - 1; ++i) {
+        _vecPlayerIds.push_back(candidates.at(i));
+    }
+
+    return true;
 }
 
 bool Incantation::start(game::World& world, game::Player& player) {
-    auto vecPlayerIds = playersWithSameLevelOnTile(player.position(), player.level(), world);
+    _vecPlayerIds.clear();
+    _vecPlayerIds.push_back(player.id());
 
-    if (player.checkIncantationRequirements(world.resourcesAt(player.position()), vecPlayerIds.size())) {
+    if (!playersWithSameLevelOnTileWithMoreFood(player.position(), player.level(), world, player.id())) {
+        _vecPlayerIds.clear();
+        return false;
+    }
+
+    if (player.checkIncantationRequirements(world.resourcesAt(player.position()))) {
         world.addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pic{
             .x = static_cast<int>(player.position().x),
             .y = static_cast<int>(player.position().y),
             .level = player.level(),
-            .playerIds = vecPlayerIds,
+            .playerIds = _vecPlayerIds,
         }));
+        for (auto playerId : _vecPlayerIds) {
+            const auto& tmpPlayer = world.playerList().at(playerId);
+            tmpPlayer->addResponse("Elevation underway\n");
+            tmpPlayer->setIncating(true);
+        }
         return true;
     }
+
+    _vecPlayerIds.clear();
     return false;
 }
 
+bool Incantation::checkIfPlayersNotDead(const game::World& world) const {
+    const auto& player = world.playerList();
+
+    // NOLINTNEXTLINE
+    for (auto playerId : _vecPlayerIds) {
+        if (!player.contains(playerId)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 void Incantation::execute(game::World& world, game::Player& player) {
-    const auto vecPlayerIds = playersWithSameLevelOnTile(player.position(), player.level(), world);
     bool isSuccess = false;
 
-    if (player.checkIncantationRequirements(world.resourcesAt(player.position()), vecPlayerIds.size())) {
-        player.addResponse("ok\n");
+    if (player.checkIncantationRequirements(world.resourcesAt(player.position())) && checkIfPlayersNotDead(world)) {
         auto [nbPlayer, resources] = game::getCondition().at(player.level() - 1);
         for (int i = 0; i < static_cast<int>(game::ItemType::COUNT); ++i) {
             const auto item = static_cast<game::ItemType>(i);
@@ -65,10 +115,18 @@ void Incantation::execute(game::World& world, game::Player& player) {
                 world.removeItemOnGround(item, player.position(), countNeeded);
             }
         }
-        player.levelUp();
+        for (auto playerId : _vecPlayerIds) {
+            const auto& tmpPlayer = world.playerList().at(playerId);
+            tmpPlayer->levelUp();
+            tmpPlayer->addResponse("Current level: " + std::to_string(tmpPlayer->level()) + "\n");
+            tmpPlayer->setIncating(false);
+        }
         isSuccess = true;
     } else {
-        player.addResponse("ko\n");
+        for (auto playerId : _vecPlayerIds) {
+            const auto& tmpPlayer = world.playerList().at(playerId);
+            tmpPlayer->addResponse("ko\n");
+        }
         isSuccess = false;
     }
     world.addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Pie{
