@@ -12,7 +12,6 @@
 #include <memory>
 
 #include "Color.hpp"
-#include "Player.hpp"
 #include "rcore/Camera.hpp"
 #include "rmath/Vector3.hpp"
 #include "rmodels/Model.hpp"
@@ -36,14 +35,13 @@ class GameModel {
     GameModel(GameModel&& other) noexcept = default;
     GameModel& operator=(GameModel&& other) noexcept = default;
 
-    void drawPlayer(raylib::rmath::Vector3 position, Player::cardinalPoint orientation,
+    void drawPlayer(raylib::rmath::Vector3 position, float rotationAngle,
                     const std::shared_ptr<raylib::rtextures::Texture2D>& texture = nullptr,
                     std::size_t level = 1) const;
     void drawEgg(raylib::rmath::Vector3 position, raylib::Color tint) const;
 
   protected:
   private:
-    static float getRotationAngle(Player::cardinalPoint orientation);
     std::reference_wrapper<raylib::rcore::Camera> _camera;
     mutable raylib::rmodels::Model _playerModel{PLAYER_MODEL_RESOURCE};
     std::shared_ptr<raylib::rtextures::Texture2D> _defaultPlayerTexture;

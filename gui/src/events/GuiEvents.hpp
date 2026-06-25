@@ -32,6 +32,10 @@ struct PlayerNameChanged {
     std::string newName;
 };
 
+struct PlayerFirstPersonRequested {
+    int playerId{0};
+};
+
 struct TileClicked {
     int x{0};
     int y{0};
