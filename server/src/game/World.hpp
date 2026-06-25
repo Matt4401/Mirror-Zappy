@@ -80,6 +80,7 @@ class World {
     void pushCommandToPlayer(std::size_t playerId, std::unique_ptr<command::ICommand> command);
     void removePlayerFromTeam(std::size_t id) const;
     void updatePositionOnMap(std::size_t id, const Position& oldPosition, const Position& newPosition);
+    std::vector<std::size_t> collectDeadPlayers() const;
 
     std::size_t removePlayer(std::size_t id);
     std::size_t getAvailableSlotInTeam(std::string_view teamName) const;
@@ -103,7 +104,10 @@ class World {
     const std::unordered_map<std::size_t, Egg>& vecEggs() const;
     [[nodiscard]] Tile tile(Position position) const;
 
+    void checkGameEnd();
+
   private:
+    bool _isGameEnd{false};
     std::unordered_map<std::string, std::unique_ptr<Team>> _teamList;
     std::unordered_map<std::size_t, std::unique_ptr<Player>> _playerList;
     std::size_t _heightMap;
@@ -128,5 +132,6 @@ class World {
     static std::string transformResourcesToStr(const Tile& tile);
 
     static constexpr std::size_t kNbTicksToRespawn = 20;
+    static constexpr std::size_t kNbPlayerToWin = 6;
 };
 }  // namespace zappy::server::game
