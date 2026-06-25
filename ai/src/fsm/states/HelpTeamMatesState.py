@@ -1,6 +1,5 @@
 from ..AState import AState
 from src.util.BroadcastMessageManager import BroadcastMessageManager
-from src.Connection import BroadcastMessage
 
 
 class HelpTeamMatesState(AState):
@@ -9,7 +8,7 @@ class HelpTeamMatesState(AState):
         self.trantorian.logger.info(
             "===========Entering Help Team mates state==========="
         )
-        self.broadcast_decoder = BroadcastMessage(self.trantorian.player_state)
+        self.broadcast_manager = BroadcastMessageManager()
         self.target_direction = 0
 
     def execute(self):
@@ -19,7 +18,7 @@ class HelpTeamMatesState(AState):
                 break
             direction = event.direction
             raw_message = event.message
-            decoded = self.broadcast_decoder.read_broadcast(raw_message)
+            decoded = self.broadcast_manager.read_broadcast(raw_message)
             if decoded is not None:
                 level, command = decoded
                 if level == 8:
