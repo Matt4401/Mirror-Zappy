@@ -9,6 +9,7 @@
 
 #include <raylib.h>
 
+#include <algorithm>
 #include <memory>
 
 #include "AssetManager.hpp"
@@ -16,6 +17,7 @@
 #include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
+#include "rmath/Vector3.hpp"
 #include "scene/Tile3D.hpp"
 #include "scene/WorldManager.hpp"
 #include "ui/hud/GameHUD.hpp"
@@ -117,10 +119,49 @@ void Render::update() {
 
     if (!_uiMode) {
         _camera.updateCamera(CAMERA_FREE);
-        if (_camera.position().y() < scene::Tile3D::TILE_SIZE * 1.3F) {
-            _camera.setPosition({_camera.position().x(), scene::Tile3D::TILE_SIZE * 1.3F, _camera.position().z()});
+        if (_camera.position().y() < scene::Tile3D::TILE_SIZE * MinCameraHeight) {
+            _camera.setPosition(
+                {_camera.position().x(), scene::Tile3D::TILE_SIZE * MinCameraHeight, _camera.position().z()});
             _camera.setTarget({_camera.target().x(), _camera.target().y() + (raylib::rcore::Window::frameTime() * 2.0F),
                                _camera.target().z()});
+        }
+
+        const float mapWidth = static_cast<float>(_worldManager.width()) * scene::Tile3D::TILE_SIZE;
+        const float mapDepth = static_cast<float>(_worldManager.height()) * scene::Tile3D::TILE_SIZE;
+        const float padding = (std::max(mapWidth, mapDepth) * 0.5F) + DepthLimit;
+
+        const float limitX = (mapWidth * 0.5F) + padding;
+        const float limitZ = (mapDepth * 0.5F) + padding;
+        const float limitY = (std::max(mapWidth, mapDepth));
+
+        raylib::rmath::Vector3 pos = _camera.position();
+        bool clamped = false;
+
+        if (pos.x() > limitX) {
+            pos.setX(limitX);
+            clamped = true;
+        }
+        if (pos.x() < -limitX) {
+            pos.setX(-limitX);
+            clamped = true;
+        }
+
+        if (pos.z() > limitZ) {
+            pos.setZ(limitZ);
+            clamped = true;
+        }
+        if (pos.z() < -limitZ) {
+            pos.setZ(-limitZ);
+            clamped = true;
+        }
+
+        if (pos.y() > limitY) {
+            pos.setY(limitY);
+            clamped = true;
+        }
+
+        if (clamped) {
+            _camera.setPosition(pos);
         }
     }
 
