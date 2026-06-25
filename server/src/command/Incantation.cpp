@@ -25,8 +25,8 @@ namespace zappy::server::command {
 
 Incantation::Incantation() : ACommand(kTimeLimit) {}
 
-bool Incantation::playersWithSameLevelOnTileWithMoreFood(const game::Position position, const int level,
-                                                         const game::World& world, const std::size_t ogId) {
+bool Incantation::trySelectParticipantsByFood(const game::Position position, const int level, const game::World& world,
+                                              const std::size_t ogId) {
     const auto [nbPlayer, resources] = game::getCondition().at(level - 1);
     if (nbPlayer <= 1) {
         return true;
@@ -66,7 +66,7 @@ bool Incantation::start(game::World& world, game::Player& player) {
     _vecPlayerIds.clear();
     _vecPlayerIds.push_back(player.id());
 
-    if (!playersWithSameLevelOnTileWithMoreFood(player.position(), player.level(), world, player.id())) {
+    if (!trySelectParticipantsByFood(player.position(), player.level(), world, player.id())) {
         _vecPlayerIds.clear();
         return false;
     }

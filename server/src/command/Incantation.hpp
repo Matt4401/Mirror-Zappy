@@ -33,7 +33,6 @@ class Incantation : public ACommand {
     std::vector<std::size_t> _vecPlayerIds;
 
     static constexpr int kTimeLimit = 300;
-    bool playersWithSameLevelOnTileWithMoreFood(game::Position position, int level, const game::World& world,
-                                                size_t ogId);
+    bool trySelectParticipantsByFood(game::Position position, int level, const game::World& world, size_t ogId);
 };
 }  // namespace zappy::server::command
