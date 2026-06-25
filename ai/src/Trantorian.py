@@ -158,7 +158,6 @@ class Trantorian:
             current_amount = getattr(self.player_state.inventory, resource, 0)
             if current_amount < required_amount:
                 return False
-
         return True
 
     def get_missing_resources_for(self, target_level: int) -> dict:
