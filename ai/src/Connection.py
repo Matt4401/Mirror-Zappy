@@ -346,6 +346,9 @@ class Connection:
             with self.response_lock:
                 if cmd_id in self.response_buffer:
                     cmd_response = self.response_buffer.pop(cmd_id)
+                    with self.command_lock:
+                        if cmd_id in self.active_requests:
+                            del self.active_requests[cmd_id]
                     return cmd_response.success, cmd_response.command
             time.sleep(0.005)
         return None

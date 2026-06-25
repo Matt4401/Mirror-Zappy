@@ -31,6 +31,7 @@ def mainAI():
     PlayerLogger.setup_logging(player_id)
     print(f"Logger is ok: {player_id}")
 
+    trantorian = None
     try:
         trantorian = Trantorian(port, host, team_name, player_id)
         print("Trantorian ok")
@@ -40,7 +41,8 @@ def mainAI():
         fsm.run()
 
     except KeyboardInterrupt:
-        trantorian.connection.disconnect()
+        if trantorian is not None:
+            trantorian.connection.disconnect()
         sys.exit(0)
 
 
