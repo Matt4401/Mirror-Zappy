@@ -33,7 +33,7 @@ struct Egg {
 struct Tile {
     std::vector<std::size_t> players;
     std::vector<std::size_t> eggs;
-    std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> resources;
+    std::array<std::size_t, static_cast<std::uint8_t>(ItemType::COUNT)> resources;
 };
 
 struct Condition {
@@ -92,7 +92,7 @@ class World {
     bool removeItemOnGround(ItemType item, Position pos, std::size_t nbItem = 1);
 
     [[nodiscard]] int getNextExecutionTick() const;
-    [[nodiscard]] std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> resourcesAt(Position pos) const;
+    [[nodiscard]] std::array<std::size_t, static_cast<std::uint8_t>(ItemType::COUNT)> resourcesAt(Position pos) const;
     [[nodiscard]] std::string getPlayerTeam(std::size_t id) const;
 
     void addGuiEvent(const std::string& event);

@@ -27,7 +27,7 @@ struct Position {
     std::size_t y;
 };
 
-enum class ItemType : uint8_t { Food, Linemate, Deraumere, Sibur, Mendiane, Phiras, Thystame, COUNT };
+enum class ItemType : std::uint8_t { Food, Linemate, Deraumere, Sibur, Mendiane, Phiras, Thystame, COUNT };
 
 using CoordinateMove = std::pair<int, int>;
 
@@ -79,7 +79,7 @@ class Player {
     void addResponse(const std::string&);
     std::vector<std::string> responses();
     [[nodiscard]] Position position() const;
-    [[nodiscard]] std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> inventory() const;
+    [[nodiscard]] std::array<std::size_t, static_cast<std::uint8_t>(ItemType::COUNT)> inventory() const;
     std::vector<Position> getLookPos(Position mapLimit);
 
     void setOrientation(cardinalPoint orient);
@@ -100,12 +100,13 @@ class Player {
     [[nodiscard]] int level() const;
     void levelUp();
     [[nodiscard]] bool checkIncantationRequirements(
-        const std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)>& resources, std::size_t nbPlayer) const;
+        const std::array<std::size_t, static_cast<std::uint8_t>(ItemType::COUNT)>& resources) const;
+    void setIncanting(bool isIncanting);
 
     [[nodiscard]] bool isDead() const;
 
   private:
-    std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> _inventory{};
+    std::array<std::size_t, static_cast<std::uint8_t>(ItemType::COUNT)> _inventory{};
     cardinalPoint _orientation;
     std::queue<std::unique_ptr<command::ICommand>> _commands;
     std::unique_ptr<command::ICommand> _currentCommand{nullptr};
@@ -117,6 +118,7 @@ class Player {
     std::size_t _id;
     bool _isNewCommand{false};
     int _level{1};
+    bool _isIncanting{false};
 
     Position getNthDiagonalLeftPosition(std::size_t n, Position mapLimit);
     Position getLeftTile(Position ogPos, const Position& mapLimit);
