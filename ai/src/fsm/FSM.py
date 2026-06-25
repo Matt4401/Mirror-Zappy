@@ -141,6 +141,7 @@ class FiniteStateMachine:
             # if hasattr(self.trantorian, "broadcast_manager") and self.trantorian.broadcast_manager.should_reproduce(
             #         tick):
             #     self.trantorian.logger.warning("[FSM]: Team too small or unknown, transitioning to ReproduceState")
+            # if self.trantorian.broadcast_manager.should_reproduce(tick) and self.trantorian.player_state.get_food() >= 400 :
             #     self.transition_to(ReproduceState)
             #     return
 
