@@ -13,6 +13,9 @@
 #include <string_view>
 #include <utility>
 
+#include "Color.hpp"
+#include "rmath/Vector2.hpp"
+
 namespace zappy::gui::raylib::rtext {
 class Font {
   public:
@@ -43,6 +46,9 @@ class Font {
     [[nodiscard]] int baseSize() const { return _font.baseSize; }
     [[nodiscard]] int glyphCount() const { return _font.glyphCount; }
     [[nodiscard]] ::Font font() const { return _font; }
+
+    [[nodiscard]] rmath::Vector2 measureTextEx(const std::string& text, float fontSize, float spacing) const;
+    void drawTextEx(const std::string& text, rmath::Vector2 position, float fontSize, float spacing, Color color) const;
 
   protected:
   private:
