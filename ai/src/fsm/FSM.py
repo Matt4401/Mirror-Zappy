@@ -5,6 +5,7 @@ from .states.ReproduceState import ReproduceState
 from .states.EvolveState import EvolveState
 from .states.GatherState import GatherState
 from .states.SurviveState import SurviveState
+from .states.HelpTeamMatesState import HelpTeamMatesState
 from .AState import AState
 from .TickManager import TickManager
 
@@ -112,6 +113,9 @@ class FiniteStateMachine:
             )
             self.transition_to(SurviveState)
             return
+        if self.trantorian.player_state.level == 8:
+            self.transition_to(HelpTeamMatesState)
+            return
 
         if self.trantorian.has_enough_resources_for(
             self.trantorian.player_state.level + 1
@@ -136,6 +140,7 @@ class FiniteStateMachine:
             # if hasattr(self.trantorian, "broadcast_manager") and self.trantorian.broadcast_manager.should_reproduce(
             #         tick):
             #     self.trantorian.logger.warning("[FSM]: Team too small or unknown, transitioning to ReproduceState")
+            # if self.trantorian.broadcast_manager.should_reproduce(tick) and self.trantorian.player_state.get_food() >= 400 :
             #     self.transition_to(ReproduceState)
             #     return
 
