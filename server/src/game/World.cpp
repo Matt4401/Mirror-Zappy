@@ -367,7 +367,7 @@ bool World::removeItemOnGround(ItemType item, const Position pos, const std::siz
     return true;
 }
 
-std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> World::resourcesAt(const Position position) const {
+std::array<std::size_t, static_cast<std::uint8_t>(ItemType::COUNT)> World::resourcesAt(const Position position) const {
     return _tiles.at(getTileIndex(position)).resources;
 }
 
