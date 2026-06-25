@@ -53,13 +53,13 @@ void World::addItemsToMap() {
     std::uniform_int_distribution<std::size_t> dist{0, totalTiles - 1};
 
     for (const auto& [itemType, density] : densityItem()) {
-        const auto quantity = static_cast<std::size_t>(static_cast<double>(totalTiles) * density);
+        const auto quantity = static_cast<int>(static_cast<double>(totalTiles) * density);
         const auto currentQuantity =
             std::accumulate(_tiles.begin(), _tiles.end(), 0, [itemType](std::size_t sum, const Tile& tile) {
                 return sum + tile.resources.at(static_cast<std::uint8_t>(itemType));
             });
 
-        for (std::size_t i = 0; i < quantity - currentQuantity; i++) {
+        for (int i = 0; i < quantity - currentQuantity; i++) {
             const std::size_t randomTileIndex = dist(e);
             addItemOnGround(itemType, getTilePosition(randomTileIndex), 1);
         }
