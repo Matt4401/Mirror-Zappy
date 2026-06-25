@@ -22,8 +22,8 @@
 #include "rcore/Event.hpp"
 #include "rcore/Window.hpp"
 #include "rmath/Vector3.hpp"
-#include "ui/components/UIButton.hpp"
 #include "ui/UIManager.hpp"
+#include "ui/components/UIButton.hpp"
 #include "ui/hud/GameHUD.hpp"
 
 namespace zappy::gui::graphics {
