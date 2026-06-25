@@ -1,6 +1,4 @@
 from ..AState import AState
-from src.util.BroadcastMessageManager import BroadcastMessageManager
-from src.Connection import BroadcastMessage
 
 
 class HelpTeamMatesState(AState):
@@ -9,23 +7,16 @@ class HelpTeamMatesState(AState):
         self.trantorian.logger.info(
             "===========Entering Help Team mates state==========="
         )
-        self.broadcast_decoder = BroadcastMessage(self.trantorian.player_state)
         self.target_direction = 0
 
     def execute(self):
-        while len(self.trantorian.broadcast_queue) > 0:
-            event = self.trantorian.get_next_broadcast()
-            if event == None:
-                break
-            direction = event.direction
-            raw_message = event.message
-            decoded = self.broadcast_decoder.read_broadcast(raw_message)
-            if decoded is not None:
-                level, command = decoded
-                if level == 8:
-                    break
-                self.target_direction = direction
-                self.trantorian.logger.info(f"[HelpTeamMates] Wer found a team mate")
+        while len(self.trantorian.received_broadcasts) > 0:
+            bc = self.trantorian.received_broadcasts.pop(0)
+            if bc["level"] != 8:
+                self.target_direction = bc["direction"]
+                self.trantorian.logger.info(
+                    f"[HelpTeamMates] We found a team mate via FSM logs"
+                )
                 break
         if self.target_direction > 0:
             self.trantorian.logger.info(
