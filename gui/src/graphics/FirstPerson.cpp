@@ -7,6 +7,7 @@
 
 #include "FirstPerson.hpp"
 
+#include <cmath>
 #include <functional>
 #include <utility>
 
@@ -55,7 +56,7 @@ void FirstPerson::updateCamera() {
         return;
     }
 
-    const auto direction = player->get().renderDirection();
+    const auto direction = rotateDirectionAroundY(player->get().renderDirection(), PLAYER_DIRECTION_OFFSET.x());
     const auto eyePosition = player->get().position() + raylib::rmath::Vector3{0.0F, EyeHeight, 0.0F};
 
     _camera.get().setPosition(eyePosition);
@@ -63,6 +64,19 @@ void FirstPerson::updateCamera() {
     _camera.get().setUp({0.0F, 1.0F, 0.0F});
     _camera.get().setFovy(FovY);
     _camera.get().setProjection(PerspectiveProjection);
+}
+
+raylib::rmath::Vector3 FirstPerson::rotateDirectionAroundY(const raylib::rmath::Vector3& direction,
+                                                           const float angleDegrees) {
+    const float angle = angleDegrees * raylib::rmath::Vector3::DegreesToRadians;
+    const float cosine = std::cos(angle);
+    const float sine = std::sin(angle);
+
+    return {
+        (direction.x() * cosine) + (direction.z() * sine),
+        direction.y(),
+        (-direction.x() * sine) + (direction.z() * cosine),
+    };
 }
 
 void FirstPerson::exit() {

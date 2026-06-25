@@ -13,6 +13,7 @@
 #include "events/EventDispatcher.hpp"
 #include "events/GuiEvents.hpp"
 #include "rcore/Camera.hpp"
+#include "rmath/Vector3.hpp"
 #include "scene/WorldManager.hpp"
 
 namespace zappy::gui::graphics {
@@ -22,6 +23,7 @@ class FirstPerson {
     static constexpr float LookDistance = 8.0F;
     static constexpr float FovY = 70.0F;
     static constexpr int PerspectiveProjection = 0;
+    static constexpr raylib::rmath::Vector3 PLAYER_DIRECTION_OFFSET = {180.0F, 0.0F, 0.0F};
 
     FirstPerson(events::EventDispatcher& dispatcher, raylib::rcore::Camera& camera, scene::WorldManager& worldManager,
                 std::function<void()> onStateChanged);
@@ -40,6 +42,7 @@ class FirstPerson {
     void handleRequest(const events::PlayerFirstPersonRequested& event);
     void updateCamera();
     void notifyStateChanged() const;
+    static raylib::rmath::Vector3 rotateDirectionAroundY(const raylib::rmath::Vector3& direction, float angle);
 
     std::reference_wrapper<events::EventDispatcher> _dispatcher;
     std::reference_wrapper<raylib::rcore::Camera> _camera;
