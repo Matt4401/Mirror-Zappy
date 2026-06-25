@@ -3,7 +3,6 @@ from ..Constant import ELEVATION_REQUIREMENTS
 
 
 class EvolveState(AState):
-
     def execute(self):
         self.trantorian.logger.info("===========Entering Evolve state===========")
         level = self.trantorian.player_state.level

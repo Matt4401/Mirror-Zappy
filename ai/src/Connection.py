@@ -256,8 +256,8 @@ class Connection:
     def send_cmd_buffer(self):
         with self.command_lock:
             while (
-                    len(self.active_requests) < self.MAX_PENDING_COMMANDS
-                    and len(self.command_queue) > 0
+                len(self.active_requests) < self.MAX_PENDING_COMMANDS
+                and len(self.command_queue) > 0
             ):
                 cmd_request = self.command_queue.popleft()
                 if self.send_raw_command(cmd_request.command):
@@ -352,4 +352,3 @@ class Connection:
                     return cmd_response.success, cmd_response.command
             time.sleep(0.005)
         return None
-

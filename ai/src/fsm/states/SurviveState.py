@@ -16,7 +16,9 @@ class SurviveState(AState):
             self.trantorian.look()
             return
 
-        self.trantorian.logger.info("[Survive]: No food visible, look then move forward")
+        self.trantorian.logger.info(
+            "[Survive]: No food visible, look then move forward"
+        )
         self.trantorian.look()
         closest_food_idx = self.trantorian.player_state.vision.get_tile_index_of("food")
         if closest_food_idx is None:

@@ -36,7 +36,9 @@ class FiniteStateMachine:
         if not tiles or "food" not in tiles[0]:
             return
 
-        self.trantorian.logger.info("[FSM]: Food underfoot, taking it before other actions")
+        self.trantorian.logger.info(
+            "[FSM]: Food underfoot, taking it before other actions"
+        )
         self.trantorian.take_object("food")
         self.trantorian.refresh_inventory()
 
@@ -99,7 +101,6 @@ class FiniteStateMachine:
             #     cmd_id = self.trantorian.send_command.broadcast(msg)
             #     self.pending_commands[cmd_id] = "broadcast"
 
-    
     def update_state(self):
         food = self.trantorian.player_state.inventory.get_food()
         self.trantorian.logger.info(f"[FSM]: number of food : {food}")
@@ -138,7 +139,9 @@ class FiniteStateMachine:
             #     self.transition_to(ReproduceState)
             #     return
 
-            self.trantorian.logger.warning("[FSM]: Not enough stones for next level, transitioning to GatherState")
+            self.trantorian.logger.warning(
+                "[FSM]: Not enough stones for next level, transitioning to GatherState"
+            )
             self.transition_to(GatherState)
 
     def transition_to(self, state_class):
