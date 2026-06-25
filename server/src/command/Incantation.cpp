@@ -49,9 +49,9 @@ bool Incantation::playersWithSameLevelOnTileWithMoreFood(const game::Position po
         return false;
     }
 
-    std::sort(candidates.begin(), candidates.end(), [&playerList](const std::size_t a, const std::size_t b) {
-        auto foodA = playerList.at(a)->inventory().at(static_cast<std::uint8_t>(game::ItemType::Food));
-        auto foodB = playerList.at(b)->inventory().at(static_cast<std::uint8_t>(game::ItemType::Food));
+    std::ranges::sort(candidates, [&playerList](const std::size_t a, const std::size_t b) {
+        const auto foodA = playerList.at(a)->inventory().at(static_cast<std::uint8_t>(game::ItemType::Food));
+        const auto foodB = playerList.at(b)->inventory().at(static_cast<std::uint8_t>(game::ItemType::Food));
         return foodA > foodB;
     });
 
