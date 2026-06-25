@@ -1,4 +1,4 @@
-class BroadcastMessage:
+class BroadcastMessageManager:
     def __init__(self, player_state):
         self.player_state = player_state
         self.team = player_state.team_name
