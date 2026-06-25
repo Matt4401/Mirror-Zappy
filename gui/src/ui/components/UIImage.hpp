@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 
 #include "Color.hpp"
 #include "rmath/Vector2.hpp"
@@ -20,6 +21,7 @@ namespace zappy::gui::ui::components {
 class UIImage : public IUIComponent {
   public:
     explicit UIImage(const std::string& path);
+    UIImage(std::shared_ptr<raylib::rtextures::Texture2D> texture, std::string_view assetId);
     ~UIImage() override = default;
 
     UIImage(const UIImage& other) = delete;

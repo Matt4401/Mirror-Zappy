@@ -17,10 +17,12 @@
 
 namespace zappy::server::guiCommand {
 
-Pin::Pin(const int id) : _id(id) {}
+Pin::Pin(shared::protocol::client::Pin cmd) : _id(cmd.playerId) {}
 
 GuiResponse Pin::execute(Core& core) {
-    const GuiResponse response;
+    if (!core.world().playerList().contains(_id)) {
+        return GuiResponse{.message = shared::protocol::Emitter::build(shared::protocol::server::Sbp{})};
+    }
     const auto& player = core.world().playerList().at(_id);
     const auto [x, y] = player->position();
     const auto inventory = player->inventory();

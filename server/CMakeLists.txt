@@ -20,6 +20,8 @@ add_library(zappy_server_objects OBJECT
         src/guiCommand/Sst.hpp
         src/guiCommand/Sbp.cpp
         src/guiCommand/Sbp.hpp
+        src/guiCommand/Ppo.cpp
+        src/guiCommand/Ppo.hpp
         src/command/ICommand.hpp
         src/command/ACommand.hpp
         src/command/CommandFactory.cpp
@@ -56,6 +58,8 @@ add_library(zappy_server_objects OBJECT
         src/command/Incantation.hpp
         src/guiCommand/Pin.cpp
         src/guiCommand/Pin.hpp
+        src/guiCommand/Plv.cpp
+        src/guiCommand/Plv.hpp
 )
 target_include_directories(zappy_server_objects PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src

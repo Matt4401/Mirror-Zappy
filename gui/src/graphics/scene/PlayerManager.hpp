@@ -82,6 +82,7 @@ class PlayerManager {
     [[nodiscard]] static game::Player::cardinalPoint orientationFromProtocol(int orientation);
 
     void updatePlayerPosition(game::Player& player, Tile3DPosition tilePosition) const;
+    void recalculateTileOffsets(Tile3DPosition tilePosition);
     void redistributeInitialEggs();
     void removeEgg(int eggId);
     [[nodiscard]] bool wrapPositionIfNeeded(const game::Player& player, Tile3DPosition tilePosition,
