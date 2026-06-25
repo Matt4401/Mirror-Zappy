@@ -23,11 +23,38 @@ class Trantorian:
         self.parser = ParseCommand(self.player_state.inventory)
         self.logger = logging.getLogger(f"player_{player_id}")
         self.broadcast_manager = BroadcastMessageManager(self.player_state)
+        self.received_broadcasts = []
 
     def wait_for_response(self, cmd_id, timeout=5.0):
         if cmd_id in (None, 84):
             return None
         return self.connection.get_command_response(cmd_id, timeout=timeout)
+
+    def move_one_step_toward(self, threat_direction):
+        if threat_direction == 7:
+            self.connection.turn_right()
+        if threat_direction == 3:
+            self.connection.turn_left()
+        if threat_direction == 5:
+            self.connection.turn_right()
+            self.connection.turn_right()
+        if threat_direction == 2:
+            self.connection.turn_left()
+            self.connection.forward()
+            self.connection.turn_right()
+        if threat_direction == 8:
+            self.connection.turn_right()
+            self.connection.forward()
+            self.connection.turn_left()
+        if threat_direction == 6:
+            self.connection.turn_right()
+            self.connection.forward()
+            self.connection.turn_right()
+        if threat_direction == 4:
+            self.connection.turn_left()
+            self.connection.forward()
+            self.connection.turn_left()
+        self.connection.forward()
 
     def invalidate_vision(self):
         self.player_state.vision.reset_on_turn()
@@ -121,6 +148,12 @@ class Trantorian:
 
         for resource, required_amount in requirements.items():
             if resource == "player":
+                tiles = self.player_state.vision.get_tiles()
+                if not tiles:
+                    return False
+                players_on_tile = tiles[0].count("player")
+                if players_on_tile < required_amount:
+                    return False
                 continue
             current_amount = getattr(self.player_state.inventory, resource, 0)
             if current_amount < required_amount:

@@ -14,7 +14,9 @@ class HelpTeamMatesState(AState):
             bc = self.trantorian.received_broadcasts.pop(0)
             if bc["level"] != 8:
                 self.target_direction = bc["direction"]
-                self.trantorian.logger.info(f"[HelpTeamMates] We found a team mate via FSM logs")
+                self.trantorian.logger.info(
+                    f"[HelpTeamMates] We found a team mate via FSM logs"
+                )
                 break
         if self.target_direction > 0:
             self.trantorian.logger.info(
