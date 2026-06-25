@@ -12,13 +12,11 @@ class SurviveState(AState):
             self.trantorian.take_object("food")
             self.trantorian.refresh_inventory()
             self.trantorian.look()
+            return
 
-        else:
-            self.trantorian.logger.info("[Survive]: No food visible, go forward and look")
-            self.trantorian.look()
-
+        self.trantorian.logger.info("[Survive]: No food visible, look then move forward")
+        self.trantorian.look()
         closest_food_idx = self.trantorian.player_state.vision.get_tile_index_of("food")
         if closest_food_idx is None:
-            self.trantorian.logger.info("[Survive]: No food visible, go forward and look")
             self.trantorian.forward()
-            self.trantorian.look()
+        self.trantorian.look()
