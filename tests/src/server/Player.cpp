@@ -98,6 +98,8 @@ TEST(PlayerTest, foodDecreasedPlayer) {
         .clientLimit = 3,
         .freq = 100,
     }};
+    // NOLINTNEXTLINE
+    const auto& tmp = world.getAndClearGuiEvents();
 
     for (int i = 0; i < 126; ++i) {
         player.update(world);
@@ -130,6 +132,8 @@ TEST(PlayerTest, starveToDeath) {
         .clientLimit = 3,
         .freq = 100,
     }};
+    // NOLINTNEXTLINE
+    const auto& tmp = world.getAndClearGuiEvents();
 
     for (int i = 0; i < 126 * 10; ++i) {
         player.update(world);

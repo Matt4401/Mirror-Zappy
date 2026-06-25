@@ -8,10 +8,10 @@
 #include "World.hpp"
 
 #include <array>
-#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <numeric>
 #include <optional>
 #include <random>
 #include <ranges>
@@ -53,12 +53,18 @@ void World::addItemsToMap() {
     std::uniform_int_distribution<std::size_t> dist{0, totalTiles - 1};
 
     for (const auto& [itemType, density] : densityItem()) {
-        const auto quantity = static_cast<std::size_t>(static_cast<double>(totalTiles) * density);
+        const int quantity = static_cast<int>(static_cast<double>(totalTiles) * density);
+        const int currentQuantity =
+            std::accumulate(_tiles.begin(), _tiles.end(), 0, [itemType](std::size_t sum, const Tile& tile) {
+                return sum + tile.resources.at(static_cast<std::uint8_t>(itemType));
+            });
 
-        for (std::size_t i = 0; i < quantity; ++i) {
+        if (currentQuantity >= quantity) {
+            continue;
+        }
+        for (int i = 0; i < quantity - currentQuantity; i++) {
             const std::size_t randomTileIndex = dist(e);
-            const auto itemIdx = static_cast<std::uint8_t>(itemType);
-            _tiles.at(randomTileIndex).resources.at(itemIdx) += 1;
+            addItemOnGround(itemType, getTilePosition(randomTileIndex), 1);
         }
     }
 }
@@ -276,13 +282,6 @@ void World::eject(const std::size_t id) {
     }
     addGuiEvent(shared::protocol::Emitter::build(
         shared::protocol::server::Pex{.playerId = static_cast<int>(pushingPlayer->id())}));
-    pushingPlayer->addResponse("ok\n");
-}
-
-bool World::hasEjectableTargetOnTile(const Position& position, const std::size_t id) const {
-    auto tile = _tiles.at(getTileIndex(position));
-    std::erase(tile.players, id);
-    return !tile.players.empty() || !tile.eggs.empty();
 }
 
 bool World::isEggOnTile(const Position& position) const {
@@ -433,11 +432,11 @@ std::string World::resourcesName(const ItemType item) {
 std::string World::transformResourcesToStr(const Tile& tile) {
     std::string str{};
 
-    for (int i = 0; i < tile.eggs.size(); i++) {
-        str += " egg";
-    }
     for (int i = 0; i < tile.players.size(); i++) {
         str += " player";
+    }
+    for (int i = 0; i < tile.eggs.size(); i++) {
+        str += " egg";
     }
     for (int i = 0; i < static_cast<int>(ItemType::COUNT); i++) {
         const auto name = resourcesName(static_cast<ItemType>(i));
