@@ -10,6 +10,7 @@
 
 #include <gtest/gtest.h>
 
+#include <cstddef>
 #include <memory>
 
 #include "command/ICommand.hpp"
@@ -34,7 +35,7 @@ TEST(EjectTest, CheckRequiredTicks) {
     ASSERT_EQ(eject->requiredTicks(), 7);
 }
 
-TEST(EjectTest, StartFailsIfTileIsEmpty) {
+TEST(EjectTest, StartSucceedIfTileIsEmpty) {
     auto modifConfig = kDefaultConfig;
     modifConfig.clientLimit = 1;
     modifConfig.teamNames = {"Team1"};
@@ -49,7 +50,7 @@ TEST(EjectTest, StartFailsIfTileIsEmpty) {
 
     const std::unique_ptr<ICommand> eject = std::make_unique<Eject>();
 
-    ASSERT_FALSE(eject->start(world, player));
+    ASSERT_TRUE(eject->start(world, player));
 }
 
 TEST(EjectTest, ExecuteEjectsOtherPlayerAndSendsResponse) {
@@ -122,12 +123,9 @@ TEST(EjectTest, ExecuteDestroysEggsOnTile) {
     launcher.setPosition(pos);
     world.updatePositionOnMap(idLauncher, ogPos, pos);
 
-    ASSERT_TRUE(world.hasEjectableTargetOnTile(pos, launcher.id()));
-
     const std::unique_ptr<ICommand> eject = std::make_unique<Eject>();
     eject->execute(world, launcher);
 
-    EXPECT_FALSE(world.hasEjectableTargetOnTile(pos, launcher.id()));
     EXPECT_FALSE(world.isEggOnTile(pos));
 }
 

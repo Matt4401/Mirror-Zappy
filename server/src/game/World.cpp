@@ -279,13 +279,6 @@ void World::eject(const std::size_t id) {
     }
     addGuiEvent(shared::protocol::Emitter::build(
         shared::protocol::server::Pex{.playerId = static_cast<int>(pushingPlayer->id())}));
-    pushingPlayer->addResponse("ok\n");
-}
-
-bool World::hasEjectableTargetOnTile(const Position& position, const std::size_t id) const {
-    auto tile = _tiles.at(getTileIndex(position));
-    std::erase(tile.players, id);
-    return !tile.players.empty() || !tile.eggs.empty();
 }
 
 bool World::isEggOnTile(const Position& position) const {
