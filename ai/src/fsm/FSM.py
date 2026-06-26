@@ -113,7 +113,7 @@ class FiniteStateMachine:
             elif cmd is None and hasattr(self.trantorian, "broadcast_manager"):
                 self.trantorian.logger.info("[FSM]: Auto command Broadcast call")
                 msg = self.trantorian.broadcast_manager.create_message(
-                    "Commande de rassemblement"
+                    "aha", "Commande de rassemblement"
                 )  # ceci est un exemple
                 cmd_id = self.trantorian.send_command.broadcast(msg)
                 self.pending_commands[cmd_id] = "broadcast"
