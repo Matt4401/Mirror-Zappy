@@ -21,7 +21,7 @@ namespace zappy::gui::game {
 class Player {
   public:
     enum class cardinalPoint : std::uint8_t { NORTH = 1, EAST = 2, SOUTH = 3, WEST = 4 };
-    static constexpr float PLAYER_SPEED = 20.0F;
+    static constexpr float PLAYER_SPEED = 6.0F;
     static constexpr int DELTA_SERVER_FREQUENCY = 20;
 
     Player(int id, raylib::rmath::Vector3 position, std::string name, cardinalPoint orientation, std::size_t level = 1);
@@ -60,11 +60,13 @@ class Player {
     [[nodiscard]] std::string textureId() const { return _textureId; }
     [[nodiscard]] raylib::rcore::BoundingBox boundingBox() const;
     [[nodiscard]] bool moving() const { return _isMoving; }
+    [[nodiscard]] int animFrame() const { return _animFrame; }
     void move(int serverFrequency, float deltaTime);
 
   protected:
   private:
     bool _isMoving{false};
+    int _animFrame{0};
     int _id{0};
     game::ItemBag _itemBag;
     raylib::rmath::Vector3 _position{10.0F, 10.0F, 0.0F};

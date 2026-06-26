@@ -7,6 +7,7 @@
 
 #include "Player.hpp"
 
+#include <algorithm>
 #include <cstddef>
 #include <string>
 #include <utility>
@@ -39,11 +40,19 @@ void Player::setTilePosition(const graphics::scene::Tile3DPosition tilePosition)
 
 void Player::move(const int serverFrequency, const float deltaTime) {
     if ((!_isMoving && _offset == _targetOffset) || serverFrequency <= 0 || deltaTime <= 0.0F) {
+        _animFrame = 0;
         return;
     }
 
-    const float serverSpeed = static_cast<float>(serverFrequency) / DELTA_SERVER_FREQUENCY;
-    const float movement = PLAYER_SPEED * serverSpeed * deltaTime;
+    float const distanceToTarget = _position.distance(_futurePosition);
+    float catchUpMultiplier = 1.0F;
+    if (distanceToTarget > 2.0F) {
+        catchUpMultiplier = distanceToTarget / 2.0F;
+    }
+
+    const float movement = PLAYER_SPEED * catchUpMultiplier * deltaTime;
+
+    _animFrame += std::max(2, static_cast<int>(movement * 30.0F));
 
     if (_isMoving) {
         if (_position.distance(_futurePosition) <= movement) {
