@@ -52,7 +52,7 @@ GameHUD::GameHUD(events::EventDispatcher& dispatcher, const std::shared_ptr<rayl
 
     _gridManager->addPanel(_worldControl, WorldControlX, WorldControlY, WorldControlWidthCols, WorldControlHeightCols);
 
-    _gridManager->addPanel(_eventLog, 2, 17, 12, 15);
+    _gridManager->addPanel(_eventLog, 2, 16, 12, 15);
 
     _gridManager->addPanel(_globalStats, 2, 2, 12, 13);
 }

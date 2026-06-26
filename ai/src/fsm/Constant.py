@@ -1,5 +1,5 @@
 # If this the food is under this threshold, survive state start
-SURVIVAL_THRESHOLD = 5
+SURVIVAL_THRESHOLD = 7
 
 # Number of member for reproduce state to start
 # NUMBER_OF_MEMBER_FOR_REPRODUCE = 0
@@ -7,8 +7,8 @@ SURVIVAL_THRESHOLD = 5
 # NUMBER_OF_MEMBER_FOR_ATTACK = 0
 
 # Interval between auto command
-INVENTORY_INTERVAL = 20
-LOOK_INTERVAL = 7
+INVENTORY_INTERVAL = 10
+LOOK_INTERVAL = 5
 BROADCAST_INTERVAL = 50
 
 DISTRIBUTION_VALUE = 50

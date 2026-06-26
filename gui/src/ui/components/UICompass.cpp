@@ -80,13 +80,13 @@ void UICompass::draw() {
         if (isCardinal) {
             std::string label;
             if (normalizedDeg == 0) {
-                label = "S";
-            } else if (normalizedDeg == 90) {
-                label = "E";
-            } else if (normalizedDeg == 180) {
-                label = "N";
-            } else if (normalizedDeg == 270) {
                 label = "W";
+            } else if (normalizedDeg == 90) {
+                label = "S";
+            } else if (normalizedDeg == 180) {
+                label = "E";
+            } else if (normalizedDeg == 270) {
+                label = "N";
             }
 
             if (!label.empty() && _font && _font->valid()) {

@@ -27,7 +27,7 @@ GuiResponse Ppo::execute(Core& core) {
         shared::protocol::server::Ppo{.playerId = static_cast<int>(_id),
                                       .x = static_cast<int>(player->position().x),
                                       .y = static_cast<int>(player->position().y),
-                                      .orientation = static_cast<int>(player->orientation())});
+                                      .orientation = static_cast<int>(player->orientation()) + 1});
     return response;
 }
 

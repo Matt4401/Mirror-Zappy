@@ -3,8 +3,7 @@ from src.PlayerState import PlayerState
 from src.SendCommand import SendCommand
 from src.ParseCommand import ParseCommand
 
-# from .util.BroadcastMessage import BroadcastMessage
-# from .util.BroadcastManager import BroadcastManager
+from .util.BroadcastMessageManager import BroadcastMessageManager
 from .fsm.Constant import ELEVATION_REQUIREMENTS
 import threading
 import math
@@ -22,14 +21,42 @@ class Trantorian:
         self.player_state = PlayerState(team_name)
         self.send_command = SendCommand(self.connection)
         self.parser = ParseCommand(self.player_state.inventory)
-        self.logger = logging.getLogger(player_id)
-        # self.broadcast_message = BroadcastMessage(self.player_state)
-        # self.broadcast_manager = BroadcastManager(self.broadcast_message, self.player_state.team_name)
+        self.logger = logging.getLogger(f"player_{player_id}")
+        self.broadcast_manager = BroadcastMessageManager(
+            self.player_state, self.player_id
+        )
+        self.received_broadcasts = []
 
     def wait_for_response(self, cmd_id, timeout=5.0):
         if cmd_id in (None, 84):
             return None
         return self.connection.get_command_response(cmd_id, timeout=timeout)
+
+    def move_one_step_toward(self, threat_direction):
+        if threat_direction == 7:
+            self.connection.turn_right()
+        if threat_direction == 3:
+            self.connection.turn_left()
+        if threat_direction == 5:
+            self.connection.turn_right()
+            self.connection.turn_right()
+        if threat_direction == 2:
+            self.connection.turn_left()
+            self.connection.forward()
+            self.connection.turn_right()
+        if threat_direction == 8:
+            self.connection.turn_right()
+            self.connection.forward()
+            self.connection.turn_left()
+        if threat_direction == 6:
+            self.connection.turn_right()
+            self.connection.forward()
+            self.connection.turn_right()
+        if threat_direction == 4:
+            self.connection.turn_left()
+            self.connection.forward()
+            self.connection.turn_left()
+        self.connection.forward()
 
     def invalidate_vision(self):
         self.player_state.vision.reset_on_turn()
@@ -123,11 +150,16 @@ class Trantorian:
 
         for resource, required_amount in requirements.items():
             if resource == "player":
+                tiles = self.player_state.vision.get_tiles()
+                if not tiles:
+                    return False
+                players_on_tile = tiles[0].count("player")
+                if players_on_tile < required_amount:
+                    return False
                 continue
             current_amount = getattr(self.player_state.inventory, resource, 0)
             if current_amount < required_amount:
                 return False
-
         return True
 
     def get_missing_resources_for(self, target_level: int) -> dict:

@@ -13,6 +13,7 @@
 #include <memory>
 
 #include "AssetManager.hpp"
+#include "FirstPerson.hpp"
 #include "events/EventDispatcher.hpp"
 #include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
@@ -37,6 +38,19 @@ Render::Render(events::EventDispatcher& dispatcher)
                                                   AssetManager::getInstance().getFont(DefaultFontName), _camera);
     _gameHUD->registerToUIManager(_uiManager);
 
+    _firstPerson = std::make_unique<FirstPerson>(_dispatcher.get(), _camera, _worldManager, [this]() {
+        if (_firstPerson && _firstPerson->active()) {
+            _uiMode = false;
+            _updateMode = UpdateMode::All;
+        }
+        updateCursorState();
+    });
+
+    _keyHandlers = {
+        {EscapeKey, [this]() { handleEscapeKey(); }},
+        {LeftAltKey, [this]() { handleAltKey(); }},
+    };
+
     if (auto pauseMenu = _gameHUD->getPauseMenu()) {
         pauseMenu->setOnExit([this]() { _isExiting = true; });
         pauseMenu->setOnUIConfig([this, pauseMenu]() {
@@ -53,6 +67,7 @@ Render::Render(events::EventDispatcher& dispatcher)
 }
 
 Render::~Render() {
+    _firstPerson.reset();
     _gameHUD.reset();
     _uiManager.clear();
     AssetManager::getInstance().clear();
@@ -70,7 +85,8 @@ void Render::renderFrame() {
 }
 
 void Render::updateCursorState() const {
-    if ((_gameHUD && _gameHUD->getPauseMenu() && _gameHUD->getPauseMenu()->isVisible()) || _uiMode) {
+    if ((_firstPerson && _firstPerson->active()) ||
+        (_gameHUD && _gameHUD->getPauseMenu() && _gameHUD->getPauseMenu()->isVisible()) || _uiMode) {
         raylib::rcore::Window::enableCursor();
     } else {
         raylib::rcore::Window::disableCursor();
@@ -78,30 +94,39 @@ void Render::updateCursorState() const {
 }
 
 void Render::handleInput() {
-    if (raylib::rcore::Event::isKeyPressed(EscapeKey)) {
-        if (_gameHUD && ((_gameHUD->getGridManager() && _gameHUD->getGridManager()->isConfigMode()) ||
-                         (_gameHUD->getWorldControl() && _gameHUD->getWorldControl()->isConfigMode()))) {
-            if (auto grid = _gameHUD->getGridManager()) {
-                grid->setConfigMode(false);
-            }
-            if (auto worldControl = _gameHUD->getWorldControl()) {
-                worldControl->setConfigMode(false);
-            }
-            _uiMode = false;
-            _updateMode = UpdateMode::All;
-        } else if (_gameHUD && _gameHUD->getPauseMenu()) {
-            bool const pauseVisible = !_gameHUD->getPauseMenu()->isVisible();
-            _gameHUD->getPauseMenu()->setVisible(pauseVisible);
-            _updateMode = pauseVisible ? UpdateMode::PauseMenuOnly : UpdateMode::All;
+    for (const auto& [key, handler] : _keyHandlers) {
+        if (raylib::rcore::Event::isKeyPressed(key)) {
+            handler();
         }
-        updateCursorState();
     }
+}
 
-    if (raylib::rcore::Event::isKeyPressed(LeftAltKey)) {
-        if (!_gameHUD || !_gameHUD->getGridManager() || !_gameHUD->getGridManager()->isConfigMode()) {
-            _uiMode = !_uiMode;
-            updateCursorState();
+void Render::handleEscapeKey() {
+    if (_firstPerson && _firstPerson->active()) {
+        _firstPerson->exit();
+    } else if (_gameHUD && ((_gameHUD->getGridManager() && _gameHUD->getGridManager()->isConfigMode()) ||
+                            (_gameHUD->getWorldControl() && _gameHUD->getWorldControl()->isConfigMode()))) {
+        if (auto grid = _gameHUD->getGridManager()) {
+            grid->setConfigMode(false);
         }
+        if (auto worldControl = _gameHUD->getWorldControl()) {
+            worldControl->setConfigMode(false);
+        }
+        _uiMode = false;
+        _updateMode = UpdateMode::All;
+    } else if (_gameHUD && _gameHUD->getPauseMenu()) {
+        bool const pauseVisible = !_gameHUD->getPauseMenu()->isVisible();
+        _gameHUD->getPauseMenu()->setVisible(pauseVisible);
+        _updateMode = pauseVisible ? UpdateMode::PauseMenuOnly : UpdateMode::All;
+    }
+    updateCursorState();
+}
+
+void Render::handleAltKey() {
+    if ((!_firstPerson || !_firstPerson->active()) &&
+        (!_gameHUD || !_gameHUD->getGridManager() || !_gameHUD->getGridManager()->isConfigMode())) {
+        _uiMode = !_uiMode;
+        updateCursorState();
     }
 }
 
@@ -109,6 +134,9 @@ void Render::update() {
     _event.update();
     handleInput();
     _worldManager.movePlayers(raylib::rcore::Window::frameTime());
+    if (_firstPerson) {
+        _firstPerson->update();
+    }
 
     _uiManager.update();
     _uiManager.handleEvent();
@@ -117,7 +145,7 @@ void Render::update() {
         return;
     }
 
-    if (!_uiMode) {
+    if (!_uiMode && (!_firstPerson || !_firstPerson->active())) {
         _camera.updateCamera(CAMERA_FREE);
         if (_camera.position().y() < scene::Tile3D::TILE_SIZE * MinCameraHeight) {
             _camera.setPosition(
@@ -165,7 +193,7 @@ void Render::update() {
         }
     }
 
-    if (_uiMode) {
+    if (_uiMode && (!_firstPerson || !_firstPerson->active())) {
         if (!_uiManager.isHovered()) {
             _map.handleEvent();
         } else {

@@ -42,7 +42,7 @@ TEST(ForwardTest, CheckMovement) {
     forward->execute(world, player);
     auto [fst, snd] = player.position();
     ASSERT_EQ(fst, 5);
-    ASSERT_EQ(snd, 6);
+    ASSERT_EQ(snd, 4);
 }
 
 TEST(ForwardTest, CheckMovementBordure) {
@@ -60,7 +60,7 @@ TEST(ForwardTest, CheckMovementBordure) {
     const auto id = world.spawnPlayer("test");
 
     auto [maxX, maxY] = world.sizeMap();
-    game::Player player{0, maxX - 1, maxY - 1, game::cardinalPoint::NORTH};
+    game::Player player{0, maxX - 1, maxY - 1, game::cardinalPoint::SOUTH};
 
     forward->execute(world, player);
     auto [fst, snd] = player.position();

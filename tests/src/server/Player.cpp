@@ -85,7 +85,7 @@ TEST(PlayerTest, MoveUpNegativeWraparound) {
 
     const auto [x, y] = player.position();
     EXPECT_EQ(x, 0);
-    EXPECT_EQ(y, 1);
+    EXPECT_EQ(y, 8);
 }
 
 TEST(PlayerTest, foodDecreasedPlayer) {
@@ -98,6 +98,8 @@ TEST(PlayerTest, foodDecreasedPlayer) {
         .clientLimit = 3,
         .freq = 100,
     }};
+    // NOLINTNEXTLINE
+    const auto& tmp = world.getAndClearGuiEvents();
 
     for (int i = 0; i < 126; ++i) {
         player.update(world);
@@ -130,6 +132,8 @@ TEST(PlayerTest, starveToDeath) {
         .clientLimit = 3,
         .freq = 100,
     }};
+    // NOLINTNEXTLINE
+    const auto& tmp = world.getAndClearGuiEvents();
 
     for (int i = 0; i < 126 * 10; ++i) {
         player.update(world);

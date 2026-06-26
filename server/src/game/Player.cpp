@@ -93,6 +93,9 @@ void Player::update(World& world) {
             return;
         }
     }
+    if (_isIncanting) {
+        return;
+    }
     if (_isNewCommand) {
         _isNewCommand = false;
     } else if (_cmdTick > 0) {
@@ -186,19 +189,23 @@ bool Player::hasCommands() const { return _currentCommand != nullptr || !_comman
 
 void Player::setPosition(const Position pos) { _pos = pos; }
 
-Position Player::getLeftTile(const Position ogPos, const Position& mapLimit) {
-    auto [fst, snd] = leftTile.at(static_cast<uint8_t>(_orientation));
-    const std::size_t width = mapLimit.x;
-    const std::size_t height = mapLimit.y;
-    Position newPos{};
+Position Player::getRightTile(const Position ogPos, const Position& mapLimit) {
+    auto [fst, snd] = rightTile.at(static_cast<std::uint8_t>(_orientation));
+    const int width = static_cast<int>(mapLimit.x);
+    const int height = static_cast<int>(mapLimit.y);
 
-    newPos.x = (ogPos.x + fst + width) % width;
-    newPos.y = (ogPos.y + snd + height) % height;
-
-    return newPos;
+    int newX = (static_cast<int>(ogPos.x) + fst) % width;
+    if (newX < 0) {
+        newX += width;
+    }
+    int newY = (static_cast<int>(ogPos.y) + snd) % height;
+    if (newY < 0) {
+        newY += height;
+    }
+    return Position{.x = static_cast<std::size_t>(newX), .y = static_cast<std::size_t>(newY)};
 }
 
-std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)> Player::inventory() const { return _inventory; }
+std::array<std::size_t, static_cast<std::uint8_t>(ItemType::COUNT)> Player::inventory() const { return _inventory; }
 
 std::vector<Position> Player::getLookPos(const Position mapLimit) {
     std::vector pos{{Position{.x = _pos.x, .y = _pos.y}}};
@@ -209,7 +216,7 @@ std::vector<Position> Player::getLookPos(const Position mapLimit) {
         pos.emplace_back(actualDiagPos);
         const int stepsToRight = 2 * (i + 1);
         for (int j = 0; j < stepsToRight; j++) {
-            pos.emplace_back(getLeftTile(pos.back(), mapLimit));
+            pos.emplace_back(getRightTile(pos.back(), mapLimit));
         }
     }
     return pos;
@@ -246,9 +253,11 @@ void Player::levelUp() {
 }
 
 bool Player::checkIncantationRequirements(
-    const std::array<std::size_t, static_cast<uint8_t>(ItemType::COUNT)>& resources, const std::size_t nbPlayer) const {
+    const std::array<std::size_t, static_cast<std::uint8_t>(ItemType::COUNT)>& resources) const {
     auto condition = getCondition().at(_level - 1);
-    return condition.nbPlayer <= nbPlayer && hasEnoughResources(resources, condition.resources);
+    return hasEnoughResources(resources, condition.resources);
 }
+
+void Player::setIncanting(const bool isIncanting) { _isIncanting = isIncanting; }
 
 }  // namespace zappy::server::game
