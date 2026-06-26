@@ -9,6 +9,8 @@
 
 #include <raylib.h>
 
+#include <algorithm>
+#include <cstddef>
 #include <functional>
 #include <memory>
 #include <string>
@@ -44,7 +46,10 @@ void UITextbox::draw() {
 
     Shapes::drawRectangleRec(rec, BackgroundColor);
 
-    raylib::Color const borderColor = _isFocused ? BorderFocusedColor : BorderNormalColor;
+    raylib::Color borderColor = _isFocused ? BorderFocusedColor : BorderNormalColor;
+    if (_errorTimer > 0.0F) {
+        borderColor = BorderErrorColor;
+    }
     Shapes::drawRectangleLinesEx(rec, 2.0F, borderColor);
 
     std::string displayText = _text;
@@ -67,6 +72,11 @@ void UITextbox::draw() {
 void UITextbox::update() {
     if (!_isVisible) {
         return;
+    }
+
+    if (_errorTimer > 0.0F) {
+        _errorTimer -= raylib::rcore::Window::frameTime();
+        _errorTimer = std::max(_errorTimer, 0.0F);
     }
 
     updateHoverState();
@@ -92,8 +102,12 @@ void UITextbox::handleInput() {
     int key = raylib::rcore::Event::getCharPressed();
     while (key > 0) {
         if ((key >= '0' && key <= '9') || (key >= 'A' && key <= 'Z') || (key >= 'a' && key <= 'z')) {
-            _text += static_cast<char>(key);
-            updateTextPosition();
+            if (_maxLength == 0 || _text.length() < _maxLength) {
+                _text += static_cast<char>(key);
+                updateTextPosition();
+            } else {
+                _errorTimer = 1.0F;
+            }
         }
         key = raylib::rcore::Event::getCharPressed();
     }
@@ -142,6 +156,8 @@ void UITextbox::setText(const std::string& text) {
     _text = text;
     updateTextPosition();
 }
+
+void UITextbox::setMaxLength(std::size_t maxLength) { _maxLength = maxLength; }
 
 void UITextbox::setOnSubmit(std::function<void(const std::string&)> callback) { _onSubmit = std::move(callback); }
 
