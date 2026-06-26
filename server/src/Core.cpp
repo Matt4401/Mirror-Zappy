@@ -21,6 +21,7 @@
 #include <utility>
 #include <vector>
 
+#include "Logger.hpp"
 #include "Parser.hpp"
 #include "SessionManager.hpp"
 #include "command/Unknown.hpp"
@@ -40,7 +41,6 @@ Core::Core(const std::span<char*> args) : _args(args) {
     try {
         setup();
     } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
         throw;
     }
 }
@@ -52,16 +52,10 @@ Core::Core(parser::ServerConfig config)
 
 int Core::run() {
     try {
+        Logger::logInfo("Server starting on port " + std::to_string(_config.port));
         loop();
     } catch (const zappy::shared::exception::Exception& e) {
-        if (std::string(e.what()) == zappy::parser::kUsageThrowMessage) {
-            return zappy::parser::kExitSuccess;
-        }
-        std::cerr << "Error: " << e.what() << std::endl;
-        return zappy::parser::kExitFailure;
-    } catch (const std::exception& e) {
-        std::cerr << "Unknown error: " << e.what() << std::endl;
-        return zappy::parser::kExitFailure;
+        Logger::logError("Server error: " + std::string(e.what()));
     }
     return zappy::parser::kExitSuccess;
 }
@@ -151,6 +145,7 @@ void Core::formatReceivedString(std::string& str) {
 }
 
 void Core::handleNewClient(int clientId) {
+    Logger::logInfo("New client connected: " + std::to_string(clientId));
     _sessionManager->sendMessage(clientId, "WELCOME\n");
     _clientStates.emplace(clientId, ClientState::WAITING_TEAM_SELECTION);
 }
@@ -172,6 +167,7 @@ void Core::handleClientMessage(int clientId, std::string_view message) {
 
 void Core::handleHandshake(int clientId, std::string_view teamName) {
     if (teamName == "GRAPHIC") {
+        Logger::logInfo("Client " + std::to_string(clientId) + " connected as GUI");
         _clientStates[clientId] = ClientState::GUI;
         sendGuiInitialState(clientId);
         return;
@@ -184,6 +180,8 @@ void Core::handleHandshake(int clientId, std::string_view teamName) {
     }
     _clientToPlayer[clientId] = playerIdOpt.value();
     _clientStates[clientId] = ClientState::IN_GAME;
+    Logger::logInfo("Client " + std::to_string(clientId) + " connected as player " +
+                    std::to_string(playerIdOpt.value()) + " in team " + std::string(teamName));
     _sessionManager->sendMessage(clientId, std::format("{}\n{} {}\n", _world->getAvailableSlotInTeam(teamName),
                                                        _world->sizeMap().x, _world->sizeMap().y));
     sendGuiNewGamePlayerData(playerIdOpt.value());
@@ -234,6 +232,7 @@ void Core::handleGuiMessage(int clientId, std::string_view message) {
 }
 
 void Core::handleClientDisconnection(int clientId) {
+    Logger::logInfo("Client disconnected: " + std::to_string(clientId));
     _clientStates.erase(clientId);
     if (!_clientToPlayer.contains(clientId)) {
         return;

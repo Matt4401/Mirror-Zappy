@@ -5,6 +5,8 @@ add_library(zappy_server_objects OBJECT
         src/game/World.hpp
         src/Core.cpp
         src/Core.hpp
+        src/Logger.cpp
+        src/Logger.hpp
         src/guiCommand/IGuiCommand.hpp
         src/guiCommand/Mct.cpp
         src/guiCommand/Mct.hpp
