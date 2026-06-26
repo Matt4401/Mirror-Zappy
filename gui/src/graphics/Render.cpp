@@ -130,6 +130,47 @@ void Render::handleAltKey() {
     }
 }
 
+void Render::updateCameraLimits() {
+    const float mapWidth = static_cast<float>(_worldManager.width()) * scene::Tile3D::TILE_SIZE;
+    const float mapDepth = static_cast<float>(_worldManager.height()) * scene::Tile3D::TILE_SIZE;
+    const float maxMapDim = std::max(mapWidth, mapDepth);
+
+    const float padding = std::clamp(maxMapDim * CameraPaddingFactor, CameraPaddingMin, CameraPaddingMax);
+    const float limitX = (mapWidth * 0.5F) + padding;
+    const float limitZ = (mapDepth * 0.5F) + padding;
+    const float limitY = std::clamp(maxMapDim * CameraHeightFactor, CameraHeightMin, CameraHeightMax);
+
+    raylib::rmath::Vector3 pos = _camera.position();
+    bool clamped = false;
+
+    if (pos.x() > limitX) {
+        pos.setX(limitX);
+        clamped = true;
+    }
+    if (pos.x() < -limitX) {
+        pos.setX(-limitX);
+        clamped = true;
+    }
+
+    if (pos.z() > limitZ) {
+        pos.setZ(limitZ);
+        clamped = true;
+    }
+    if (pos.z() < -limitZ) {
+        pos.setZ(-limitZ);
+        clamped = true;
+    }
+
+    if (pos.y() > limitY) {
+        pos.setY(limitY);
+        clamped = true;
+    }
+
+    if (clamped) {
+        _camera.setPosition(pos);
+    }
+}
+
 void Render::update() {
     _event.update();
     handleInput();
@@ -154,43 +195,7 @@ void Render::update() {
                                _camera.target().z()});
         }
 
-        const float mapWidth = static_cast<float>(_worldManager.width()) * scene::Tile3D::TILE_SIZE;
-        const float mapDepth = static_cast<float>(_worldManager.height()) * scene::Tile3D::TILE_SIZE;
-        const float padding = (std::max(mapWidth, mapDepth) * 0.5F) + DepthLimit;
-
-        const float limitX = (mapWidth * 0.5F) + padding;
-        const float limitZ = (mapDepth * 0.5F) + padding;
-        const float limitY = (std::max(mapWidth, mapDepth));
-
-        raylib::rmath::Vector3 pos = _camera.position();
-        bool clamped = false;
-
-        if (pos.x() > limitX) {
-            pos.setX(limitX);
-            clamped = true;
-        }
-        if (pos.x() < -limitX) {
-            pos.setX(-limitX);
-            clamped = true;
-        }
-
-        if (pos.z() > limitZ) {
-            pos.setZ(limitZ);
-            clamped = true;
-        }
-        if (pos.z() < -limitZ) {
-            pos.setZ(-limitZ);
-            clamped = true;
-        }
-
-        if (pos.y() > limitY) {
-            pos.setY(limitY);
-            clamped = true;
-        }
-
-        if (clamped) {
-            _camera.setPosition(pos);
-        }
+        updateCameraLimits();
     }
 
     if (_uiMode && (!_firstPerson || !_firstPerson->active())) {
