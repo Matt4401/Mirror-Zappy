@@ -18,7 +18,7 @@
 
 namespace network::socket {
 
-constexpr auto kMaxBufferSize = 42000;
+constexpr auto kMaxBufferSize = 50000;
 
 constexpr auto delimiter = "\n";
 
