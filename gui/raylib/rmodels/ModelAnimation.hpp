@@ -17,8 +17,14 @@
 namespace zappy::gui::raylib::rmodels {
 class ModelAnimation {
   public:
-    explicit ModelAnimation(const std::string& file)
-        : _animations{LoadModelAnimations(file.c_str(), &_animationCount)} {}
+    ModelAnimation() = default;
+
+    explicit ModelAnimation(const std::string& fileName) {
+        int count = 0;
+        ::ModelAnimation* anims = LoadModelAnimations(fileName.c_str(), &count);
+        _animations.reset(anims);
+        _animationCount = count;
+    }
 
     ~ModelAnimation() { reset(); }
 
@@ -39,14 +45,30 @@ class ModelAnimation {
     }
 
     [[nodiscard]] bool valid() const { return _animations != nullptr && _animationCount > 0; }
-    [[nodiscard]] int frameCount() const { return valid() ? _animations->keyframeCount : 0; }
-    [[nodiscard]] bool compatibleWith(const rmodels::Model& model) const {
-        return valid() && model.valid() && IsModelAnimationValid(model.model(), *_animations);
+    [[nodiscard]] int frameCount(int animIndex = 0) const {
+        return (valid() && animIndex >= 0 && animIndex < _animationCount) ? _animations.get()[animIndex].keyframeCount
+                                                                          : 0;
+    }
+    [[nodiscard]] bool compatibleWith(const rmodels::Model& model, int animIndex = 0) const {
+        return valid() && model.valid() && animIndex >= 0 && animIndex < _animationCount &&
+               IsModelAnimationValid(model.model(), _animations.get()[animIndex]);
     }
 
-    void update(rmodels::Model& model, float frame) const {
-        if (compatibleWith(model)) {
-            UpdateModelAnimation(model.model(), *_animations, frame);
+    [[nodiscard]] int getAnimationIndex(const std::string& name) const {
+        if (!valid()) {
+            return 0;
+        }
+        for (int i = 0; i < _animationCount; i++) {
+            if (std::string(static_cast<const char*>(_animations.get()[i].name)) == name) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
+    void update(rmodels::Model& model, float frame, int animIndex = 0) const {
+        if (valid() && animIndex >= 0 && animIndex < _animationCount) {
+            UpdateModelAnimation(model.model(), _animations.get()[animIndex], frame);
         }
     }
 
@@ -54,7 +76,7 @@ class ModelAnimation {
   private:
     void reset() {
         if (_animations != nullptr) {
-            UnloadModelAnimations(_animations.get(), _animationCount);
+            UnloadModelAnimations(_animations.release(), _animationCount);
         }
         _animationCount = 0;
     }

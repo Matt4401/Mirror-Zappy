@@ -59,9 +59,17 @@ float GameModel::getRotationAngle(Player::cardinalPoint orientation) {
     return 0.0F;
 }
 
-void GameModel::drawPlayer(raylib::rmath::Vector3 position, Player::cardinalPoint orientation,
+void GameModel::drawPlayer(raylib::rmath::Vector3 position, Player::cardinalPoint orientation, int animFrame,
                            const std::shared_ptr<raylib::rtextures::Texture2D>& texture, std::size_t level) const {
     if (_camera.get().isVisibleFromCamera(position)) {
+        if (_playerAnim.valid()) {
+            int const walkIndex = _playerAnim.getAnimationIndex("walk");
+            if (_playerAnim.frameCount(walkIndex) > 0) {
+                _playerAnim.update(_playerModel, static_cast<float>(animFrame % _playerAnim.frameCount(walkIndex)),
+                                   walkIndex);
+            }
+        }
+
         if (texture && texture->valid()) {
             _playerModel.setMaterialTexture(0, MATERIAL_MAP_ALBEDO, *texture);
         } else if (_defaultPlayerTexture && _defaultPlayerTexture->valid()) {
@@ -70,8 +78,22 @@ void GameModel::drawPlayer(raylib::rmath::Vector3 position, Player::cardinalPoin
         _playerModel.drawModelEx(position, {0.0F, 1.0F, 0.0F}, getRotationAngle(orientation), PLAYER_SCALE,
                                  raylib::Color::White());
         if (level > 1 && level <= 8) {
+            auto& armorAnim = _armorAnims.at(level - 2);
+            if (armorAnim.valid()) {
+                int const walkIndex = armorAnim.getAnimationIndex("walk");
+                if (armorAnim.frameCount(walkIndex) > 0) {
+                    armorAnim.update(_armorModels.at(level - 2),
+                                     static_cast<float>(animFrame % armorAnim.frameCount(walkIndex)), walkIndex);
+                }
+            }
+
+            raylib::Color armorTint = raylib::Color::White();
+            if (level == 2) {
+                armorTint = raylib::Color(139, 69, 19, 255);
+            }
+
             _armorModels.at(level - 2).drawModelEx(position, {0.0F, 1.0F, 0.0F}, getRotationAngle(orientation),
-                                                   {ARMOR_SCALE, ARMOR_SCALE, ARMOR_SCALE}, raylib::Color::White());
+                                                   {ARMOR_SCALE, ARMOR_SCALE, ARMOR_SCALE}, armorTint);
         }
     }
 }
