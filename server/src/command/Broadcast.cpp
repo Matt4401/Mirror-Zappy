@@ -14,6 +14,7 @@
 #include <string>
 #include <utility>
 
+#include "Logger.hpp"
 #include "command/ACommand.hpp"
 #include "game/Player.hpp"
 #include "game/World.hpp"
@@ -36,6 +37,7 @@ void Broadcast::execute(game::World& world, game::Player& player) {
     player.addResponse("ok\n");
     world.addGuiEvent(shared::protocol::Emitter::build(
         shared::protocol::server::Pbc{.playerId = static_cast<int>(player.id()), .message = _args}));
+    Logger::logInfo("Player " + std::to_string(player.id()) + " broadcasted message: " + _args);
 }
 
 std::uint8_t Broadcast::getDirection(const game::Player& player, const game::Player& otherPlayer,

@@ -8,7 +8,9 @@
 #include "Left.hpp"
 
 #include <cstdint>
+#include <string>
 
+#include "Logger.hpp"
 #include "command/ACommand.hpp"
 #include "game/Player.hpp"
 #include "game/World.hpp"
@@ -34,5 +36,8 @@ void Left::execute(game::World& world, game::Player& player) {
         .y = static_cast<int>(player.position().y),
         .orientation = static_cast<int>(newOrientation) + 1,
     }));
+    Logger::logInfo("Left command executed for player " + std::to_string(player.id()) + " at position (" +
+                    std::to_string(player.position().x) + ", " + std::to_string(player.position().y) +
+                    ") with new orientation " + std::to_string(static_cast<int>(newOrientation)) + ".");
 }
 }  // namespace zappy::server::command

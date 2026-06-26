@@ -123,7 +123,6 @@ class World {
     void erasePlayerFromTile(std::size_t position1dVec, std::size_t id);
     void eraseEggFromTile(std::size_t position1dVec, std::size_t id);
     std::optional<Egg> getTeamEgg(const std::string_view& teamName);
-    void removeFromMap(std::size_t id);
     [[nodiscard]] static std::unordered_map<ItemType, double> densityItem();
     [[nodiscard]] static std::unordered_map<cardinalPoint, std::string> cardinalPointToStr();
 

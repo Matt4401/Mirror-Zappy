@@ -11,6 +11,7 @@
 #include <string>
 #include <utility>
 
+#include "Logger.hpp"
 #include "command/ACommand.hpp"
 #include "game/Player.hpp"
 #include "game/World.hpp"
@@ -56,5 +57,7 @@ void Set::execute(game::World& world, game::Player& player) {
         .phiras = static_cast<int>(inventory.at(static_cast<std::uint8_t>(game::ItemType::Phiras))),
         .thystame = static_cast<int>(inventory.at(static_cast<std::uint8_t>(game::ItemType::Thystame))),
     }));
+    Logger::logInfo("Set command executed for player " + std::to_string(player.id()) + " at position (" +
+                    std::to_string(x) + ", " + std::to_string(y) + ") with item " + _arg + ".");
 }
 }  // namespace zappy::server::command

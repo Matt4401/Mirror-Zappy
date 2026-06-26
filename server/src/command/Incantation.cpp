@@ -16,6 +16,7 @@
 #include <vector>
 
 #include "ACommand.hpp"
+#include "Logger.hpp"
 #include "game/Player.hpp"
 #include "game/World.hpp"
 #include "protocol/Commands.hpp"
@@ -85,6 +86,9 @@ bool Incantation::start(game::World& world, game::Player& player) {
                 tmpPlayer->setIncanting(true);
             }
         }
+        Logger::logInfo("Incantation started for player " + std::to_string(player.id()) + " at position (" +
+                        std::to_string(player.position().x) + ", " + std::to_string(player.position().y) +
+                        ") with level " + std::to_string(player.level()) + ".");
         return true;
     }
 
@@ -122,6 +126,9 @@ void Incantation::execute(game::World& world, game::Player& player) {
             tmpPlayer->levelUp();
             tmpPlayer->addResponse("Current level: " + std::to_string(tmpPlayer->level()) + "\n");
             tmpPlayer->setIncanting(false);
+            Logger::logInfo("Player " + std::to_string(playerId) + " leveled up to level " +
+                            std::to_string(tmpPlayer->level()) + " at position (" +
+                            std::to_string(player.position().x) + ", " + std::to_string(player.position().y) + ").");
         }
         isSuccess = true;
         world.addGuiEvent(shared::protocol::Emitter::build(shared::protocol::server::Plv{
@@ -136,6 +143,9 @@ void Incantation::execute(game::World& world, game::Player& player) {
             }
             it->second->addResponse("ko\n");
             it->second->setIncanting(false);
+            Logger::logInfo("Incantation command failed for player " + std::to_string(playerId) + " at position (" +
+                            std::to_string(player.position().x) + ", " + std::to_string(player.position().y) +
+                            ") with level " + std::to_string(player.level()) + ".");
         }
         isSuccess = false;
     }

@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <string>
 
+#include "Logger.hpp"
 #include "command/ACommand.hpp"
 #include "game/Player.hpp"
 #include "game/World.hpp"
@@ -33,5 +34,7 @@ void Inventory::execute(game::World& /*world*/, game::Player& player) {
     }
     response += "]\n";
     player.addResponse(response);
+    Logger::logInfo("Inventory command executed for player " + std::to_string(player.id()) +
+                    " with response: " + response);
 }
 }  // namespace zappy::server::command

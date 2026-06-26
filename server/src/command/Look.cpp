@@ -10,6 +10,7 @@
 #include <string>
 
 #include "ACommand.hpp"
+#include "Logger.hpp"
 #include "game/Player.hpp"
 #include "game/World.hpp"
 
@@ -21,5 +22,6 @@ void Look::execute(game::World& world, game::Player& player) {
     auto diagPos = player.getLookPos(world.sizeMap());
     responses = world.visionOfPlayer(diagPos);
     player.addResponse(responses);
+    Logger::logInfo("Look command executed for player " + std::to_string(player.id()) + " with response: " + responses);
 }
 }  // namespace zappy::server::command

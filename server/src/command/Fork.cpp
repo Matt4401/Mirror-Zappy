@@ -9,6 +9,7 @@
 
 #include <string>
 
+#include "Logger.hpp"
 #include "command/ACommand.hpp"
 #include "game/Player.hpp"
 #include "game/World.hpp"
@@ -27,5 +28,6 @@ bool Fork::start(game::World& world, game::Player& player) {
 void Fork::execute(game::World& world, game::Player& player) {
     world.layEgg(player);
     player.addResponse("ok\n");
+    Logger::logInfo("Fork command executed for player " + std::to_string(player.id()) + ".");
 }
 }  // namespace zappy::server::command

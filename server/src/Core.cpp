@@ -180,8 +180,6 @@ void Core::handleHandshake(int clientId, std::string_view teamName) {
     }
     _clientToPlayer[clientId] = playerIdOpt.value();
     _clientStates[clientId] = ClientState::IN_GAME;
-    Logger::logInfo("Client " + std::to_string(clientId) + " connected as player " +
-                    std::to_string(playerIdOpt.value()) + " in team " + std::string(teamName));
     _sessionManager->sendMessage(clientId, std::format("{}\n{} {}\n", _world->getAvailableSlotInTeam(teamName),
                                                        _world->sizeMap().x, _world->sizeMap().y));
     sendGuiNewGamePlayerData(playerIdOpt.value());

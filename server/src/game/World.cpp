@@ -21,6 +21,7 @@
 #include <utility>
 #include <vector>
 
+#include "Logger.hpp"
 #include "Player.hpp"
 #include "Team.hpp"
 #include "command/ICommand.hpp"
@@ -132,6 +133,9 @@ std::optional<size_t> World::spawnPlayer(const std::string_view teamName) {
         std::make_unique<Player>(egg.value().id, egg.value().position.x, egg.value().position.y, randomCardinalPoint());
     const auto& newPlayer = _playerList.at(egg.value().id);
     _tiles.at(getTileIndex(newPlayer->position().x, newPlayer->position().y)).players.emplace_back(newPlayer->id());
+    Logger::logInfo("Player " + std::to_string(newPlayer->id()) + " spawned in team " + std::string(teamName) +
+                    " at position (" + std::to_string(newPlayer->position().x) + ", " +
+                    std::to_string(newPlayer->position().y) + ")");
     return newPlayer->id();
 }
 [[nodiscard]] Position World::getTilePosition(const std::size_t position1D) const {
@@ -185,6 +189,9 @@ void World::updatePositionOnMap(const std::size_t id, const Position& oldPositio
         .y = static_cast<int>(newPosition.y),
         .orientation = static_cast<int>(_playerList.at(id)->orientation()) + 1,
     }));
+    Logger::logInfo("Player " + std::to_string(id) + " moved from (" + std::to_string(oldPosition.x) + ", " +
+                    std::to_string(oldPosition.y) + ") to (" + std::to_string(newPosition.x) + ", " +
+                    std::to_string(newPosition.y) + ")");
 }
 
 void World::update() {
@@ -203,12 +210,6 @@ void World::update() {
         player->update(*this);
     }
     checkGameEnd();
-}
-
-void World::removeFromMap(const std::size_t id) {
-    const auto& player = _playerList.at(id);
-    const auto tileIndex = getTileIndex(player->position());
-    erasePlayerFromTile(tileIndex, id);
 }
 
 std::unordered_map<std::size_t, std::vector<std::string>> World::getAllResponsesBuffer() const {
