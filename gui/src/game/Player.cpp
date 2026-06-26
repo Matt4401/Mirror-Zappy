@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <optional>
 #include <string>
 #include <utility>
 
@@ -38,43 +39,88 @@ Player::Player(int id, raylib::rmath::Vector3 position, std::string name, cardin
 
 void Player::setTilePosition(const graphics::scene::Tile3DPosition tilePosition) { _tilePosition = tilePosition; }
 
-void Player::move(const int serverFrequency, const float deltaTime) {
-    if ((!_isMoving && _offset == _targetOffset) || serverFrequency <= 0 || deltaTime <= 0.0F) {
+void Player::updateActionState() {
+    const bool isPhysicallyMoving = (_isMoving || _offset != _targetOffset);
+
+    if (_isMoving) {
+        if (_action != Action::WALK) {
+            _action = Action::WALK;
+            _animFrame = 0;
+        }
+    } else if (isPhysicallyMoving) {
+        if (_action == Action::IDLE) {
+            _action = Action::WALK;
+            _animFrame = 0;
+        }
+    } else if (_action == Action::WALK) {
+        _action = Action::IDLE;
+        _animFrame = 0;
+    }
+}
+
+void Player::updateAnimation(const float deltaTime) {
+    if (_action == Action::IDLE) {
         _animFrame = 0;
         return;
     }
 
-    float const distanceToTarget = _position.distance(_futurePosition);
+    const float distanceToTarget = _position.distance(_futurePosition);
     float catchUpMultiplier = 1.0F;
-    if (distanceToTarget > 2.0F) {
+    if (distanceToTarget > 2.0F && _action == Action::WALK) {
         catchUpMultiplier = distanceToTarget / 2.0F;
     }
 
     const float movement = PLAYER_SPEED * catchUpMultiplier * deltaTime;
 
-    _animFrame += std::max(2, static_cast<int>(movement * 30.0F));
+    if (_action == Action::WALK) {
+        _animFrame += std::max(2, static_cast<int>(movement * 30.0F));
+    } else {
+        _animFrame += 2;
+    }
+}
 
-    if (_isMoving) {
-        if (_position.distance(_futurePosition) <= movement) {
-            _position = _futurePosition;
-            if (_wrappedPosition.has_value()) {
-                _position = _wrappedPosition.value();
-                _futurePosition = _position;
-                _wrappedPosition.reset();
-            }
-            _isMoving = false;
-        } else {
-            _position = _position.movedTowards(_futurePosition, movement);
+void Player::updatePhysicalPosition(const float deltaTime) {
+    if (!_isMoving) {
+        return;
+    }
+    const float distanceToTarget = _position.distance(_futurePosition);
+    const float catchUpMultiplier = (distanceToTarget > 2.0F) ? (distanceToTarget / 2.0F) : 1.0F;
+    const float movement = PLAYER_SPEED * catchUpMultiplier * deltaTime;
+
+    if (distanceToTarget <= movement) {
+        _position = _futurePosition;
+        if (_wrappedPosition.has_value()) {
+            _position = _wrappedPosition.value();
+            _futurePosition = _position;
+            _wrappedPosition.reset();
         }
+        _isMoving = false;
+    } else {
+        _position = _position.movedTowards(_futurePosition, movement);
+    }
+}
+
+void Player::updateOffset(const float deltaTime) {
+    if (_offset == _targetOffset) {
+        return;
+    }
+    const float movement = PLAYER_SPEED * deltaTime;
+    if (_offset.distance(_targetOffset) <= movement) {
+        _offset = _targetOffset;
+    } else {
+        _offset = _offset.movedTowards(_targetOffset, movement);
+    }
+}
+
+void Player::move(const int serverFrequency, const float deltaTime) {
+    if (serverFrequency <= 0 || deltaTime <= 0.0F) {
+        return;
     }
 
-    if (_offset != _targetOffset) {
-        if (_offset.distance(_targetOffset) <= movement) {
-            _offset = _targetOffset;
-        } else {
-            _offset = _offset.movedTowards(_targetOffset, movement);
-        }
-    }
+    updateActionState();
+    updateAnimation(deltaTime);
+    updatePhysicalPosition(deltaTime);
+    updateOffset(deltaTime);
 }
 
 void Player::setPosition(const raylib::rmath::Vector3& position) {

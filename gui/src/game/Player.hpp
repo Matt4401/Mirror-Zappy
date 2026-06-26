@@ -21,6 +21,7 @@ namespace zappy::gui::game {
 class Player {
   public:
     enum class cardinalPoint : std::uint8_t { NORTH = 1, EAST = 2, SOUTH = 3, WEST = 4 };
+    enum class Action : std::uint8_t { IDLE = 0, WALK = 1, INCANTATION = 2, FORK = 3 };
     static constexpr float PLAYER_SPEED = 6.0F;
     static constexpr int DELTA_SERVER_FREQUENCY = 20;
 
@@ -61,11 +62,22 @@ class Player {
     [[nodiscard]] raylib::rcore::BoundingBox boundingBox() const;
     [[nodiscard]] bool moving() const { return _isMoving; }
     [[nodiscard]] int animFrame() const { return _animFrame; }
+    [[nodiscard]] Action action() const { return _action; }
+    void setAction(Action action) {
+        _action = action;
+        _animFrame = 0;
+    }
     void move(int serverFrequency, float deltaTime);
 
   protected:
   private:
+    void updateActionState();
+    void updateAnimation(float deltaTime);
+    void updatePhysicalPosition(float deltaTime);
+    void updateOffset(float deltaTime);
+
     bool _isMoving{false};
+    Action _action{Action::IDLE};
     int _animFrame{0};
     int _id{0};
     game::ItemBag _itemBag;

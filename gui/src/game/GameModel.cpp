@@ -8,14 +8,19 @@
 #include "GameModel.hpp"
 
 #include <raylib.h>
+#include <rlgl.h>
 
+#include <cmath>
 #include <cstddef>
 #include <memory>
+#include <string>
 
 #include "Color.hpp"
 #include "Player.hpp"
 #include "rcore/Camera.hpp"
 #include "rmath/Vector3.hpp"
+#include "rmodels/Model.hpp"
+#include "rmodels/ModelAnimation.hpp"
 #include "rtextures/Texture2D.hpp"
 
 namespace zappy::gui::game {
@@ -59,42 +64,61 @@ float GameModel::getRotationAngle(Player::cardinalPoint orientation) {
     return 0.0F;
 }
 
-void GameModel::drawPlayer(raylib::rmath::Vector3 position, Player::cardinalPoint orientation, int animFrame,
-                           const std::shared_ptr<raylib::rtextures::Texture2D>& texture, std::size_t level) const {
-    if (_camera.get().isVisibleFromCamera(position)) {
-        if (_playerAnim.valid()) {
-            int const walkIndex = _playerAnim.getAnimationIndex("walk");
-            if (_playerAnim.frameCount(walkIndex) > 0) {
-                _playerAnim.update(_playerModel, static_cast<float>(animFrame % _playerAnim.frameCount(walkIndex)),
-                                   walkIndex);
-            }
-        }
+int GameModel::getAnimationIndexFromAction(const Player::Action action) {
+    switch (action) {
+        case Player::Action::WALK:
+            return 0;
+        case Player::Action::INCANTATION:
+            return 1;
+        case Player::Action::FORK:
+            return 2;
+        default:
+            return 0;
+    }
+}
 
-        if (texture && texture->valid()) {
-            _playerModel.setMaterialTexture(0, MATERIAL_MAP_ALBEDO, *texture);
-        } else if (_defaultPlayerTexture && _defaultPlayerTexture->valid()) {
-            _playerModel.setMaterialTexture(0, MATERIAL_MAP_ALBEDO, *_defaultPlayerTexture);
-        }
-        _playerModel.drawModelEx(position, {0.0F, 1.0F, 0.0F}, getRotationAngle(orientation), PLAYER_SCALE,
-                                 raylib::Color::White());
-        if (level > 1 && level <= 8) {
-            auto& armorAnim = _armorAnims.at(level - 2);
-            if (armorAnim.valid()) {
-                int const walkIndex = armorAnim.getAnimationIndex("walk");
-                if (armorAnim.frameCount(walkIndex) > 0) {
-                    armorAnim.update(_armorModels.at(level - 2),
-                                     static_cast<float>(animFrame % armorAnim.frameCount(walkIndex)), walkIndex);
-                }
-            }
+void GameModel::updateAnimationIfValid(const raylib::rmodels::ModelAnimation& anim, raylib::rmodels::Model& model,
+                                       const int animIndex, const int animFrame) {
+    if (!anim.valid() || animIndex < 0) {
+        return;
+    }
+    if (animIndex != 0 && anim.frameCount(0) > 0) {
+        anim.update(model, 0.0F, 0);
+    }
+    if (anim.frameCount(animIndex) > 0) {
+        anim.update(model, static_cast<float>(animFrame % anim.frameCount(animIndex)), animIndex);
+    }
+}
 
-            raylib::Color armorTint = raylib::Color::White();
-            if (level == 2) {
-                armorTint = raylib::Color(139, 69, 19, 255);
-            }
+void GameModel::drawPlayer(raylib::rmath::Vector3 position, Player::cardinalPoint orientation, Player::Action action,
+                           int animFrame, const std::shared_ptr<raylib::rtextures::Texture2D>& texture,
+                           std::size_t level) const {
+    if (!_camera.get().isVisibleFromCamera(position)) {
+        return;
+    }
 
-            _armorModels.at(level - 2).drawModelEx(position, {0.0F, 1.0F, 0.0F}, getRotationAngle(orientation),
-                                                   {ARMOR_SCALE, ARMOR_SCALE, ARMOR_SCALE}, armorTint);
+    const int animIndex = getAnimationIndexFromAction(action);
+    updateAnimationIfValid(_playerAnim, _playerModel, animIndex, animFrame);
+
+    if (texture && texture->valid()) {
+        _playerModel.setMaterialTexture(0, MATERIAL_MAP_ALBEDO, *texture);
+    } else if (_defaultPlayerTexture && _defaultPlayerTexture->valid()) {
+        _playerModel.setMaterialTexture(0, MATERIAL_MAP_ALBEDO, *_defaultPlayerTexture);
+    }
+
+    _playerModel.drawModelEx(position, {0.0F, 1.0F, 0.0F}, getRotationAngle(orientation), PLAYER_SCALE,
+                             raylib::Color::White());
+
+    if (level > 1 && level <= 8) {
+        auto& armorAnim = _armorAnims.at(level - 2);
+        updateAnimationIfValid(armorAnim, _armorModels.at(level - 2), animIndex, animFrame);
+
+        raylib::Color armorTint = raylib::Color::White();
+        if (level == 2) {
+            armorTint = raylib::Color(139, 69, 19, 255);
         }
+        _armorModels.at(level - 2).drawModelEx(position, {0.0F, 1.0F, 0.0F}, getRotationAngle(orientation),
+                                               {ARMOR_SCALE, ARMOR_SCALE, ARMOR_SCALE}, armorTint);
     }
 }
 void GameModel::drawEgg(raylib::rmath::Vector3 position, const raylib::Color tint) const {
