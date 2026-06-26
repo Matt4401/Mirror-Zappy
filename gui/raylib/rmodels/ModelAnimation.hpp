@@ -46,10 +46,12 @@ class ModelAnimation {
 
     [[nodiscard]] bool valid() const { return _animations != nullptr && _animationCount > 0; }
     [[nodiscard]] int frameCount(int animIndex = 0) const {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         return (valid() && animIndex >= 0 && animIndex < _animationCount) ? _animations.get()[animIndex].keyframeCount
                                                                           : 0;
     }
     [[nodiscard]] bool compatibleWith(const rmodels::Model& model, int animIndex = 0) const {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         return valid() && model.valid() && animIndex >= 0 && animIndex < _animationCount &&
                IsModelAnimationValid(model.model(), _animations.get()[animIndex]);
     }
@@ -59,7 +61,9 @@ class ModelAnimation {
             return 0;
         }
         for (int i = 0; i < _animationCount; i++) {
-            if (std::string(static_cast<const char*>(_animations.get()[i].name)) == name) {
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+            const char* animName = static_cast<const char*>(_animations.get()[i].name);
+            if (animName != nullptr && std::string(animName) == name) {
                 return i;
             }
         }
@@ -68,6 +72,7 @@ class ModelAnimation {
 
     void update(rmodels::Model& model, float frame, int animIndex = 0) const {
         if (valid() && animIndex >= 0 && animIndex < _animationCount) {
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
             UpdateModelAnimation(model.model(), _animations.get()[animIndex], frame);
         }
     }
