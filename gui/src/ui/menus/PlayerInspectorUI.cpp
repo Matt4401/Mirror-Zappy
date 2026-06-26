@@ -120,6 +120,11 @@ PlayerInspectorUI::PlayerInspectorUI(float x, float y, float width, events::Even
     _previewModel = std::make_shared<raylib::rmodels::Model>("assets/models/player.gltf");
 
     _firstPersonBtn->setFontSize(FirstPersonBtnFontSize);
+    _firstPersonBtn->setOnClick([this]() {
+        if (_targetPlayerId >= 0) {
+            getDispatcher().dispatch(events::PlayerFirstPersonRequested{.playerId = _targetPlayerId});
+        }
+    });
 
     getEventTokens().push_back(getDispatcher().subscribe<events::PlayerClicked>(
         [this](const events::PlayerClicked& e) { onPlayerClicked(e); }));

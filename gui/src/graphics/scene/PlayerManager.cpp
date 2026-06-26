@@ -58,7 +58,7 @@ void PlayerManager::handlePlayerPosition(const shared::protocol::server::Ppo& co
     if (const auto player = playerById(command.playerId); player.has_value()) {
         const auto oldTilePosition = player->get().tilePosition();
         updatePlayerPosition(player->get(), tilePosition);
-        player->get().setOrientation(orientationFromProtocol(command.orientation));
+        player->get().turnToOrientation(orientationFromProtocol(command.orientation));
         recalculateTileOffsets(oldTilePosition);
         recalculateTileOffsets(tilePosition);
     }

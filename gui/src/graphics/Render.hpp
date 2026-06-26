@@ -9,9 +9,11 @@
 
 #include <cstdint>
 #include <functional>
+#include <map>
 #include <memory>
 #include <string>
 
+#include "FirstPerson.hpp"
 #include "Map.hpp"
 #include "Skybox3D.hpp"
 #include "WorldManager.hpp"
@@ -51,7 +53,10 @@ class Render {
     void render3D();
     void updateCursorState() const;
     void handleInput();
+    void handleEscapeKey();
+    void handleAltKey();
 
+    std::map<int, std::function<void()>> _keyHandlers;
     raylib::rcore::Window _window{WINDOW_NAME.c_str()};
     raylib::rcore::Camera _camera{raylib::rmath::Vector3{10.0F, 10.0F, 10.0F}};
     scene::Skybox3D _skybox;
@@ -61,6 +66,7 @@ class Render {
     scene::Map _map;
     ui::UIManager _uiManager;
     std::shared_ptr<ui::hud::GameHUD> _gameHUD;
+    std::unique_ptr<FirstPerson> _firstPerson;
     bool _isExiting{false};
     bool _uiMode{false};
     UpdateMode _updateMode{UpdateMode::All};
