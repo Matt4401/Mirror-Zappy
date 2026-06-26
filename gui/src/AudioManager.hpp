@@ -27,6 +27,11 @@ class AudioManager {
     static constexpr auto SoundWalkPath = "assets/audio/minecraft-grass-walking-sound-effect.mp3";
     static constexpr auto SoundLevelUpPath = "assets/audio/levelup.mp3";
     static constexpr auto SoundIncantationPath = "assets/audio/ziak-villagers.mp3";
+    static constexpr auto SoundDropItemPath = "assets/audio/minecraft-drop-block-sound-effect.mp3";
+    static constexpr auto SoundPlayerDeathPath = "assets/audio/villager-death.mp3";
+    static constexpr auto SoundPlayerForkPath = "assets/audio/fork-vilager.mp3";
+    static constexpr auto SoundPlayerEjectPath = "assets/audio/minecraft-sword-swing.mp3";
+    static constexpr auto SoundPlayerConnectedPath = "assets/audio/Player-connected(Guerrier - Doigby).mp3";
 
     static constexpr float MinSpatialVolume = 0.0F;
     static constexpr float MaxSpatialVolume = 0.15F;
@@ -38,12 +43,13 @@ class AudioManager {
     static constexpr int MinServerFrequency = 1;
     static constexpr int FastServerFrequency = 500;
 
-    static constexpr float MinSoundPitch = 0.5F;
+    static constexpr float MinSoundPitch = 0.75F;
     static constexpr float NormalSoundPitch = 1.0F;
-    static constexpr float MaxSoundPitch = 2.0F;
+    static constexpr float MaxSoundPitch = 1.5F;
 
-    static constexpr float WalkActionTicks = 7.0F;
+    static constexpr float DefaultTicks = 7.0F;
     static constexpr float IncantationActionTicks = 300.0F;
+    static constexpr float ForkActionTicks = 42.0F;
 
     AudioManager();
     ~AudioManager();

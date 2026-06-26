@@ -64,7 +64,7 @@ class PlayerManager {
     void handleEggLaid(const shared::protocol::server::Enw& command);
     void handleEggRemoved(const shared::protocol::server::Ebo& command);
     void handleEggRemoved(const shared::protocol::server::Edi& command);
-    void handleExpulsionAnimation(const shared::protocol::server::Pex& /*command*/) {}  // TODO
+    void handleExpulsionAnimation(const shared::protocol::server::Pex& command);
     void handleBroadcastAnimation(const shared::protocol::server::Pbc& /*command*/) {}  // TODO
     void handleEggDropAnimation(const shared::protocol::server::Pfk& /*command*/) {}    // TODO
 

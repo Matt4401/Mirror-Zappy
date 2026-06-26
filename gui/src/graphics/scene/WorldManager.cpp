@@ -39,6 +39,7 @@ void WorldManager::initPlayerSubscriptions() {
     registerHandler(_playerManager.get(), &PlayerManager::handlePlayerLevel);
     registerHandler(_playerManager.get(), &PlayerManager::handlePlayerInventory);
     registerHandler(_playerManager.get(), &PlayerManager::handlePlayerDeath);
+    registerHandler(_playerManager.get(), &PlayerManager::handleExpulsionAnimation);
 }
 
 void WorldManager::initResourceSubscriptions() {

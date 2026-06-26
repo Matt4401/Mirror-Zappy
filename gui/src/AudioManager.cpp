@@ -22,9 +22,14 @@ AudioManager::AudioManager() {
     initAudioDevice();
     if (_audioReady) {
         loadMusic(DefaultBackgroundMusicPath);
-        loadSound("walk", SoundWalkPath, DefaultMusicVolume, WalkActionTicks);
+        loadSound("walk", SoundWalkPath, DefaultMusicVolume, DefaultTicks);
         loadSound("levelup", SoundLevelUpPath);
         loadSound("incantation", SoundIncantationPath, DefaultMusicVolume, IncantationActionTicks);
+        loadSound("item", SoundDropItemPath, DefaultMusicVolume, DefaultTicks);
+        loadSound("death", SoundPlayerDeathPath, DefaultMusicVolume);
+        loadSound("fork", SoundPlayerForkPath, DefaultMusicVolume, ForkActionTicks);
+        loadSound("eject", SoundPlayerEjectPath, DefaultMusicVolume);
+        loadSound("connected", SoundPlayerConnectedPath, DefaultMusicVolume, ForkActionTicks);
         playMusic();
     }
 }
