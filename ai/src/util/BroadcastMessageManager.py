@@ -1,11 +1,16 @@
 class BroadcastMessageManager:
-    def __init__(self, player_state):
+    def __init__(self, player_state, player_id):
         self.player_state = player_state
         self.team = player_state.team_name
+        self.id = player_id
         self.key = sum(ord(letter) for letter in self.team)
+        self.id = self.get_id()
 
-    def create_message(self):
-        content = f"{self.player_state.level}"
+    def get_id(self):
+        return int(self.id.split("_")[-1])
+
+    def create_message(self, status, instruction):
+        content = f"{self.id} {status} {self.player_state.level} {instruction}"
         encrypted_content = self.code(content)
         return f"{self.team}_{encrypted_content}"
 
