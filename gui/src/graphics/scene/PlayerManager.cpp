@@ -13,7 +13,6 @@
 #include <array>
 #include <cmath>
 #include <cstddef>
-#include <cstdint>
 #include <functional>
 #include <optional>
 #include <string>
@@ -107,8 +106,8 @@ void PlayerManager::handleIncantationStart(const shared::protocol::server::Pic& 
         *incantation = next;
     }
 
-    for (const uint8_t playerId : command.playerIds) {
-        if (const auto player = playerById(playerId); player.has_value()) {
+    for (const auto playerId : command.playerIds) {
+        if (const auto player = playerById(static_cast<int>(playerId)); player.has_value()) {
             player->get().setAction(game::Player::Action::INCANTATION);
         }
     }
@@ -122,15 +121,15 @@ void PlayerManager::handleIncantationEnd(const shared::protocol::server::Pie& co
         return;
     }
     if (command.incantationResult) {
-        for (const uint8_t playerId : incantation->playerIds) {
-            if (const auto player = playerById(playerId); player.has_value()) {
+        for (const auto playerId : incantation->playerIds) {
+            if (const auto player = playerById(static_cast<int>(playerId)); player.has_value()) {
                 const auto nextLevel = static_cast<std::size_t>(incantation->level) + 1U;
                 player->get().setLevel(std::max(player->get().level(), nextLevel));
             }
         }
     }
-    for (const uint8_t playerId : incantation->playerIds) {
-        if (const auto player = playerById(playerId); player.has_value()) {
+    for (const auto playerId : incantation->playerIds) {
+        if (const auto player = playerById(static_cast<int>(playerId)); player.has_value()) {
             player->get().setAction(game::Player::Action::IDLE);
         }
     }

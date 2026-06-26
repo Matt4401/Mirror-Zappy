@@ -77,13 +77,12 @@ void Player::setTilePosition(const graphics::scene::Tile3DPosition tilePosition)
 void Player::updateActionState() {
     const bool isPhysicallyMoving = (_isMoving || _offset != _targetOffset);
 
-    if (_isMoving) {
+    if (_action != Action::IDLE && _action != Action::WALK) {
+        return;
+    }
+
+    if (isPhysicallyMoving) {
         if (_action != Action::WALK) {
-            _action = Action::WALK;
-            _animFrame = 0;
-        }
-    } else if (isPhysicallyMoving) {
-        if (_action == Action::IDLE) {
             _action = Action::WALK;
             _animFrame = 0;
         }
@@ -107,11 +106,7 @@ void Player::updateAnimation(const float deltaTime) {
 
     const float movement = PLAYER_SPEED * catchUpMultiplier * deltaTime;
 
-    if (_action == Action::WALK) {
-        _animFrame += std::max(2, static_cast<int>(movement * 30.0F));
-    } else {
-        _animFrame += 2;
-    }
+    _animFrame += std::max(2, static_cast<int>(movement * 30.0F));
 }
 
 void Player::updateRotation(const float deltaTime) {
