@@ -25,8 +25,8 @@ GameModel::GameModel(raylib::rcore::Camera& camera)
         std::span<::Material> materials(_playerModel.model().materials, _playerModel.model().materialCount);
         if (!materials.empty() && materials.front().maps != nullptr) {
             std::span<::MaterialMap> const maps(materials.front().maps, MaxMaterialMaps);
-            _defaultPlayerTexture =
-                std::make_shared<raylib::rtextures::Texture2D>(maps[MATERIAL_MAP_ALBEDO].texture, false);
+            static_assert(MATERIAL_MAP_ALBEDO == 0, "MATERIAL_MAP_ALBEDO is expected to be 0 for front()");
+            _defaultPlayerTexture = std::make_shared<raylib::rtextures::Texture2D>(maps.front().texture, false);
         }
 
         for (auto& material : materials) {
