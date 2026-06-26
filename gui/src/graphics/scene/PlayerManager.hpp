@@ -65,7 +65,11 @@ class PlayerManager {
     void handleEggRemoved(const shared::protocol::server::Edi& command);
     void handleExpulsionAnimation(const shared::protocol::server::Pex& /*command*/) {}  // TODO
     void handleBroadcastAnimation(const shared::protocol::server::Pbc& /*command*/) {}  // TODO
-    void handleEggDropAnimation(const shared::protocol::server::Pfk& /*command*/) {}    // TODO
+    void handleEggDropAnimation(const shared::protocol::server::Pfk& command) {
+        if (auto player = playerById(command.playerId); player.has_value()) {
+            player->get().setAction(game::Player::Action::FORK);
+        }
+    }
 
     void movePlayers(int serverFrequency, float deltaTime);
 

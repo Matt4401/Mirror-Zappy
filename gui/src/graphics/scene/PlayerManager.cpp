@@ -106,6 +106,12 @@ void PlayerManager::handleIncantationStart(const shared::protocol::server::Pic& 
     } else {
         *incantation = next;
     }
+
+    for (const uint8_t playerId : command.playerIds) {
+        if (const auto player = playerById(playerId); player.has_value()) {
+            player->get().setAction(game::Player::Action::INCANTATION);
+        }
+    }
 }
 
 void PlayerManager::handleIncantationEnd(const shared::protocol::server::Pie& command) {
@@ -121,6 +127,11 @@ void PlayerManager::handleIncantationEnd(const shared::protocol::server::Pie& co
                 const auto nextLevel = static_cast<std::size_t>(incantation->level) + 1U;
                 player->get().setLevel(std::max(player->get().level(), nextLevel));
             }
+        }
+    }
+    for (const uint8_t playerId : incantation->playerIds) {
+        if (const auto player = playerById(playerId); player.has_value()) {
+            player->get().setAction(game::Player::Action::IDLE);
         }
     }
     _activeIncantations.erase(incantation);
@@ -178,6 +189,9 @@ void PlayerManager::handleEggLaid(const shared::protocol::server::Enw& command) 
     }
     if (const auto team = teamForPlayer(command.playerId); team.has_value()) {
         team->get().addEgg(command.eggId, command.playerId, position);
+    }
+    if (const auto player = playerById(command.playerId); player.has_value()) {
+        player->get().setAction(game::Player::Action::IDLE);
     }
 }
 
