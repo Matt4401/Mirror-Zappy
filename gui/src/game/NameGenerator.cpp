@@ -47,7 +47,7 @@ std::string NameGenerator::getRandomName() {
     static std::random_device rd;
     static std::mt19937 gen(rd());
     std::uniform_int_distribution<std::size_t> dist(0, _names.size() - 1);
-    return _names[dist(gen)];
+    return _names.at(dist(gen));
 }
 
 }  // namespace zappy::gui::game
