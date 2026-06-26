@@ -16,6 +16,7 @@
 #include <string>
 
 #include "Color.hpp"
+#include "Player.hpp"
 #include "rcore/Camera.hpp"
 #include "rmath/Vector3.hpp"
 #include "rmodels/Model.hpp"
