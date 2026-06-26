@@ -31,7 +31,7 @@ void Right::execute(game::World& world, game::Player& player) {
         .playerId = static_cast<int>(player.id()),
         .x = static_cast<int>(player.position().x),
         .y = static_cast<int>(player.position().y),
-        .orientation = static_cast<int>(newOrientation),
+        .orientation = static_cast<int>(newOrientation) + 1,
     }));
 }
 }  // namespace zappy::server::command

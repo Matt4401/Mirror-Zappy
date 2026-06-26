@@ -67,8 +67,8 @@ TEST_F(LookTest, ExecuteLookWhithSomeItem) {
     world.clearAllResourcesAndEggs();
     const std::unique_ptr<ICommand> look = std::make_unique<Look>();
 
-    world.addItemOnGround(game::ItemType::Food, game::Position{.x = 5, .y = 6});
-    world.addItemOnGround(game::ItemType::Linemate, game::Position{.x = 5, .y = 6});
+    world.addItemOnGround(game::ItemType::Food, game::Position{.x = 5, .y = 4});
+    world.addItemOnGround(game::ItemType::Linemate, game::Position{.x = 5, .y = 4});
 
     auto oldPos = player.position();
     player.setOrientation(game::cardinalPoint::NORTH);
@@ -88,8 +88,8 @@ TEST_F(LookTest, ExecuteLookWithItemsAndPlayers) {
     game::World world{config};
     game::Player player{1, 5, 5, game::cardinalPoint::NORTH};
 
-    world.addItemOnGround(game::ItemType::Food, game::Position{.x = 5, .y = 6});
-    world.addItemOnGround(game::ItemType::Linemate, game::Position{.x = 5, .y = 6});
+    world.addItemOnGround(game::ItemType::Food, game::Position{.x = 5, .y = 4});
+    world.addItemOnGround(game::ItemType::Linemate, game::Position{.x = 5, .y = 4});
 
     const std::unique_ptr<ICommand> look = std::make_unique<Look>();
     look->execute(world, player);
@@ -104,10 +104,10 @@ TEST_F(LookTest, ExecuteLookWithItemsAndPlayers) {
 TEST_F(LookTest, ExecuteLookAtMapEdgeWrapping) {
     game::World world{config};
 
-    game::Player player{1, 5, 9, game::cardinalPoint::NORTH};
+    game::Player player{1, 5, 0, game::cardinalPoint::NORTH};
 
     world.clearAllResourcesAndEggs();
-    world.addItemOnGround(game::ItemType::Food, game::Position{.x = 5, .y = 0});
+    world.addItemOnGround(game::ItemType::Food, game::Position{.x = 5, .y = 9});
 
     const std::unique_ptr<ICommand> look = std::make_unique<Look>();
 
@@ -130,7 +130,7 @@ TEST_F(LookTest, CheckPositionsOrientationEast) {
     ASSERT_EQ(lookPositions.at(0).y, 5);
 
     ASSERT_EQ(lookPositions.at(1).x, 6);
-    ASSERT_EQ(lookPositions.at(1).y, 6);
+    ASSERT_EQ(lookPositions.at(1).y, 4);
 }
 
 }  // namespace zappy::server::command
