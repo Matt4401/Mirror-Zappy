@@ -1,8 +1,8 @@
 class BroadcastMessageManager:
-    def __init__(self, player_state, trantorian):
+    def __init__(self, player_state, player_id):
         self.player_state = player_state
         self.team = player_state.team_name
-        self.id = trantorian.player_id
+        self.id = player_id
         self.key = sum(ord(letter) for letter in self.team)
         self.role = "FOLLOWER"
         self.id = self.get_id()

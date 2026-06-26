@@ -22,7 +22,7 @@ class Trantorian:
         self.send_command = SendCommand(self.connection)
         self.parser = ParseCommand(self.player_state.inventory)
         self.logger = logging.getLogger(f"player_{player_id}")
-        self.broadcast_manager = BroadcastMessageManager(self.player_state, self)
+        self.broadcast_manager = BroadcastMessageManager(self.player_state, self.player_id)
         self.received_broadcasts = []
 
     def wait_for_response(self, cmd_id, timeout=5.0):
