@@ -61,6 +61,7 @@ void PlayerManager::handlePlayerPosition(const shared::protocol::server::Ppo& co
         player->get().turnToOrientation(orientationFromProtocol(command.orientation));
         recalculateTileOffsets(oldTilePosition);
         recalculateTileOffsets(tilePosition);
+        _audioManager.get().playSoundAt("walk", player->get().position());
     }
 }
 
@@ -101,6 +102,9 @@ void PlayerManager::handleIncantationStart(const shared::protocol::server::Pic& 
         .level = command.level,
         .playerIds = command.playerIds,
     };
+    auto incantationPosition = _tileManager.tilePosition({.x = command.x, .y = command.y});
+    incantationPosition.setY(Tile3D::TILE_SIZE * DefaultPlayerOffsetY);
+    _audioManager.get().playSoundAt("incantation", incantationPosition);
     if (incantation == _activeIncantations.end()) {
         _activeIncantations.push_back(next);
     } else {
@@ -120,6 +124,7 @@ void PlayerManager::handleIncantationEnd(const shared::protocol::server::Pie& co
             if (const auto player = playerById(playerId); player.has_value()) {
                 const auto nextLevel = static_cast<std::size_t>(incantation->level) + 1U;
                 player->get().setLevel(std::max(player->get().level(), nextLevel));
+                _audioManager.get().playSoundAt("levelup", player->get().position());
             }
         }
     }

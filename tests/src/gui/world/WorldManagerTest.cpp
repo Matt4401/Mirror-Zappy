@@ -14,6 +14,7 @@
 #include <string>
 #include <utility>
 
+#include "AudioManager.hpp"
 #include "events/EventDispatcher.hpp"
 #include "graphics/scene/Tile3D.hpp"
 #include "graphics/scene/WorldManager.hpp"
@@ -56,8 +57,10 @@ class WorldManagerTest : public testing::Test {
 
     events::EventDispatcher dispatcher;  // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes,
                                          // misc-non-private-member-variables-in-classes)
-    WorldManager world{dispatcher};      // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes,
+    AudioManager audioManager;           // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes,
                                          // misc-non-private-member-variables-in-classes)
+    WorldManager world{dispatcher, audioManager};  // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes,
+                                                   // misc-non-private-member-variables-in-classes)
 };
 
 TEST_F(WorldManagerTest, MszBuildsTheMap) {

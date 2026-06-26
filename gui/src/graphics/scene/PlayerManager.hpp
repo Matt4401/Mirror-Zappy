@@ -20,6 +20,7 @@
 #include "gui/src/game/Player.hpp"
 #include "gui/src/game/Team.hpp"
 #include "protocol/Commands.hpp"
+#include "AudioManager.hpp"
 #include "rmath/Vector3.hpp"
 
 namespace zappy::gui::graphics::scene {
@@ -38,7 +39,7 @@ class PlayerManager {
         raylib::Color::Purple(), raylib::Color::Orange(), raylib::Color::SkyBlue(), raylib::Color::Pink(),
     };
 
-    explicit PlayerManager(TileManager& tileManager) : _tileManager(tileManager) {}
+    explicit PlayerManager(TileManager& tileManager, AudioManager& audioManager) : _tileManager(tileManager), _audioManager(audioManager) {}
     ~PlayerManager() = default;
     PlayerManager(const PlayerManager& other) = delete;
     PlayerManager& operator=(const PlayerManager& other) = delete;
@@ -92,5 +93,6 @@ class PlayerManager {
     std::vector<game::Team> _teams;
     std::vector<Incantation> _activeIncantations;
     std::vector<InitialEgg> _initialEggs;
+    std::reference_wrapper<AudioManager> _audioManager;
 };
 }  // namespace zappy::gui::graphics::scene
