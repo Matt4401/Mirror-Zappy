@@ -319,7 +319,7 @@ void Core::sendGuiNewGamePlayerData(std::size_t playerId) {
         .playerId = static_cast<int>(playerId),
         .x = static_cast<int>(playerList.at(playerId)->position().x),
         .y = static_cast<int>(playerList.at(playerId)->position().y),
-        .orientation = static_cast<int>(playerList.at(playerId)->orientation()),
+        .orientation = static_cast<int>(playerList.at(playerId)->orientation()) + 1,
         .level = 1,
         .teamName = std::string{_world->getPlayerTeam(playerId)},
     }));
@@ -356,7 +356,7 @@ void Core::sendGuiNewPlayerData(int clientId, std::size_t playerId) {
                                                .playerId = static_cast<int>(playerId),
                                                .x = static_cast<int>(player->position().x),
                                                .y = static_cast<int>(player->position().y),
-                                               .orientation = static_cast<int>(player->orientation()),
+                                               .orientation = static_cast<int>(player->orientation()) + 1,
                                                .level = player->level(),
                                                .teamName = world().getPlayerTeam(playerId)}));
     _sessionManager->sendMessage(

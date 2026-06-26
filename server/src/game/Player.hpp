@@ -36,11 +36,11 @@ constexpr std::array<std::string, static_cast<std::size_t>(ItemType::COUNT)> kIn
 
 enum class cardinalPoint : uint8_t { NORTH, EAST, SOUTH, WEST, COUNT };
 
-constexpr std::array<CoordinateMove, 4> playerMove = {{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}};
+constexpr std::array<CoordinateMove, 4> playerMove = {{{0, -1}, {1, 0}, {0, 1}, {-1, 0}}};
 
-constexpr std::array<CoordinateMove, 4> diagonalLeftMove = {{{-1, 1}, {1, 1}, {1, -1}, {-1, -1}}};
+constexpr std::array<CoordinateMove, 4> diagonalLeftMove = {{{-1, -1}, {1, -1}, {1, 1}, {-1, 1}}};
 
-constexpr std::array<CoordinateMove, 4> leftTile = {{{1, 0}, {0, -1}, {-1, 0}, {0, 1}}};
+constexpr std::array<CoordinateMove, 4> leftTile = {{{-1, 0}, {0, -1}, {1, 0}, {0, 1}}};
 
 static constexpr std::size_t kNbLifeTickFood = 126;
 static constexpr std::size_t kNbStartFood = 10;
