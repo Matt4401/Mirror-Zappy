@@ -51,8 +51,8 @@ class ModelAnimation {
                                                                           : 0;
     }
     [[nodiscard]] bool compatibleWith(const rmodels::Model& model, int animIndex = 0) const {
-        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         return valid() && model.valid() && animIndex >= 0 && animIndex < _animationCount &&
+               // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
                IsModelAnimationValid(model.model(), _animations.get()[animIndex]);
     }
 
