@@ -30,7 +30,7 @@ void Team::draw(const GameModel& gameModel) const {
         if (!player.textureId().empty()) {
             tex = graphics::AssetManager::getInstance().getTexture(player.textureId());
         }
-        gameModel.drawPlayer(player.position(), player.orientation(), tex, player.level());
+        gameModel.drawPlayer(player.position(), player.renderRotationAngle(), tex, player.level());
     }
     for (const auto& egg : _eggs) {
         const auto tint = raylib::Color::lerp(raylib::Color::White(), _teamColor, GameModel::EGG_TINT_STRENGTH);
@@ -88,9 +88,7 @@ void Team::removeEgg(int id) {
 
 void Team::movePlayers(const int serverFrequency, const float deltaTime) {
     for (auto& player : _players) {
-        if (player.moving()) {
-            player.move(serverFrequency, deltaTime);
-        }
+        player.move(serverFrequency, deltaTime);
     }
 }
 }  // namespace zappy::gui::game

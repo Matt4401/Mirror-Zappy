@@ -12,6 +12,8 @@
 namespace zappy::gui::raylib::rmath {
 class Vector3 {
   public:
+    static constexpr float DegreesToRadians = DEG2RAD;
+
     constexpr Vector3() = default;
     constexpr Vector3(int x, int y, int z)
         : _vector{.x = static_cast<float>(x), .y = static_cast<float>(y), .z = static_cast<float>(z)} {}
