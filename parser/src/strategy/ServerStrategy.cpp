@@ -73,6 +73,12 @@ void ServerStrategy::validate(const ServerConfig& config) {
     isValidate(config.width, "Missing or invalid width (-x)");
     isValidate(config.height, "Missing or invalid height (-y)");
     isValidate(config.clientLimit, "Missing or invalid clientsNb (-c)");
+    if (config.teamNames.size() > 8) {
+        throw shared::exception::ParsingError("Too many teams, maximum is 8 (-n)");
+    }
+    if (config.clientLimit > 20) {
+        throw shared::exception::ParsingError("Client limit must be smaller than 20 (-c)");
+    }
     if (config.width > 42 || config.height > 42 || config.width < 10 || config.height < 10) {
         throw shared::exception::ParsingError("Width and height must be larger than 10 and smaller than 42 (-x, -y)");
     }
