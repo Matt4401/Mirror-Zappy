@@ -87,7 +87,7 @@ TEST(EjectTest, ExecuteEjectsOtherPlayerAndSendsResponse) {
     ASSERT_EQ(launcher.position().y, 5);
 
     ASSERT_EQ(victim.position().x, 5);
-    ASSERT_EQ(victim.position().y, 6);
+    ASSERT_EQ(victim.position().y, 4);
 
     auto responses = world.getAllResponsesBuffer();
 

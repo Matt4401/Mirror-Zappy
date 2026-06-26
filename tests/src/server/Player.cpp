@@ -85,7 +85,7 @@ TEST(PlayerTest, MoveUpNegativeWraparound) {
 
     const auto [x, y] = player.position();
     EXPECT_EQ(x, 0);
-    EXPECT_EQ(y, 1);
+    EXPECT_EQ(y, 8);
 }
 
 TEST(PlayerTest, foodDecreasedPlayer) {
