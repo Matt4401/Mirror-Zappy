@@ -8,6 +8,10 @@ from .states.SurviveState import SurviveState
 from .states.HelpTeamMatesState import HelpTeamMatesState
 from .AState import AState
 from .TickManager import TickManager
+from .states.FollowerState import FollowerState
+from .states.LeaderState import LeaderState
+
+status = ["LEADER", "FOLLOWER"]
 
 
 class FiniteStateMachine:
@@ -17,6 +21,7 @@ class FiniteStateMachine:
         self.tick_manager = tick_manager
         self.sender = []
         self.pending_commands = {}
+        self.status = "LEADER"
 
     def run(self):
         self.trantorian.logger.warning("===========Start FSM process===========")
@@ -47,6 +52,7 @@ class FiniteStateMachine:
     def process_broadcasts(self):
         if not hasattr(self.trantorian, "broadcast_manager"):
             return
+        # ici rajouter une methode qui va checker si on a le leader le plus récent (plus petit id) en fct, si oui, envoyer un broadcast dans la direction, si non passer en follower
         broadcasts = self.trantorian.connection.get_broadcasts()
         for broadcast in broadcasts:
             decoded = self.trantorian.broadcast_manager.read_broadcast(
@@ -113,7 +119,7 @@ class FiniteStateMachine:
             elif cmd is None and hasattr(self.trantorian, "broadcast_manager"):
                 self.trantorian.logger.info("[FSM]: Auto command Broadcast call")
                 msg = self.trantorian.broadcast_manager.create_message(
-                    "aha", "Commande de rassemblement"
+                    self.status, "Commande de rassemblement"
                 )  # ceci est un exemple
                 cmd_id = self.trantorian.send_command.broadcast(msg)
                 self.pending_commands[cmd_id] = "broadcast"
@@ -132,39 +138,45 @@ class FiniteStateMachine:
         if self.trantorian.player_state.level == 8:
             self.transition_to(HelpTeamMatesState)
             return
+        if self.trantorian.have_layed == 0:
+            pass  # ici se mettre en mode ponte
+        if self.status == "FOLLOWER":
+            self.transition_to(FollowerState)
+        if self.status == "LEADER":
+            self.transition_to(LeaderState)
 
-        if self.trantorian.has_enough_resources_for(
-            self.trantorian.player_state.level + 1
-        ):
-            self.trantorian.logger.warning(
-                "[FSM]: Enough stones for next level, transitioning to EvolveState"
-            )
-            self.transition_to(EvolveState)
-            return
-        else:
-            # Pareil ne pas activer pour le moment.
-            # threat = None
-            # my_size = 1
-            # if hasattr(self.trantorian, "broadcast_manager"):
-            #     my_size = self.trantorian.broadcast_manager.my_team_size(tick)
-            #     threat = self.trantorian.broadcast_manager.get_threat(my_size, tick)
-            #
-            # if threat:
-            #     self.trantorian.logger.warning("[FSM]: Threat detected, transitioning to AttackState")
-            #     self.state = AttackState(self.trantorian, threat.direction)
-            #     return
-            #
-            # if hasattr(self.trantorian, "broadcast_manager") and self.trantorian.broadcast_manager.should_reproduce(
-            #         tick):
-            #     self.trantorian.logger.warning("[FSM]: Team too small or unknown, transitioning to ReproduceState")
-            # if self.trantorian.broadcast_manager.should_reproduce(tick) and self.trantorian.player_state.get_food() >= 400 :
-            #     self.transition_to(ReproduceState)
-            #     return
+        # if self.trantorian.has_enough_resources_for(
+        #    self.trantorian.player_state.level + 1
+        # ):
+        #    self.trantorian.logger.warning(
+        #        "[FSM]: Enough stones for next level, transitioning to EvolveState"
+        #    )
+        #    self.transition_to(EvolveState)
+        #    return
+        # else:
+        # Pareil ne pas activer pour le moment.
+        # threat = None
+        # my_size = 1
+        # if hasattr(self.trantorian, "broadcast_manager"):
+        #     my_size = self.trantorian.broadcast_manager.my_team_size(tick)
+        #     threat = self.trantorian.broadcast_manager.get_threat(my_size, tick)
+        #
+        # if threat:
+        #     self.trantorian.logger.warning("[FSM]: Threat detected, transitioning to AttackState")
+        #     self.state = AttackState(self.trantorian, threat.direction)
+        #     return
+        #
+        # if hasattr(self.trantorian, "broadcast_manager") and self.trantorian.broadcast_manager.should_reproduce(
+        #         tick):
+        #     self.trantorian.logger.warning("[FSM]: Team too small or unknown, transitioning to ReproduceState")
+        # if self.trantorian.broadcast_manager.should_reproduce(tick) and self.trantorian.player_state.get_food() >= 400 :
+        #     self.transition_to(ReproduceState)
+        #     return
 
-            self.trantorian.logger.warning(
-                "[FSM]: Not enough stones for next level, transitioning to GatherState"
-            )
-            self.transition_to(GatherState)
+        # self.trantorian.logger.warning(
+        #    "[FSM]: Not enough stones for next level, transitioning to GatherState"
+        # )
+        # self.transition_to(GatherState)
 
     def transition_to(self, state_class):
         if not isinstance(self.state, state_class):
