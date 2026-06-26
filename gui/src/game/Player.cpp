@@ -8,6 +8,7 @@
 #include "Player.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <cstddef>
 #include <optional>
 #include <string>
@@ -18,6 +19,38 @@
 #include "rmath/Vector3.hpp"
 
 namespace zappy::gui::game {
+float Player::angleForOrientation(const Player::cardinalPoint orientation) {
+    switch (orientation) {
+        case Player::cardinalPoint::NORTH:
+            return NorthAngle;
+        case Player::cardinalPoint::EAST:
+            return EastAngle;
+        case Player::cardinalPoint::SOUTH:
+            return SouthAngle;
+        case Player::cardinalPoint::WEST:
+            return WestAngle;
+    }
+    return SouthAngle;
+}
+
+float Player::normalizeAngle(float angle) {
+    angle = std::fmod(angle, FullTurnDegrees);
+    if (angle < 0.0F) {
+        angle += FullTurnDegrees;
+    }
+    return angle;
+}
+
+float Player::shortestAngleDelta(const float from, const float to) {
+    float delta = normalizeAngle(to) - normalizeAngle(from);
+    if (delta > HalfTurnDegrees) {
+        delta -= FullTurnDegrees;
+    } else if (delta < -HalfTurnDegrees) {
+        delta += FullTurnDegrees;
+    }
+    return delta;
+}
+
 raylib::rcore::BoundingBox Player::boundingBox() const {
     static constexpr float PICK_RADIUS = 0.8F;
     static constexpr float PICK_HEIGHT = 2.4F;
@@ -35,6 +68,8 @@ Player::Player(int id, raylib::rmath::Vector3 position, std::string name, cardin
       _futurePosition(position),
       _name(std::move(name)),
       _orientation(orientation),
+      _renderRotationAngle(angleForOrientation(orientation)),
+      _targetRotationAngle(angleForOrientation(orientation)),
       _level(level) {}
 
 void Player::setTilePosition(const graphics::scene::Tile3DPosition tilePosition) { _tilePosition = tilePosition; }
@@ -79,6 +114,29 @@ void Player::updateAnimation(const float deltaTime) {
     }
 }
 
+void Player::updateRotation(const float deltaTime) {
+    if (!_isTurning) {
+        return;
+    }
+
+    const float distanceToTarget = _position.distance(_futurePosition);
+    float catchUpMultiplier = 1.0F;
+    if (distanceToTarget > 2.0F && _action == Action::WALK) {
+        catchUpMultiplier = distanceToTarget / 2.0F;
+    }
+
+    const float movement = PLAYER_SPEED * catchUpMultiplier * deltaTime;
+    const float rotationMovement = (movement / graphics::scene::Tile3D::TILE_SIZE) * DegreesPerQuarterTurn;
+    const float delta = shortestAngleDelta(_renderRotationAngle, _targetRotationAngle);
+    if (std::fabs(delta) <= rotationMovement) {
+        _renderRotationAngle = _targetRotationAngle;
+        _isTurning = false;
+    } else {
+        _renderRotationAngle =
+            normalizeAngle(_renderRotationAngle + (delta > 0.0F ? rotationMovement : -rotationMovement));
+    }
+}
+
 void Player::updatePhysicalPosition(const float deltaTime) {
     if (!_isMoving) {
         return;
@@ -119,6 +177,7 @@ void Player::move(const int serverFrequency, const float deltaTime) {
 
     updateActionState();
     updateAnimation(deltaTime);
+    updateRotation(deltaTime);
     updatePhysicalPosition(deltaTime);
     updateOffset(deltaTime);
 }
@@ -141,5 +200,23 @@ void Player::setWrappedFuturePosition(const raylib::rmath::Vector3& exitPosition
     _futurePosition = exitPosition;
     _wrappedPosition = wrappedPosition;
     _isMoving = true;
+}
+
+void Player::setOrientation(const cardinalPoint orientation) {
+    _orientation = orientation;
+    _renderRotationAngle = angleForOrientation(orientation);
+    _targetRotationAngle = _renderRotationAngle;
+    _isTurning = false;
+}
+
+void Player::turnToOrientation(const cardinalPoint orientation) {
+    _orientation = orientation;
+    _targetRotationAngle = angleForOrientation(orientation);
+    _isTurning = shortestAngleDelta(_renderRotationAngle, _targetRotationAngle) != 0.0F;
+}
+
+raylib::rmath::Vector3 Player::renderDirection() const {
+    const float radians = _renderRotationAngle * raylib::rmath::Vector3::DegreesToRadians;
+    return {std::sin(radians), 0.0F, std::cos(radians)};
 }
 }  // namespace zappy::gui::game

@@ -204,7 +204,7 @@ TEST(PpoCommandTest, PpoCmd) {
     auto [x, y] = player->position();
     std::string expectedResponse;
     expectedResponse += "ppo #" + std::to_string(playerIdOpt.value()) + " " + std::to_string(x) + " " +
-                        std::to_string(y) + " " + std::to_string(static_cast<int>(player->orientation())) + "\n";
+                        std::to_string(y) + " " + std::to_string(static_cast<int>(player->orientation()) + 1) + "\n";
     ASSERT_EQ(response, expectedResponse);
 }
 

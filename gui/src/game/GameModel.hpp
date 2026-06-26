@@ -37,18 +37,16 @@ class GameModel {
     GameModel(GameModel&& other) noexcept = default;
     GameModel& operator=(GameModel&& other) noexcept = default;
 
-    void drawPlayer(raylib::rmath::Vector3 position, Player::cardinalPoint orientation, Player::Action action,
-                    int animFrame, const std::shared_ptr<raylib::rtextures::Texture2D>& texture = nullptr,
+    void drawPlayer(raylib::rmath::Vector3 position, float rotationAngle, Player::Action action, int animFrame,
+                    const std::shared_ptr<raylib::rtextures::Texture2D>& texture = nullptr,
                     std::size_t level = 1) const;
     void drawEgg(raylib::rmath::Vector3 position, raylib::Color tint) const;
 
   protected:
   private:
-    static float getRotationAngle(Player::cardinalPoint orientation);
     static int getAnimationIndexFromAction(Player::Action action);
     static void updateAnimationIfValid(const raylib::rmodels::ModelAnimation& anim, raylib::rmodels::Model& model,
                                        int animIndex, int animFrame);
-
     std::reference_wrapper<raylib::rcore::Camera> _camera;
     mutable raylib::rmodels::Model _playerModel{PLAYER_MODEL_RESOURCE};
     mutable raylib::rmodels::ModelAnimation _playerAnim{PLAYER_MODEL_RESOURCE};

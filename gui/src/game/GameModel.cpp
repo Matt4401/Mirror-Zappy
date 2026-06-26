@@ -16,7 +16,6 @@
 #include <string>
 
 #include "Color.hpp"
-#include "Player.hpp"
 #include "rcore/Camera.hpp"
 #include "rmath/Vector3.hpp"
 #include "rmodels/Model.hpp"
@@ -50,20 +49,6 @@ GameModel::GameModel(raylib::rcore::Camera& camera)
     }
 }
 
-float GameModel::getRotationAngle(Player::cardinalPoint orientation) {
-    switch (orientation) {
-        case Player::cardinalPoint::NORTH:
-            return 0.0F;
-        case Player::cardinalPoint::EAST:
-            return 270.0F;
-        case Player::cardinalPoint::SOUTH:
-            return 180.0F;
-        case Player::cardinalPoint::WEST:
-            return 90.0F;
-    }
-    return 0.0F;
-}
-
 int GameModel::getAnimationIndexFromAction(const Player::Action action) {
     switch (action) {
         case Player::Action::WALK:
@@ -90,9 +75,8 @@ void GameModel::updateAnimationIfValid(const raylib::rmodels::ModelAnimation& an
     }
 }
 
-void GameModel::drawPlayer(raylib::rmath::Vector3 position, Player::cardinalPoint orientation, Player::Action action,
-                           int animFrame, const std::shared_ptr<raylib::rtextures::Texture2D>& texture,
-                           std::size_t level) const {
+void GameModel::drawPlayer(raylib::rmath::Vector3 position, float rotationAngle, Player::Action action, int animFrame,
+                           const std::shared_ptr<raylib::rtextures::Texture2D>& texture, std::size_t level) const {
     if (!_camera.get().isVisibleFromCamera(position)) {
         return;
     }
@@ -106,8 +90,7 @@ void GameModel::drawPlayer(raylib::rmath::Vector3 position, Player::cardinalPoin
         _playerModel.setMaterialTexture(0, MATERIAL_MAP_ALBEDO, *_defaultPlayerTexture);
     }
 
-    _playerModel.drawModelEx(position, {0.0F, 1.0F, 0.0F}, getRotationAngle(orientation), PLAYER_SCALE,
-                             raylib::Color::White());
+    _playerModel.drawModelEx(position, {0.0F, 1.0F, 0.0F}, rotationAngle, PLAYER_SCALE, raylib::Color::White());
 
     if (level > 1 && level <= 8) {
         auto& armorAnim = _armorAnims.at(level - 2);
@@ -117,7 +100,7 @@ void GameModel::drawPlayer(raylib::rmath::Vector3 position, Player::cardinalPoin
         if (level == 2) {
             armorTint = raylib::Color(139, 69, 19, 255);
         }
-        _armorModels.at(level - 2).drawModelEx(position, {0.0F, 1.0F, 0.0F}, getRotationAngle(orientation),
+        _armorModels.at(level - 2).drawModelEx(position, {0.0F, 1.0F, 0.0F}, rotationAngle,
                                                {ARMOR_SCALE, ARMOR_SCALE, ARMOR_SCALE}, armorTint);
     }
 }

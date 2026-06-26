@@ -24,6 +24,13 @@ class Player {
     enum class Action : std::uint8_t { IDLE = 0, WALK = 1, INCANTATION = 2, FORK = 3 };
     static constexpr float PLAYER_SPEED = 6.0F;
     static constexpr int DELTA_SERVER_FREQUENCY = 20;
+    static constexpr float DegreesPerQuarterTurn = 90.0F;
+    static constexpr float FullTurnDegrees = 360.0F;
+    static constexpr float HalfTurnDegrees = 180.0F;
+    static constexpr float SouthAngle = 180.0F;
+    static constexpr float EastAngle = 270.0F;
+    static constexpr float NorthAngle = 0.0F;
+    static constexpr float WestAngle = 90.0F;
 
     Player(int id, raylib::rmath::Vector3 position, std::string name, cardinalPoint orientation, std::size_t level = 1);
     ~Player() = default;
@@ -40,6 +47,8 @@ class Player {
     [[nodiscard]] const std::string& name() const { return _name; }
     void setName(const std::string& name) { _name = name; }
     [[nodiscard]] cardinalPoint orientation() const { return _orientation; }
+    [[nodiscard]] float renderRotationAngle() const { return _renderRotationAngle; }
+    [[nodiscard]] raylib::rmath::Vector3 renderDirection() const;
     [[nodiscard]] std::size_t level() const { return _level; }
     [[nodiscard]] graphics::scene::Tile3DPosition tilePosition() const { return _tilePosition; }
     [[nodiscard]] const game::ItemBag& itemBag() const { return _itemBag; }
@@ -55,7 +64,8 @@ class Player {
                                   const raylib::rmath::Vector3& wrappedPosition);
     [[nodiscard]] const raylib::rmath::Vector3& futurePosition() const { return _futurePosition; }
     void setTilePosition(graphics::scene::Tile3DPosition tilePosition);
-    void setOrientation(cardinalPoint orientation) { _orientation = orientation; }
+    void setOrientation(cardinalPoint orientation);
+    void turnToOrientation(cardinalPoint orientation);
     void setLevel(std::size_t level) { _level = level; }
     void setTextureId(const std::string& textureId) { _textureId = textureId; }
     [[nodiscard]] std::string textureId() const { return _textureId; }
@@ -69,16 +79,22 @@ class Player {
     }
     void move(int serverFrequency, float deltaTime);
 
+    static float angleForOrientation(cardinalPoint orientation);
+    static float normalizeAngle(float angle);
+    static float shortestAngleDelta(float from, float to);
+
   protected:
   private:
     void updateActionState();
     void updateAnimation(float deltaTime);
+    void updateRotation(float deltaTime);
     void updatePhysicalPosition(float deltaTime);
     void updateOffset(float deltaTime);
 
     bool _isMoving{false};
     Action _action{Action::IDLE};
     int _animFrame{0};
+    bool _isTurning{false};
     int _id{0};
     game::ItemBag _itemBag;
     raylib::rmath::Vector3 _position{10.0F, 10.0F, 0.0F};
@@ -88,6 +104,8 @@ class Player {
     std::optional<raylib::rmath::Vector3> _wrappedPosition;
     std::string _name;
     cardinalPoint _orientation{cardinalPoint::NORTH};
+    float _renderRotationAngle{0.0F};
+    float _targetRotationAngle{0.0F};
     std::size_t _level{1};
     std::size_t _life{10};
     std::string _textureId;

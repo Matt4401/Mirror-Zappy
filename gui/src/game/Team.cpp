@@ -30,7 +30,7 @@ void Team::draw(const GameModel& gameModel) const {
         if (!player.textureId().empty()) {
             tex = graphics::AssetManager::getInstance().getTexture(player.textureId());
         }
-        gameModel.drawPlayer(player.position(), player.orientation(), player.action(), player.animFrame(), tex,
+        gameModel.drawPlayer(player.position(), player.renderRotationAngle(), player.action(), player.animFrame(), tex,
                              player.level());
     }
     for (const auto& egg : _eggs) {

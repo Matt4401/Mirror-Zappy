@@ -183,7 +183,7 @@ void World::updatePositionOnMap(const std::size_t id, const Position& oldPositio
         .playerId = static_cast<int>(id),
         .x = static_cast<int>(newPosition.x),
         .y = static_cast<int>(newPosition.y),
-        .orientation = static_cast<int>(_playerList.at(id)->orientation()),
+        .orientation = static_cast<int>(_playerList.at(id)->orientation()) + 1,
     }));
 }
 
