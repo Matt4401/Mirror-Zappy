@@ -13,6 +13,7 @@
 #include <memory>
 #include <string>
 
+#include "AudioManager.hpp"
 #include "FirstPerson.hpp"
 #include "Map.hpp"
 #include "Skybox3D.hpp"
@@ -31,7 +32,7 @@ class Render {
     static constexpr const std::string WINDOW_NAME = "Zappy GUI";
     static constexpr int FLAG_FULLSCREEN_MODE = 2;
 
-    explicit Render(events::EventDispatcher& dispatcher);
+    Render(events::EventDispatcher& dispatcher, AudioManager& audioManager);
     ~Render();
     Render(const Render& other) = delete;
     Render& operator=(const Render& other) = delete;
@@ -63,6 +64,7 @@ class Render {
     scene::Skybox3D _skybox;
     raylib::rcore::Event _event;
     std::reference_wrapper<events::EventDispatcher> _dispatcher;
+    std::reference_wrapper<AudioManager> _audioManager;
     scene::WorldManager _worldManager;
     scene::Map _map;
     ui::UIManager _uiManager;

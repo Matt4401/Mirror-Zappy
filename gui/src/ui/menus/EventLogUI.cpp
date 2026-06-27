@@ -131,7 +131,7 @@ void EventLogUI::initEventSubscriptions() {
                     [this](const shared::protocol::server::Edi& arg) {
                         addLogLine({{"Egg #", raylib::Color::Black()},
                                     {std::to_string(arg.eggId), raylib::Color::DarkBrown()},
-                                    {" died of starvation", raylib::Color::Red()}});
+                                    {" has been destroyed", raylib::Color::Red()}});
                     },
                     [this](const shared::protocol::server::Seg& arg) {
                         addLogLine({{"Game Over! Team ", raylib::Color::Red()},

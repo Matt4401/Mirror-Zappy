@@ -8,7 +8,6 @@
 #include "GameModel.hpp"
 
 #include <raylib.h>
-#include <rlgl.h>
 
 #include <cmath>
 #include <cstddef>
@@ -27,14 +26,18 @@
 namespace zappy::gui::game {
 GameModel::GameModel(raylib::rcore::Camera& camera)
     : _camera(camera), _alphaDiscardShader("", "assets/shaders/alpha_discard.fs") {
+    if (_playerModel.model().materials != nullptr &&
+        _playerModel.model().materials[0].maps !=  // NOLINT (cppcoreguidelines-pro-bounds-pointer-arithmetic)
+            nullptr) {
+        // NOLINTNEXTLINE (cppcoreguidelines-pro-bounds-pointer-arithmetic)
+        const int materialIndex = _playerModel.model().meshMaterial[0];
+        _defaultPlayerTexture = std::make_shared<raylib::rtextures::Texture2D>(
+            // NOLINTNEXTLINE (cppcoreguidelines-pro-bounds-pointer-arithmetic)
+            _playerModel.model().materials[materialIndex].maps[0].texture, false);
+    }
+
     if (_playerModel.model().materials != nullptr) {
         std::span<::Material> materials(_playerModel.model().materials, _playerModel.model().materialCount);
-        if (!materials.empty() && materials.front().maps != nullptr) {
-            std::span<::MaterialMap> const maps(materials.front().maps, MaxMaterialMaps);
-            static_assert(MATERIAL_MAP_ALBEDO == 0, "MATERIAL_MAP_ALBEDO is expected to be 0 for front()");
-            _defaultPlayerTexture = std::make_shared<raylib::rtextures::Texture2D>(maps.front().texture, false);
-        }
-
         for (auto& material : materials) {
             material.shader = _alphaDiscardShader.shader();
         }
@@ -85,10 +88,12 @@ void GameModel::drawPlayer(raylib::rmath::Vector3 position, float rotationAngle,
     const int animIndex = getAnimationIndexFromAction(action);
     updateAnimationIfValid(_playerAnim, _playerModel, animIndex, animFrame);
 
+    // NOLINTNEXTLINE (cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    const int materialIndex = _playerModel.model().meshMaterial[0];
     if (texture && texture->valid()) {
-        _playerModel.setMaterialTexture(0, MATERIAL_MAP_ALBEDO, *texture);
+        _playerModel.setMaterialTexture(materialIndex, MATERIAL_MAP_ALBEDO, *texture);
     } else if (_defaultPlayerTexture && _defaultPlayerTexture->valid()) {
-        _playerModel.setMaterialTexture(0, MATERIAL_MAP_ALBEDO, *_defaultPlayerTexture);
+        _playerModel.setMaterialTexture(materialIndex, MATERIAL_MAP_ALBEDO, *_defaultPlayerTexture);
     }
 
     _playerModel.drawModelEx(position, {0.0F, 1.0F, 0.0F}, rotationAngle, PLAYER_SCALE, raylib::Color::White());

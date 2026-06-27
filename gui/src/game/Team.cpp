@@ -19,6 +19,7 @@
 #include "Egg.hpp"
 #include "GameModel.hpp"
 #include "Player.hpp"
+#include "SkinGenerator.hpp"
 #include "game/NameGenerator.hpp"
 #include "graphics/AssetManager.hpp"
 #include "rmath/Vector3.hpp"
@@ -30,6 +31,10 @@ void Team::draw(const GameModel& gameModel) const {
         std::shared_ptr<raylib::rtextures::Texture2D> tex = nullptr;
         if (!player.textureId().empty()) {
             tex = graphics::AssetManager::getInstance().getTexture(player.textureId());
+            if (!tex) {
+                graphics::AssetManager::getInstance().loadTexture(player.textureId(), player.textureId());
+                tex = graphics::AssetManager::getInstance().getTexture(player.textureId());
+            }
         }
         gameModel.drawPlayer(player.position(), player.renderRotationAngle(), player.action(), player.animFrame(), tex,
                              player.level());
@@ -45,6 +50,12 @@ Player& Team::addPlayer(int id, raylib::rmath::Vector3 position, Player::cardina
         return existing->get();
     }
     _players.emplace_back(id, position, NameGenerator::getInstance().getRandomName(), orientation, level);
+
+    std::string const skin = SkinGenerator::getInstance().getRandomSkin();
+    if (!skin.empty()) {
+        _players.back().setTextureId(skin);
+    }
+
     return _players.back();
 }
 
