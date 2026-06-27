@@ -30,6 +30,9 @@ class Trantorian:
         self.leader_level = self.broadcast_manager.id
         self.status = "LEADER"
         self.traveling_stone = None
+        self.last_leader_tick = 0
+        # On définit un timeout (ex: si le leader ne parle pas pendant 20 ticks, il est mort)
+        self.LEADER_TIMEOUT_TICKS = 20
 
     def wait_for_response(self, cmd_id, timeout=5.0):
         if cmd_id in (None, 84):
@@ -38,29 +41,29 @@ class Trantorian:
 
     def move_one_step_toward(self, threat_direction):
         if threat_direction == 7:
-            self.connection.turn_right()
+            self.turn_right()
         if threat_direction == 3:
-            self.connection.turn_left()
+            self.turn_left()
         if threat_direction == 5:
-            self.connection.turn_right()
-            self.connection.turn_right()
+            self.turn_right()
+            self.turn_right()
         if threat_direction == 2:
-            self.connection.turn_left()
-            self.connection.forward()
-            self.connection.turn_right()
+            self.turn_left()
+            self.forward()
+            self.turn_right()
         if threat_direction == 8:
-            self.connection.turn_right()
-            self.connection.forward()
-            self.connection.turn_left()
+            self.turn_right()
+            self.forward()
+            self.turn_left()
         if threat_direction == 6:
-            self.connection.turn_right()
-            self.connection.forward()
-            self.connection.turn_right()
+            self.turn_right()
+            self.forward()
+            self.turn_right()
         if threat_direction == 4:
-            self.connection.turn_left()
-            self.connection.forward()
-            self.connection.turn_left()
-        self.connection.forward()
+            self.turn_left()
+            self.forward()
+            self.turn_left()
+        self.forward()
 
     def invalidate_vision(self):
         self.player_state.vision.reset_on_turn()

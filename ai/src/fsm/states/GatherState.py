@@ -1,4 +1,5 @@
 from ..AState import AState
+from .EvolveState import EvolveState
 
 
 class GatherState(AState):
@@ -12,6 +13,7 @@ class GatherState(AState):
             self.trantorian.logger.info(
                 "[Gather]: Player already get all his needed stones"
             )
+            self.fsm.transition_to(EvolveState)
             return
 
         visible = None

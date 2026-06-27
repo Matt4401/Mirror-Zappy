@@ -23,9 +23,13 @@ class FiniteStateMachine:
     def run(self):
         self.trantorian.logger.warning("===========Start FSM process===========")
         while True:
+            #self.process_server_events()
+            if not self.trantorian.connection.running:
+                self.trantorian.logger.warning("[FSM]: Player is dead. Stopping FSM loop.")
+                break
+
             meta_cmds = self.tick_manager.tick_update()
             self.send_auto_cmds(meta_cmds)
-            self.process_server_events()
             self.process_broadcasts()
             self.process_pending_commands()
             self.eat_current_tile_food()
@@ -48,64 +52,82 @@ class FiniteStateMachine:
         self.trantorian.refresh_inventory()
 
     def process_broadcasts(self):
-        if not hasattr(self.trantorian, "broadcast_manager"):
-            return
-        broadcasts = self.trantorian.connection.get_broadcasts()
-        if not broadcasts:
-            return
+        """
+        Récupère tous les broadcasts de la boîte aux lettres dédiée,
+        les stocke pour le FollowerState, et gère l'élection/timeout du Leader.
+        """
+        # 1. Utiliser la BONNE méthode de Connection.py pour vider la file des broadcasts
+        broadcast_messages = self.trantorian.connection.get_broadcasts()
+
+        current_tick = getattr(self.tick_manager, "current_tick", 0)
         my_id = self.trantorian.broadcast_manager.id
-        all_player_ids = {my_id}  # Inclure moi-même
-        for broadcast in broadcasts:
-            decoded = self.trantorian.broadcast_manager.read_broadcast(
-                broadcast.message
-            )
+        my_level = self.trantorian.player_state.level
+
+        # Si aucun message n'a été reçu à ce tick, on vérifie juste le timeout du leader
+        if not broadcast_messages:
+            self._handle_leader_timeout(current_tick)
+            return
+
+        for broadcast in broadcast_messages:
+            # broadcast est un objet BroadcastMessage (avec .direction et .message)
+            raw_message = broadcast.message
+
+            # Tenter de décoder le message via le manager
+            decoded = self.trantorian.broadcast_manager.read_broadcast(raw_message)
             if decoded is None:
-                continue
-            player_id, full_instruction = decoded
-        # full_instruction format: "status level instruction"
-        # Exemple: "LEADER 5 need {'linemate': 2}"
-            parts = full_instruction.split(" ", 2)
-            if len(parts) < 3:
-                continue
-            status = parts[0]
-            try:
-                level = int(parts[1])
-            except ValueError:
-                continue
-            instruction = parts[2] if len(parts) > 2 else ""
-            self.trantorian.logger.info(
-                f"[FSM] Broadcast reçu du joueur {player_id} "
-                f"(status={status}, level={level}): {instruction}"
-            )
-            self.trantorian.received_broadcasts.append(
-                {
-                    "player_id": player_id,
-                    "status": status,
-                    "level": level,
-                    "instruction": instruction,
-                    "direction": broadcast.direction,
-                }
-            )
-        # Ajouter le joueur au registre pour déterminer le leader
-            all_player_ids.add(player_id)
-    # Déterminer le leader = plus petit ID parmi tous les joueurs
-        leader_id = min(all_player_ids)
-        if leader_id == my_id:
-        # Je suis le leader
-            if self.trantorian.status != "LEADER":
+                continue  # Message corrompu ou d'une autre équipe, on l'ignore
+
+            sender_id, content_str = decoded
+
+            # 2. Remplir la liste au format EXACT attendu par FollowerState.py
+            self.trantorian.received_broadcasts.append({
+                "direction": broadcast.direction,
+                "msg": raw_message
+            })
+
+            # 3. Logique d'arbitrage Leader / Follower
+            # Le contenu ressemble à : "STATUS LEVEL INSTRUCTION" -> ex: "LEADER 1 need linemate"
+            parts = content_str.split(" ", 2)
+            if len(parts) >= 2:
+                sender_status = parts[0]
+                try:
+                    sender_level = int(parts[1])
+                except ValueError:
+                    sender_level = my_level
+            else:
+                sender_status = "UNKNOWN"
+                sender_level = my_level
+
+            # On ne compare notre autorité qu'avec des joueurs de MÊME niveau
+            if sender_level == my_level:
+                # Si un joueur avec un ID plus petit (prioritaire) dit qu'il est LEADER
+                if sender_id < my_id and sender_status == "LEADER":
+                    if self.trantorian.status != "FOLLOWER" or self.trantorian.leader_level != sender_id:
+                        self.trantorian.logger.info(f"[FSM] Abdication ! Je deviens FOLLOWER du joueur {sender_id}")
+                        self.trantorian.status = "FOLLOWER"
+                        self.trantorian.leader_level = sender_id
+
+                    # On met à jour le moment où on a entendu ce leader pour éviter le timeout
+                    self.trantorian.last_leader_tick = current_tick
+
+                # Si c'est notre leader actuel qui parle (peu importe son message), on reset son timeout
+                elif sender_id == self.trantorian.leader_level:
+                    self.trantorian.last_leader_tick = current_tick
+
+        # 4. Vérification du timeout après avoir traité tous les messages
+        self._handle_leader_timeout(current_tick)
+
+    def _handle_leader_timeout(self, current_tick):
+        """Repasse en mode LEADER si notre chef ne donne plus de signes de vie."""
+        if self.trantorian.status == "FOLLOWER":
+            elapsed_ticks = current_tick - self.trantorian.last_leader_tick
+            if elapsed_ticks > self.trantorian.LEADER_TIMEOUT_TICKS:
                 self.trantorian.logger.warning(
-                    f"[FSM] ✓ I am the LEADER (my_id={my_id})"
+                    f"[FSM] Le Leader {self.trantorian.leader_level} est silencieux depuis {elapsed_ticks} ticks. "
+                    f"Je reprends mon autonomie et repasse LEADER."
                 )
                 self.trantorian.status = "LEADER"
-        else:
-            # Je suis follower
-            if self.trantorian.status != "FOLLOWER":
-                self.trantorian.logger.warning(
-                    f"[FSM] ✓ I am FOLLOWER (leader_id={leader_id}, my_id={my_id})"
-                )
-                self.trantorian.status = "FOLLOWER"
-                self.trantorian.leader_level = leader_id
-
+                self.trantorian.leader_level = self.trantorian.broadcast_manager.id
 
     def falseprocess_broadcasts(self):
         if not hasattr(self.trantorian, "broadcast_manager"):
@@ -179,25 +201,35 @@ class FiniteStateMachine:
         self.trantorian.logger.info(f"[FSM]: number of food : {food}")
         tick = self.tick_manager.tick
 
+        if isinstance(self.state, SurviveState):
+            if food < 20:
+                return
+
         if food < SURVIVAL_THRESHOLD:
             self.trantorian.logger.warning(
                 "[FSM]: Food is low, transitioning to SurviveState"
             )
             self.transition_to(SurviveState)
+            self.trantorian.refresh_inventory()
             return
         if self.trantorian.player_state.level == 8:
             self.transition_to(HelpTeamMatesState)
             return
         if self.trantorian.player_state.level == 1:
             self.transition_to(GatherState)
-            self.transition_to(EvolveState)
+            self.trantorian.refresh_inventory()
             return
         if self.trantorian.have_layed != 1:
             self.transition_to(ReproduceState)
+            return
         if self.trantorian.status == "FOLLOWER":
             self.transition_to(FollowerState)
+            self.trantorian.refresh_inventory()
+            return
         if self.trantorian.status == "LEADER":
             self.transition_to(LeaderState)
+            self.trantorian.refresh_inventory()
+            return
 
     def transition_to(self, state_class):
         if not isinstance(self.state, state_class):
@@ -208,6 +240,8 @@ class FiniteStateMachine:
 
     def process_server_events(self):
         while True:
+            if hasattr(self.trantorian.connection, 'event_queue') and len(self.trantorian.connection.event_queue) == 0:
+                break
             if len(self.trantorian.connection.event_queue) < 0:
                 continue
             event = self.trantorian.connection.get_next_event()
@@ -216,7 +250,8 @@ class FiniteStateMachine:
             if event.event_type == "dead":
                 self.trantorian.logger.warning("dead")
                 self.trantorian.connection.running = False
-                return
+                return False  # Ajoute le False ici pour signaler la mort !
+
             elif event.event_type == "eject":
                 direction = event.data.get("direction")
                 cmd_id = self.trantorian.send_command.look()
@@ -235,3 +270,6 @@ class FiniteStateMachine:
                         self.trantorian.logger.info(f"up level  {new_level}")
                         cmd_id = self.trantorian.send_command.look()
                         self.pending_commands[cmd_id] = "look"
+
+        # Ajoute ce retour True vital pour que la condition de survie soit validée
+            return True
