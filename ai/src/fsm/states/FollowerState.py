@@ -25,8 +25,14 @@ class FollowerState(AState):
                     )
                     if tile_index is not None:
                         self.trantorian.move_to_tile(tile_index)
-                        self.trantorian.take_object(stone)
-                        self.trantorian.refresh_inventory()
+                        res = self.trantorian.take_object(stone)
+                        if res and res[0]:
+                            val = getattr(
+                                self.trantorian.player_state.inventory, stone, 0
+                            )
+                            setattr(
+                                self.trantorian.player_state.inventory, stone, val + 1
+                            )
                     return
                 else:
                     self.trantorian.move_one_step_toward(direction)

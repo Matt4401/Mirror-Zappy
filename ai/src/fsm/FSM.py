@@ -1,7 +1,6 @@
 import time
 import re
 from .Constant import SURVIVAL_THRESHOLD
-from .states.AttackState import AttackState
 from .states.ReproduceState import ReproduceState
 from .states.EvolveState import EvolveState
 from .states.GatherState import GatherState
@@ -24,7 +23,7 @@ class FiniteStateMachine:
     def run(self):
         self.trantorian.logger.warning("===========Start FSM process===========")
         while True:
-            # self.process_server_events()
+            self.process_server_events()
             if not self.trantorian.connection.running:
                 self.trantorian.logger.warning(
                     "[FSM]: Player is dead. Stopping FSM loop."
@@ -51,8 +50,9 @@ class FiniteStateMachine:
         self.trantorian.logger.info(
             "[FSM]: Food underfoot, taking it before other actions"
         )
-        self.trantorian.take_object("food")
-        self.trantorian.refresh_inventory()
+        res = self.trantorian.take_object("food")
+        if res and res[0]:
+            self.trantorian.player_state.inventory.food += 1
 
     def process_broadcasts(self):
         """
@@ -206,7 +206,7 @@ class FiniteStateMachine:
     def update_state(self):
         food = self.trantorian.player_state.inventory.get_food()
         self.trantorian.logger.info(f"[FSM]: number of food : {food}")
-        tick = self.tick_manager.tick
+        # tick = self.tick_manager.tick
 
         if isinstance(self.state, SurviveState):
             if food < 10:
@@ -267,7 +267,7 @@ class FiniteStateMachine:
                 return False  # Ajoute le False ici pour signaler la mort !
 
             elif event.event_type == "eject":
-                direction = event.data.get("direction")
+                # direction = event.data.get("direction")
                 cmd_id = self.trantorian.send_command.look()
                 self.pending_commands[cmd_id] = "look"
 

@@ -11,8 +11,9 @@ class SurviveState(AState):
                 "[Survive]: Food visible, go to the tile and take it"
             )
             self.trantorian.move_to_tile(closest_food_idx)
-            self.trantorian.take_object("food")
-            self.trantorian.refresh_inventory()
+            res = self.trantorian.take_object("food")
+            if res and res[0]:
+                self.trantorian.player_state.inventory.food += 1
             self.trantorian.look()
             return
 

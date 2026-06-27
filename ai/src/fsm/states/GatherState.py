@@ -1,5 +1,4 @@
 from ..AState import AState
-from .EvolveState import EvolveState
 
 
 class GatherState(AState):
@@ -37,7 +36,9 @@ class GatherState(AState):
             )
             stone, tile_index = visible
             self.trantorian.move_to_tile(tile_index)
-            self.trantorian.take_object(stone)
-            self.trantorian.refresh_inventory()
+            res = self.trantorian.take_object(stone)
+            if res and res[0]:
+                val = getattr(self.trantorian.player_state.inventory, stone, 0)
+                setattr(self.trantorian.player_state.inventory, stone, val + 1)
             self.trantorian.look()
             """
