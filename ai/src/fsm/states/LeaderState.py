@@ -43,10 +43,11 @@ class LeaderState(AState):
                 self.trantorian.logger.info("[Leader]: Start Evolution")
                 self.fsm.transition_to(EvolveState)
             else:
-                msg = self.trantorian.broadcast_manager.create_message(
-                    self.trantorian.status, "join"
-                )
-                self.trantorian.send_command.broadcast(msg)
+                if self.fsm.tick_manager._should_broadcast():
+                    msg = self.trantorian.broadcast_manager.create_message(
+                        self.trantorian.status, "join"
+                    )
+                    self.trantorian.send_command.broadcast(msg)
                 for i in range(3):
                     self.trantorian.turn_right()
                     msg = self.trantorian.broadcast_manager.create_message(
