@@ -9,24 +9,25 @@ class FollowerState(AState):
             self.trantorian.send_command.forward()
 
         latest_broadcast = self.trantorian.received_broadcasts.pop(0)
-        direction = latest_broadcast.get("dir")
+        direction = latest_broadcast.get("direction")
         raw_message = latest_broadcast.get("msg")
         decoded = self.trantorian.broadcast_manager.read_broadcast(raw_message)
         if decoded:
             sender_id, instruction = decoded
             if "need" in instruction:
-                if self.trantorian.travelling_stone is None:
-                    stone = random.choice() #amodifier, mettre la liste provenant de instruction
+                clean_instruction = instruction.split("need"[-1])
+                stone_list = clean_instruction.split(" ")
+                if self.trantorian.traveling_stone is None:
+                    stone = random.choice(stone_list)
                     tile_index = self.trantorian.player_state.vision.get_tile_index_of(stone)
                     if tile_index is not None:
                         self.trantorian.move_to_tile(tile_index)
                         self.trantorian.take_object(stone)
                         self.trantorian.refresh_inventory()
                     return
-                if direction == 0:
-                    if self.trantorian.traveling_stone:
-                        self.trantorian.set_object_down(self.trantorian.traveling_stone)
-                        self.trantorian.traveling_stone = None
+                if direction == 0 and self.trantorian.traveling_stone:
+                    self.trantorian.set_object_down(self.trantorian.traveling_stone)
+                    self.trantorian.traveling_stone = None
                 else:
                     self.trantorian.move_one_step_toward(direction)
                 return
