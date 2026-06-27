@@ -217,7 +217,6 @@ class FiniteStateMachine:
                 "[FSM]: Food is low, transitioning to SurviveState"
             )
             self.transition_to(SurviveState)
-            self.trantorian.refresh_inventory()
             return
         if self.trantorian.player_state.level == 8:
             self.transition_to(HelpTeamMatesState)
@@ -235,11 +234,9 @@ class FiniteStateMachine:
             return
         if self.trantorian.status == "FOLLOWER":
             self.transition_to(FollowerState)
-            self.trantorian.refresh_inventory()
             return
         if self.trantorian.status == "LEADER":
             self.transition_to(LeaderState)
-            self.trantorian.refresh_inventory()
             return
 
     def transition_to(self, state_class):
