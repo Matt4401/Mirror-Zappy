@@ -28,6 +28,7 @@ class Trantorian:
         self.received_broadcasts = []
         self.have_layed = 0
         self.leader_level = self.broadcast_manager.id
+        self.status = "LEADER"
 
     def wait_for_response(self, cmd_id, timeout=5.0):
         if cmd_id in (None, 84):

@@ -22,7 +22,6 @@ class FiniteStateMachine:
         self.tick_manager = tick_manager
         self.sender = []
         self.pending_commands = {}
-        self.status = "LEADER"
 
     def run(self):
         self.trantorian.logger.warning("===========Start FSM process===========")
@@ -120,7 +119,7 @@ class FiniteStateMachine:
             elif cmd is None and hasattr(self.trantorian, "broadcast_manager"):
                 self.trantorian.logger.info("[FSM]: Auto command Broadcast call")
                 msg = self.trantorian.broadcast_manager.create_message(
-                    self.status, "Commande de rassemblement"
+                    self.trantorian.status, "Commande de rassemblement"
                 )  # ceci est un exemple
                 cmd_id = self.trantorian.send_command.broadcast(msg)
                 self.pending_commands[cmd_id] = "broadcast"
@@ -141,9 +140,9 @@ class FiniteStateMachine:
             return
         if self.trantorian.have_layed != 1:
             pass  # ici se mettre en mode ponte
-        if self.status == "FOLLOWER":
+        if self.trantorian.status == "FOLLOWER":
             self.transition_to(FollowerState)
-        if self.status == "LEADER":
+        if self.trantorian.status == "LEADER":
             self.transition_to(LeaderState)
 
     def transition_to(self, state_class):
