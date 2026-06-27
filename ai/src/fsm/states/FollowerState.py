@@ -15,6 +15,24 @@ class FollowerState(AState):
         decoded = self.trantorian.broadcast_manager.read_broadcast(raw_message)
         if decoded:
             sender_id, instruction = decoded
+
+            if "join" in instruction:
+                status, level, raw_instruction = instruction.split(" ")
+                if int(level) != self.trantorian.player_state.level:
+                    return
+                if direction == 0:
+                    if self.fsm.tick_manager._should_broadcast():
+                        self.trantorian.logger.info("[Follower]: On leader emplacement")
+                        msg = self.trantorian.broadcast_manager.create_message(
+                            self.trantorian.status, "Here"
+                        )
+                        self.trantorian.send_command.broadcast(msg)
+                else:
+                    self.trantorian.logger.info(
+                        f"[Follower]: To leader emplacement (direction {direction})"
+                    )
+                    self.trantorian.move_one_step_toward(direction)
+
             if "need" in instruction:
                 clean_instruction = instruction.split("need ")[1].strip()
                 stone_list = clean_instruction.split(" ")
@@ -83,22 +101,7 @@ class FollowerState(AState):
                         return
                     self.trantorian.move_one_step_toward(direction)
                 return
-            if "join" in instruction:
-                status, level, raw_instruction = instruction.split(" ")
-                if int(level) != self.trantorian.player_state.level:
-                    return
-                if direction == 0:
-                    if self.fsm.tick_manager._should_broadcast():
-                        self.trantorian.logger.info("[Follower]: On leader emplacement")
-                        msg = self.trantorian.broadcast_manager.create_message(
-                            self.trantorian.status, "Here"
-                        )
-                        self.trantorian.send_command.broadcast(msg)
-                else:
-                    self.trantorian.logger.info(
-                        f"[Follower]: To leader emplacement (direction {direction})"
-                    )
-                    self.trantorian.move_one_step_toward(direction)
+
 
 
 # faire en sorte de gratter ressources sur le chemin -> fait

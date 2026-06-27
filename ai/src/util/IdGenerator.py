@@ -7,6 +7,6 @@ import random
 def generate_id(team_name: str) -> str:
     team_clean = team_name.replace(" ", "_")
     now = datetime.now().strftime("%Y-%m-%d_%H%M%S-%f")
-    id_aleatoire = random.randint(1, 999)
+    id_aleatoire = random.randint(1, 9999)
 
     return f"{team_clean}_{now}_{id_aleatoire}"

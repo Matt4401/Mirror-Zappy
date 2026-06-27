@@ -147,6 +147,7 @@ class Trantorian:
 
     def start_incantation(self):
         cmd_id = self.send_command.start_incantation()
+        self.logger.warning("                                                                           on tente incante")
         return self.wait_for_response(cmd_id)
 
     def move_to_tile(self, index):

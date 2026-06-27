@@ -11,7 +11,7 @@ from .TickManager import TickManager
 from .states.FollowerState import FollowerState
 from .states.LeaderState import LeaderState
 
-
+MAX_BROADCAST_QUEUE = 5
 class FiniteStateMachine:
     def __init__(self, default_state: AState, trantorian, tick_manager: TickManager):
         self.state = default_state
@@ -70,6 +70,8 @@ class FiniteStateMachine:
         if not broadcast_messages:
             self._handle_leader_timeout(current_tick)
             return
+        if len(self.trantorian.received_broadcasts) >= MAX_BROADCAST_QUEUE:
+            self.trantorian.received_broadcasts.pop(0)
 
         for broadcast in broadcast_messages:
             # broadcast est un objet BroadcastMessage (avec .direction et .message)
@@ -209,7 +211,9 @@ class FiniteStateMachine:
         # tick = self.tick_manager.tick
 
         if isinstance(self.state, SurviveState):
-            if food < 10:
+            if self.trantorian.status == "FOLLOWER" and food < 11:
+                return
+            if self.trantorian.status == "LEADER" and food < 16:
                 return
 
         if food < SURVIVAL_THRESHOLD:
@@ -217,29 +221,27 @@ class FiniteStateMachine:
                 "[FSM]: Food is low, transitioning to SurviveState"
             )
             self.transition_to(SurviveState)
-            self.trantorian.refresh_inventory()
+            # self.trantorian.refresh_inventory()
             return
         if self.trantorian.player_state.level == 8:
             self.transition_to(HelpTeamMatesState)
             return
         if self.trantorian.player_state.level == 1:
             tile = self.trantorian.player_state.vision.get_tile_index_of("linemate")
-            if not tile:
-                self.transition_to(GatherState)
+            if tile:
+                self.trantorian.move_to_tile(tile)
+                self.transition_to(EvolveState)
                 return
-            self.trantorian.move_to_tile(tile)
-            self.transition_to(EvolveState)
-            return
         if self.trantorian.have_layed != 1:
             self.transition_to(ReproduceState)
             return
         if self.trantorian.status == "FOLLOWER":
             self.transition_to(FollowerState)
-            self.trantorian.refresh_inventory()
+            # self.trantorian.refresh_inventory()
             return
         if self.trantorian.status == "LEADER":
             self.transition_to(LeaderState)
-            self.trantorian.refresh_inventory()
+            # self.trantorian.refresh_inventory()
             return
 
     def transition_to(self, state_class):
