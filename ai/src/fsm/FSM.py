@@ -1,4 +1,5 @@
 import time
+import re
 from .Constant import SURVIVAL_THRESHOLD
 from .states.AttackState import AttackState
 from .states.ReproduceState import ReproduceState
