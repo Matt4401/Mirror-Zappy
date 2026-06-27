@@ -69,5 +69,7 @@ class GameModel {
         raylib::rmodels::ModelAnimation{"assets/models/armor/diamond.gltf"},
         raylib::rmodels::ModelAnimation{"assets/models/armor/netherite.gltf"}};
     raylib::rmodels::Shader _alphaDiscardShader;
+
+    static constexpr std::size_t MaxMaterialMaps = 12;
 };
 }  // namespace zappy::gui::game

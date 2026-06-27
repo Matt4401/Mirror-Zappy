@@ -10,6 +10,7 @@
 #include <cmath>
 #include <cstddef>
 #include <memory>
+#include <span>
 #include <string>
 
 #include "Color.hpp"
@@ -33,14 +34,17 @@ GameModel::GameModel(raylib::rcore::Camera& camera)
             _playerModel.model().materials[materialIndex].maps[0].texture, false);
     }
 
-    for (int i = 0; i < _playerModel.model().materialCount; i++) {
-        // NOLINTNEXTLINE (cppcoreguidelines-pro-bounds-pointer-arithmetic)
-        _playerModel.model().materials[i].shader = _alphaDiscardShader.shader();
+        for (auto& material : materials) {
+            material.shader = _alphaDiscardShader.shader();
+        }
     }
+
     for (auto& _armorModel : _armorModels) {
-        for (int j = 0; j < _armorModel.model().materialCount; j++) {
-            // NOLINTNEXTLINE (cppcoreguidelines-pro-bounds-pointer-arithmetic)
-            _armorModel.model().materials[j].shader = _alphaDiscardShader.shader();
+        if (_armorModel.model().materials != nullptr) {
+            std::span<::Material> materials(_armorModel.model().materials, _armorModel.model().materialCount);
+            for (auto& material : materials) {
+                material.shader = _alphaDiscardShader.shader();
+            }
         }
     }
 }
