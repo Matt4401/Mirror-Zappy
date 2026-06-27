@@ -26,6 +26,13 @@ class Trantorian:
             self.player_state, self.player_id
         )
         self.received_broadcasts = []
+        self.have_layed = 0
+        self.leader_level = self.broadcast_manager.id
+        self.status = "LEADER"
+        self.traveling_stone = None
+        self.last_leader_tick = 0
+        # On définit un timeout (ex: si le leader ne parle pas pendant 20 ticks, il est mort)
+        self.LEADER_TIMEOUT_TICKS = 20
 
     def wait_for_response(self, cmd_id, timeout=5.0):
         if cmd_id in (None, 84):
@@ -34,29 +41,29 @@ class Trantorian:
 
     def move_one_step_toward(self, threat_direction):
         if threat_direction == 7:
-            self.connection.turn_right()
+            self.turn_right()
         if threat_direction == 3:
-            self.connection.turn_left()
+            self.turn_left()
         if threat_direction == 5:
-            self.connection.turn_right()
-            self.connection.turn_right()
+            self.turn_right()
+            self.turn_right()
         if threat_direction == 2:
-            self.connection.turn_left()
-            self.connection.forward()
-            self.connection.turn_right()
+            self.turn_left()
+            self.forward()
+            self.turn_right()
         if threat_direction == 8:
-            self.connection.turn_right()
-            self.connection.forward()
-            self.connection.turn_left()
+            self.turn_right()
+            self.forward()
+            self.turn_left()
         if threat_direction == 6:
-            self.connection.turn_right()
-            self.connection.forward()
-            self.connection.turn_right()
+            self.turn_right()
+            self.forward()
+            self.turn_right()
         if threat_direction == 4:
-            self.connection.turn_left()
-            self.connection.forward()
-            self.connection.turn_left()
-        self.connection.forward()
+            self.turn_left()
+            self.forward()
+            self.turn_left()
+        self.forward()
 
     def invalidate_vision(self):
         self.player_state.vision.reset_on_turn()
@@ -175,6 +182,19 @@ class Trantorian:
             if current_amount < required_amount:
                 missing[resource] = required_amount - current_amount
 
+        return missing
+
+    def get_missing_resources_for_list(self, target_level: int) -> list:
+        missing = []
+        if target_level not in ELEVATION_REQUIREMENTS:
+            return missing
+        requirements = ELEVATION_REQUIREMENTS[target_level]
+        for resource, required_amount in requirements.items():
+            if resource == "player":
+                continue
+            current_amount = getattr(self.player_state.inventory, resource, 0)
+            if current_amount < required_amount:
+                missing.append(resource)
         return missing
 
     def refresh_inventory(self):
