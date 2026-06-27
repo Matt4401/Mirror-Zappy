@@ -131,7 +131,12 @@ void UISlider::setSize(float width, float height) {
 
 bool UISlider::isVisible() const { return _isVisible; }
 
-void UISlider::setVisible(bool visible) { _isVisible = visible; }
+void UISlider::setVisible(bool visible) {
+    _isVisible = visible;
+    if (!visible) {
+        cancelDrag();
+    }
+}
 
 void UISlider::setOnValueChanged(std::function<void(float)> callback) { _onValueChanged = std::move(callback); }
 
@@ -146,6 +151,11 @@ void UISlider::setValue(float value) {
 }
 
 float UISlider::getValue() const { return _value; }
+
+void UISlider::cancelDrag() {
+    _isDragging = false;
+    _isHovered = false;
+}
 
 void UISlider::updateHandlePositionFromValue() {
     float const handleWidth = std::max(MinHandleWidth, _size.x() * HandleWidthRatio);

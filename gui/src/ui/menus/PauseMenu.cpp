@@ -199,6 +199,8 @@ bool PauseMenu::isVisible() const { return _isVisible; }
 void PauseMenu::setVisible(bool visible) {
     _isVisible = visible;
     if (!visible) {
+        _musicVolumeSlider->cancelDrag();
+        _soundVolumeSlider->cancelDrag();
         _settingsVisible = false;
     }
 }

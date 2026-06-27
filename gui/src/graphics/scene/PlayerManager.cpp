@@ -175,9 +175,10 @@ void PlayerManager::handleResourceCollected(const shared::protocol::server::Pgt&
 void PlayerManager::handlePlayerDeath(const shared::protocol::server::Pdi& command) {
     if (const auto player = playerById(command.playerId); player.has_value()) {
         const auto oldTilePosition = player->get().tilePosition();
+        const auto deathPosition = player->get().position();
         if (const auto team = teamForPlayer(command.playerId); team.has_value()) {
             team->get().removePlayer(command.playerId);
-            _audioManager.get().playSoundAt("death", player->get().position());
+            _audioManager.get().playSoundAt("death", deathPosition);
         }
         recalculateTileOffsets(oldTilePosition);
     }

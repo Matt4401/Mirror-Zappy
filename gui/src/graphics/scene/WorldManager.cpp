@@ -7,6 +7,7 @@
 
 #include "WorldManager.hpp"
 
+#include <algorithm>
 #include <functional>
 #include <memory>
 
@@ -75,14 +76,14 @@ WorldManager::~WorldManager() {
 
 void WorldManager::handleTimeUnit(const shared::protocol::server::Sgt& command) {
     if (command.timeUnit > 0) {
-        _timeUnit = command.timeUnit;
+        _timeUnit = std::max(command.timeUnit, AudioManager::MinServerFrequency);
         _audioManager.get().setServerFrequency(_timeUnit);
     }
 }
 
 void WorldManager::handleTimeUnit(const shared::protocol::server::Sst& command) {
     if (command.timeUnit > 0) {
-        _timeUnit = command.timeUnit;
+        _timeUnit = std::max(command.timeUnit, AudioManager::MinServerFrequency);
         _audioManager.get().setServerFrequency(_timeUnit);
     }
 }

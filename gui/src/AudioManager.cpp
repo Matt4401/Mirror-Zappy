@@ -123,6 +123,7 @@ void AudioManager::loadSound(const std::string_view id, const std::string& path,
         return;
     }
     const std::string key{id};
+    stopSound(key);
     _sounds.erase(key);
     _sounds.emplace(key, raylib::raudio::Sound{path, volume});
     if (actionTicks > 0.0F) {
@@ -203,7 +204,7 @@ float AudioManager::spatialPan(const raylib::rmath::Vector3& position) const {
         return CenterPan;
     }
     const raylib::rmath::Vector3 up{0.0F, 1.0F, 0.0F};
-    const auto right = _listenerForward.cross(up).normalized();
+    const auto right = up.cross(_listenerForward).normalized();
     const auto side = std::clamp(toSound.dot(right) / SpatialPanDistance, -1.0F, 1.0F);
     return std::clamp(CenterPan + (side * CenterPan), 0.0F, 1.0F);
 }
