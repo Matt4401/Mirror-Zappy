@@ -7,15 +7,20 @@
 
 #include "WorldManager.hpp"
 
+#include <algorithm>
 #include <functional>
+#include <memory>
 
+#include "AudioManager.hpp"
 #include "PlayerManager.hpp"
 #include "TileManager.hpp"
 #include "events/EventDispatcher.hpp"
 #include "protocol/Commands.hpp"
 
 namespace zappy::gui::graphics::scene {
-WorldManager::WorldManager(events::EventDispatcher& dispatcher) : _dispatcher(dispatcher) {
+WorldManager::WorldManager(events::EventDispatcher& dispatcher, AudioManager& audioManager)
+    : _dispatcher(dispatcher), _audioManager(audioManager), _tileManager(std::make_unique<TileManager>()) {
+    _playerManager = std::make_unique<PlayerManager>(*_tileManager, _dispatcher.get(), _audioManager.get());
     initMapSubscriptions();
     initPlayerSubscriptions();
     initResourceSubscriptions();
@@ -24,33 +29,34 @@ WorldManager::WorldManager(events::EventDispatcher& dispatcher) : _dispatcher(di
 }
 
 void WorldManager::initMapSubscriptions() {
-    registerHandler(&_tileManager, &TileManager::handleMapSize);
-    registerHandler(&_tileManager, &TileManager::handleTileContent);
+    registerHandler(_tileManager.get(), &TileManager::handleMapSize);
+    registerHandler(_tileManager.get(), &TileManager::handleTileContent);
 }
 
 void WorldManager::initPlayerSubscriptions() {
-    registerHandler(&_playerManager, &PlayerManager::handleTeamName);
-    registerHandler(&_playerManager, &PlayerManager::handlePlayerConnected);
-    registerHandler(&_playerManager, &PlayerManager::handlePlayerPosition);
-    registerHandler(&_playerManager, &PlayerManager::handlePlayerLevel);
-    registerHandler(&_playerManager, &PlayerManager::handlePlayerInventory);
-    registerHandler(&_playerManager, &PlayerManager::handlePlayerDeath);
+    registerHandler(_playerManager.get(), &PlayerManager::handleTeamName);
+    registerHandler(_playerManager.get(), &PlayerManager::handlePlayerConnected);
+    registerHandler(_playerManager.get(), &PlayerManager::handlePlayerPosition);
+    registerHandler(_playerManager.get(), &PlayerManager::handlePlayerLevel);
+    registerHandler(_playerManager.get(), &PlayerManager::handlePlayerInventory);
+    registerHandler(_playerManager.get(), &PlayerManager::handlePlayerDeath);
+    registerHandler(_playerManager.get(), &PlayerManager::handleExpulsionAnimation);
 }
 
 void WorldManager::initResourceSubscriptions() {
-    registerHandler(&_playerManager, &PlayerManager::handleIncantationStart);
-    registerHandler(&_playerManager, &PlayerManager::handleIncantationEnd);
-    registerHandler(&_playerManager, &PlayerManager::handleResourceDropped);
-    registerHandler(&_playerManager, &PlayerManager::handleResourceCollected);
+    registerHandler(_playerManager.get(), &PlayerManager::handleIncantationStart);
+    registerHandler(_playerManager.get(), &PlayerManager::handleIncantationEnd);
+    registerHandler(_playerManager.get(), &PlayerManager::handleResourceDropped);
+    registerHandler(_playerManager.get(), &PlayerManager::handleResourceCollected);
 }
 
 void WorldManager::initEggSubscriptions() {
-    registerHandler(&_playerManager, &PlayerManager::handleEggDropAnimation);
-    registerHandler(&_playerManager, &PlayerManager::handleEggLaid);
+    registerHandler(_playerManager.get(), &PlayerManager::handleEggLaid);
+    registerHandler(_playerManager.get(), &PlayerManager::handleEggDropAnimation);
     subscribe<shared::protocol::server::Ebo>(
-        [this](const shared::protocol::server::Ebo& command) { _playerManager.handleEggRemoved(command); });
+        [this](const shared::protocol::server::Ebo& command) { _playerManager->handleEggRemoved(command); });
     subscribe<shared::protocol::server::Edi>(
-        [this](const shared::protocol::server::Edi& command) { _playerManager.handleEggRemoved(command); });
+        [this](const shared::protocol::server::Edi& command) { _playerManager->handleEggRemoved(command); });
 }
 
 void WorldManager::initGameSubscriptions() {
@@ -70,13 +76,15 @@ WorldManager::~WorldManager() {
 
 void WorldManager::handleTimeUnit(const shared::protocol::server::Sgt& command) {
     if (command.timeUnit > 0) {
-        _timeUnit = command.timeUnit;
+        _timeUnit = std::max(command.timeUnit, AudioManager::MinServerFrequency);
+        _audioManager.get().setServerFrequency(_timeUnit);
     }
 }
 
 void WorldManager::handleTimeUnit(const shared::protocol::server::Sst& command) {
     if (command.timeUnit > 0) {
-        _timeUnit = command.timeUnit;
+        _timeUnit = std::max(command.timeUnit, AudioManager::MinServerFrequency);
+        _audioManager.get().setServerFrequency(_timeUnit);
     }
 }
 

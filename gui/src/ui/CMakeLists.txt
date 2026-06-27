@@ -55,6 +55,7 @@ target_link_libraries(zappy_gui_ui PUBLIC
         zappy_gui_raylib
         zappy_shared
         zappy_gui_events
+        zappy_gui_audio
 )
 target_link_libraries(zappy_gui_ui PRIVATE
         zappy_gui_assets

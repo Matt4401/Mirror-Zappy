@@ -48,6 +48,7 @@ void PlayerManager::handlePlayerConnected(const shared::protocol::server::Pnw& c
     player.setTilePosition(tilePosition);
     player.setOrientation(orientationFromProtocol(command.orientation));
     player.setLevel(static_cast<std::size_t>(std::max(command.level, 1)));
+    _audioManager.get().playSoundAt("connected", player.position());
     recalculateTileOffsets(tilePosition);
 }
 
@@ -62,6 +63,7 @@ void PlayerManager::handlePlayerPosition(const shared::protocol::server::Ppo& co
         player->get().turnToOrientation(orientationFromProtocol(command.orientation));
         recalculateTileOffsets(oldTilePosition);
         recalculateTileOffsets(tilePosition);
+        _audioManager.get().playSoundAt("walk", player->get().position());
     }
 }
 
@@ -102,6 +104,9 @@ void PlayerManager::handleIncantationStart(const shared::protocol::server::Pic& 
         .level = command.level,
         .playerIds = command.playerIds,
     };
+    auto incantationPosition = _tileManager.tilePosition({.x = command.x, .y = command.y});
+    incantationPosition.setY(Tile3D::TILE_SIZE * DefaultPlayerOffsetY);
+    _audioManager.get().playSoundAt("incantation", incantationPosition);
     if (incantation == _activeIncantations.end()) {
         _activeIncantations.push_back(next);
     } else {
@@ -127,6 +132,7 @@ void PlayerManager::handleIncantationEnd(const shared::protocol::server::Pie& co
             if (const auto player = playerById(static_cast<int>(playerId)); player.has_value()) {
                 const auto nextLevel = static_cast<std::size_t>(incantation->level) + 1U;
                 player->get().setLevel(std::max(player->get().level(), nextLevel));
+                _audioManager.get().playSoundAt("levelup", player->get().position());
             }
         }
     }
@@ -149,6 +155,7 @@ void PlayerManager::handleResourceDropped(const shared::protocol::server::Pdr& c
     }
     TileManager::removeResource(player->get().itemBag(), command.resourceId);
     _tileManager.addResource(tile->get().itemBag(), tile->get().position(), command.resourceId);
+    _audioManager.get().playSoundAt("item", player->get().position());
 }
 
 void PlayerManager::handleResourceCollected(const shared::protocol::server::Pgt& command) {
@@ -162,13 +169,16 @@ void PlayerManager::handleResourceCollected(const shared::protocol::server::Pgt&
     }
     TileManager::removeResource(tile->get().itemBag(), command.resourceId);
     _tileManager.addResource(player->get().itemBag(), player->get().position(), command.resourceId);
+    _audioManager.get().playSoundAt("item", player->get().position());
 }
 
 void PlayerManager::handlePlayerDeath(const shared::protocol::server::Pdi& command) {
     if (const auto player = playerById(command.playerId); player.has_value()) {
         const auto oldTilePosition = player->get().tilePosition();
+        const auto deathPosition = player->get().position();
         if (const auto team = teamForPlayer(command.playerId); team.has_value()) {
             team->get().removePlayer(command.playerId);
+            _audioManager.get().playSoundAt("death", deathPosition);
         }
         recalculateTileOffsets(oldTilePosition);
     }
@@ -190,6 +200,7 @@ void PlayerManager::handleEggLaid(const shared::protocol::server::Enw& command) 
     }
     if (const auto team = teamForPlayer(command.playerId); team.has_value()) {
         team->get().addEgg(command.eggId, command.playerId, position);
+        _audioManager.get().playSoundAt("fork", position);
     }
     if (const auto player = playerById(command.playerId); player.has_value()) {
         player->get().setAction(game::Player::Action::IDLE);
@@ -199,6 +210,16 @@ void PlayerManager::handleEggLaid(const shared::protocol::server::Enw& command) 
 void PlayerManager::handleEggRemoved(const shared::protocol::server::Ebo& command) { removeEgg(command.eggId); }
 
 void PlayerManager::handleEggRemoved(const shared::protocol::server::Edi& command) { removeEgg(command.eggId); }
+
+void PlayerManager::handleExpulsionAnimation(const shared::protocol::server::Pex& command) {
+    const auto player = playerById(command.playerId);
+
+    if (!player.has_value()) {
+        return;
+    }
+    _audioManager.get().playSoundAt("eject", player->get().position());
+    // TODO Do something with the expulsion animation, like moving the player back a tile or something similar
+}
 
 std::optional<std::reference_wrapper<const game::Player>> PlayerManager::playerById(const int id) const {
     for (const auto& team : _teams) {
@@ -234,6 +255,8 @@ std::optional<std::reference_wrapper<game::Team>> PlayerManager::teamForPlayer(c
 }
 
 void PlayerManager::updatePlayerPosition(game::Player& player, const Tile3DPosition tilePosition) const {
+    player.completePendingWrap();
+
     auto destination = _tileManager.tilePosition(tilePosition);
     destination.setY(Tile3D::TILE_SIZE * DefaultPlayerOffsetY);
 
