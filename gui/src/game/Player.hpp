@@ -21,7 +21,8 @@ namespace zappy::gui::game {
 class Player {
   public:
     enum class cardinalPoint : std::uint8_t { NORTH = 1, EAST = 2, SOUTH = 3, WEST = 4 };
-    static constexpr float PLAYER_SPEED = 20.0F;
+    enum class Action : std::uint8_t { IDLE = 0, WALK = 1, INCANTATION = 2, FORK = 3 };
+    static constexpr float PLAYER_SPEED = 6.0F;
     static constexpr int DELTA_SERVER_FREQUENCY = 20;
     static constexpr float DegreesPerQuarterTurn = 90.0F;
     static constexpr float FullTurnDegrees = 360.0F;
@@ -70,6 +71,12 @@ class Player {
     [[nodiscard]] std::string textureId() const { return _textureId; }
     [[nodiscard]] raylib::rcore::BoundingBox boundingBox() const;
     [[nodiscard]] bool moving() const { return _isMoving; }
+    [[nodiscard]] int animFrame() const { return _animFrame; }
+    [[nodiscard]] Action action() const { return _action; }
+    void setAction(Action action) {
+        _action = action;
+        _animFrame = 0;
+    }
     void move(int serverFrequency, float deltaTime);
 
     static float angleForOrientation(cardinalPoint orientation);
@@ -78,7 +85,15 @@ class Player {
 
   protected:
   private:
+    void updateActionState();
+    void updateAnimation(float deltaTime);
+    void updateRotation(float deltaTime);
+    void updatePhysicalPosition(float deltaTime);
+    void updateOffset(float deltaTime);
+
     bool _isMoving{false};
+    Action _action{Action::IDLE};
+    int _animFrame{0};
     bool _isTurning{false};
     int _id{0};
     game::ItemBag _itemBag;

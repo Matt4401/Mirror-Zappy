@@ -5,6 +5,7 @@ add_library(zappy_gui_game
         Team.cpp
         GameModel.cpp
         Player.cpp
+        NameGenerator.cpp
 )
 target_sources(zappy_gui_game PUBLIC
         FILE_SET HEADERS
@@ -15,6 +16,7 @@ target_sources(zappy_gui_game PUBLIC
         ItemBag.hpp
         GameModel.hpp
         Egg.hpp
+        NameGenerator.hpp
 )
 target_include_directories(zappy_gui_game PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}

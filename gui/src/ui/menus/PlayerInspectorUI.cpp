@@ -203,6 +203,7 @@ void PlayerInspectorUI::buildInfoPanel() {
     _compassIcon->setSize(PrimaryIconSize, PrimaryIconSize);
 
     _nameBox = std::make_shared<components::UITextbox>(0.0F, 0.0F, 200.0F, NameBoxHeight, getFont(), "Enter Name...");
+    _nameBox->setMaxLength(12);
     _nameBox->setOnSubmit([this](const std::string& name) {
         if (_targetPlayerId != -1) {
             getDispatcher().dispatch(events::PlayerNameChanged{.playerId = _targetPlayerId, .newName = name});

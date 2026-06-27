@@ -55,8 +55,8 @@ class WorldManager {
     void handleTimeUnit(const shared::protocol::server::Sst& command);
     void handleGameEnd(const shared::protocol::server::Seg& command);
     void handleServerMessage(const shared::protocol::server::Smg& command);
-    void handleUnknownCommand(const shared::protocol::ServerCommand& command) {}  // TODO
-    void handleWrongParam(const shared::protocol::server::Sbp& command) {}        // TODO
+    void handleUnknownCommand(const shared::protocol::ServerCommand& /*command*/) {}  // TODO
+    void handleWrongParam(const shared::protocol::server::Sbp& /*command*/) {}        // TODO
 
     void initMapSubscriptions();
     void initPlayerSubscriptions();
@@ -78,7 +78,7 @@ class WorldManager {
     std::reference_wrapper<events::EventDispatcher> _dispatcher;
     std::vector<std::function<void()>> _unsubscribers;
     TileManager _tileManager;
-    PlayerManager _playerManager{_tileManager};
+    PlayerManager _playerManager{_tileManager, _dispatcher.get()};
     int _timeUnit{100};
     std::string _winningTeam;
     std::string _lastServerMessage;
