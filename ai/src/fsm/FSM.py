@@ -285,5 +285,4 @@ class FiniteStateMachine:
                         cmd_id = self.trantorian.send_command.look()
                         self.pending_commands[cmd_id] = "look"
 
-            # Ajoute ce retour True vital pour que la condition de survie soit validée
-            return True
+            pass
