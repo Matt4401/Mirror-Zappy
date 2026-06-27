@@ -95,9 +95,7 @@ void PlayerManager::handleIncantationStart(const shared::protocol::server::Pic& 
     if (!_tileManager.contains({.x = command.x, .y = command.y}) || command.level < 1 || command.playerIds.empty()) {
         return;
     }
-    const auto incantation = std::ranges::find_if(_activeIncantations, [&command](const Incantation& active) {
-        return active.x == command.x && active.y == command.y;
-    });
+
     const Incantation next{
         .x = command.x,
         .y = command.y,
@@ -107,11 +105,7 @@ void PlayerManager::handleIncantationStart(const shared::protocol::server::Pic& 
     auto incantationPosition = _tileManager.tilePosition({.x = command.x, .y = command.y});
     incantationPosition.setY(Tile3D::TILE_SIZE * DefaultPlayerOffsetY);
     _audioManager.get().playSoundAt("incantation", incantationPosition);
-    if (incantation == _activeIncantations.end()) {
-        _activeIncantations.push_back(next);
-    } else {
-        *incantation = next;
-    }
+    _activeIncantations.push_back(next);
 
     for (const auto playerId : command.playerIds) {
         if (const auto player = playerById(static_cast<int>(playerId)); player.has_value()) {
