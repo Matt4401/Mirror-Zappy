@@ -20,11 +20,11 @@ MIN_TEAM_SIZE = 6
 WORLD_MODEL_TTL = 100
 
 ELEVATION_REQUIREMENTS = {
-        "player": 1,
-        "linemate": 2,
-        "deraumere": 2,
-        "sibur": 3,
-        "mendiane": 3,
-        "phiras": 2,
-        "thystame": 1,
+    "player": 1,
+    "linemate": 2,
+    "deraumere": 2,
+    "sibur": 3,
+    "mendiane": 3,
+    "phiras": 2,
+    "thystame": 1,
 }

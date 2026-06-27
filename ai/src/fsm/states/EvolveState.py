@@ -6,13 +6,13 @@ class EvolveState(AState):
     def execute(self):
         self.trantorian.logger.info("===========Entering Evolve state===========")
         level = self.trantorian.player_state.level
-        req = ELEVATION_REQUIREMENTS.get(level + 1, {})
+        # req = ELEVATION_REQUIREMENTS.get(level + 1, {})
 
-        for resource, amount in req.items():
+        """for resource, amount in req.items():
             if resource == "player":
                 continue
             for _ in range(amount):
-                self.trantorian.set_object_down(resource)
+                self.trantorian.set_object_down(resource)"""
 
         result = self.trantorian.start_incantation()
         if result:
@@ -24,5 +24,5 @@ class EvolveState(AState):
                 self.trantorian.player_state.upgrade_level()
                 self.trantorian.player_state.vision.current_level += 1
                 self.trantorian.refresh_inventory()
-                #for stone in resource:
-                 #   self.trantorian.take_object(stone)
+                # for stone in resource:
+                #   self.trantorian.take_object(stone)

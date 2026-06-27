@@ -12,6 +12,7 @@ from .TickManager import TickManager
 from .states.FollowerState import FollowerState
 from .states.LeaderState import LeaderState
 
+
 class FiniteStateMachine:
     def __init__(self, default_state: AState, trantorian, tick_manager: TickManager):
         self.state = default_state
@@ -23,9 +24,11 @@ class FiniteStateMachine:
     def run(self):
         self.trantorian.logger.warning("===========Start FSM process===========")
         while True:
-            #self.process_server_events()
+            # self.process_server_events()
             if not self.trantorian.connection.running:
-                self.trantorian.logger.warning("[FSM]: Player is dead. Stopping FSM loop.")
+                self.trantorian.logger.warning(
+                    "[FSM]: Player is dead. Stopping FSM loop."
+                )
                 break
 
             meta_cmds = self.tick_manager.tick_update()
@@ -80,10 +83,9 @@ class FiniteStateMachine:
             sender_id, content_str = decoded
 
             # 2. Remplir la liste au format EXACT attendu par FollowerState.py
-            self.trantorian.received_broadcasts.append({
-                "direction": broadcast.direction,
-                "msg": raw_message
-            })
+            self.trantorian.received_broadcasts.append(
+                {"direction": broadcast.direction, "msg": raw_message}
+            )
 
             # 3. Logique d'arbitrage Leader / Follower
             # Le contenu ressemble à : "STATUS LEVEL INSTRUCTION" -> ex: "LEADER 1 need linemate"
@@ -102,8 +104,13 @@ class FiniteStateMachine:
             if sender_level == my_level:
                 # Si un joueur avec un ID plus petit (prioritaire) dit qu'il est LEADER
                 if sender_id < my_id and sender_status == "LEADER":
-                    if self.trantorian.status != "FOLLOWER" or self.trantorian.leader_level != sender_id:
-                        self.trantorian.logger.info(f"[FSM] Abdication ! Je deviens FOLLOWER du joueur {sender_id}")
+                    if (
+                        self.trantorian.status != "FOLLOWER"
+                        or self.trantorian.leader_level != sender_id
+                    ):
+                        self.trantorian.logger.info(
+                            f"[FSM] Abdication ! Je deviens FOLLOWER du joueur {sender_id}"
+                        )
                         self.trantorian.status = "FOLLOWER"
                         self.trantorian.leader_level = sender_id
 
@@ -202,7 +209,7 @@ class FiniteStateMachine:
         tick = self.tick_manager.tick
 
         if isinstance(self.state, SurviveState):
-            if food < 20:
+            if food < 10:
                 return
 
         if food < SURVIVAL_THRESHOLD:
@@ -216,8 +223,12 @@ class FiniteStateMachine:
             self.transition_to(HelpTeamMatesState)
             return
         if self.trantorian.player_state.level == 1:
-            self.transition_to(GatherState)
-            self.trantorian.refresh_inventory()
+            tile = self.trantorian.player_state.vision.get_tile_index_of("linemate")
+            if not tile:
+                self.transition_to(GatherState)
+                return
+            self.trantorian.move_to_tile(tile)
+            self.transition_to(EvolveState)
             return
         if self.trantorian.have_layed != 1:
             self.transition_to(ReproduceState)
@@ -240,7 +251,10 @@ class FiniteStateMachine:
 
     def process_server_events(self):
         while True:
-            if hasattr(self.trantorian.connection, 'event_queue') and len(self.trantorian.connection.event_queue) == 0:
+            if (
+                hasattr(self.trantorian.connection, "event_queue")
+                and len(self.trantorian.connection.event_queue) == 0
+            ):
                 break
             if len(self.trantorian.connection.event_queue) < 0:
                 continue
@@ -271,5 +285,5 @@ class FiniteStateMachine:
                         cmd_id = self.trantorian.send_command.look()
                         self.pending_commands[cmd_id] = "look"
 
-        # Ajoute ce retour True vital pour que la condition de survie soit validée
+            # Ajoute ce retour True vital pour que la condition de survie soit validée
             return True

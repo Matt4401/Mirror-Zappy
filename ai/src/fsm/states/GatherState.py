@@ -4,6 +4,8 @@ from .EvolveState import EvolveState
 
 class GatherState(AState):
     def execute(self):
+        pass
+        """"
         self.trantorian.logger.info("===========Entering Gather state===========")
         next_level = self.trantorian.player_state.level + 1
         needed_dict = self.trantorian.get_missing_resources_for(next_level)
@@ -38,3 +40,4 @@ class GatherState(AState):
             self.trantorian.take_object(stone)
             self.trantorian.refresh_inventory()
             self.trantorian.look()
+            """

@@ -20,19 +20,18 @@ class FollowerState(AState):
                 stone_list = clean_instruction.split(" ")
                 if self.trantorian.traveling_stone is None:
                     stone = random.choice(stone_list)
-                    tile_index = self.trantorian.player_state.vision.get_tile_index_of(stone)
+                    tile_index = self.trantorian.player_state.vision.get_tile_index_of(
+                        stone
+                    )
                     if tile_index is not None:
                         self.trantorian.move_to_tile(tile_index)
                         self.trantorian.take_object(stone)
                         self.trantorian.refresh_inventory()
                     return
-                if (direction == 0 or direction == 3 or direction == 4 or direction == 5 or direction == 6 or direction == 7) and self.trantorian.traveling_stone:
-                    self.trantorian.set_object_down(self.trantorian.traveling_stone)
-                    self.trantorian.traveling_stone = None
                 else:
                     self.trantorian.move_one_step_toward(direction)
                 return
-            if "join" in instruction:
+            if "join" in instruction:  # check level bb, batarc
                 if direction == 0:
                     self.trantorian.logger.info("[Follower]: On leader emplacement")
                     msg = self.trantorian.broadcast_manager.create_message(
@@ -44,4 +43,3 @@ class FollowerState(AState):
                         f"[Follower]: To leader emplacement (direction {direction})"
                     )
                     self.trantorian.move_one_step_toward(direction)
-

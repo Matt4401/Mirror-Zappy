@@ -1,11 +1,14 @@
 from ..AState import AState
 
+
 class LeaderState(AState):
     def execute(self):
         self.trantorian.logger.info("===========Entering Leader state===========")
 
         target_level = self.trantorian.player_state.level + 1
-        missing_resources = self.trantorian.get_missing_resources_for_list(target_level)
+        missing_resources = self.trantorian.get_missing_resources_for_list(
+            target_level
+        )  # verifier sur la case et non ds l'inventaire
 
         if missing_resources:
             for stone in missing_resources:
@@ -26,7 +29,9 @@ class LeaderState(AState):
             self.trantorian.logger.info("[Leader]: Broadcast send to require resources")
         else:
             self.trantorian.logger.info("[Leader]: Get all resources!")
-            if self.trantorian.has_enough_resources_for(target_level):
+            if self.trantorian.has_enough_resources_for(
+                target_level
+            ):  # ressource + joueur ^m au level
                 self.trantorian.logger.info("[Leader]: Start Evolution")
                 self.fsm.transition_to(EvolveState)
             else:
