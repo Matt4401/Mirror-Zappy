@@ -16,6 +16,7 @@
 
 #include "Color.hpp"
 #include "TileManager.hpp"
+#include "events/EventDispatcher.hpp"
 #include "graphics/scene/Tile3D.hpp"
 #include "gui/src/game/Player.hpp"
 #include "gui/src/game/Team.hpp"
@@ -38,7 +39,8 @@ class PlayerManager {
         raylib::Color::Purple(), raylib::Color::Orange(), raylib::Color::SkyBlue(), raylib::Color::Pink(),
     };
 
-    explicit PlayerManager(TileManager& tileManager) : _tileManager(tileManager) {}
+    explicit PlayerManager(TileManager& tileManager, events::EventDispatcher& dispatcher)
+        : _tileManager(tileManager), _dispatcher(dispatcher) {}
     ~PlayerManager() = default;
     PlayerManager(const PlayerManager& other) = delete;
     PlayerManager& operator=(const PlayerManager& other) = delete;
@@ -65,7 +67,11 @@ class PlayerManager {
     void handleEggRemoved(const shared::protocol::server::Edi& command);
     void handleExpulsionAnimation(const shared::protocol::server::Pex& /*command*/) {}  // TODO
     void handleBroadcastAnimation(const shared::protocol::server::Pbc& /*command*/) {}  // TODO
-    void handleEggDropAnimation(const shared::protocol::server::Pfk& /*command*/) {}    // TODO
+    void handleEggDropAnimation(const shared::protocol::server::Pfk& command) {
+        if (auto player = playerById(command.playerId); player.has_value()) {
+            player->get().setAction(game::Player::Action::FORK);
+        }
+    }
 
     void movePlayers(int serverFrequency, float deltaTime);
 
@@ -89,6 +95,7 @@ class PlayerManager {
                                             raylib::rmath::Vector3& exitPosition) const;
 
     TileManager& _tileManager;
+    std::reference_wrapper<events::EventDispatcher> _dispatcher;
     std::vector<game::Team> _teams;
     std::vector<Incantation> _activeIncantations;
     std::vector<InitialEgg> _initialEggs;
