@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <optional>
+#include <set>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -33,6 +34,7 @@ class AudioManager {
     static constexpr auto SoundPlayerForkAnimPath = "assets/audio/Fork-animation.mp3";
     static constexpr auto SoundPlayerEjectPath = "assets/audio/minecraft-sword-swing.mp3";
     static constexpr auto SoundPlayerConnectedPath = "assets/audio/orb.mp3";
+    static constexpr auto SoundButtonClickPath = "assets/audio/minecraft_click.mp3";
 
     static constexpr float MaxSpatialVolume = 0.3F;
     static constexpr float MinSpatialVolume = 0.0F;
@@ -73,7 +75,7 @@ class AudioManager {
     void setSoundVolume(float volume);
 
     void loadSound(std::string_view id, const std::string& path, float volume = DefaultMusicVolume,
-                   float actionTicks = 0.0F);
+                   float actionTicks = 0.0F, bool scaleWithServerFrequency = true);
     void playSound(std::string_view id);
     void playSoundAt(std::string_view id, const raylib::rmath::Vector3& position);
     void stopSound(std::string_view id);
@@ -99,6 +101,7 @@ class AudioManager {
     std::unique_ptr<raylib::raudio::Music> _backgroundMusic;
     std::unordered_map<std::string, raylib::raudio::Sound> _sounds;
     std::unordered_map<std::string, float> _soundActionTicks;
+    std::set<std::string> _fixedPitchSounds;
     std::vector<ActiveSound> _activeSounds;
     raylib::rmath::Vector3 _listenerPosition{0.0F, 0.0F, 0.0F};
     raylib::rmath::Vector3 _listenerForward{0.0F, 0.0F, 1.0F};

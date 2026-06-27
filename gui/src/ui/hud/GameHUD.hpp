@@ -31,7 +31,7 @@ class GameHUD {
   public:
     GameHUD(events::EventDispatcher& dispatcher, AudioManager& audioManager,
             const std::shared_ptr<raylib::rtext::Font>& font, raylib::rcore::Camera& camera);
-    ~GameHUD() = default;
+    ~GameHUD();
 
     GameHUD(const GameHUD& other) = delete;
     GameHUD& operator=(const GameHUD& other) = delete;

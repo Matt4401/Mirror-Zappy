@@ -31,6 +31,7 @@ AudioManager::AudioManager() {
         loadSound("eject", SoundPlayerEjectPath, DefaultMusicVolume);
         loadSound("connected", SoundPlayerConnectedPath, DefaultMusicVolume, DefaultTicks);
         loadSound("fork_anim", SoundPlayerForkAnimPath, DefaultMusicVolume, ForkActionTicks);
+        loadSound("button_click", SoundButtonClickPath, DefaultMusicVolume, DefaultTicks, false);
         playMusic();
     }
 }
@@ -49,6 +50,7 @@ void AudioManager::closeAudioDevice() {
     _activeSounds.clear();
     _sounds.clear();
     _soundActionTicks.clear();
+    _fixedPitchSounds.clear();
     _backgroundMusic.reset();
     if (_ownsAudioDevice && raylib::raudio::Music::isAudioDeviceReady()) {
         raylib::raudio::Music::closeAudioDevice();
@@ -116,7 +118,7 @@ void AudioManager::setSoundVolume(const float volume) {
 }
 
 void AudioManager::loadSound(const std::string_view id, const std::string& path, const float volume,
-                             const float actionTicks) {
+                             const float actionTicks, const bool scaleWithServerFrequency) {
     if (!_audioReady) {
         return;
     }
@@ -127,6 +129,11 @@ void AudioManager::loadSound(const std::string_view id, const std::string& path,
         _soundActionTicks[key] = actionTicks;
     } else {
         _soundActionTicks.erase(key);
+    }
+    if (scaleWithServerFrequency) {
+        _fixedPitchSounds.erase(key);
+    } else {
+        _fixedPitchSounds.insert(key);
     }
 }
 
@@ -214,7 +221,11 @@ float AudioManager::frequencyPitch() const {
 }
 
 float AudioManager::playbackPitch(const std::string_view id, const raylib::raudio::Sound& sound) const {
-    const auto ticks = _soundActionTicks.find(std::string{id});
+    const std::string key{id};
+    if (_fixedPitchSounds.contains(key)) {
+        return NormalSoundPitch;
+    }
+    const auto ticks = _soundActionTicks.find(key);
     if (ticks == _soundActionTicks.end()) {
         return frequencyPitch();
     }

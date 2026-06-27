@@ -14,6 +14,7 @@
 #include "AudioManager.hpp"
 #include "EventDispatcher.hpp"
 #include "UIManager.hpp"
+#include "components/UIButton.hpp"
 #include "components/UICompass.hpp"
 #include "components/UIGridManager.hpp"
 #include "events/GuiEvents.hpp"
@@ -47,6 +48,9 @@ GameHUD::GameHUD(events::EventDispatcher& dispatcher, AudioManager& audioManager
                                                             makeSendCommand(_dispatcher.get()))),
       _eventLog(std::make_shared<menus::EventLogUI>(0.0F, 0.0F, 400.0F, 300.0F, _dispatcher.get(), _font)),
       _globalStats(std::make_shared<menus::GlobalStatsUI>(0.0F, 0.0F, 400.0F, 300.0F, _dispatcher.get(), _font)) {
+    auto* const audio = &audioManager;
+    components::UIButton::setClickSoundHandler([audio]() { audio->playSound("button_click"); });
+
     _gridManager->addPanel(_playerInspector, 52, 16, 10, 15);
 
     _gridManager->addPanel(_tileInspector, 52, 3, 10, 12);
@@ -57,6 +61,8 @@ GameHUD::GameHUD(events::EventDispatcher& dispatcher, AudioManager& audioManager
 
     _gridManager->addPanel(_globalStats, 2, 2, 12, 13);
 }
+
+GameHUD::~GameHUD() { components::UIButton::setClickSoundHandler(nullptr); }
 
 void GameHUD::registerToUIManager(UIManager& uiManager) {
     uiManager.addComponent(_compass);
