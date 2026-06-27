@@ -7,6 +7,8 @@
 
 #include "GameModel.hpp"
 
+#include <raylib.h>
+
 #include <cmath>
 #include <cstddef>
 #include <memory>
@@ -34,6 +36,8 @@ GameModel::GameModel(raylib::rcore::Camera& camera)
             _playerModel.model().materials[materialIndex].maps[0].texture, false);
     }
 
+    if (_playerModel.model().materials != nullptr) {
+        std::span<::Material> materials(_playerModel.model().materials, _playerModel.model().materialCount);
         for (auto& material : materials) {
             material.shader = _alphaDiscardShader.shader();
         }
@@ -87,9 +91,9 @@ void GameModel::drawPlayer(raylib::rmath::Vector3 position, float rotationAngle,
     // NOLINTNEXTLINE (cppcoreguidelines-pro-bounds-pointer-arithmetic)
     const int materialIndex = _playerModel.model().meshMaterial[0];
     if (texture && texture->valid()) {
-        _playerModel.setMaterialTexture(materialIndex, 0 /*MATERIAL_MAP_ALBEDO*/, *texture);
+        _playerModel.setMaterialTexture(materialIndex, MATERIAL_MAP_ALBEDO, *texture);
     } else if (_defaultPlayerTexture && _defaultPlayerTexture->valid()) {
-        _playerModel.setMaterialTexture(materialIndex, 0 /*MATERIAL_MAP_ALBEDO*/, *_defaultPlayerTexture);
+        _playerModel.setMaterialTexture(materialIndex, MATERIAL_MAP_ALBEDO, *_defaultPlayerTexture);
     }
 
     _playerModel.drawModelEx(position, {0.0F, 1.0F, 0.0F}, rotationAngle, PLAYER_SCALE, raylib::Color::White());
