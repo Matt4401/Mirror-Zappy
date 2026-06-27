@@ -176,6 +176,22 @@ TEST_F(WorldManagerTest, PlayerLeavesTheMapBeforeWrappingToTheOppositeEdge) {
     EXPECT_FALSE(requirePlayer(42).moving());
 }
 
+TEST_F(WorldManagerTest, PlayerCompletesPendingWrapBeforeHandlingNextServerPosition) {
+    static constexpr float TestDeltaTime = 0.01F;
+    createPlayer(42, 0, 1);
+
+    dispatcher.dispatch(shared::protocol::server::Ppo{.playerId = 42, .x = 3, .y = 1, .orientation = 4});
+    world.movePlayers(TestDeltaTime);
+    ASSERT_LT(requirePlayer(42).position().x(), requireTile(0, 1).position().x());
+
+    dispatcher.dispatch(shared::protocol::server::Ppo{.playerId = 42, .x = 2, .y = 1, .orientation = 4});
+
+    EXPECT_EQ(requirePlayer(42).tilePosition(), (Tile3DPosition{.x = 2, .y = 1}));
+    EXPECT_GT(requirePlayer(42).position().x(), requireTile(2, 1).position().x());
+    EXPECT_FLOAT_EQ(requirePlayer(42).futurePosition().x(), requireTile(2, 1).position().x());
+    EXPECT_FLOAT_EQ(requirePlayer(42).futurePosition().z(), requireTile(2, 1).position().z());
+}
+
 TEST_F(WorldManagerTest, PlayerNameCanBeUpdatedByGuiEvent) {
     createPlayer();
 

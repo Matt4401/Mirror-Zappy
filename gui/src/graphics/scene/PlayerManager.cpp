@@ -254,6 +254,8 @@ std::optional<std::reference_wrapper<game::Team>> PlayerManager::teamForPlayer(c
 }
 
 void PlayerManager::updatePlayerPosition(game::Player& player, const Tile3DPosition tilePosition) const {
+    player.completePendingWrap();
+
     auto destination = _tileManager.tilePosition(tilePosition);
     destination.setY(Tile3D::TILE_SIZE * DefaultPlayerOffsetY);
 
