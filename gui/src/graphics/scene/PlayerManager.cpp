@@ -21,6 +21,7 @@
 #include "Color.hpp"
 #include "Tile3D.hpp"
 #include "TileManager.hpp"
+#include "events/GuiEvents.hpp"
 #include "gui/src/game/Player.hpp"
 #include "gui/src/game/Team.hpp"
 #include "protocol/Commands.hpp"
@@ -42,6 +43,7 @@ void PlayerManager::handlePlayerConnected(const shared::protocol::server::Pnw& c
     auto& player = ensureTeamExist(command.teamName)
                        .addPlayer(command.playerId, position, orientationFromProtocol(command.orientation),
                                   static_cast<std::size_t>(std::max(command.level, 1)));
+    _dispatcher.get().dispatch(events::PlayerNameChanged{.playerId = command.playerId, .newName = player.name()});
     player.setPosition(position);
     player.setTilePosition(tilePosition);
     player.setOrientation(orientationFromProtocol(command.orientation));

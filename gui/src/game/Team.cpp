@@ -19,6 +19,7 @@
 #include "Egg.hpp"
 #include "GameModel.hpp"
 #include "Player.hpp"
+#include "game/NameGenerator.hpp"
 #include "graphics/AssetManager.hpp"
 #include "rmath/Vector3.hpp"
 #include "rtextures/Texture2D.hpp"
@@ -43,7 +44,7 @@ Player& Team::addPlayer(int id, raylib::rmath::Vector3 position, Player::cardina
     if (const auto existing = findPlayer(id); existing.has_value()) {
         return existing->get();
     }
-    _players.emplace_back(id, position, _name + std::to_string(id), orientation, level);
+    _players.emplace_back(id, position, NameGenerator::getInstance().getRandomName(), orientation, level);
     return _players.back();
 }
 
