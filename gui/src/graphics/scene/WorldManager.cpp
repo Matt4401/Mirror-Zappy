@@ -19,7 +19,7 @@
 namespace zappy::gui::graphics::scene {
 WorldManager::WorldManager(events::EventDispatcher& dispatcher, AudioManager& audioManager)
     : _dispatcher(dispatcher), _audioManager(audioManager), _tileManager(std::make_unique<TileManager>()) {
-    _playerManager = std::make_unique<PlayerManager>(*_tileManager, _audioManager.get());
+    _playerManager = std::make_unique<PlayerManager>(*_tileManager, _dispatcher.get(), _audioManager.get());
     initMapSubscriptions();
     initPlayerSubscriptions();
     initResourceSubscriptions();
@@ -51,6 +51,7 @@ void WorldManager::initResourceSubscriptions() {
 
 void WorldManager::initEggSubscriptions() {
     registerHandler(_playerManager.get(), &PlayerManager::handleEggLaid);
+    registerHandler(_playerManager.get(), &PlayerManager::handleEggDropAnimation);
     subscribe<shared::protocol::server::Ebo>(
         [this](const shared::protocol::server::Ebo& command) { _playerManager->handleEggRemoved(command); });
     subscribe<shared::protocol::server::Edi>(

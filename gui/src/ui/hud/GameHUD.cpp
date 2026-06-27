@@ -11,6 +11,7 @@
 #include <memory>
 #include <string>
 
+#include "AudioManager.hpp"
 #include "EventDispatcher.hpp"
 #include "UIManager.hpp"
 #include "components/UICompass.hpp"
@@ -31,13 +32,13 @@ std::function<void(const std::string&)> GameHUD::makeSendCommand(events::EventDi
     return [&dispatcher](const std::string& cmd) { dispatcher.dispatch(events::SendCommand{cmd}); };
 }
 
-GameHUD::GameHUD(events::EventDispatcher& dispatcher, const std::shared_ptr<raylib::rtext::Font>& font,
-                 raylib::rcore::Camera& camera)
+GameHUD::GameHUD(events::EventDispatcher& dispatcher, AudioManager& audioManager,
+                 const std::shared_ptr<raylib::rtext::Font>& font, raylib::rcore::Camera& camera)
     : _dispatcher(dispatcher),
       _font(font),
       _gridManager(std::make_shared<components::UIGridManager>()),
       _compass(std::make_shared<components::UICompass>(0.0F, 0.0F, 0.0F, 0.0F, camera, _font)),
-      _pauseMenu(std::make_shared<menus::PauseMenu>(_dispatcher.get(), _font)),
+      _pauseMenu(std::make_shared<menus::PauseMenu>(_dispatcher.get(), audioManager, _font)),
       _playerInspector(std::make_shared<menus::PlayerInspectorUI>(0.0F, 0.0F, 300.0F, _dispatcher.get(), _font,
                                                                   makeSendCommand(_dispatcher.get()))),
       _tileInspector(std::make_shared<menus::TileInspectorUI>(0.0F, 0.0F, 300.0F, _dispatcher.get(), _font,

@@ -30,11 +30,12 @@ class AudioManager {
     static constexpr auto SoundDropItemPath = "assets/audio/minecraft-drop-block-sound-effect.mp3";
     static constexpr auto SoundPlayerDeathPath = "assets/audio/villager-death.mp3";
     static constexpr auto SoundPlayerForkPath = "assets/audio/fork-vilager.mp3";
+    static constexpr auto SoundPlayerForkAnimPath = "assets/audio/Fork-animation.mp3";
     static constexpr auto SoundPlayerEjectPath = "assets/audio/minecraft-sword-swing.mp3";
-    static constexpr auto SoundPlayerConnectedPath = "assets/audio/Player-connected(Guerrier - Doigby).mp3";
+    static constexpr auto SoundPlayerConnectedPath = "assets/audio/orb.mp3";
 
+    static constexpr float MaxSpatialVolume = 0.3F;
     static constexpr float MinSpatialVolume = 0.0F;
-    static constexpr float MaxSpatialVolume = 0.15F;
     static constexpr float SpatialFullVolumeDistance = 3.0F;
     static constexpr float SpatialMaxDistance = 35.0F;
     static constexpr float SpatialPanDistance = 18.0F;
@@ -61,12 +62,15 @@ class AudioManager {
 
     [[nodiscard]] bool ready() const { return _audioReady; }
     [[nodiscard]] bool hasSound(std::string_view id) const;
+    [[nodiscard]] float musicVolume() const { return _musicVolume; }
+    [[nodiscard]] float soundVolume() const { return _soundVolume; }
 
     void update();
     void loadMusic(const std::string& path, float volume = DefaultMusicVolume, bool looping = true);
     void playMusic() const;
     void stopMusic() const;
-    void setMusicVolume(float volume) const;
+    void setMusicVolume(float volume);
+    void setSoundVolume(float volume);
 
     void loadSound(std::string_view id, const std::string& path, float volume = DefaultMusicVolume,
                    float actionTicks = 0.0F);
@@ -99,5 +103,7 @@ class AudioManager {
     raylib::rmath::Vector3 _listenerPosition{0.0F, 0.0F, 0.0F};
     raylib::rmath::Vector3 _listenerForward{0.0F, 0.0F, 1.0F};
     int _serverFrequency{DefaultServerFrequency};
+    float _musicVolume{DefaultMusicVolume};
+    float _soundVolume{DefaultMusicVolume};
 };
 }  // namespace zappy::gui

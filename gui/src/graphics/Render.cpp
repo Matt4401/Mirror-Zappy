@@ -34,7 +34,7 @@ Render::Render(events::EventDispatcher& dispatcher, AudioManager& audioManager)
 
     AssetManager::getInstance().loadFont(DefaultFontName, "assets/fonts/Minecraft.ttf");
 
-    _gameHUD = std::make_shared<ui::hud::GameHUD>(_dispatcher.get(),
+    _gameHUD = std::make_shared<ui::hud::GameHUD>(_dispatcher.get(), _audioManager.get(),
                                                   AssetManager::getInstance().getFont(DefaultFontName), _camera);
     _gameHUD->registerToUIManager(_uiManager);
 

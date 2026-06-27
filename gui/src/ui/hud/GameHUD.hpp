@@ -11,6 +11,7 @@
 #include <memory>
 #include <string>
 
+#include "AudioManager.hpp"
 #include "events/EventDispatcher.hpp"
 #include "rcore/Camera.hpp"
 #include "rtext/Font.hpp"
@@ -28,7 +29,8 @@ namespace zappy::gui::ui::hud {
 
 class GameHUD {
   public:
-    GameHUD(events::EventDispatcher& dispatcher, const std::shared_ptr<raylib::rtext::Font>& font,
+    GameHUD(events::EventDispatcher& dispatcher, AudioManager& audioManager,
+            const std::shared_ptr<raylib::rtext::Font>& font,
             raylib::rcore::Camera& camera);
     ~GameHUD() = default;
 

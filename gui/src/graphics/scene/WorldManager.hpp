@@ -58,8 +58,8 @@ class WorldManager {
     void handleTimeUnit(const shared::protocol::server::Sst& command);
     void handleGameEnd(const shared::protocol::server::Seg& command);
     void handleServerMessage(const shared::protocol::server::Smg& command);
-    void handleUnknownCommand(const shared::protocol::ServerCommand& command) {}  // TODO
-    void handleWrongParam(const shared::protocol::server::Sbp& command) {}        // TODO
+    void handleUnknownCommand(const shared::protocol::ServerCommand& /*command*/) {}  // TODO
+    void handleWrongParam(const shared::protocol::server::Sbp& /*command*/) {}        // TODO
 
     void initMapSubscriptions();
     void initPlayerSubscriptions();

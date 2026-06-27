@@ -27,9 +27,10 @@ AudioManager::AudioManager() {
         loadSound("incantation", SoundIncantationPath, DefaultMusicVolume, IncantationActionTicks);
         loadSound("item", SoundDropItemPath, DefaultMusicVolume, DefaultTicks);
         loadSound("death", SoundPlayerDeathPath, DefaultMusicVolume);
-        loadSound("fork", SoundPlayerForkPath, DefaultMusicVolume, ForkActionTicks);
+        loadSound("fork", SoundPlayerForkPath, DefaultMusicVolume, DefaultTicks);
         loadSound("eject", SoundPlayerEjectPath, DefaultMusicVolume);
-        loadSound("connected", SoundPlayerConnectedPath, DefaultMusicVolume, ForkActionTicks);
+        loadSound("connected", SoundPlayerConnectedPath, DefaultMusicVolume, DefaultTicks);
+        loadSound("fork_anim", SoundPlayerForkAnimPath, DefaultMusicVolume, ForkActionTicks);
         playMusic();
     }
 }
@@ -79,7 +80,8 @@ void AudioManager::loadMusic(const std::string& path, const float volume, const 
     if (!_audioReady) {
         return;
     }
-    _backgroundMusic = std::make_unique<raylib::raudio::Music>(path, volume);
+    _musicVolume = std::clamp(volume, 0.0F, 1.0F);
+    _backgroundMusic = std::make_unique<raylib::raudio::Music>(path, _musicVolume);
     _backgroundMusic->setLooping(looping);
 }
 
@@ -95,9 +97,21 @@ void AudioManager::stopMusic() const {
     }
 }
 
-void AudioManager::setMusicVolume(const float volume) const {
+void AudioManager::setMusicVolume(const float volume) {
+    _musicVolume = std::clamp(volume, 0.0F, 1.0F);
     if (_backgroundMusic && _backgroundMusic->valid()) {
-        _backgroundMusic->setVolume(volume);
+        _backgroundMusic->setVolume(_musicVolume);
+    }
+}
+
+void AudioManager::setSoundVolume(const float volume) {
+    _soundVolume = std::clamp(volume, 0.0F, 1.0F);
+    for (auto& activeSound : _activeSounds) {
+        if (activeSound.position.has_value()) {
+            activeSound.sound.setVolume(spatialVolume(activeSound.position.value()));
+        } else {
+            activeSound.sound.setVolume(_soundVolume);
+        }
     }
 }
 
@@ -120,6 +134,7 @@ void AudioManager::playSound(const std::string_view id) {
     if (const auto sound = _sounds.find(std::string{id}); sound != _sounds.end() && sound->second.valid()) {
         auto& activeSound =
             _activeSounds.emplace_back(std::string{id}, raylib::raudio::Sound::aliasFrom(sound->second));
+        activeSound.sound.setVolume(_soundVolume);
         activeSound.sound.setPitch(playbackPitch(id, sound->second));
         activeSound.sound.play();
     }
@@ -164,14 +179,14 @@ void AudioManager::setServerFrequency(const int frequency) {
 float AudioManager::spatialVolume(const raylib::rmath::Vector3& position) const {
     const auto distance = _listenerPosition.distance(position);
     if (distance <= SpatialFullVolumeDistance) {
-        return MaxSpatialVolume;
+        return _soundVolume * MaxSpatialVolume;
     }
     if (distance >= SpatialMaxDistance) {
-        return MinSpatialVolume;
+        return _soundVolume * MinSpatialVolume;
     }
     const auto range = SpatialMaxDistance - SpatialFullVolumeDistance;
     const auto amount = (distance - SpatialFullVolumeDistance) / range;
-    return MaxSpatialVolume - ((MaxSpatialVolume - MinSpatialVolume) * amount * amount);
+    return _soundVolume * (MaxSpatialVolume - ((MaxSpatialVolume - MinSpatialVolume) * amount * amount));
 }
 
 float AudioManager::spatialPan(const raylib::rmath::Vector3& position) const {

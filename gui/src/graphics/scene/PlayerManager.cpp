@@ -13,7 +13,6 @@
 #include <array>
 #include <cmath>
 #include <cstddef>
-#include <cstdint>
 #include <functional>
 #include <optional>
 #include <string>
@@ -22,6 +21,7 @@
 #include "Color.hpp"
 #include "Tile3D.hpp"
 #include "TileManager.hpp"
+#include "events/GuiEvents.hpp"
 #include "gui/src/game/Player.hpp"
 #include "gui/src/game/Team.hpp"
 #include "protocol/Commands.hpp"
@@ -43,6 +43,7 @@ void PlayerManager::handlePlayerConnected(const shared::protocol::server::Pnw& c
     auto& player = ensureTeamExist(command.teamName)
                        .addPlayer(command.playerId, position, orientationFromProtocol(command.orientation),
                                   static_cast<std::size_t>(std::max(command.level, 1)));
+    _dispatcher.get().dispatch(events::PlayerNameChanged{.playerId = command.playerId, .newName = player.name()});
     player.setPosition(position);
     player.setTilePosition(tilePosition);
     player.setOrientation(orientationFromProtocol(command.orientation));
@@ -111,6 +112,12 @@ void PlayerManager::handleIncantationStart(const shared::protocol::server::Pic& 
     } else {
         *incantation = next;
     }
+
+    for (const auto playerId : command.playerIds) {
+        if (const auto player = playerById(static_cast<int>(playerId)); player.has_value()) {
+            player->get().setAction(game::Player::Action::INCANTATION);
+        }
+    }
 }
 
 void PlayerManager::handleIncantationEnd(const shared::protocol::server::Pie& command) {
@@ -121,12 +128,17 @@ void PlayerManager::handleIncantationEnd(const shared::protocol::server::Pie& co
         return;
     }
     if (command.incantationResult) {
-        for (const uint8_t playerId : incantation->playerIds) {
-            if (const auto player = playerById(playerId); player.has_value()) {
+        for (const auto playerId : incantation->playerIds) {
+            if (const auto player = playerById(static_cast<int>(playerId)); player.has_value()) {
                 const auto nextLevel = static_cast<std::size_t>(incantation->level) + 1U;
                 player->get().setLevel(std::max(player->get().level(), nextLevel));
                 _audioManager.get().playSoundAt("levelup", player->get().position());
             }
+        }
+    }
+    for (const auto playerId : incantation->playerIds) {
+        if (const auto player = playerById(static_cast<int>(playerId)); player.has_value()) {
+            player->get().setAction(game::Player::Action::IDLE);
         }
     }
     _activeIncantations.erase(incantation);
@@ -188,6 +200,9 @@ void PlayerManager::handleEggLaid(const shared::protocol::server::Enw& command) 
     if (const auto team = teamForPlayer(command.playerId); team.has_value()) {
         team->get().addEgg(command.eggId, command.playerId, position);
         _audioManager.get().playSoundAt("fork", position);
+    }
+    if (const auto player = playerById(command.playerId); player.has_value()) {
+        player->get().setAction(game::Player::Action::IDLE);
     }
 }
 
