@@ -24,7 +24,7 @@ class LeaderState(AState):
                 self.trantorian.logger.info("[Leader]: Start Evolution")
                 self.transition_to(
                     EvolveState()
-                )  # ça ne marche pas car c'est ds fsm...
+                )
             else:
                 msg = self.trantorian.broadcast_manager.create_message(
                     self.trantorian.status, "join"

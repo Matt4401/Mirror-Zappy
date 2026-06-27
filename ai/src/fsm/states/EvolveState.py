@@ -24,4 +24,5 @@ class EvolveState(AState):
                 self.trantorian.player_state.upgrade_level()
                 self.trantorian.player_state.vision.current_level += 1
                 self.trantorian.refresh_inventory()
-                # on devrait rajouter ici meme la récupération des pierres
+                #for stone in resource:
+                 #   self.trantorian.take_object(stone)

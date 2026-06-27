@@ -28,6 +28,7 @@ class FiniteStateMachine:
         while True:
             meta_cmds = self.tick_manager.tick_update()
             self.send_auto_cmds(meta_cmds)
+            self.process_server_events()
             self.process_broadcasts()
             self.process_pending_commands()
             self.eat_current_tile_food()
@@ -53,6 +54,7 @@ class FiniteStateMachine:
         if not hasattr(self.trantorian, "broadcast_manager"):
             return
         # ici rajouter une methode qui va checker si on a le leader le plus récent (plus petit id) en fct, si oui, envoyer un broadcast dans la direction, si non passer en follower
+        # puis traiter que les leaders
         broadcasts = self.trantorian.connection.get_broadcasts()
         for broadcast in broadcasts:
             decoded = self.trantorian.broadcast_manager.read_broadcast(
@@ -116,13 +118,14 @@ class FiniteStateMachine:
                 cmd_id = self.trantorian.send_command.look()
                 self.pending_commands[cmd_id] = "look"
 
-            elif cmd is None and hasattr(self.trantorian, "broadcast_manager"):
+            """elif cmd is None and hasattr(self.trantorian, "broadcast_manager"):
                 self.trantorian.logger.info("[FSM]: Auto command Broadcast call")
                 msg = self.trantorian.broadcast_manager.create_message(
                     self.trantorian.status, "Commande de rassemblement"
                 )  # ceci est un exemple
                 cmd_id = self.trantorian.send_command.broadcast(msg)
                 self.pending_commands[cmd_id] = "broadcast"
+            """
 
     def update_state(self):
         food = self.trantorian.player_state.inventory.get_food()
@@ -139,7 +142,7 @@ class FiniteStateMachine:
             self.transition_to(HelpTeamMatesState)
             return
         if self.trantorian.have_layed != 1:
-            pass  # ici se mettre en mode ponte
+            self.transition_to(ReproduceState)
         if self.trantorian.status == "FOLLOWER":
             self.transition_to(FollowerState)
         if self.trantorian.status == "LEADER":
@@ -147,7 +150,7 @@ class FiniteStateMachine:
 
     def transition_to(self, state_class):
         if not isinstance(self.state, state_class):
-            self.state = state_class(self.trantorian)
+            self.state = state_class(self.trantorian, self)
 
     def execute_state(self):
         self.state.execute()

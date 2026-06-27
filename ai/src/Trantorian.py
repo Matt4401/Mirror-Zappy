@@ -29,6 +29,7 @@ class Trantorian:
         self.have_layed = 0
         self.leader_level = self.broadcast_manager.id
         self.status = "LEADER"
+        self.traveling_stone = None
 
     def wait_for_response(self, cmd_id, timeout=5.0):
         if cmd_id in (None, 84):
