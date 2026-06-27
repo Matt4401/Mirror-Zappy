@@ -16,15 +16,21 @@ class FollowerState(AState):
         if decoded:
             sender_id, instruction = decoded
             if "need" in instruction:
-                clean_instruction = instruction.replace("need ", "").strip()
+                clean_instruction = instruction.split("need ")[1].strip()
                 stone_list = clean_instruction.split(" ")
                 for stone in stone_list:
                     if (
                         self.trantorian.player_state.vision.get_tile_index_of(stone)
                         == 0
                     ):
-                        self.trantorian.take_object(stone)
-                        # self.trantorian.refresh_inventory()
+                        res = self.trantorian.take_object(stone)
+                        if res and res[0]:
+                            val = getattr(
+                                self.trantorian.player_state.inventory, stone, 0
+                            )
+                            setattr(
+                                self.trantorian.player_state.inventory, stone, val + 1
+                            )
                 has_needed_stone = False
                 for stone in stone_list:
                     if getattr(self.trantorian.player_state.inventory, stone, 0) > 0:
@@ -79,7 +85,7 @@ class FollowerState(AState):
                 return
             if "join" in instruction:
                 status, level, raw_instruction = instruction.split(" ")
-                if level != self.trantorian.player_state.level:
+                if int(level) != self.trantorian.player_state.level:
                     return
                 if direction == 0:
                     if self.fsm.tick_manager._should_broadcast():
