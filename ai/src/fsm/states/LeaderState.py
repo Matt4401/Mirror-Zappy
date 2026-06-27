@@ -14,8 +14,10 @@ class LeaderState(AState):
         if missing_resources:
             for stone in missing_resources:
                 if self.trantorian.player_state.vision.get_tile_index_of(stone) == 0:
-                    self.trantorian.take_object(stone)
-                    self.trantorian.refresh_inventory()
+                    res = self.trantorian.take_object(stone)
+                    if res and res[0]:
+                        val = getattr(self.trantorian.player_state.inventory, stone, 0)
+                        setattr(self.trantorian.player_state.inventory, stone, val + 1)
 
             self.trantorian.logger.info(
                 f"[Leader]: Missing resources : {missing_resources}"
@@ -27,12 +29,6 @@ class LeaderState(AState):
                 self.trantorian.status, f"need {resources_str}"
             )
             self.trantorian.send_command.broadcast(msg)
-            for i in range(3):
-                self.trantorian.turn_right()
-                msg = self.trantorian.broadcast_manager.create_message(
-                    self.trantorian.status, f"need {resources_str}"
-                )
-                self.trantorian.send_command.broadcast(msg)
 
             self.trantorian.logger.info("[Leader]: Broadcast send to require resources")
         else:
@@ -44,12 +40,6 @@ class LeaderState(AState):
                 self.fsm.transition_to(EvolveState)
             else:
                 if self.fsm.tick_manager._should_broadcast():
-                    msg = self.trantorian.broadcast_manager.create_message(
-                        self.trantorian.status, "join"
-                    )
-                    self.trantorian.send_command.broadcast(msg)
-                for i in range(3):
-                    self.trantorian.turn_right()
                     msg = self.trantorian.broadcast_manager.create_message(
                         self.trantorian.status, "join"
                     )
