@@ -56,6 +56,7 @@ class Render {
     void handleInput();
     void handleEscapeKey();
     void handleAltKey();
+    void updateCameraLimits();
 
     std::map<int, std::function<void()>> _keyHandlers;
     raylib::rcore::Window _window{WINDOW_NAME.c_str()};
@@ -77,5 +78,13 @@ class Render {
     static constexpr int LeftAltKey = 342;
     static constexpr int DefaultFps = 60;
     static constexpr std::string DefaultFontName = "Minecraft";
+    static constexpr float MinCameraHeight = 1.3F;
+
+    static constexpr float CameraPaddingMin = 50.0F;
+    static constexpr float CameraPaddingMax = 60.0F;
+    static constexpr float CameraHeightMin = 80.0F;
+    static constexpr float CameraHeightMax = 110.0F;
+    static constexpr float CameraPaddingFactor = 0.3F;
+    static constexpr float CameraHeightFactor = 0.6F;
 };
 }  // namespace zappy::gui::graphics
