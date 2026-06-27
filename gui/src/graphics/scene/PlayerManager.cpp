@@ -217,7 +217,7 @@ void PlayerManager::handleExpulsionAnimation(const shared::protocol::server::Pex
         return;
     }
     _audioManager.get().playSoundAt("eject", player->get().position());
-     // TODO Do something with the expulsion animation, like moving the player back a tile or something similar
+    // TODO Do something with the expulsion animation, like moving the player back a tile or something similar
 }
 
 std::optional<std::reference_wrapper<const game::Player>> PlayerManager::playerById(const int id) const {

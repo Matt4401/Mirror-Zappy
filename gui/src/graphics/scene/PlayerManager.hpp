@@ -14,6 +14,7 @@
 #include <string>
 #include <vector>
 
+#include "AudioManager.hpp"
 #include "Color.hpp"
 #include "TileManager.hpp"
 #include "events/EventDispatcher.hpp"
@@ -21,7 +22,6 @@
 #include "gui/src/game/Player.hpp"
 #include "gui/src/game/Team.hpp"
 #include "protocol/Commands.hpp"
-#include "AudioManager.hpp"
 #include "rmath/Vector3.hpp"
 
 namespace zappy::gui::graphics::scene {

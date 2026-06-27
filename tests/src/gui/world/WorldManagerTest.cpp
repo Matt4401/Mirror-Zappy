@@ -55,10 +55,10 @@ class WorldManagerTest : public testing::Test {
         return tile->get();
     }
 
-    events::EventDispatcher dispatcher;  // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes,
-                                         // misc-non-private-member-variables-in-classes)
-    AudioManager audioManager;           // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes,
-                                         // misc-non-private-member-variables-in-classes)
+    events::EventDispatcher dispatcher;            // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes,
+                                                   // misc-non-private-member-variables-in-classes)
+    AudioManager audioManager;                     // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes,
+                                                   // misc-non-private-member-variables-in-classes)
     WorldManager world{dispatcher, audioManager};  // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes,
                                                    // misc-non-private-member-variables-in-classes)
 };

@@ -26,7 +26,8 @@ class Sound {
     Sound(const Sound& other) = delete;
     Sound& operator=(const Sound& other) = delete;
 
-    Sound(Sound&& other) noexcept : _sound{std::exchange(other._sound, {})}, _alias{std::exchange(other._alias, false)} {}
+    Sound(Sound&& other) noexcept
+        : _sound{std::exchange(other._sound, {})}, _alias{std::exchange(other._alias, false)} {}
 
     Sound& operator=(Sound&& other) noexcept {
         if (this != &other) {

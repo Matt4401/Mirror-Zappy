@@ -31,16 +31,16 @@ PauseMenu::PauseMenu(events::EventDispatcher& dispatcher, AudioManager& audioMan
     int const screenWidth = raylib::rcore::Window::screenWidth();
     int const screenHeight = raylib::rcore::Window::screenHeight();
 
-    _backgroundPanel = std::make_unique<components::UIPanel>(
-        _backgroundX, _backgroundY, static_cast<float>(screenWidth), static_cast<float>(screenHeight),
-        raylib::Color(0, 0, 0, 180));
+    _backgroundPanel =
+        std::make_unique<components::UIPanel>(_backgroundX, _backgroundY, static_cast<float>(screenWidth),
+                                              static_cast<float>(screenHeight), raylib::Color(0, 0, 0, 180));
     _backgroundPanel->setRounded(false);
 
     float const startX = (static_cast<float>(screenWidth) - _panelWidth) / _halfRatio;
-    float const startY = (static_cast<float>(screenHeight) -
-                          ((_buttonHeight * static_cast<float>(_mainButtonCount)) +
-                           (_buttonSpacing * static_cast<float>(_mainButtonGapCount)))) /
-                         _halfRatio;
+    float const startY =
+        (static_cast<float>(screenHeight) - ((_buttonHeight * static_cast<float>(_mainButtonCount)) +
+                                             (_buttonSpacing * static_cast<float>(_mainButtonGapCount)))) /
+        _halfRatio;
     float const settingsX = (static_cast<float>(screenWidth) - _settingsPanelWidth) / _halfRatio;
     float const settingsY = (static_cast<float>(screenHeight) - _settingsPanelHeight) / _halfRatio;
 
@@ -69,14 +69,12 @@ PauseMenu::PauseMenu(events::EventDispatcher& dispatcher, AudioManager& audioMan
     _soundVolumeText->setFontSize(_settingsLabelFontSize);
     _soundVolumeText->setPosition(settingsX + _soundLabelOffsetX, settingsY + _soundLabelOffsetY);
 
-    _musicVolumeSlider = std::make_unique<components::UISlider>(settingsX + _settingsSliderOffsetX,
-                                                                settingsY + _musicSliderOffsetY, _sliderWidth,
-                                                                _sliderHeight, _volumeSliderMin, _volumeSliderMax,
-                                                                _audioManager.get().musicVolume());
-    _soundVolumeSlider = std::make_unique<components::UISlider>(settingsX + _settingsSliderOffsetX,
-                                                                settingsY + _soundSliderOffsetY, _sliderWidth,
-                                                                _sliderHeight, _volumeSliderMin, _volumeSliderMax,
-                                                                _audioManager.get().soundVolume());
+    _musicVolumeSlider = std::make_unique<components::UISlider>(
+        settingsX + _settingsSliderOffsetX, settingsY + _musicSliderOffsetY, _sliderWidth, _sliderHeight,
+        _volumeSliderMin, _volumeSliderMax, _audioManager.get().musicVolume());
+    _soundVolumeSlider = std::make_unique<components::UISlider>(
+        settingsX + _settingsSliderOffsetX, settingsY + _soundSliderOffsetY, _sliderWidth, _sliderHeight,
+        _volumeSliderMin, _volumeSliderMax, _audioManager.get().soundVolume());
     _settingsBackBtn = std::make_unique<components::UIButton>(
         settingsX + ((_settingsPanelWidth - _settingsBackButtonWidth) / _halfRatio),
         settingsY + _settingsBackButtonOffsetY, _settingsBackButtonWidth, _buttonHeight, "Back", font);

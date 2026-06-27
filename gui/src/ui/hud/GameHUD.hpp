@@ -30,8 +30,7 @@ namespace zappy::gui::ui::hud {
 class GameHUD {
   public:
     GameHUD(events::EventDispatcher& dispatcher, AudioManager& audioManager,
-            const std::shared_ptr<raylib::rtext::Font>& font,
-            raylib::rcore::Camera& camera);
+            const std::shared_ptr<raylib::rtext::Font>& font, raylib::rcore::Camera& camera);
     ~GameHUD() = default;
 
     GameHUD(const GameHUD& other) = delete;
