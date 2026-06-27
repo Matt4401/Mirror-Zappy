@@ -32,7 +32,7 @@ void SkinGenerator::loadSkinsFromFile(const std::string& path) {
     std::vector<double> weights;
     std::string line;
     while (std::getline(file, line)) {
-        if (line.empty() || line[0] == '#') {
+        if (line.empty() || line.at(0) == '#') {
             continue;
         }
 
@@ -60,7 +60,7 @@ std::string SkinGenerator::getRandomSkin() {
     }
     static std::random_device rd;
     static std::mt19937 gen(rd());
-    return _skins[_distribution(gen)];
+    return _skins.at(_distribution(gen));
 }
 
 }  // namespace zappy::gui::game
