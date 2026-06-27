@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <functional>
 #include <memory>
 #include <string>
@@ -42,6 +43,7 @@ class UITextbox : public IUIComponent {
 
     [[nodiscard]] std::string getText() const;
     void setText(const std::string& text);
+    void setMaxLength(std::size_t maxLength);
 
     void setOnSubmit(std::function<void(const std::string&)> callback);
 
@@ -56,6 +58,8 @@ class UITextbox : public IUIComponent {
 
     std::string _text;
     std::string _placeholder;
+    std::size_t _maxLength{0};
+    float _errorTimer{0.0F};
     bool _isFocused{false};
     bool _isHovered{false};
 
@@ -76,6 +80,7 @@ class UITextbox : public IUIComponent {
     static constexpr raylib::Color BackgroundColor{40, 40, 40, 255};
     static constexpr raylib::Color BorderNormalColor{100, 100, 100, 255};
     static constexpr raylib::Color BorderFocusedColor{150, 150, 255, 255};
+    static constexpr raylib::Color BorderErrorColor{255, 50, 50, 255};
     static constexpr raylib::Color TextColor{255, 255, 255, 255};
     static constexpr raylib::Color PlaceholderColor{120, 120, 120, 255};
 };

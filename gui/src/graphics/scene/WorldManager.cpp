@@ -45,6 +45,7 @@ void WorldManager::initResourceSubscriptions() {
 }
 
 void WorldManager::initEggSubscriptions() {
+    registerHandler(&_playerManager, &PlayerManager::handleEggDropAnimation);
     registerHandler(&_playerManager, &PlayerManager::handleEggLaid);
     subscribe<shared::protocol::server::Ebo>(
         [this](const shared::protocol::server::Ebo& command) { _playerManager.handleEggRemoved(command); });
