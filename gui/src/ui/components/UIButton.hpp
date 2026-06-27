@@ -41,6 +41,7 @@ class UIButton : public IUIComponent {
     [[nodiscard]] bool isHovered() const override { return _isHovered; }
 
     void setOnClick(std::function<void()> callback);
+    static void setClickSoundHandler(std::function<void()> callback);
     void setFontSize(float size);
     void setText(const std::string& text);
 
@@ -56,6 +57,8 @@ class UIButton : public IUIComponent {
     std::shared_ptr<raylib::rtext::Font> _fontRef;
     std::unique_ptr<UIText> _label;
     float _fontSize;
+
+    static std::function<void()> _clickSoundHandler;
 
     static constexpr int MouseLeftButton = 0;
     static constexpr float DefaultFontSize = 20.0F;

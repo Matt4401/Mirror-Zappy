@@ -197,6 +197,16 @@ void Player::setWrappedFuturePosition(const raylib::rmath::Vector3& exitPosition
     _isMoving = true;
 }
 
+void Player::completePendingWrap() {
+    if (!_wrappedPosition.has_value()) {
+        return;
+    }
+    _position = _wrappedPosition.value();
+    _futurePosition = _position;
+    _wrappedPosition.reset();
+    _isMoving = false;
+}
+
 void Player::setOrientation(const cardinalPoint orientation) {
     _orientation = orientation;
     _renderRotationAngle = angleForOrientation(orientation);

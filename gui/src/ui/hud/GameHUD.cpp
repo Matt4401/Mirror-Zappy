@@ -11,8 +11,10 @@
 #include <memory>
 #include <string>
 
+#include "AudioManager.hpp"
 #include "EventDispatcher.hpp"
 #include "UIManager.hpp"
+#include "components/UIButton.hpp"
 #include "components/UICompass.hpp"
 #include "components/UIGridManager.hpp"
 #include "events/GuiEvents.hpp"
@@ -31,13 +33,13 @@ std::function<void(const std::string&)> GameHUD::makeSendCommand(events::EventDi
     return [&dispatcher](const std::string& cmd) { dispatcher.dispatch(events::SendCommand{cmd}); };
 }
 
-GameHUD::GameHUD(events::EventDispatcher& dispatcher, const std::shared_ptr<raylib::rtext::Font>& font,
-                 raylib::rcore::Camera& camera)
+GameHUD::GameHUD(events::EventDispatcher& dispatcher, AudioManager& audioManager,
+                 const std::shared_ptr<raylib::rtext::Font>& font, raylib::rcore::Camera& camera)
     : _dispatcher(dispatcher),
       _font(font),
       _gridManager(std::make_shared<components::UIGridManager>()),
       _compass(std::make_shared<components::UICompass>(0.0F, 0.0F, 0.0F, 0.0F, camera, _font)),
-      _pauseMenu(std::make_shared<menus::PauseMenu>(_dispatcher.get(), _font)),
+      _pauseMenu(std::make_shared<menus::PauseMenu>(_dispatcher.get(), audioManager, _font)),
       _playerInspector(std::make_shared<menus::PlayerInspectorUI>(0.0F, 0.0F, 300.0F, _dispatcher.get(), _font,
                                                                   makeSendCommand(_dispatcher.get()))),
       _tileInspector(std::make_shared<menus::TileInspectorUI>(0.0F, 0.0F, 300.0F, _dispatcher.get(), _font,
@@ -46,6 +48,9 @@ GameHUD::GameHUD(events::EventDispatcher& dispatcher, const std::shared_ptr<rayl
                                                             makeSendCommand(_dispatcher.get()))),
       _eventLog(std::make_shared<menus::EventLogUI>(0.0F, 0.0F, 400.0F, 300.0F, _dispatcher.get(), _font)),
       _globalStats(std::make_shared<menus::GlobalStatsUI>(0.0F, 0.0F, 400.0F, 300.0F, _dispatcher.get(), _font)) {
+    auto* const audio = &audioManager;
+    components::UIButton::setClickSoundHandler([audio]() { audio->playSound("button_click"); });
+
     _gridManager->addPanel(_playerInspector, 52, 16, 10, 15);
 
     _gridManager->addPanel(_tileInspector, 52, 3, 10, 12);
@@ -56,6 +61,8 @@ GameHUD::GameHUD(events::EventDispatcher& dispatcher, const std::shared_ptr<rayl
 
     _gridManager->addPanel(_globalStats, 2, 2, 12, 13);
 }
+
+GameHUD::~GameHUD() { components::UIButton::setClickSoundHandler(nullptr); }
 
 void GameHUD::registerToUIManager(UIManager& uiManager) {
     uiManager.addComponent(_compass);

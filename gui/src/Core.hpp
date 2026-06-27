@@ -10,6 +10,7 @@
 #include <memory>
 #include <span>
 
+#include "AudioManager.hpp"
 #include "EventDispatcher.hpp"
 #include "Render.hpp"
 #include "network/Client.hpp"
@@ -29,11 +30,12 @@ class Core {
 
   private:
     void setup();
-    void loop() const;
+    void loop();
 
     std::span<char*> _args;
     parser::GuiConfig _config;
     events::EventDispatcher _dispatcher;
+    AudioManager _audioManager;
     std::unique_ptr<graphics::Render> _render;
     std::unique_ptr<network::Client> _client;
 };
