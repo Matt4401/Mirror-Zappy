@@ -62,6 +62,7 @@ class Player {
     void setFuturePosition(const raylib::rmath::Vector3& position);
     void setWrappedFuturePosition(const raylib::rmath::Vector3& exitPosition,
                                   const raylib::rmath::Vector3& wrappedPosition);
+    void completePendingWrap();
     [[nodiscard]] const raylib::rmath::Vector3& futurePosition() const { return _futurePosition; }
     void setTilePosition(graphics::scene::Tile3DPosition tilePosition);
     void setOrientation(cardinalPoint orientation);

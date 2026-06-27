@@ -13,6 +13,7 @@
 #include <memory>
 
 #include "AssetManager.hpp"
+#include "AudioManager.hpp"
 #include "FirstPerson.hpp"
 #include "events/EventDispatcher.hpp"
 #include "rcore/Camera.hpp"
@@ -24,17 +25,18 @@
 #include "ui/hud/GameHUD.hpp"
 
 namespace zappy::gui::graphics {
-Render::Render(events::EventDispatcher& dispatcher)
+Render::Render(events::EventDispatcher& dispatcher, AudioManager& audioManager)
     : _skybox(dispatcher),
       _dispatcher(dispatcher),
-      _worldManager(dispatcher),
+      _audioManager(audioManager),
+      _worldManager(dispatcher, audioManager),
       _map(_camera, _worldManager, dispatcher) {
     _window.setTargetFPS(DefaultFps);
     raylib::rcore::Window::setExitKey(0);
 
     AssetManager::getInstance().loadFont(DefaultFontName, "assets/fonts/Minecraft.ttf");
 
-    _gameHUD = std::make_shared<ui::hud::GameHUD>(_dispatcher.get(),
+    _gameHUD = std::make_shared<ui::hud::GameHUD>(_dispatcher.get(), _audioManager.get(),
                                                   AssetManager::getInstance().getFont(DefaultFontName), _camera);
     _gameHUD->registerToUIManager(_uiManager);
 
@@ -197,6 +199,7 @@ void Render::update() {
 
         updateCameraLimits();
     }
+    _audioManager.get().setListener(_camera.position(), _camera.target());
 
     if (_uiMode && (!_firstPerson || !_firstPerson->active())) {
         if (!_uiManager.isHovered()) {

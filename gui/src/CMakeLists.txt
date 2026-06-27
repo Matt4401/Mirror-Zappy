@@ -14,6 +14,22 @@ target_link_libraries(zappy_gui_assets PUBLIC
         zappy_gui_raylib
 )
 
+add_library(zappy_gui_audio
+        AudioManager.cpp
+)
+target_sources(zappy_gui_audio PUBLIC
+        FILE_SET HEADERS
+        BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
+        FILES AudioManager.hpp
+)
+target_include_directories(zappy_gui_audio PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_SOURCE_DIR}/gui/raylib
+)
+target_link_libraries(zappy_gui_audio PUBLIC
+        zappy_gui_raylib
+)
+
 add_subdirectory(game)
 add_subdirectory(events)
 add_subdirectory(graphics)
@@ -33,6 +49,7 @@ target_include_directories(zappy_gui_core PUBLIC
 )
 target_link_libraries(zappy_gui_core PUBLIC
         zappy_shared
+        zappy_gui_audio
         zappy_gui_raylib
         zappy_gui_graphics
         network
