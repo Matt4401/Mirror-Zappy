@@ -22,8 +22,8 @@ namespace zappy::gui::game {
 class GameModel {
   public:
     static constexpr raylib::rmath::Vector3 PLAYER_SCALE = {2.0F, 2.0F, 2.0F};
-    static constexpr auto PLAYER_MODEL_RESOURCE = "assets/models/player.gltf";
-    static constexpr auto EGG_MODEL_RESOURCE = "assets/minecraft_dragon_egg/scene.gltf";
+    static constexpr auto PLAYER_MODEL_RESOURCE = "assets/models/player/player.gltf";
+    static constexpr auto EGG_MODEL_RESOURCE = "assets/models/environment/minecraft_dragon_egg/scene.gltf";
     static constexpr auto EGG_SCALE = 0.6F;
     static constexpr auto EGG_TINT_STRENGTH = 0.75F;
     static constexpr auto ARMOR_SCALE = 2.1F;
@@ -47,13 +47,13 @@ class GameModel {
     std::shared_ptr<raylib::rtextures::Texture2D> _defaultPlayerTexture;
     mutable raylib::rmodels::Model _eggModel{EGG_MODEL_RESOURCE};
     mutable std::array<raylib::rmodels::Model, 7> _armorModels{
-        raylib::rmodels::Model{"assets/models/armor/leather.gltf"},
-        raylib::rmodels::Model{"assets/models/armor/chainmail.gltf"},
-        raylib::rmodels::Model{"assets/models/armor/copper.gltf"},
-        raylib::rmodels::Model{"assets/models/armor/iron.gltf"},
-        raylib::rmodels::Model{"assets/models/armor/gold.gltf"},
-        raylib::rmodels::Model{"assets/models/armor/diamond.gltf"},
-        raylib::rmodels::Model{"assets/models/armor/netherite.gltf"}};
+        raylib::rmodels::Model{"assets/models/player/armor/leather.gltf"},
+        raylib::rmodels::Model{"assets/models/player/armor/chainmail.gltf"},
+        raylib::rmodels::Model{"assets/models/player/armor/copper.gltf"},
+        raylib::rmodels::Model{"assets/models/player/armor/iron.gltf"},
+        raylib::rmodels::Model{"assets/models/player/armor/gold.gltf"},
+        raylib::rmodels::Model{"assets/models/player/armor/diamond.gltf"},
+        raylib::rmodels::Model{"assets/models/player/armor/netherite.gltf"}};
     raylib::rmodels::Shader _alphaDiscardShader;
 };
 }  // namespace zappy::gui::game
