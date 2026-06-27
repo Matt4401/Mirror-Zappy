@@ -13,6 +13,7 @@
 #include <cmath>
 #include <cstddef>
 #include <memory>
+#include <span>
 #include <string>
 
 #include "Color.hpp"
@@ -26,26 +27,25 @@
 namespace zappy::gui::game {
 GameModel::GameModel(raylib::rcore::Camera& camera)
     : _camera(camera), _alphaDiscardShader("", "assets/shaders/alpha_discard.fs") {
-    if (_playerModel.model().materials != nullptr &&
-        _playerModel.model().materials[0].maps !=  // NOLINT (cppcoreguidelines-pro-bounds-pointer-arithmetic)
-            nullptr) {
-        _defaultPlayerTexture = std::make_shared<raylib::rtextures::Texture2D>(
-            _playerModel  // NOLINT (cppcoreguidelines-pro-bounds-pointer-arithmetic)
-                .model()
-                .materials[0]
-                .maps[MATERIAL_MAP_ALBEDO]
-                .texture,
-            false);
+    if (_playerModel.model().materials != nullptr) {
+        std::span<::Material> materials(_playerModel.model().materials, _playerModel.model().materialCount);
+        if (!materials.empty() && materials.front().maps != nullptr) {
+            std::span<::MaterialMap> const maps(materials.front().maps, MaxMaterialMaps);
+            static_assert(MATERIAL_MAP_ALBEDO == 0, "MATERIAL_MAP_ALBEDO is expected to be 0 for front()");
+            _defaultPlayerTexture = std::make_shared<raylib::rtextures::Texture2D>(maps.front().texture, false);
+        }
+
+        for (auto& material : materials) {
+            material.shader = _alphaDiscardShader.shader();
+        }
     }
 
-    for (int i = 0; i < _playerModel.model().materialCount; i++) {
-        // NOLINTNEXTLINE (cppcoreguidelines-pro-bounds-pointer-arithmetic)
-        _playerModel.model().materials[i].shader = _alphaDiscardShader.shader();
-    }
     for (auto& _armorModel : _armorModels) {
-        for (int j = 0; j < _armorModel.model().materialCount; j++) {
-            // NOLINTNEXTLINE (cppcoreguidelines-pro-bounds-pointer-arithmetic)
-            _armorModel.model().materials[j].shader = _alphaDiscardShader.shader();
+        if (_armorModel.model().materials != nullptr) {
+            std::span<::Material> materials(_armorModel.model().materials, _armorModel.model().materialCount);
+            for (auto& material : materials) {
+                material.shader = _alphaDiscardShader.shader();
+            }
         }
     }
 }
