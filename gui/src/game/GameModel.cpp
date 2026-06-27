@@ -7,9 +7,6 @@
 
 #include "GameModel.hpp"
 
-#include <raylib.h>
-#include <rlgl.h>
-
 #include <cmath>
 #include <cstddef>
 #include <memory>
@@ -29,13 +26,11 @@ GameModel::GameModel(raylib::rcore::Camera& camera)
     if (_playerModel.model().materials != nullptr &&
         _playerModel.model().materials[0].maps !=  // NOLINT (cppcoreguidelines-pro-bounds-pointer-arithmetic)
             nullptr) {
+        // NOLINTNEXTLINE (cppcoreguidelines-pro-bounds-pointer-arithmetic)
+        const int materialIndex = _playerModel.model().meshMaterial[0];
         _defaultPlayerTexture = std::make_shared<raylib::rtextures::Texture2D>(
-            _playerModel  // NOLINT (cppcoreguidelines-pro-bounds-pointer-arithmetic)
-                .model()
-                .materials[0]
-                .maps[MATERIAL_MAP_ALBEDO]
-                .texture,
-            false);
+            // NOLINTNEXTLINE (cppcoreguidelines-pro-bounds-pointer-arithmetic)
+            _playerModel.model().materials[materialIndex].maps[0].texture, false);
     }
 
     for (int i = 0; i < _playerModel.model().materialCount; i++) {
@@ -85,10 +80,12 @@ void GameModel::drawPlayer(raylib::rmath::Vector3 position, float rotationAngle,
     const int animIndex = getAnimationIndexFromAction(action);
     updateAnimationIfValid(_playerAnim, _playerModel, animIndex, animFrame);
 
+    // NOLINTNEXTLINE (cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    const int materialIndex = _playerModel.model().meshMaterial[0];
     if (texture && texture->valid()) {
-        _playerModel.setMaterialTexture(0, MATERIAL_MAP_ALBEDO, *texture);
+        _playerModel.setMaterialTexture(materialIndex, 0 /*MATERIAL_MAP_ALBEDO*/, *texture);
     } else if (_defaultPlayerTexture && _defaultPlayerTexture->valid()) {
-        _playerModel.setMaterialTexture(0, MATERIAL_MAP_ALBEDO, *_defaultPlayerTexture);
+        _playerModel.setMaterialTexture(materialIndex, 0 /*MATERIAL_MAP_ALBEDO*/, *_defaultPlayerTexture);
     }
 
     _playerModel.drawModelEx(position, {0.0F, 1.0F, 0.0F}, rotationAngle, PLAYER_SCALE, raylib::Color::White());
