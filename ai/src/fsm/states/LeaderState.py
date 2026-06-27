@@ -1,4 +1,5 @@
 from ..AState import AState
+from EvolveState import EvolveState
 
 
 class LeaderState(AState):
@@ -26,6 +27,13 @@ class LeaderState(AState):
                 self.trantorian.status, f"need {resources_str}"
             )
             self.trantorian.send_command.broadcast(msg)
+            for i in range(3):
+                self.trantorian.turn_right()
+                msg = self.trantorian.broadcast_manager.create_message(
+                    self.trantorian.status, f"need {resources_str}"
+                )
+                self.trantorian.send_command.broadcast(msg)
+
             self.trantorian.logger.info("[Leader]: Broadcast send to require resources")
         else:
             self.trantorian.logger.info("[Leader]: Get all resources!")
@@ -39,3 +47,9 @@ class LeaderState(AState):
                     self.trantorian.status, "join"
                 )
                 self.trantorian.send_command.broadcast(msg)
+                for i in range(3):
+                    self.trantorian.turn_right()
+                    msg = self.trantorian.broadcast_manager.create_message(
+                        self.trantorian.status, "join"
+                    )
+                    self.trantorian.send_command.broadcast(msg)

@@ -81,6 +81,23 @@ class Trantorian:
             self.invalidate_vision()
         return result
 
+    def is_stone_on_me(self):
+        missing = {}
+        if target_level not in ELEVATION_REQUIREMENTS:
+            return missing
+
+        requirements = ELEVATION_REQUIREMENTS[target_level]
+        for resource, required_amount in requirements.items():
+            if resource == "player":
+                continue
+            current_amount = getattr(self.player_state.inventory, resource, 0)
+            if current_amount < required_amount:
+                missing[resource] = required_amount - current_amount
+
+        return missing
+        self.player_state.vision.update_tiles()
+        return self.player_state.vision.get_tiles[0]
+
     def forward(self):
         cmd_id = self.send_command.forward()
         result = self.wait_for_response(cmd_id)
