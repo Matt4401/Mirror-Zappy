@@ -61,13 +61,13 @@ class GameModel {
         raylib::rmodels::Model{"assets/models/player/armor/diamond.gltf"},
         raylib::rmodels::Model{"assets/models/player/armor/netherite.gltf"}};
     mutable std::array<raylib::rmodels::ModelAnimation, 7> _armorAnims{
-        raylib::rmodels::ModelAnimation{"assets/models/armor/leather.gltf"},
-        raylib::rmodels::ModelAnimation{"assets/models/armor/chainmail.gltf"},
-        raylib::rmodels::ModelAnimation{"assets/models/armor/copper.gltf"},
-        raylib::rmodels::ModelAnimation{"assets/models/armor/iron.gltf"},
-        raylib::rmodels::ModelAnimation{"assets/models/armor/gold.gltf"},
-        raylib::rmodels::ModelAnimation{"assets/models/armor/diamond.gltf"},
-        raylib::rmodels::ModelAnimation{"assets/models/armor/netherite.gltf"}};
+        raylib::rmodels::ModelAnimation{"assets/models/player/armor/leather.gltf"},
+        raylib::rmodels::ModelAnimation{"assets/models/player/armor/chainmail.gltf"},
+        raylib::rmodels::ModelAnimation{"assets/models/player/armor/copper.gltf"},
+        raylib::rmodels::ModelAnimation{"assets/models/player/armor/iron.gltf"},
+        raylib::rmodels::ModelAnimation{"assets/models/player/armor/gold.gltf"},
+        raylib::rmodels::ModelAnimation{"assets/models/player/armor/diamond.gltf"},
+        raylib::rmodels::ModelAnimation{"assets/models/player/armor/netherite.gltf"}};
     raylib::rmodels::Shader _alphaDiscardShader;
 
     static constexpr std::size_t MaxMaterialMaps = 12;
