@@ -22,7 +22,7 @@ class Player {
   public:
     enum class cardinalPoint : std::uint8_t { NORTH = 1, EAST = 2, SOUTH = 3, WEST = 4 };
     enum class Action : std::uint8_t { IDLE = 0, WALK = 1, INCANTATION = 2, FORK = 3 };
-    static constexpr float PLAYER_SPEED = 6.0F;
+    static constexpr float PLAYER_SPEED = 15.0F;
     static constexpr int DELTA_SERVER_FREQUENCY = 20;
     static constexpr float DegreesPerQuarterTurn = 90.0F;
     static constexpr float FullTurnDegrees = 360.0F;
