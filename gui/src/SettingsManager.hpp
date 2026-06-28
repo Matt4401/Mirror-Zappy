@@ -37,7 +37,7 @@ struct SettingsData {
     bool showTiles{true};
 
     std::map<std::string, int> keybinds{
-        {"Move Forward", KEY_Z}, {"Move Backward", KEY_S},      {"Move Left", KEY_Q},  {"Move Right", KEY_D},
+        {"Move Forward", KEY_W}, {"Move Backward", KEY_S},      {"Move Left", KEY_A},  {"Move Right", KEY_D},
         {"Move Up", KEY_SPACE},  {"Move Down", KEY_LEFT_SHIFT}, {"Pause", KEY_ESCAPE}, {"Sprint", KEY_LEFT_CONTROL},
         {"Reset Camera", KEY_R}, {"Toggle UI", KEY_LEFT_ALT}};
 };
