@@ -97,6 +97,24 @@ The player inspector can dispatch `PlayerFirstPersonRequested`. `FirstPerson` th
 
 `Escape` exits first-person mode.
 
+### Follow Mode
+
+When the user selects a player by clicking on them in the 3D scene, the camera automatically tracks that player's position. While in follow mode:
+
+* The camera's position and target update automatically to match the player's movements.
+* The user can still rotate and zoom the camera freely around the tracked player using the mouse.
+* Free movement via WASD is disabled to ensure the camera stays anchored to the player.
+* Follow mode stops when the Player Inspector UI is closed, or when the followed player dies.
+
+## Procedural Generation (Names & Skins)
+
+To give each Trantorian a unique and recognizable identity, the GUI procedurally generates attributes when a new player connects (`pnw`):
+
+* **NameGenerator**: Automatically assigns a unique, lore-friendly name to the player. The names are dynamically generated, making it easier to track individual players in the UI and Event Log without relying purely on their IDs.
+* **SkinGenerator**: Assigns a random, visually distinct skin (texture ID) to the player's 3D model. This ensures a diverse population of Trantorians on the map.
+
+These generated attributes are persistently tied to the player's ID for the duration of their life and are used across the rendering and UI systems.
+
 ## Asset Loading
 
 Static models are generally owned by render classes as wrapper objects. UI textures and dynamic player skins should go through `AssetManager` so they are cached and reused.
