@@ -52,6 +52,9 @@ class Image {
     static Image genColor(int width, int height, Color color) {
         return Image{GenImageColor(width, height, color.color())};
     }
+    static Image genPerlinNoise(int width, int height, int offsetX, int offsetY, float scale) {
+        return Image{GenImagePerlinNoise(width, height, offsetX, offsetY, scale)};
+    }
 
     void draw(const Image& src, Rectangle srcRec, Rectangle dstRec, Color tint) {
         ImageDraw(&_image, src.image(), srcRec, dstRec, tint.color());

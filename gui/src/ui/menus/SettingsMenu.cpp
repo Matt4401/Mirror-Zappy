@@ -267,6 +267,8 @@ void SettingsMenu::initVisibilityTab() {
                [this](bool state) { _settingsManager.get().getSettings().showFood = state; });
     makeToggle("Grid/Tiles:", settings.showTiles,
                [this](bool state) { _settingsManager.get().getSettings().showTiles = state; });
+    makeToggle("Floating Island:", settings.showFloatingIsland,
+               [this](bool state) { _settingsManager.get().getSettings().showFloatingIsland = state; });
 }
 
 void SettingsMenu::switchTab(Tab tab) { _currentTab = tab; }

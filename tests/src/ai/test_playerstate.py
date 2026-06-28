@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import Mock
 from src.PlayerState import PlayerState
 
+
 class TestPlayerState(unittest.TestCase):
     def setUp(self):
         self.state = PlayerState("TeamRocket")
