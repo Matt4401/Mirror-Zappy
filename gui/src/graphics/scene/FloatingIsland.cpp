@@ -8,7 +8,6 @@
 #include "FloatingIsland.hpp"
 
 #include <raylib.h>
-#include <raymath.h>
 
 #include <algorithm>
 #include <cmath>
@@ -57,9 +56,9 @@ void FloatingIsland::generateIsland() {
         return;
     }
 
-    const float maxDepth = static_cast<float>(std::max(width, height)) * 0.8F;
-    const float offsetX = static_cast<float>(width - 1) * Tile3D::TILE_SIZE * 0.5F;
-    const float offsetZ = static_cast<float>(height - 1) * Tile3D::TILE_SIZE * 0.5F;
+    const float maxDepth = static_cast<float>(std::max(width, height)) * MaxDepthFactor;
+    const float offsetX = static_cast<float>(width - 1) * Tile3D::TILE_SIZE * CenterOffsetMultiplier;
+    const float offsetZ = static_cast<float>(height - 1) * Tile3D::TILE_SIZE * CenterOffsetMultiplier;
 
     std::vector<std::vector<int>> depthGrid(height, std::vector<int>(width, 0));
     std::vector<std::vector<unsigned char>> noiseGrid(height, std::vector<unsigned char>(width, 0));
@@ -72,8 +71,8 @@ void FloatingIsland::generateIsland() {
 
 void FloatingIsland::buildDepthGrid(int width, int height, float maxDepth, std::vector<std::vector<int>>& depthGrid,
                                     std::vector<std::vector<unsigned char>>& noiseGrid) {
-    auto noiseImage =
-        raylib::rtextures::Image::genPerlinNoise(width, height, GetRandomValue(0, 1000), GetRandomValue(0, 1000), 5.0F);
+    auto noiseImage = raylib::rtextures::Image::genPerlinNoise(width, height, GetRandomValue(0, PerlinNoiseMaxSeed),
+                                                               GetRandomValue(0, PerlinNoiseMaxSeed), PerlinNoiseScale);
     ImageFormat(&noiseImage.image(), PIXELFORMAT_UNCOMPRESSED_R8G8B8A8);
 
     std::span<::Color> const pixels{static_cast<::Color*>(noiseImage.image().data),
@@ -81,20 +80,20 @@ void FloatingIsland::buildDepthGrid(int width, int height, float maxDepth, std::
 
     for (int z = 0; z < height; z++) {
         for (int x = 0; x < width; x++) {
-            const float halfW = std::max((static_cast<float>(width) - 1.0F) / 2.0F, 0.001F);
-            const float halfH = std::max((static_cast<float>(height) - 1.0F) / 2.0F, 0.001F);
+            const float halfW = std::max((static_cast<float>(width) - 1.0F) / 2.0F, MinHalfSize);
+            const float halfH = std::max((static_cast<float>(height) - 1.0F) / 2.0F, MinHalfSize);
             const float dx = (static_cast<float>(x) - halfW) / halfW;
             const float dz = (static_cast<float>(z) - halfH) / halfH;
 
             const float dist = std::max(std::abs(dx), std::abs(dz));
-            float mask = 1.0F - std::pow(dist, 2.0F);
+            float mask = 1.0F - std::pow(dist, DistPower);
             mask = std::max(mask, 0.0F);
 
             unsigned char const noiseVal = pixels[((z * width) + x)].r;
-            float const rawHeight = (static_cast<float>(noiseVal) / 255.0F) * maxDepth * mask;
+            float const rawHeight = (static_cast<float>(noiseVal) / PixelNormalization) * maxDepth * mask;
 
-            depthGrid[z][x] = std::max(1, static_cast<int>(std::ceil(rawHeight)));
-            noiseGrid[z][x] = noiseVal;
+            depthGrid.at(z).at(x) = std::max(1, static_cast<int>(std::ceil(rawHeight)));
+            noiseGrid.at(z).at(x) = noiseVal;
         }
     }
 }
@@ -102,12 +101,10 @@ void FloatingIsland::buildDepthGrid(int width, int height, float maxDepth, std::
 void FloatingIsland::buildBlocks(int width, int height, float offsetX, float offsetZ,
                                  const std::vector<std::vector<int>>& depthGrid,
                                  const std::vector<std::vector<unsigned char>>& noiseGrid) {
-    const float yOffset = 2.0F;
-
     for (int z = 0; z < height; z++) {
         for (int x = 0; x < width; x++) {
-            int const blocksDepth = depthGrid[z][x];
-            unsigned char const noiseVal = noiseGrid[z][x];
+            int const blocksDepth = depthGrid.at(z).at(x);
+            unsigned char const noiseVal = noiseGrid.at(z).at(x);
 
             for (int y = -1; y >= -blocksDepth; y--) {
                 if (!isBlockExposed(x, y, z, width, height, blocksDepth, depthGrid)) {
@@ -115,7 +112,7 @@ void FloatingIsland::buildBlocks(int width, int height, float offsetX, float off
                 }
 
                 raylib::rmath::Vector3 const pos{(static_cast<float>(x) * Tile3D::TILE_SIZE) - offsetX,
-                                                 (static_cast<float>(y) * Tile3D::TILE_SIZE) + yOffset,
+                                                 (static_cast<float>(y) * Tile3D::TILE_SIZE) + YOffset,
                                                  (static_cast<float>(z) * Tile3D::TILE_SIZE) - offsetZ};
 
                 IslandBlockType const type = determineBlockType(y, noiseVal);
@@ -131,27 +128,30 @@ bool FloatingIsland::isBlockExposed(int x, int y, int z, int width, int height, 
         return true;
     }
     int const cd = -y;
-    return depthGrid[z][x - 1] < cd || depthGrid[z][x + 1] < cd || depthGrid[z - 1][x] < cd || depthGrid[z + 1][x] < cd;
+    return depthGrid.at(z).at(x - 1) < cd || depthGrid.at(z).at(x + 1) < cd || depthGrid.at(z - 1).at(x) < cd ||
+           depthGrid.at(z + 1).at(x) < cd;
 }
 
 IslandBlockType FloatingIsland::determineBlockType(int y, unsigned char noiseVal) {
     if (y == -1) {
         return IslandBlockType::Dirt;
     }
-    if (y == -2) {
+    if (y == RootedDirtDepth) {
         return IslandBlockType::RootedDirt;
     }
-    if (y > -4) {
+    if (y > CobblestoneDepth) {
         return IslandBlockType::Cobblestone;
     }
 
-    auto const rockVal = static_cast<unsigned char>((noiseVal + std::abs(y) * 15) % 255);
-    if (rockVal < 80) {
+    auto const rockVal = static_cast<unsigned char>((noiseVal + std::abs(y) * NoiseRockMultiplier) %
+                                                    static_cast<int>(PixelNormalization));
+    if (rockVal < NoiseDeepslateThreshold) {
         return IslandBlockType::Deepslate;
     }
-    if (rockVal < 150) {
+    if (rockVal < NoiseStoneThreshold) {
         return IslandBlockType::Stone;
     }
+
     return IslandBlockType::MossyCobblestone;
 }
 

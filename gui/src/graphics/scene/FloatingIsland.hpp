@@ -36,8 +36,22 @@ class FloatingIsland {
 
     void draw(const raylib::rcore::Camera& camera) const;
 
-  private:
     void generateIsland();
+
+    static constexpr float MaxDepthFactor = 0.8F;
+    static constexpr float CenterOffsetMultiplier = 0.5F;
+    static constexpr int PerlinNoiseMaxSeed = 1000;
+    static constexpr float PerlinNoiseScale = 5.0F;
+    static constexpr float MinHalfSize = 0.001F;
+    static constexpr float PixelNormalization = 255.0F;
+    static constexpr float DistPower = 2.0F;
+    static constexpr float YOffset = 2.0F;
+    static constexpr int RootedDirtDepth = -2;
+    static constexpr int CobblestoneDepth = -4;
+    static constexpr int NoiseRockMultiplier = 15;
+    static constexpr unsigned char NoiseDeepslateThreshold = 80;
+    static constexpr unsigned char NoiseStoneThreshold = 150;
+
     static void buildDepthGrid(int width, int height, float maxDepth, std::vector<std::vector<int>>& depthGrid,
                                std::vector<std::vector<unsigned char>>& noiseGrid);
     void buildBlocks(int width, int height, float offsetX, float offsetZ,
