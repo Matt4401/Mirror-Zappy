@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import Mock
-from src.util.BroadcastMessageManager import BroadcastMessageManager
+from src.util.BroadcastMessageManager import BroadcastMessage
 
 
 class TestBroadcastMessageManager(unittest.TestCase):
@@ -8,10 +8,8 @@ class TestBroadcastMessageManager(unittest.TestCase):
         self.mock_player_state = Mock()
         self.mock_player_state.team_name = "TeamA"
         self.mock_player_state.level = 2
-        self.manager = BroadcastMessageManager(self.mock_player_state, "player_42")
+        self.manager = BroadcastMessage(self.mock_player_state)
 
-    def test_get_id(self):
-        self.assertEqual(self.manager.id, 42)
 
     def test_code_decode(self):
         message = "HELLO WORLD"
@@ -20,15 +18,13 @@ class TestBroadcastMessageManager(unittest.TestCase):
         self.assertEqual(decoded, message)
 
     def test_create_message(self):
-        msg = self.manager.create_message("LEADER", "GOTO 3")
+        msg = self.manager.create_message()
         self.assertTrue(msg.startswith("TeamA_"))
 
     def test_read_broadcast_valid(self):
-        created_msg = self.manager.create_message("LEADER", "GOTO 3")
+        created_msg = self.manager.create_message()
         parsed = self.manager.read_broadcast(created_msg)
         self.assertIsNotNone(parsed)
-        self.assertEqual(parsed[0], 42)
-        self.assertEqual(parsed[1], "LEADER 2 GOTO 3")
 
     def test_read_broadcast_invalid_team(self):
         created_msg = "TeamB_123-123-123"

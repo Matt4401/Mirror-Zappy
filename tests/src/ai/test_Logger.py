@@ -1,66 +1,86 @@
+import logging
+import os
 import sys
-from unittest.mock import patch, mock_open, MagicMock
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 import pytest
-from src.util.InitLogger import PlayerLogger
 
-FAKE_YAML_CONTENT = """
-version: 1
-handlers:
-  console:
-    class: logging.StreamHandler
-    level: DEBUG
-  network_file:
-    filename: ~
-  command_file:
-    filename: ~
-  player_file_template:
-    level: INFO
-    formatter: detailed
-    filename: ~
-    maxBytes: 100000
-    backupCount: 5
-loggers:
-  player_template:
-    level: INFO
-    handlers: [console]
-"""
+from src.util.InitLogger import PlayerLogger, ColorFormatter, TagFilter
 
 
-@patch("yaml.safe_load")
-@patch(
-    "src.util.InitLogger.Path.open", new_callable=mock_open, read_data=FAKE_YAML_CONTENT
-)
-@patch("src.util.InitLogger.logging.config.dictConfig")
+@pytest.fixture(autouse=True)
+def cleanup_logging():
+    yield
+    logger = logging.getLogger("player_42")
+    for handler in logger.handlers[:]:
+        logger.removeHandler(handler)
+
+
 @patch("src.util.InitLogger.Path.mkdir")
-def test_setup_logging(mock_mkdir, mock_dict_config, mock_open_file, mock_yaml_load):
-    import yaml
+@patch("src.util.InitLogger.logging.FileHandler")
+@patch("src.util.InitLogger.logging.StreamHandler")
+def test_setup_logging_success(mock_stream_handler, mock_file_handler, mock_mkdir):
+    mock_console_instance = MagicMock()
+    mock_file_instance = MagicMock()
 
-    config_dict = yaml.unsafe_load(FAKE_YAML_CONTENT)
-    mock_yaml_load.return_value = config_dict
+    mock_stream_handler.return_value = mock_console_instance
+    mock_file_handler.return_value = mock_file_instance
+
     test_player_id = "42"
 
-    PlayerLogger.setup_logging(test_player_id)
+    logger = PlayerLogger.setup_logging(test_player_id, fresh=True)
 
-    assert mock_mkdir.call_count == 2
-    mock_mkdir.assert_called_with(parents=True, exist_ok=True)
+    mock_mkdir.assert_called_once_with(parents=True, exist_ok=True)
 
-    mock_dict_config.assert_called_once()
-    final_config = mock_dict_config.call_args[0][0]
-    assert "player_file_template" not in final_config["handlers"]
+    assert logger.name == "player_42"
+    assert logger.level == logging.INFO
+    assert logger.propagate is False
 
-    expected_handler_name = f"player_{test_player_id}_file"
-    expected_logger_name = f"player_{test_player_id}"
+    mock_stream_handler.assert_called_once_with(sys.stdout)
+    mock_console_instance.setLevel.assert_called_with(logging.INFO)
+    mock_console_instance.setFormatter.assert_called_once()
+    mock_console_instance.addFilter.assert_called_once()
 
-    assert expected_handler_name in final_config["handlers"]
-    assert expected_logger_name in final_config["loggers"]
+    root_project = Path(__file__).resolve().parents[3]
+    expected_log_file = root_project / "logs" / "ai.log"
 
-    dynamic_handler = final_config["handlers"][expected_handler_name]
-    assert dynamic_handler["class"] == "logging.handlers.RotatingFileHandler"
-    assert f"player/player_{test_player_id}.log" in dynamic_handler["filename"]
-
-    assert "server.log" in final_config["handlers"]["network_file"]["filename"]
-    assert "commands.log" in final_config["handlers"]["command_file"]["filename"]
-    assert (
-        "player/server.log" not in final_config["handlers"]["network_file"]["filename"]
+    mock_file_handler.assert_called_once_with(
+        expected_log_file, mode="w", encoding="utf-8"
     )
+    mock_file_instance.setLevel.assert_called_with(logging.INFO)
+    mock_file_instance.setFormatter.assert_called_once()
+    mock_file_instance.addFilter.assert_called_once()
+
+    assert mock_console_instance in logger.handlers
+    assert mock_file_instance in logger.handlers
+
+
+
+def test_tag_filter():
+    filter_tag = "p1234"
+    tag_filter = TagFilter(filter_tag)
+
+    record = logging.LogRecord("name", logging.INFO, "path", 1, "msg", None, None)
+
+    assert not hasattr(record, "tag")
+    result = tag_filter.filter(record)
+
+    assert result is True
+    assert record.tag == filter_tag
+
+
+def test_color_formatter_with_color():
+    formatter = ColorFormatter(fmt="%(message)s", datefmt=None, use_color=True)
+    record = logging.LogRecord("name", logging.ERROR, "path", 1, "Test Error", None, None)
+
+    formatted_text = formatter.format(record)
+    assert formatted_text.startswith("\033[31m")
+    assert formatted_text.endswith("\033[0m")
+
+
+def test_color_formatter_without_color():
+    formatter = ColorFormatter(fmt="%(message)s", datefmt=None, use_color=False)
+    record = logging.LogRecord("name", logging.ERROR, "path", 1, "Test Error", None, None)
+
+    formatted_text = formatter.format(record)
+    assert formatted_text == "Test Error"
