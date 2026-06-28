@@ -3,6 +3,7 @@ add_library(zappy_gui_graphics_scene
         Skybox3D.cpp
         Tile3D.cpp
         TileManager.cpp
+        FloatingIsland.cpp
         PlayerManager.cpp
         WorldManager.cpp
 )
