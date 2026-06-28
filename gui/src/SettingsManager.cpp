@@ -48,7 +48,9 @@ std::vector<SettingsManager::LoadProp> SettingsManager::getLoadProperties() {
          .setter = [this](const std::string& v) { _settings.showMinerals = (v == "1" || v == "true"); }},
         {.key = "showFood", .setter = [this](const std::string& v) { _settings.showFood = (v == "1" || v == "true"); }},
         {.key = "showTiles",
-         .setter = [this](const std::string& v) { _settings.showTiles = (v == "1" || v == "true"); }}};
+         .setter = [this](const std::string& v) { _settings.showTiles = (v == "1" || v == "true"); }},
+        {.key = "showFloatingIsland",
+         .setter = [this](const std::string& v) { _settings.showFloatingIsland = (v == "1" || v == "true"); }}};
 }
 
 std::vector<SettingsManager::SaveProp> SettingsManager::getSaveProperties() const {
@@ -87,6 +89,9 @@ std::vector<SettingsManager::SaveProp> SettingsManager::getSaveProperties() cons
          .getter = [this]() { return _settings.showMinerals ? "1" : "0"; }},
         {.section = "Visibility", .key = "showFood", .getter = [this]() { return _settings.showFood ? "1" : "0"; }},
         {.section = "Visibility", .key = "showTiles", .getter = [this]() { return _settings.showTiles ? "1" : "0"; }},
+        {.section = "Visibility",
+         .key = "showFloatingIsland",
+         .getter = [this]() { return _settings.showFloatingIsland ? "1" : "0"; }},
     };
 }
 
