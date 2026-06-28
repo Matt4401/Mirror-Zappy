@@ -8,6 +8,7 @@
 #pragma once
 #include <functional>
 #include <map>
+#include <optional>
 #include <string>
 #include <utility>
 
@@ -21,6 +22,7 @@
 #include "game/Team.hpp"
 #include "game/components/IObject.hpp"
 #include "rcore/Camera.hpp"
+#include "rcore/Ray.hpp"
 #include "rmodels/Model.hpp"
 
 namespace zappy::gui::graphics::scene {
@@ -60,6 +62,8 @@ class Map {
     void dispatchClickedPlayer(const game::Team& team, const game::Player& player) const;
     void dispatchClickedTile(const Tile3D& tile) const;
     void handleRequestCyclePlayer(const events::RequestCyclePlayer& e);
+    void updateHoveredTile(const raylib::rcore::Ray& ray, float& nearestDistance);
+    std::optional<SelectedPlayer> getSelectedPlayer(const raylib::rcore::Ray& ray, float& nearestDistance) const;
 
     const Tile3D* _hoveredTile{nullptr};
     std::reference_wrapper<raylib::rcore::Camera> _camera;

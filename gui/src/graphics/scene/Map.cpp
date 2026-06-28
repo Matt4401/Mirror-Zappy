@@ -103,11 +103,7 @@ void Map::drawItems(const Tile3D& tile) const {
     }
 }
 
-void Map::handleEvent() {
-    _hoveredTile = nullptr;
-    const auto ray = raylib::rcore::Event::mouseRay(_camera.get());
-    float nearestDistance = std::numeric_limits<float>::max();
-
+void Map::updateHoveredTile(const raylib::rcore::Ray& ray, float& nearestDistance) {
     for (const auto& tile : _worldManager.get().tiles()) {
         if (!_camera.get().isVisibleFromCamera(tile.position())) {
             continue;
@@ -118,14 +114,10 @@ void Map::handleEvent() {
             _hoveredTile = &tile;
         }
     }
+}
 
-    if (!raylib::rcore::Event::isMouseButtonPressed(MOUSE_LEFT_CLICK)) {
-        return;
-    }
-
+std::optional<Map::SelectedPlayer> Map::getSelectedPlayer(const raylib::rcore::Ray& ray, float& nearestDistance) const {
     std::optional<SelectedPlayer> selected;
-    nearestDistance = std::numeric_limits<float>::max();
-
     for (const auto& team : _worldManager.get().teams()) {
         for (const auto& player : team.players()) {
             if (!_camera.get().isVisibleFromCamera(player.position())) {
@@ -137,6 +129,29 @@ void Map::handleEvent() {
                 selected = std::make_pair(std::cref(team), std::cref(player));
             }
         }
+    }
+    return selected;
+}
+
+void Map::handleEvent() {
+    const auto& settings = _settingsManager.get().getSettings();
+    _hoveredTile = nullptr;
+    const auto ray = raylib::rcore::Event::mouseRay(_camera.get());
+    float nearestDistance = std::numeric_limits<float>::max();
+
+    if (settings.showTiles) {
+        updateHoveredTile(ray, nearestDistance);
+    }
+
+    if (!raylib::rcore::Event::isMouseButtonPressed(MOUSE_LEFT_CLICK)) {
+        return;
+    }
+
+    nearestDistance = std::numeric_limits<float>::max();
+    std::optional<SelectedPlayer> selected;
+
+    if (settings.showPlayers) {
+        selected = getSelectedPlayer(ray, nearestDistance);
     }
 
     if (selected.has_value()) {
