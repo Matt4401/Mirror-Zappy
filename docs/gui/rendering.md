@@ -47,6 +47,13 @@ Resources are dispatched by name through `_itemDrawFunctions`. If you add a new 
 * `TileManager::_resourceFactories`;
 * `Map::_itemDrawFunctions` and model fields.
 
+## Floating Island (Underworld)
+
+To give the map a distinct look, a procedural floating island extends downwards from the map grid.
+The island uses Perlin noise to generate a depth map, bounded by a radial mask to ensure it tapers to a point underneath.
+The island rendering is highly optimized through volume culling: only exterior blocks are sent to the GPU.
+The floating island can be toggled via `showFloatingIsland` in the settings, and fully respects the camera's render distance frustum culling.
+
 ## Picking
 
 Picking only runs when `Render` is in UI mode and the UI is not hovered.

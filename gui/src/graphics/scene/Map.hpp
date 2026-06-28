@@ -12,6 +12,7 @@
 #include <string>
 #include <utility>
 
+#include "FloatingIsland.hpp"
 #include "GuiEvents.hpp"
 #include "SettingsManager.hpp"
 #include "Tile3D.hpp"
@@ -82,6 +83,7 @@ class Map {
     raylib::rmodels::Model _foodModel{FOOD_TEXTURE_RESOURCE};
     events::EventDispatcher::EventToken _nameToken{0};
     events::EventDispatcher::EventToken _cycleToken{0};
+    FloatingIsland _floatingIsland;
 
     static constexpr int MOUSE_LEFT_CLICK = 0;
 };
