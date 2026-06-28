@@ -283,6 +283,7 @@ void SettingsMenu::setPosition(float x, float y) {
     _videoComponents.clear();
     _controlsComponents.clear();
     _visibilityComponents.clear();
+    _visibilityTexts.clear();
 
     initAudioTab();
     initVideoTab();
