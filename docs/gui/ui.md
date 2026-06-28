@@ -54,14 +54,29 @@ Reusable components include:
 * `WorldControlUI`
 * `EventLogUI`
 * `GlobalStatsUI`
+* `GameOverUI`
 
 It registers only the root components in `UIManager`:
 
 * compass;
 * grid manager;
-* pause menu.
+* pause menu;
+* game over UI.
 
 The grid manager owns the normal HUD panels.
+
+## Game Over UI
+
+`GameOverUI` is a full-screen overlay that appears automatically when the server broadcasts the end of the game (`Seg` event).
+
+It provides:
+
+* a full-screen dark overlay to mask the game slightly;
+* a centered modal panel displaying the winning team's name;
+* a "Spectate" button that hides the menu and returns to a free-camera view;
+* a "Quit Game" button that triggers the application exit.
+
+`Render` uses its callbacks to update the cursor state when returning to the game in spectator mode, and to begin the exit sequence when quitting.
 
 ## UI Grid
 
