@@ -52,6 +52,10 @@ Render::Render(events::EventDispatcher& dispatcher, AudioManager& audioManager, 
     });
 
     if (auto pauseMenu = _gameHUD->getPauseMenu()) {
+        pauseMenu->setOnResume([this]() {
+            _updateMode = UpdateMode::All;
+            updateCursorState();
+        });
         pauseMenu->setOnExit([this]() { _isExiting = true; });
         pauseMenu->setOnResume([this, pauseMenu]() {
             pauseMenu->setVisible(false);
