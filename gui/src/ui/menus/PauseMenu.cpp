@@ -58,6 +58,7 @@ PauseMenu::PauseMenu(events::EventDispatcher& dispatcher, AudioManager& audioMan
     _settingsMenu->setOnBack([this]() {
         _settingsVisible = false;
         _settingsMenu->setVisible(false);
+    });
 
     _resumeBtn->setOnClick([this]() {
         this->setVisible(false);
