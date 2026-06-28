@@ -20,6 +20,7 @@
 #include "ui/components/UICompass.hpp"
 #include "ui/components/UIGridManager.hpp"
 #include "ui/menus/EventLogUI.hpp"
+#include "ui/menus/GameOverUI.hpp"
 #include "ui/menus/GlobalStatsUI.hpp"
 #include "ui/menus/PauseMenu.hpp"
 #include "ui/menus/PlayerInspectorUI.hpp"
@@ -44,6 +45,7 @@ class GameHUD {
     [[nodiscard]] std::shared_ptr<components::UIGridManager> getGridManager() const { return _gridManager; }
     [[nodiscard]] std::shared_ptr<components::UICompass> getCompass() const { return _compass; }
     [[nodiscard]] std::shared_ptr<menus::PauseMenu> getPauseMenu() const { return _pauseMenu; }
+    [[nodiscard]] std::shared_ptr<menus::GameOverUI> getGameOverUI() const { return _gameOverUI; }
     [[nodiscard]] std::shared_ptr<menus::PlayerInspectorUI> getPlayerInspector() const { return _playerInspector; }
     [[nodiscard]] std::shared_ptr<menus::WorldControlUI> getWorldControl() const { return _worldControl; }
     [[nodiscard]] std::shared_ptr<menus::EventLogUI> getEventLog() const { return _eventLog; }
@@ -57,6 +59,7 @@ class GameHUD {
     std::shared_ptr<components::UIGridManager> _gridManager;
     std::shared_ptr<components::UICompass> _compass;
     std::shared_ptr<menus::PauseMenu> _pauseMenu;
+    std::shared_ptr<menus::GameOverUI> _gameOverUI;
     std::shared_ptr<menus::PlayerInspectorUI> _playerInspector;
     std::shared_ptr<menus::TileInspectorUI> _tileInspector;
     std::shared_ptr<menus::WorldControlUI> _worldControl;
