@@ -18,6 +18,7 @@
 #include <vector>
 
 #include "Color.hpp"
+#include "SettingsManager.hpp"
 #include "Tile3D.hpp"
 #include "WorldManager.hpp"
 #include "events/EventDispatcher.hpp"
@@ -30,8 +31,13 @@
 #include "rshapes/Shapes.hpp"
 
 namespace zappy::gui::graphics::scene {
-Map::Map(raylib::rcore::Camera& camera, WorldManager& worldManager, events::EventDispatcher& dispatcher)
-    : _camera(camera), _dispatcher(dispatcher), _worldManager(worldManager), _gameModel(_camera) {
+Map::Map(raylib::rcore::Camera& camera, WorldManager& worldManager, events::EventDispatcher& dispatcher,
+         SettingsManager& settingsManager)
+    : _camera(camera),
+      _dispatcher(dispatcher),
+      _worldManager(worldManager),
+      _settingsManager(settingsManager),
+      _gameModel(_camera) {
     _itemDrawFunctions["Deraumere"] = [this](const game::IObject& object) { object.draw(_deraumereModel); };
     _itemDrawFunctions["Linemate"] = [this](const game::IObject& object) { object.draw(_linemateModel); };
     _itemDrawFunctions["Sibur"] = [this](const game::IObject& object) { object.draw(_siburModel); };
@@ -57,25 +63,39 @@ Map::~Map() {
 }
 
 void Map::draw() const {
+    const auto& settings = _settingsManager.get().getSettings();
+
     for (const auto& tile : _worldManager.get().tiles()) {
         if (_camera.get().isVisibleFromCamera(tile.position())) {
-            tile.draw(_tileModel);
+            if (settings.showTiles) {
+                tile.draw(_tileModel);
+            }
             if (tile.itemBag().hasItems()) {
                 drawItems(tile);
             }
         }
     }
-    for (const auto& team : _worldManager.get().teams()) {
-        team.draw(_gameModel);
+    if (settings.showPlayers) {
+        for (const auto& team : _worldManager.get().teams()) {
+            team.draw(_gameModel);
+        }
     }
-    if (_hoveredTile != nullptr) {
+    if (_hoveredTile != nullptr && settings.showTiles) {
         raylib::rshapes::Shapes::drawThickBoundingBox(_hoveredTile->boundingBox(_tileModel.getBoundingBox()),
                                                       raylib::Color::White(), 0.05F);
     }
 }
 
 void Map::drawItems(const Tile3D& tile) const {
+    const auto& settings = _settingsManager.get().getSettings();
     for (const auto& item : tile.itemBag().items()) {
+        if (!settings.showFood && item.object->name() == "Food") {
+            continue;
+        }
+        if (!settings.showMinerals && item.object->name() != "Food") {
+            continue;
+        }
+
         auto it = _itemDrawFunctions.find(item.object->name());
         if (it != _itemDrawFunctions.end()) {
             it->second(*item.object);
