@@ -86,7 +86,7 @@ class AInspectorUI : public components::UIGamePanel {
 
   protected:
     void buildInventoryPanel(bool includeFood = true);
-    void drawInventoryPanel(float& currentY, float startX, float panelW, int indexStart = 0);
+    void drawInventoryPanel(float& currentY, float startX, float panelW);
 
     [[nodiscard]] events::EventDispatcher& getDispatcher() { return _dispatcher.get(); }
     [[nodiscard]] std::shared_ptr<raylib::rtext::Font>& getFont() { return _font; }

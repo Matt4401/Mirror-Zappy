@@ -74,14 +74,14 @@ void AInspectorUI::buildInventoryPanel(bool includeFood) {
     }
 }
 
-void AInspectorUI::drawInventoryPanel(float& currentY, float startX, float panelW, int indexStart) {
+void AInspectorUI::drawInventoryPanel(float& currentY, float startX, float panelW) {
     float const titleX = startX + ((panelW - InvGridTotalWidth) / 2.0F);
     _inventoryTitleText->setPosition(titleX, currentY);
     _inventoryTitleText->draw();
     currentY += InvTitleToGridSpacing;
 
     float const gridX = startX + ((panelW - InvGridTotalWidth) / 2.0F);
-    for (size_t i = indexStart; i < _inventoryTexts.size(); ++i) {
+    for (size_t i = 0; i < _inventoryTexts.size(); ++i) {
         const int row = static_cast<int>(i) / 3;
         const int col = static_cast<int>(i) % 3;
         auto& invText = _inventoryTexts.at(i);
