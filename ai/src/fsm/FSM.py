@@ -1,11 +1,13 @@
 import time
-from .Constant import SURVIVAL_THRESHOLD
+import re
+from .Constant import SURVIVAL_THRESHOLD, FOOD_SAFE_FOR_FORK, ELEVATION_REQUIREMENTS, FORK_COOLDOWN_SECONDS, \
+    FOOD_SAFE_FOR_INCANTATION, BROADCAST_EVO_PROCESS, BROADCAST_DONE
 from .states.AttackState import AttackState
 from .states.ReproduceState import ReproduceState
 from .states.EvolveState import EvolveState
 from .states.GatherState import GatherState
 from .states.SurviveState import SurviveState
-from .states.HelpTeamMatesState import HelpTeamMatesState
+from .states.JoinIncantationState import JoinIncantationState
 from .AState import AState
 from .TickManager import TickManager
 
@@ -15,20 +17,22 @@ class FiniteStateMachine:
         self.state = default_state
         self.trantorian = trantorian
         self.tick_manager = tick_manager
-        self.sender = []
         self.pending_commands = {}
 
     def run(self):
         self.trantorian.logger.warning("===========Start FSM process===========")
-        while True:
+        while self.trantorian.connection.running:
             meta_cmds = self.tick_manager.tick_update()
             self.send_auto_cmds(meta_cmds)
             self.process_broadcasts()
+            self.process_server_events()
             self.process_pending_commands()
             self.eat_current_tile_food()
             self.update_state()
             self.execute_state()
             time.sleep(0.01)
+        self.trantorian.logger.warning("===========Player died, FSM stopped===========")
+        self.trantorian.connection.disconnect()
 
     def eat_current_tile_food(self):
         if self.pending_commands:
@@ -42,30 +46,8 @@ class FiniteStateMachine:
             "[FSM]: Food underfoot, taking it before other actions"
         )
         self.trantorian.take_object("food")
-        self.trantorian.refresh_inventory()
-
-    def process_broadcasts(self):
-        if not hasattr(self.trantorian, "broadcast_manager"):
-            return
-        broadcasts = self.trantorian.connection.get_broadcasts()
-        for broadcast in broadcasts:
-            decoded = self.trantorian.broadcast_manager.read_broadcast(
-                broadcast.message
-            )
-            if decoded is not None:
-                level, state = decoded
-                self.trantorian.logger.info(
-                    f"[FSM] Broadcast décodé de niveau {level}: {state}"
-                )
-                self.trantorian.received_broadcasts.append(
-                    {
-                        "level": level,
-                        "state": state,
-                        "direction": broadcast.direction,
-                        # "tick": self.tick_manager.tick,jsp si nécéssaire
-                        # "urgent_food": self.urgentfood
-                    }
-                )
+        self.trantorian.inventory()
+        # self.trantorian.refresh_inventory()
 
     def process_pending_commands(self):
         completed = []
@@ -110,73 +92,139 @@ class FiniteStateMachine:
                 cmd_id = self.trantorian.send_command.look()
                 self.pending_commands[cmd_id] = "look"
 
-            elif cmd is None and hasattr(self.trantorian, "broadcast_manager"):
+            elif cmd is None and hasattr(self.trantorian, "broadcast_message"):
                 self.trantorian.logger.info("[FSM]: Auto command Broadcast call")
-                msg = self.trantorian.broadcast_manager.create_message(
-                    "aha", "Commande de rassemblement"
-                )  # ceci est un exemple
+                msg = self.trantorian.broadcast_message.create_message()
                 cmd_id = self.trantorian.send_command.broadcast(msg)
                 self.pending_commands[cmd_id] = "broadcast"
 
     def update_state(self):
-        food = self.trantorian.player_state.inventory.get_food()
+        ps = self.trantorian.player_state
+        food = ps.inventory.get_food()
         self.trantorian.logger.info(f"[FSM]: number of food : {food}")
-        tick = self.tick_manager.tick
+
+        if isinstance(self.state, EvolveState):
+            if food < SURVIVAL_THRESHOLD:
+                self.state.reset("food_critical")
+                self.transition_to(SurviveState)
+                return
+            if ps.is_joining_incantation:
+                self.transition_to(JoinIncantationState)
+                return
+            if not self.state.finished:
+                return
+            # finished
 
         if food < SURVIVAL_THRESHOLD:
-            self.trantorian.logger.warning(
-                "[FSM]: Food is low, transitioning to SurviveState"
-            )
+            self.trantorian.logger.warning("[FSM]: Food is low, transitioning to SurviveState")
+            if isinstance(self.state, JoinIncantationState):
+                ps.clear_incantation_target()
             self.transition_to(SurviveState)
             return
-        if self.trantorian.player_state.level == 8:
-            self.transition_to(HelpTeamMatesState)
+
+        if isinstance(self.state, JoinIncantationState):
+            if ps.is_joining_incantation and not getattr(self.state, "force_exit", False):
+                return
+            ps.clear_incantation_target()
+
+        if ps.is_joining_incantation:
+            self.transition_to(JoinIncantationState)
             return
 
-        if self.trantorian.has_enough_resources_for(
-            self.trantorian.player_state.level + 1
-        ):
-            self.trantorian.logger.warning(
-                "[FSM]: Enough stones for next level, transitioning to EvolveState"
-            )
-            self.transition_to(EvolveState)
+        if self.trantorian.has_enough_resources_for(ps.level + 1):
+            if food >= FOOD_SAFE_FOR_INCANTATION:
+                self.trantorian.logger.warning("[FSM]: Enough stones, transitioning to EvolveState")
+                self.transition_to(EvolveState)
+                return
+            self.transition_to(SurviveState)
             return
-        else:
-            # Pareil ne pas activer pour le moment.
-            # threat = None
-            # my_size = 1
-            # if hasattr(self.trantorian, "broadcast_manager"):
-            #     my_size = self.trantorian.broadcast_manager.my_team_size(tick)
-            #     threat = self.trantorian.broadcast_manager.get_threat(my_size, tick)
-            #
-            # if threat:
-            #     self.trantorian.logger.warning("[FSM]: Threat detected, transitioning to AttackState")
-            #     self.state = AttackState(self.trantorian, threat.direction)
-            #     return
-            #
-            # if hasattr(self.trantorian, "broadcast_manager") and self.trantorian.broadcast_manager.should_reproduce(
-            #         tick):
-            #     self.trantorian.logger.warning("[FSM]: Team too small or unknown, transitioning to ReproduceState")
-            # if self.trantorian.broadcast_manager.should_reproduce(tick) and self.trantorian.player_state.get_food() >= 400 :
-            #     self.transition_to(ReproduceState)
-            #     return
 
-            self.trantorian.logger.warning(
-                "[FSM]: Not enough stones for next level, transitioning to GatherState"
-            )
-            self.transition_to(GatherState)
+        elapsed = time.time() - self.trantorian.last_fork_time
+        should_reproduce = (
+                self.trantorian.can_reproduce()
+                and food >= FOOD_SAFE_FOR_FORK
+                and elapsed >= FORK_COOLDOWN_SECONDS
+        )
+        if should_reproduce:
+            self.transition_to(ReproduceState)
+            return
+        self.trantorian.logger.warning("[FSM]: Not enough stones, transitioning to GatherState")
+        self.transition_to(GatherState)
+
+    def process_broadcasts(self):
+        ps = self.trantorian.player_state
+        broadcasts = self.trantorian.connection.get_broadcasts()
+        for broadcast in broadcasts:
+            direction = broadcast.direction
+            message = broadcast.message
+
+            if "|" not in message:
+                continue
+            team_name, payload = message.split("|", 1)
+            if team_name != ps.team_name:
+                continue
+
+            parts = payload.split(":")
+            kind = parts[0]
+
+            if kind == BROADCAST_EVO_PROCESS:
+                try:
+                    level = int(parts[1])
+                    leader = int(parts[2])
+                except (IndexError, ValueError):
+                    continue
+                self._handle_evo_process(direction, level, leader)
+
+            elif kind == BROADCAST_DONE:
+                try:
+                    leader = int(parts[2])
+                except (IndexError, ValueError):
+                    leader = None
+                self.handle_done(leader)
+
+    def _handle_evo_process(self, direction, level, leader):
+        ps = self.trantorian.player_state
+
+        if level != ps.level:
+            return
+        if leader == self.trantorian.leader_id:
+            return  # its the same player (not appended normally)
+
+        if isinstance(self.state, EvolveState):
+            if leader < self.trantorian.leader_id:
+                self.state.request(direction, level, leader)
+            return
+
+        current = ps.incantation_leader
+        if (not ps.is_joining_incantation
+                or current is None
+                or leader <= current):
+            ps.set_incantation_target(direction, level, leader)
+            if isinstance(self.state, JoinIncantationState):
+                self.state.on_signal()
+
+    def handle_done(self, leader):
+        ps = self.trantorian.player_state
+        if not isinstance(self.state, JoinIncantationState):
+            return
+        if ps.incantation_leader is None or leader is None or leader == ps.incantation_leader:
+            ps.clear_incantation_target()
+            self.state.force_exit = True
 
     def transition_to(self, state_class):
-        if not isinstance(self.state, state_class):
+        if not isinstance(self.state, state_class) or getattr(self.state, "finished", False):
             self.state = state_class(self.trantorian)
 
     def execute_state(self):
         self.state.execute()
 
+    def process_broadcast_events(self):
+        while True:
+            if len(self.trantorian.broadcast_queue) > 0:
+                event = self.trantorian.get_next_broadcast()
+
     def process_server_events(self):
         while True:
-            if len(self.trantorian.connection.event_queue) < 0:
-                continue
             event = self.trantorian.connection.get_next_event()
             if event is None:
                 break
@@ -185,7 +233,7 @@ class FiniteStateMachine:
                 self.trantorian.connection.running = False
                 return
             elif event.event_type == "eject":
-                direction = event.data.get("direction")
+                # direction = event.data.get("direction")
                 cmd_id = self.trantorian.send_command.look()
                 self.pending_commands[cmd_id] = "look"
 
@@ -198,7 +246,14 @@ class FiniteStateMachine:
                     match = re.search(r"Current level:\s*(\d+)", msg)
                     if match:
                         new_level = int(match.group(1))
-                        self.trantorian.player_state.level = new_level
-                        self.trantorian.logger.info(f"up level  {new_level}")
-                        cmd_id = self.trantorian.send_command.look()
-                        self.pending_commands[cmd_id] = "look"
+                        if new_level > self.trantorian.player_state.level:
+                            self.trantorian.player_state.level = new_level
+                            self.trantorian.player_state.vision.set_level(new_level)
+                            self.trantorian.player_state.vision.reset_on_turn()
+                            if isinstance(self.state, EvolveState):
+                                self.state.stones_placed = False
+                                self.state.wait_ticks = 0
+                                self.state.finished = True
+                            self.trantorian.logger.info(f"up level  {new_level}")
+                            cmd_id = self.trantorian.send_command.look()
+                            self.pending_commands[cmd_id] = "look"
