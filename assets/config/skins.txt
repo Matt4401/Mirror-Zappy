@@ -24,7 +24,6 @@ assets/models/player/skins/oxilac.png 100
 assets/models/player/skins/ponk.png 100
 assets/models/player/skins/popigames.png 100
 assets/models/player/skins/redkill.png 100
-assets/models/player/skins/roilouis.png 100
 assets/models/player/skins/siphano.png 100
 assets/models/player/skins/soristos.png 100
 assets/models/player/skins/superbrioche.png 100

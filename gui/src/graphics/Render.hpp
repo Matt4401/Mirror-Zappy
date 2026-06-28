@@ -89,7 +89,7 @@ class Render {
     static constexpr int LeftAltKey = 342;
     static constexpr int DefaultFps = 60;
     static constexpr std::string DefaultFontName = "Minecraft";
-    static constexpr float MinCameraHeight = 1.3F;
+    static constexpr float MinCameraHeight = -30.0F;
 
     static constexpr float CameraPaddingMin = 50.0F;
     static constexpr float CameraPaddingMax = 60.0F;
