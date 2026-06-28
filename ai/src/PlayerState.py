@@ -9,6 +9,34 @@ class PlayerState:
         self.direction = 1
         self.inventory = Inventory()
         self.vision = VisionManager()
+        self.incantation_target = None
+        self.incantation_level = None
+        self.incantation_leader = None
+        self.is_joining_incantation = False
+        self.is_evolving = False
+
+    def set_incantation_target(self, direction, level=None, leader=None):
+        self.incantation_target = direction
+        if level is not None:
+            self.incantation_level = level
+        if leader is not None:
+            self.incantation_leader = leader
+        self.is_joining_incantation = True
+
+    def consume_incantation_target(self):
+        self.incantation_target = None
+
+    def clear_incantation_target(self):
+        self.incantation_target = None
+        self.incantation_level = None
+        self.incantation_leader = None
+        self.is_joining_incantation = False
+
+    def set_evolving(self):
+        self.is_evolving = True
+
+    def clear_evolving(self):
+        self.is_evolving = False
 
     def get_direction(self):
         return self.direction

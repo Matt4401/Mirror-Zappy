@@ -3,6 +3,7 @@ from ..AState import AState
 
 class SurviveState(AState):
     def execute(self):
+        self.maybe_eat_food()
         self.trantorian.logger.info("===========Entering Survive state===========")
         closest_food_idx = self.trantorian.player_state.vision.get_tile_index_of("food")
 
@@ -12,7 +13,7 @@ class SurviveState(AState):
             )
             self.trantorian.move_to_tile(closest_food_idx)
             self.trantorian.take_object("food")
-            self.trantorian.refresh_inventory()
+            self.trantorian.inventory()
             self.trantorian.look()
             return
 

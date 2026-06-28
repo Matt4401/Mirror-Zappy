@@ -41,7 +41,7 @@ class CommandResponse:
 class Connection:
     MAX_PENDING_COMMANDS = 10
 
-    def __init__(self, host, port, team_name):
+    def __init__(self, host, port, team_name, connect_timeout=0.0):
         self.host = host
         self.port = port
         self.team_name = team_name
@@ -64,8 +64,19 @@ class Connection:
         self.reader_thread = None
         self.on_event_received = None
         self.event_thread = None
-        self.connect(host, port)
-        self.do_handshake()
+        deadline = time.time() + connect_timeout
+        while True:
+            self.connect(host, port)
+            if self.do_handshake():
+                break
+            try:
+                self.socket.close()
+            except OSError:
+                pass
+            if time.time() >= deadline:
+                print("No team slot available")
+                sys.exit(84)
+            time.sleep(0.3)
         self.start()
 
     def connect(self, host, port):
@@ -109,7 +120,9 @@ class Connection:
                     idx += 1
                     self.send_raw_command(self.team_name)
                 elif idx == 1:
-                    if not line.isdigit() or int(line) <= 0:
+                    if line == "ko":
+                        return False
+                    if not line.isdigit():
                         print(f"Handshake failed: invalid client number '{line}'")
                         sys.exit(84)
                     self.client_num = int(line)
@@ -123,6 +136,7 @@ class Connection:
                     except ValueError:
                         print(f"Handshake failled: invalid dimensions '{line}'")
                         sys.exit(84)
+        return True
 
     def start(self):
         self.running = True
@@ -153,6 +167,8 @@ class Connection:
                         if not line:
                             continue
                         msg_type, msg_data = self.parse_server_message(line)
+                        if msg_type == "pending":
+                            continue
                         if msg_type == "dead":
                             self.running = False
                         if msg_type == "broadcast":
@@ -183,13 +199,20 @@ class Connection:
                                     )
                                 )
                             if msg_data.get("message", "").startswith("Current level"):
-                                with self.response_lock:
-                                    self.command_responses.append(msg_data["message"])
+                                with self.command_lock:
+                                    has_incantation = any(
+                                        req.command == "Incantation"
+                                        for req in self.active_requests.values()
+                                    )
+                                if has_incantation:
+                                    with self.response_lock:
+                                        self.command_responses.append(msg_data["message"])
                         else:
                             with self.response_lock:
                                 self.command_responses.append(msg_data["content"])
                 except BlockingIOError:
                     time.sleep(0.01)
+                    # pass
                 except Exception as e:
                     if self.running:
                         print(f"Error reading from socket: {e}")
@@ -249,8 +272,11 @@ class Connection:
                 return "eject", {"direction": direction}
         if line == "dead":
             return "dead", {}
-        if "Elevation" in line or "Current level" in line:
+        if line == "Elevation underway":
+            return "pending", {"content": line}
+        if line.startswith("Current level"):
             return "elevation", {"message": line}
+
         return "response", {"content": line}
 
     def send_cmd_buffer(self):

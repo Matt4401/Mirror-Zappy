@@ -7,6 +7,7 @@ class AttackState(AState):
         self.threat_direction = threat_direction
 
     def execute(self):
+        self.maybe_eat_food()
         vision = self.trantorian.player_state.vision
 
         players_here = (
