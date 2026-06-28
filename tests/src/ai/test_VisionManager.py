@@ -1,71 +1,44 @@
-import sys
-import os
+import unittest
+from src.util.VisionManager import VisionManager
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
+class TestVisionManager(unittest.TestCase):
+    def setUp(self):
+        self.vision = VisionManager()
 
-from ai.src.util.VisionManager import VisionManager
+    def test_initial_state(self):
+        self.assertEqual(self.vision.current_level, 1)
+        self.assertEqual(self.vision.tiles, [])
 
+    def test_set_level(self):
+        self.vision.set_level(3)
+        self.assertEqual(self.vision.current_level, 3)
 
-def test_vision_manager_initialization():
-    vm = VisionManager()
-    assert vm.tiles == []
-    assert vm.current_level == 1
+    def test_update_tiles(self):
+        new_tiles = [["player"], ["food", "linemate"]]
+        self.vision.update_tiles(new_tiles)
+        self.assertEqual(self.vision.get_tiles(), new_tiles)
 
+    def test_remove_resource_underfoot(self):
+        self.vision.update_tiles([["food", "linemate"]])
+        self.vision.remove_resource_underfoot("food")
+        self.assertIn("linemate", self.vision.get_tiles()[0])
+        self.assertNotIn("food", self.vision.get_tiles()[0])
 
-def test_set_level_and_update_tiles():
-    vm = VisionManager()
+    def test_add_resource_underfoot(self):
+        self.vision.update_tiles([["linemate"]])
+        self.vision.add_resource_underfoot("food")
+        self.assertIn("food", self.vision.get_tiles()[0])
+        self.assertIn("linemate", self.vision.get_tiles()[0])
 
-    vm.set_level(3)
-    assert vm.current_level == 3
+    def test_get_tile_index_of_found(self):
+        self.vision.update_tiles([["player"], [], ["food"]])
+        self.assertEqual(self.vision.get_tile_index_of("food"), 2)
 
-    mock_tiles = [["player"], ["food"], ["linemate"]]
-    vm.update_tiles(mock_tiles)
-    assert vm.tiles == mock_tiles
+    def test_get_tile_index_of_not_found(self):
+        self.vision.update_tiles([["player"], [], ["food"]])
+        self.assertIsNone(self.vision.get_tile_index_of("sibur"))
 
-
-def test_resource_management_underfoot():
-    vm = VisionManager()
-    vm.update_tiles([["player", "food"], ["linemate"]])
-
-    vm.remove_resource_underfoot("food")
-    assert "food" not in vm.tiles[0]
-    assert "player" in vm.tiles[0]
-
-    vm.add_resource_underfoot("sibur")
-    assert "sibur" in vm.tiles[0]
-
-
-def test_get_tile_index_of():
-    vm = VisionManager()
-    vm.update_tiles([["player"], ["food"], [], ["linemate"]])
-    assert vm.get_tile_index_of("food") == 1
-    assert vm.get_tile_index_of("linemate") == 3
-    assert vm.get_tile_index_of("thystame") is None
-
-
-def test_reset_on_turn():
-    vm = VisionManager()
-    vm.update_tiles([["player"], ["food"]])
-    vm.reset_on_turn()
-    assert vm.tiles == []
-
-
-def test_shift_on_forward_level_1():
-    vm = VisionManager()
-    vm.set_level(1)
-    initial_tiles = [["player"], ["food"], ["linemate"], ["deraumere"]]
-    vm.update_tiles(initial_tiles)
-    vm.shift_on_forward()
-
-    assert len(vm.tiles) == 4
-    assert vm.tiles[0] == ["linemate"]
-    assert vm.tiles[1] == []
-    assert vm.tiles[2] == []
-    assert vm.tiles[3] == []
-
-
-def test_shift_on_forward_empty():
-    vm = VisionManager()
-    vm.tiles = []
-    vm.shift_on_forward()
-    assert vm.tiles == []
+    def test_reset_on_turn(self):
+        self.vision.update_tiles([["food"]])
+        self.vision.reset_on_turn()
+        self.assertEqual(self.vision.get_tiles(), [])

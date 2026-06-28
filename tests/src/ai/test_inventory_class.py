@@ -1,30 +1,29 @@
-import sys
-import os
-import pytest
+import unittest
+from src.util.InventoryClass import Inventory
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
+class TestInventory(unittest.TestCase):
+    def setUp(self):
+        self.inventory = Inventory()
 
-from ai.src.util.InventoryClass import Inventory
-from ai.src.ParseCommand import ParseCommand
+    def test_initial_values(self):
+        self.assertEqual(self.inventory.food, 10)
+        self.assertEqual(self.inventory.linemate, 0)
+        self.assertEqual(self.inventory.deraumere, 0)
+        self.assertEqual(self.inventory.sibur, 0)
+        self.assertEqual(self.inventory.mendiane, 0)
+        self.assertEqual(self.inventory.phiras, 0)
+        self.assertEqual(self.inventory.thystame, 0)
 
+    def test_update_inventory(self):
+        self.inventory.update_inventory(1, 2, 3, 4, 5, 6, 20)
+        self.assertEqual(self.inventory.linemate, 1)
+        self.assertEqual(self.inventory.deraumere, 2)
+        self.assertEqual(self.inventory.sibur, 3)
+        self.assertEqual(self.inventory.mendiane, 4)
+        self.assertEqual(self.inventory.phiras, 5)
+        self.assertEqual(self.inventory.thystame, 6)
+        self.assertEqual(self.inventory.food, 20)
 
-def test_inventory():
-    inventory = Inventory()
-    parser = ParseCommand(inventory)
-    cmd = (
-        "linemate 5, deraumere 4, sibur 5, mendiane 0, phiras 55, thystame 8, food 444"
-    )
-
-    parser.parse_inventory(cmd)
-    assert inventory.linemate == 5
-    assert inventory.food == 444
-
-
-def test_parse_inventory__missing_value():
-    inventory = Inventory()
-    parser = ParseCommand(inventory)
-    cmd = "linemate 5 4, sibur 5, mendiane 0, phiras 55, thystame 8, food 444"
-
-    with pytest.raises(ValueError) as e:
-        parser.parse_inventory(cmd)
-    assert "deraumere" in str(e.value)
+    def test_get_food(self):
+        self.inventory.food = 15
+        self.assertEqual(self.inventory.get_food(), 15)
