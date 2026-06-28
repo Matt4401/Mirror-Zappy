@@ -11,7 +11,10 @@ add_library(zappy_gui_ui
         components/UITextbox.cpp
         components/UICompass.cpp
         components/EventLogRow.cpp
+        components/UIToggle.cpp
+        components/UIKeybindButton.cpp
         menus/PauseMenu.cpp
+        menus/SettingsMenu.cpp
         menus/PlayerInspectorUI.cpp
         menus/AInspectorUI.cpp
         menus/TileInspectorUI.cpp
@@ -37,7 +40,10 @@ target_sources(zappy_gui_ui PUBLIC
         components/UITextbox.hpp
         components/UICompass.hpp
         components/EventLogRow.hpp
+        components/UIToggle.hpp
+        components/UIKeybindButton.hpp
         menus/PauseMenu.hpp
+        menus/SettingsMenu.hpp
         menus/PlayerInspectorUI.hpp
         menus/AInspectorUI.hpp
         menus/TileInspectorUI.hpp
