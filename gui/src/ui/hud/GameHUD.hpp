@@ -41,6 +41,7 @@ class GameHUD {
     GameHUD& operator=(GameHUD&& other) = delete;
 
     void registerToUIManager(UIManager& uiManager);
+    void saveUILayout();
 
     [[nodiscard]] std::shared_ptr<components::UIGridManager> getGridManager() const { return _gridManager; }
     [[nodiscard]] std::shared_ptr<components::UICompass> getCompass() const { return _compass; }
@@ -65,6 +66,7 @@ class GameHUD {
     std::shared_ptr<menus::WorldControlUI> _worldControl;
     std::shared_ptr<menus::EventLogUI> _eventLog;
     std::shared_ptr<menus::GlobalStatsUI> _globalStats;
+    std::reference_wrapper<SettingsManager> _settingsManager;
 
     static constexpr int WorldControlWidthCols = 26;
     static constexpr int WorldControlX = (components::UIGridManager::GridCols - WorldControlWidthCols) / 2;

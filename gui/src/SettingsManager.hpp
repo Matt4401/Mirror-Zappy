@@ -40,6 +40,7 @@ struct SettingsData {
         {"Move Forward", KEY_W}, {"Move Backward", KEY_S},      {"Move Left", KEY_A},  {"Move Right", KEY_D},
         {"Move Up", KEY_SPACE},  {"Move Down", KEY_LEFT_SHIFT}, {"Pause", KEY_ESCAPE}, {"Sprint", KEY_LEFT_CONTROL},
         {"Reset Camera", KEY_R}, {"Toggle UI", KEY_LEFT_ALT}};
+    std::map<std::string, std::vector<int>> uiLayouts;
 };
 
 class SettingsManager {
