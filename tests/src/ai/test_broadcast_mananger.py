@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import Mock
 from src.util.BroadcastMessageManager import BroadcastMessageManager
 
+
 class TestBroadcastMessageManager(unittest.TestCase):
     def setUp(self):
         self.mock_player_state = Mock()

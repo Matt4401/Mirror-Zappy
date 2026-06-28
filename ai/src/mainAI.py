@@ -18,6 +18,7 @@ def mainAI():
     parser.add_argument(
         "-h", type=str, required=True, metavar="machine", dest="machine"
     )
+    parser.add_argument("-b", action="store_true", help="get bonus mode")
     parser.add_argument("-g", type=int, default=0, metavar="generation")
 
     try:
@@ -36,7 +37,9 @@ def mainAI():
     trantorian = None
     try:
         connect_timeout = 15.0 if generation > 0 else 3.0
-        trantorian = Trantorian(port, host, team_name, player_id, connect_timeout)
+        trantorian = Trantorian(
+            port, host, team_name, player_id, args.b, connect_timeout
+        )
         trantorian.generation = generation
         print("Trantorian ok")
         if generation == 0:

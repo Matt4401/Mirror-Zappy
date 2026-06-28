@@ -1,7 +1,14 @@
 import time
 import re
-from .Constant import SURVIVAL_THRESHOLD, FOOD_SAFE_FOR_FORK, ELEVATION_REQUIREMENTS, FORK_COOLDOWN_SECONDS, \
-    FOOD_SAFE_FOR_INCANTATION, BROADCAST_EVO_PROCESS, BROADCAST_DONE
+from .Constant import (
+    SURVIVAL_THRESHOLD,
+    FOOD_SAFE_FOR_FORK,
+    ELEVATION_REQUIREMENTS,
+    FORK_COOLDOWN_SECONDS,
+    FOOD_SAFE_FOR_INCANTATION,
+    BROADCAST_EVO_PROCESS,
+    BROADCAST_DONE,
+)
 from .states.AttackState import AttackState
 from .states.ReproduceState import ReproduceState
 from .states.EvolveState import EvolveState
@@ -116,14 +123,18 @@ class FiniteStateMachine:
             # finished
 
         if food < SURVIVAL_THRESHOLD:
-            self.trantorian.logger.warning("[FSM]: Food is low, transitioning to SurviveState")
+            self.trantorian.logger.warning(
+                "[FSM]: Food is low, transitioning to SurviveState"
+            )
             if isinstance(self.state, JoinIncantationState):
                 ps.clear_incantation_target()
             self.transition_to(SurviveState)
             return
 
         if isinstance(self.state, JoinIncantationState):
-            if ps.is_joining_incantation and not getattr(self.state, "force_exit", False):
+            if ps.is_joining_incantation and not getattr(
+                self.state, "force_exit", False
+            ):
                 return
             ps.clear_incantation_target()
 
@@ -133,7 +144,9 @@ class FiniteStateMachine:
 
         if self.trantorian.has_enough_resources_for(ps.level + 1):
             if food >= FOOD_SAFE_FOR_INCANTATION:
-                self.trantorian.logger.warning("[FSM]: Enough stones, transitioning to EvolveState")
+                self.trantorian.logger.warning(
+                    "[FSM]: Enough stones, transitioning to EvolveState"
+                )
                 self.transition_to(EvolveState)
                 return
             self.transition_to(SurviveState)
@@ -141,14 +154,17 @@ class FiniteStateMachine:
 
         elapsed = time.time() - self.trantorian.last_fork_time
         should_reproduce = (
-                self.trantorian.can_reproduce()
-                and food >= FOOD_SAFE_FOR_FORK
-                and elapsed >= FORK_COOLDOWN_SECONDS
+            self.trantorian.can_reproduce()
+            and food >= FOOD_SAFE_FOR_FORK
+            and elapsed >= FORK_COOLDOWN_SECONDS
         )
-        if should_reproduce:
-            self.transition_to(ReproduceState)
-            return
-        self.trantorian.logger.warning("[FSM]: Not enough stones, transitioning to GatherState")
+        if self.trantorian.sex == "Female":
+            if should_reproduce:
+                self.transition_to(ReproduceState)
+                return
+        self.trantorian.logger.warning(
+            "[FSM]: Not enough stones, transitioning to GatherState"
+        )
         self.transition_to(GatherState)
 
     def process_broadcasts(self):
@@ -196,9 +212,7 @@ class FiniteStateMachine:
             return
 
         current = ps.incantation_leader
-        if (not ps.is_joining_incantation
-                or current is None
-                or leader <= current):
+        if not ps.is_joining_incantation or current is None or leader <= current:
             ps.set_incantation_target(direction, level, leader)
             if isinstance(self.state, JoinIncantationState):
                 self.state.on_signal()
@@ -207,12 +221,18 @@ class FiniteStateMachine:
         ps = self.trantorian.player_state
         if not isinstance(self.state, JoinIncantationState):
             return
-        if ps.incantation_leader is None or leader is None or leader == ps.incantation_leader:
+        if (
+            ps.incantation_leader is None
+            or leader is None
+            or leader == ps.incantation_leader
+        ):
             ps.clear_incantation_target()
             self.state.force_exit = True
 
     def transition_to(self, state_class):
-        if not isinstance(self.state, state_class) or getattr(self.state, "finished", False):
+        if not isinstance(self.state, state_class) or getattr(
+            self.state, "finished", False
+        ):
             self.state = state_class(self.trantorian)
 
     def execute_state(self):

@@ -7,6 +7,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.
 
 from ai.zappy_ai import main
 
+
 @patch("src.Trantorian.Connection")
 def test_main(mock_connect_class):
     mock_instance = MagicMock()

@@ -1,6 +1,7 @@
 import unittest
 from src.util.InventoryClass import Inventory
 
+
 class TestInventory(unittest.TestCase):
     def setUp(self):
         self.inventory = Inventory()
