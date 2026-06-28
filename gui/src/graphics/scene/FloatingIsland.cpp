@@ -102,7 +102,7 @@ void FloatingIsland::buildDepthGrid(int width, int height, float maxDepth, std::
 void FloatingIsland::buildBlocks(int width, int height, float offsetX, float offsetZ,
                                  const std::vector<std::vector<int>>& depthGrid,
                                  const std::vector<std::vector<unsigned char>>& noiseGrid) {
-    const float yOffset = 0.0F;
+    const float yOffset = 2.0F;
 
     for (int z = 0; z < height; z++) {
         for (int x = 0; x < width; x++) {
