@@ -29,15 +29,16 @@ class Map {
     using SelectedPlayer =
         std::pair<std::reference_wrapper<const game::Team>, std::reference_wrapper<const game::Player>>;
 
-    static constexpr const char* TILE_MODEL_RESOURCE = "assets/minecraft-grass-block/source/Grass_Block.obj";
+    static constexpr const char* TILE_MODEL_RESOURCE =
+        "assets/models/environment/minecraft-grass-block/source/Grass_Block.obj";
 
-    static constexpr const char* DERAUMERE_MODEL_RESOURCE = "assets/red-ore.glb";
-    static constexpr const char* LINEMATE_MODEL_RESOURCE = "assets/pink-ore.glb";
-    static constexpr const char* SIBUR_MODEL_RESOURCE = "assets/green-ore.glb";
-    static constexpr const char* PHIRAS_MODEL_RESOURCE = "assets/blue-ore.glb";
-    static constexpr const char* THYSTAME_MODEL_RESOURCE = "assets/cyan-ore.glb";
-    static constexpr const char* MENDIANE_MODEL_RESOURCE = "assets/orange-ore/scene.gltf";
-    static constexpr const char* FOOD_TEXTURE_RESOURCE = "assets/food.glb";
+    static constexpr const char* DERAUMERE_MODEL_RESOURCE = "assets/models/resources/red-ore.glb";
+    static constexpr const char* LINEMATE_MODEL_RESOURCE = "assets/models/resources/pink-ore.glb";
+    static constexpr const char* SIBUR_MODEL_RESOURCE = "assets/models/resources/green-ore.glb";
+    static constexpr const char* PHIRAS_MODEL_RESOURCE = "assets/models/resources/blue-ore.glb";
+    static constexpr const char* THYSTAME_MODEL_RESOURCE = "assets/models/resources/cyan-ore.glb";
+    static constexpr const char* MENDIANE_MODEL_RESOURCE = "assets/models/resources/orange-ore/scene.gltf";
+    static constexpr const char* FOOD_TEXTURE_RESOURCE = "assets/models/resources/food.glb";
 
     Map(raylib::rcore::Camera& camera, WorldManager& worldManager, events::EventDispatcher& dispatcher);
     ~Map();

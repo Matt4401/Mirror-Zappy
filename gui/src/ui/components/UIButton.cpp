@@ -35,6 +35,7 @@ const raylib::Color UIButton::DarkBorderColor(60, 60, 60, 255);
 const raylib::Color UIButton::HoverOutlineColor(255, 255, 255, 180);
 const raylib::Color UIButton::TextHoverColor(255, 255, 255, 255);
 const raylib::Color UIButton::TextNormalColor(220, 220, 220, 255);
+std::function<void()> UIButton::_clickSoundHandler;
 
 UIButton::UIButton(float x, float y, float width, float height, const std::string& text,
                    std::shared_ptr<raylib::rtext::Font> font)
@@ -154,6 +155,9 @@ void UIButton::handleEvent() {
     }
 
     if (_isHovered && raylib::rcore::Event::isMouseButtonReleased(MouseLeftButton)) {
+        if (_clickSoundHandler) {
+            _clickSoundHandler();
+        }
         if (_onClick) {
             _onClick();
         }
@@ -180,6 +184,8 @@ bool UIButton::isVisible() const { return _isVisible; }
 void UIButton::setVisible(bool visible) { _isVisible = visible; }
 
 void UIButton::setOnClick(std::function<void()> callback) { _onClick = std::move(callback); }
+
+void UIButton::setClickSoundHandler(std::function<void()> callback) { _clickSoundHandler = std::move(callback); }
 
 void UIButton::setFontSize(float size) {
     if (size <= 0.0F) {

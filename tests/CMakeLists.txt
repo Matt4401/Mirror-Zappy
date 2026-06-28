@@ -40,6 +40,7 @@ target_link_libraries(unit_tests PRIVATE
         zappy_shared
         zappy_parser
         zappy_server_objects
+        zappy_gui_audio
         zappy_gui_events
         zappy_gui_network
         zappy_gui_graphics_scene

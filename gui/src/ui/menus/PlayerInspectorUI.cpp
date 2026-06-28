@@ -117,7 +117,7 @@ PlayerInspectorUI::PlayerInspectorUI(float x, float y, float width, events::Even
     buildInfoPanel();
     buildInventoryPanel();
 
-    _previewModel = std::make_shared<raylib::rmodels::Model>("assets/models/player.gltf");
+    _previewModel = std::make_shared<raylib::rmodels::Model>("assets/models/player/player.gltf");
 
     _firstPersonBtn->setFontSize(FirstPersonBtnFontSize);
     _firstPersonBtn->setOnClick([this]() {
@@ -260,11 +260,15 @@ void PlayerInspectorUI::onPlayerClicked(const events::PlayerClicked& event) {
     if (_previewModel) {
         if (!event.textureId.empty()) {
             auto tex = graphics::AssetManager::getInstance().getTexture(event.textureId);
-            if (tex) {
-                _previewModel->setMaterialTexture(0, 0 /* MATERIAL_MAP_ALBEDO */, *tex);
+            if (tex && tex->valid()) {
+                // NOLINTNEXTLINE (cppcoreguidelines-pro-bounds-pointer-arithmetic)
+                const int materialIndex = _previewModel->model().meshMaterial[0];
+                _previewModel->setMaterialTexture(materialIndex, 0 /* MATERIAL_MAP_ALBEDO */, *tex);
             }
         } else {
-            _previewModel->setMaterialTexture(0, 0 /* MATERIAL_MAP_ALBEDO */,
+            // NOLINTNEXTLINE (cppcoreguidelines-pro-bounds-pointer-arithmetic)
+            const int materialIndex = _previewModel->model().meshMaterial[0];
+            _previewModel->setMaterialTexture(materialIndex, 0 /* MATERIAL_MAP_ALBEDO */,
                                               raylib::rtextures::Texture2D{::Texture2D{}, false});
         }
     }
