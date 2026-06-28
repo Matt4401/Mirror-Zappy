@@ -1,3 +1,4 @@
+---
 site_name: Zappy documentation
 nav:
   - Home: index.md
@@ -11,6 +12,12 @@ nav:
       - Overview: ai/index.md
   - GUI:
       - Overview: gui/index.md
+      - Architecture: gui/architecture.md
+      - Core Orchestrator: gui/core.md
+      - User Interface: gui/ui.md
+      - Rendering: gui/rendering.md
+      - Networking: gui/network.md
+      - Events: gui/events.md
 theme:
   name: readthedocs
 plugins:
