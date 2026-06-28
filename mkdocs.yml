@@ -14,10 +14,13 @@ nav:
       - Overview: gui/index.md
       - Architecture: gui/architecture.md
       - Core Orchestrator: gui/core.md
+      - World State: gui/world.md
       - User Interface: gui/ui.md
       - Rendering: gui/rendering.md
+      - Audio: gui/audio.md
       - Networking: gui/network.md
       - Events: gui/events.md
+      - Raylib Wrappers: gui/raylib_wrappers.md
 theme:
   name: readthedocs
 plugins:

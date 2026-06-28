@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string>
 
 #include "AudioManager.hpp"
@@ -56,7 +57,11 @@ class Render {
     void handleInput();
     void handleEscapeKey();
     void handleAltKey();
+    void updateCameraState();
+    void updateHUDVisibility() const;
+    void updateInteraction();
     void updateFreeCamera();
+    void updateFollowCamera();
     void updateCameraLimits();
 
     raylib::rcore::Window _window{WINDOW_NAME.c_str()};
@@ -74,6 +79,11 @@ class Render {
     bool _isExiting{false};
     bool _uiMode{false};
     UpdateMode _updateMode{UpdateMode::All};
+
+    int _followedPlayerId{-1};
+    std::optional<raylib::rmath::Vector3> _lastPlayerPos;
+    events::EventDispatcher::EventToken _playerClickedToken{0};
+    events::EventDispatcher::EventToken _playerUnselectedToken{0};
 
     static constexpr int EscapeKey = 256;
     static constexpr int LeftAltKey = 342;

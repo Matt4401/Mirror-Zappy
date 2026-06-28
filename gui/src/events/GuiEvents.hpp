@@ -46,6 +46,8 @@ struct RequestCyclePlayer {
     int currentPlayerId{-1};
 };
 
+struct PlayerUnselected {};
+
 enum class TimeMode : std::uint8_t { MORNING, AFTERNOON, EVENING, NIGHT, CYCLE };
 
 struct TimeOfDayChanged {

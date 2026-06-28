@@ -395,6 +395,9 @@ void PlayerInspectorUI::handleEvent() {
 void PlayerInspectorUI::setVisible(bool visible) {
     AInspectorUI::setVisible(visible);
     if (!visible) {
+        if (_targetPlayerId != -1) {
+            getDispatcher().dispatch(events::PlayerUnselected{});
+        }
         _targetPlayerId = -1;
     }
 }

@@ -32,7 +32,7 @@ The GUI is not authoritative. It never decides game rules. Its job is to:
 7. **[UI System](ui.md):** HUD, panels, inspectors, pause menu, and layout grid.
 8. **[Audio](audio.md):** Music, spatial sounds, pitch scaling, and UI sounds.
 9. **[Raylib Wrappers](raylib_wrappers.md):** Local wrapper conventions.
-10. **[Contributing](contributing.md):** How to add features safely.
+10. **[Contributing](../CONTRIBUTING.md):** How to add features safely.
 
 ## Quick Developer Map
 
@@ -44,4 +44,3 @@ The GUI is not authoritative. It never decides game rules. Its job is to:
 | Add UI panel behavior | `GameHUD`, `UIManager`, [UI System](ui.md) |
 | Add a sound | `AudioManager`, [Audio](audio.md) |
 | Add a Raylib feature | `gui/raylib/`, [Raylib Wrappers](raylib_wrappers.md) |
-

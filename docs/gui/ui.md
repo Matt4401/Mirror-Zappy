@@ -41,6 +41,10 @@ Reusable components include:
 | `UIDropdown` | Selectable dropdown. |
 | `UITextbox` | Editable text input. |
 | `UICompass` | Camera direction display. |
+| `UIToggle` | Checkbox/toggle switch component. |
+| `UIKeybindButton` | Specialized button for capturing keyboard/mouse inputs for keybindings. |
+| `EventLogRow` | A single entry in the event log containing formatted text. |
+| `UIGridManager` | Container that handles grid-based layout and editing for game panels. |
 
 ## GameHUD
 

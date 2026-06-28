@@ -11,10 +11,12 @@
 
 #include <algorithm>
 #include <memory>
+#include <optional>
 
 #include "AssetManager.hpp"
 #include "AudioManager.hpp"
 #include "FirstPerson.hpp"
+#include "GuiEvents.hpp"
 #include "SettingsManager.hpp"
 #include "events/EventDispatcher.hpp"
 #include "rcore/Camera.hpp"
@@ -78,9 +80,26 @@ Render::Render(events::EventDispatcher& dispatcher, AudioManager& audioManager, 
         gameOverUI->setOnExit([this]() { _isExiting = true; });
         gameOverUI->setOnSpectate([this]() { updateCursorState(); });
     }
+
+    _playerClickedToken = _dispatcher.get().subscribe<events::PlayerClicked>([this](const events::PlayerClicked& e) {
+        _followedPlayerId = e.playerId;
+        _lastPlayerPos = std::nullopt;
+    });
+
+    _playerUnselectedToken =
+        _dispatcher.get().subscribe<events::PlayerUnselected>([this](const events::PlayerUnselected& /*e*/) {
+            _followedPlayerId = -1;
+            _lastPlayerPos = std::nullopt;
+        });
 }
 
 Render::~Render() {
+    if (_playerClickedToken != 0) {
+        _dispatcher.get().unsubscribe<events::PlayerClicked>(_playerClickedToken);
+    }
+    if (_playerUnselectedToken != 0) {
+        _dispatcher.get().unsubscribe<events::PlayerUnselected>(_playerUnselectedToken);
+    }
     _firstPerson.reset();
     _gameHUD.reset();
     _uiManager.clear();
@@ -143,6 +162,28 @@ void Render::updateFreeCamera() {
     raylib::rmath::Vector3 const movement(forward * speed, right * speed, up * speed);
     raylib::rmath::Vector3 const rotation(mouseDelta.x() * sens, mouseDelta.y() * sens, 0.0F);
 
+    float const zoom = raylib::rcore::Event::getMouseWheelMoveStatic() * CameraZoomSpeed;
+
+    _camera.updateCameraPro(movement, rotation, zoom);
+
+    if (_camera.position().y() < scene::Tile3D::TILE_SIZE * MinCameraHeight) {
+        _camera.setPosition(
+            {_camera.position().x(), scene::Tile3D::TILE_SIZE * MinCameraHeight, _camera.position().z()});
+        _camera.setTarget({_camera.target().x(), _camera.target().y() + (raylib::rcore::Window::frameTime() * 2.0F),
+                           _camera.target().z()});
+    }
+
+    updateCameraLimits();
+}
+
+void Render::updateFollowCamera() {
+    auto& settings = _settingsManager.get().getSettings();
+
+    raylib::rmath::Vector2 const mouseDelta = raylib::rcore::Event::getMouseDeltaStatic();
+    float const sens = settings.cameraSensitivity * CameraSensMultiplier;
+
+    raylib::rmath::Vector3 const movement(0.0F, 0.0F, 0.0F);
+    raylib::rmath::Vector3 const rotation(mouseDelta.x() * sens, mouseDelta.y() * sens, 0.0F);
     float const zoom = raylib::rcore::Event::getMouseWheelMoveStatic() * CameraZoomSpeed;
 
     _camera.updateCameraPro(movement, rotation, zoom);
@@ -257,6 +298,53 @@ void Render::updateCameraLimits() {
     }
 }
 
+void Render::updateCameraState() {
+    if (_followedPlayerId != -1) {
+        auto playerOpt = _worldManager.playerById(_followedPlayerId);
+        if (playerOpt) {
+            auto const pos = playerOpt->get().position();
+            raylib::rmath::Vector3 const delta =
+                _lastPlayerPos.has_value() ? pos - *_lastPlayerPos : pos - _camera.target();
+            _camera.setPosition(_camera.position() + delta);
+            _camera.setTarget(pos);
+            _lastPlayerPos = pos;
+
+            if (!_firstPerson || !_firstPerson->active()) {
+                updateFollowCamera();
+            }
+        } else {
+            _followedPlayerId = -1;
+            _lastPlayerPos = std::nullopt;
+        }
+    } else if (!_uiMode && (!_firstPerson || !_firstPerson->active())) {
+        updateFreeCamera();
+    }
+}
+
+void Render::updateHUDVisibility() const {
+    if (_gameHUD) {
+        bool const showUI = _settingsManager.get().getSettings().showUI;
+        if (_gameHUD->getGridManager()) {
+            _gameHUD->getGridManager()->setVisible(showUI);
+        }
+        if (_gameHUD->getCompass()) {
+            _gameHUD->getCompass()->setVisible(showUI);
+        }
+    }
+}
+
+void Render::updateInteraction() {
+    if (_uiMode && (!_firstPerson || !_firstPerson->active())) {
+        if (!_uiManager.isHovered()) {
+            _map.handleEvent();
+        } else {
+            _map.clearHoveredTile();
+        }
+    } else {
+        _map.clearHoveredTile();
+    }
+}
+
 void Render::update() {
     _event.update();
     handleInput();
@@ -272,32 +360,14 @@ void Render::update() {
         return;
     }
 
-    if (!_uiMode && (!_firstPerson || !_firstPerson->active())) {
-        updateFreeCamera();
-    }
+    updateCameraState();
     _camera.setFovy(_settingsManager.get().getSettings().fov);
 
-    if (_gameHUD) {
-        bool const showUI = _settingsManager.get().getSettings().showUI;
-        if (_gameHUD->getGridManager()) {
-            _gameHUD->getGridManager()->setVisible(showUI);
-        }
-        if (_gameHUD->getCompass()) {
-            _gameHUD->getCompass()->setVisible(showUI);
-        }
-    }
+    updateHUDVisibility();
 
     _audioManager.get().setListener(_camera.position(), _camera.target());
 
-    if (_uiMode && (!_firstPerson || !_firstPerson->active())) {
-        if (!_uiManager.isHovered()) {
-            _map.handleEvent();
-        } else {
-            _map.clearHoveredTile();
-        }
-    } else {
-        _map.clearHoveredTile();
-    }
+    updateInteraction();
 
     _skybox.update(raylib::rcore::Window::frameTime(), static_cast<float>(_worldManager.timeUnit()));
 }
