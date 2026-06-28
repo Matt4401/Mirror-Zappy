@@ -21,6 +21,8 @@ class Trantorian:
         self.data_lock = threading.Lock()
         self.team_name = team_name
         self.player_id = player_id
+        self.port = port
+        self.host = host
         self.connection = Connection(host, port, team_name, connect_timeout)
         self.player_state = PlayerState(team_name)
         self.send_command = SendCommand(self.connection)
