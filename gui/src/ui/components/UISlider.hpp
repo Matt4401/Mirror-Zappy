@@ -40,6 +40,7 @@ class UISlider : public IUIComponent {
     void setOnValueChanged(std::function<void(float)> callback);
     void setOnValueConfirmed(std::function<void(float)> callback);
     void setValue(float value);
+    void cancelDrag();
     [[nodiscard]] float getValue() const;
 
   private:

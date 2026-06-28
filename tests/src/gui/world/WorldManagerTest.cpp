@@ -14,6 +14,7 @@
 #include <string>
 #include <utility>
 
+#include "AudioManager.hpp"
 #include "events/EventDispatcher.hpp"
 #include "graphics/scene/Tile3D.hpp"
 #include "graphics/scene/WorldManager.hpp"
@@ -54,10 +55,12 @@ class WorldManagerTest : public testing::Test {
         return tile->get();
     }
 
-    events::EventDispatcher dispatcher;  // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes,
-                                         // misc-non-private-member-variables-in-classes)
-    WorldManager world{dispatcher};      // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes,
-                                         // misc-non-private-member-variables-in-classes)
+    events::EventDispatcher dispatcher;            // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes,
+                                                   // misc-non-private-member-variables-in-classes)
+    AudioManager audioManager;                     // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes,
+                                                   // misc-non-private-member-variables-in-classes)
+    WorldManager world{dispatcher, audioManager};  // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes,
+                                                   // misc-non-private-member-variables-in-classes)
 };
 
 TEST_F(WorldManagerTest, MszBuildsTheMap) {
@@ -171,6 +174,22 @@ TEST_F(WorldManagerTest, PlayerLeavesTheMapBeforeWrappingToTheOppositeEdge) {
     EXPECT_FLOAT_EQ(requirePlayer(42).position().x(), wrappedPosition.x());
     EXPECT_FLOAT_EQ(requirePlayer(42).position().z(), wrappedPosition.z());
     EXPECT_FALSE(requirePlayer(42).moving());
+}
+
+TEST_F(WorldManagerTest, PlayerCompletesPendingWrapBeforeHandlingNextServerPosition) {
+    static constexpr float TestDeltaTime = 0.01F;
+    createPlayer(42, 0, 1);
+
+    dispatcher.dispatch(shared::protocol::server::Ppo{.playerId = 42, .x = 3, .y = 1, .orientation = 4});
+    world.movePlayers(TestDeltaTime);
+    ASSERT_LT(requirePlayer(42).position().x(), requireTile(0, 1).position().x());
+
+    dispatcher.dispatch(shared::protocol::server::Ppo{.playerId = 42, .x = 2, .y = 1, .orientation = 4});
+
+    EXPECT_EQ(requirePlayer(42).tilePosition(), (Tile3DPosition{.x = 2, .y = 1}));
+    EXPECT_GT(requirePlayer(42).position().x(), requireTile(2, 1).position().x());
+    EXPECT_FLOAT_EQ(requirePlayer(42).futurePosition().x(), requireTile(2, 1).position().x());
+    EXPECT_FLOAT_EQ(requirePlayer(42).futurePosition().z(), requireTile(2, 1).position().z());
 }
 
 TEST_F(WorldManagerTest, PlayerNameCanBeUpdatedByGuiEvent) {

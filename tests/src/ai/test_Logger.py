@@ -2,7 +2,6 @@ import sys
 from unittest.mock import patch, mock_open, MagicMock
 from pathlib import Path
 import pytest
-
 from src.util.InitLogger import PlayerLogger
 
 FAKE_YAML_CONTENT = """

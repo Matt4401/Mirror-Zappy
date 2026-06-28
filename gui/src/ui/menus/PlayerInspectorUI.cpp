@@ -42,7 +42,7 @@ namespace zappy::gui::ui::menus {
 
 namespace {
 constexpr float FirstPersonBtnWidth = 160.0F;
-constexpr float FirstPersonBtnHeight = 40.0F;
+constexpr float FirstPersonBtnHeight = 70.0F;
 constexpr int FirstPersonBtnFontSize = 16;
 
 constexpr float FoodMax = 126.0F;
@@ -85,7 +85,7 @@ constexpr float HeartsToInventorySpacing = 40.0F;
 constexpr int MaxHearts = 10;
 constexpr int MaxXp = 8;
 
-constexpr float InvToBtnSpacing = 20.0F;
+constexpr float InvToBtnSpacing = -52.0F;
 
 constexpr float CameraPosX = 0.0F;
 constexpr float CameraPosY = 4.0F;
@@ -115,11 +115,16 @@ PlayerInspectorUI::PlayerInspectorUI(float x, float y, float width, events::Even
       _previewRenderTexture(std::make_shared<raylib::rtextures::RenderTexture2D>(static_cast<int>(AvatarWidth),
                                                                                  static_cast<int>(AvatarHeight))) {
     buildInfoPanel();
-    buildInventoryPanel();
+    buildInventoryPanel(false);
 
-    _previewModel = std::make_shared<raylib::rmodels::Model>("assets/models/player.gltf");
+    _previewModel = std::make_shared<raylib::rmodels::Model>("assets/models/player/player.gltf");
 
     _firstPersonBtn->setFontSize(FirstPersonBtnFontSize);
+    _firstPersonBtn->setOnClick([this]() {
+        if (_targetPlayerId >= 0) {
+            getDispatcher().dispatch(events::PlayerFirstPersonRequested{.playerId = _targetPlayerId});
+        }
+    });
 
     getEventTokens().push_back(getDispatcher().subscribe<events::PlayerClicked>(
         [this](const events::PlayerClicked& e) { onPlayerClicked(e); }));
@@ -198,6 +203,7 @@ void PlayerInspectorUI::buildInfoPanel() {
     _compassIcon->setSize(PrimaryIconSize, PrimaryIconSize);
 
     _nameBox = std::make_shared<components::UITextbox>(0.0F, 0.0F, 200.0F, NameBoxHeight, getFont(), "Enter Name...");
+    _nameBox->setMaxLength(12);
     _nameBox->setOnSubmit([this](const std::string& name) {
         if (_targetPlayerId != -1) {
             getDispatcher().dispatch(events::PlayerNameChanged{.playerId = _targetPlayerId, .newName = name});
@@ -254,11 +260,15 @@ void PlayerInspectorUI::onPlayerClicked(const events::PlayerClicked& event) {
     if (_previewModel) {
         if (!event.textureId.empty()) {
             auto tex = graphics::AssetManager::getInstance().getTexture(event.textureId);
-            if (tex) {
-                _previewModel->setMaterialTexture(0, 0 /* MATERIAL_MAP_ALBEDO */, *tex);
+            if (tex && tex->valid()) {
+                // NOLINTNEXTLINE (cppcoreguidelines-pro-bounds-pointer-arithmetic)
+                const int materialIndex = _previewModel->model().meshMaterial[0];
+                _previewModel->setMaterialTexture(materialIndex, 0 /* MATERIAL_MAP_ALBEDO */, *tex);
             }
         } else {
-            _previewModel->setMaterialTexture(0, 0 /* MATERIAL_MAP_ALBEDO */,
+            // NOLINTNEXTLINE (cppcoreguidelines-pro-bounds-pointer-arithmetic)
+            const int materialIndex = _previewModel->model().meshMaterial[0];
+            _previewModel->setMaterialTexture(materialIndex, 0 /* MATERIAL_MAP_ALBEDO */,
                                               raylib::rtextures::Texture2D{::Texture2D{}, false});
         }
     }
@@ -385,6 +395,9 @@ void PlayerInspectorUI::handleEvent() {
 void PlayerInspectorUI::setVisible(bool visible) {
     AInspectorUI::setVisible(visible);
     if (!visible) {
+        if (_targetPlayerId != -1) {
+            getDispatcher().dispatch(events::PlayerUnselected{});
+        }
         _targetPlayerId = -1;
     }
 }

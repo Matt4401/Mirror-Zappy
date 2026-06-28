@@ -46,15 +46,16 @@ void Core::setup() {
 
     _config = parser.parse(static_cast<int>(_args.size()), _args.data());
     _client = std::make_unique<network::Client>(_config, _dispatcher);
-    _render = std::make_unique<graphics::Render>(_dispatcher);
+    _render = std::make_unique<graphics::Render>(_dispatcher, _audioManager, _settingsManager);
 }
 
-void Core::loop() const {
+void Core::loop() {
     while (_render && _render->isRunning()) {
         if (_client) {
             _client->update();
         }
         _render->renderFrame();
+        _audioManager.update();
     }
 }
 }  // namespace zappy::gui

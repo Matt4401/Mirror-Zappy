@@ -1,12 +1,15 @@
 add_subdirectory(scene)
 
 add_library(zappy_gui_graphics
+        FirstPerson.cpp
         Render.cpp
 )
 target_sources(zappy_gui_graphics PUBLIC
         FILE_SET HEADERS
         BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
-        FILES Render.hpp
+        FILES
+        FirstPerson.hpp
+        Render.hpp
 )
 target_include_directories(zappy_gui_graphics PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
@@ -15,6 +18,7 @@ target_include_directories(zappy_gui_graphics PUBLIC
 )
 target_link_libraries(zappy_gui_graphics PUBLIC
         zappy_shared
+        zappy_gui_audio
         zappy_gui_raylib
         zappy_gui_graphics_scene
         zappy_gui_events

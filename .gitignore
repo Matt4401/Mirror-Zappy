@@ -19,3 +19,4 @@ binary_ref/
 logs/
 *.log
 *.sh
+assets/config/settings.cfg

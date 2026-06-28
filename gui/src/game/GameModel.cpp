@@ -9,13 +9,18 @@
 
 #include <raylib.h>
 
+#include <cmath>
 #include <cstddef>
 #include <memory>
+#include <span>
+#include <string>
 
 #include "Color.hpp"
 #include "Player.hpp"
 #include "rcore/Camera.hpp"
 #include "rmath/Vector3.hpp"
+#include "rmodels/Model.hpp"
+#include "rmodels/ModelAnimation.hpp"
 #include "rtextures/Texture2D.hpp"
 
 namespace zappy::gui::game {
@@ -24,55 +29,85 @@ GameModel::GameModel(raylib::rcore::Camera& camera)
     if (_playerModel.model().materials != nullptr &&
         _playerModel.model().materials[0].maps !=  // NOLINT (cppcoreguidelines-pro-bounds-pointer-arithmetic)
             nullptr) {
-        _defaultPlayerTexture = std::make_shared<raylib::rtextures::Texture2D>(
-            _playerModel  // NOLINT (cppcoreguidelines-pro-bounds-pointer-arithmetic)
-                .model()
-                .materials[0]
-                .maps[MATERIAL_MAP_ALBEDO]
-                .texture,
-            false);
-    }
-
-    for (int i = 0; i < _playerModel.model().materialCount; i++) {
         // NOLINTNEXTLINE (cppcoreguidelines-pro-bounds-pointer-arithmetic)
-        _playerModel.model().materials[i].shader = _alphaDiscardShader.shader();
-    }
-    for (auto& _armorModel : _armorModels) {
-        for (int j = 0; j < _armorModel.model().materialCount; j++) {
+        const int materialIndex = _playerModel.model().meshMaterial[0];
+        _defaultPlayerTexture = std::make_shared<raylib::rtextures::Texture2D>(
             // NOLINTNEXTLINE (cppcoreguidelines-pro-bounds-pointer-arithmetic)
-            _armorModel.model().materials[j].shader = _alphaDiscardShader.shader();
+            _playerModel.model().materials[materialIndex].maps[0].texture, false);
+    }
+
+    if (_playerModel.model().materials != nullptr) {
+        std::span<::Material> materials(_playerModel.model().materials, _playerModel.model().materialCount);
+        for (auto& material : materials) {
+            material.shader = _alphaDiscardShader.shader();
+        }
+    }
+
+    for (auto& _armorModel : _armorModels) {
+        if (_armorModel.model().materials != nullptr) {
+            std::span<::Material> materials(_armorModel.model().materials, _armorModel.model().materialCount);
+            for (auto& material : materials) {
+                material.shader = _alphaDiscardShader.shader();
+            }
         }
     }
 }
 
-float GameModel::getRotationAngle(Player::cardinalPoint orientation) {
-    switch (orientation) {
-        case Player::cardinalPoint::NORTH:
-            return 180.0F;
-        case Player::cardinalPoint::EAST:
-            return 90.0F;
-        case Player::cardinalPoint::SOUTH:
-            return 0.0F;
-        case Player::cardinalPoint::WEST:
-            return 270.0F;
+int GameModel::getAnimationIndexFromAction(const Player::Action action) {
+    switch (action) {
+        case Player::Action::WALK:
+            return 0;
+        case Player::Action::INCANTATION:
+            return 1;
+        case Player::Action::FORK:
+            return 2;
+        default:
+            return 0;
     }
-    return 0.0F;
 }
 
-void GameModel::drawPlayer(raylib::rmath::Vector3 position, Player::cardinalPoint orientation,
+void GameModel::updateAnimationIfValid(const raylib::rmodels::ModelAnimation& anim, raylib::rmodels::Model& model,
+                                       const int animIndex, const int animFrame) {
+    if (!anim.valid() || animIndex < 0) {
+        return;
+    }
+    if (animIndex != 0 && anim.frameCount(0) > 0) {
+        anim.update(model, 0.0F, 0);
+    }
+    if (anim.frameCount(animIndex) > 0) {
+        anim.update(model, static_cast<float>(animFrame % anim.frameCount(animIndex)), animIndex);
+    }
+}
+
+void GameModel::drawPlayer(raylib::rmath::Vector3 position, float rotationAngle, Player::Action action, int animFrame,
                            const std::shared_ptr<raylib::rtextures::Texture2D>& texture, std::size_t level) const {
-    if (_camera.get().isVisibleFromCamera(position)) {
-        if (texture && texture->valid()) {
-            _playerModel.setMaterialTexture(0, MATERIAL_MAP_ALBEDO, *texture);
-        } else if (_defaultPlayerTexture && _defaultPlayerTexture->valid()) {
-            _playerModel.setMaterialTexture(0, MATERIAL_MAP_ALBEDO, *_defaultPlayerTexture);
+    if (!_camera.get().isVisibleFromCamera(position)) {
+        return;
+    }
+
+    const int animIndex = getAnimationIndexFromAction(action);
+    updateAnimationIfValid(_playerAnim, _playerModel, animIndex, animFrame);
+
+    // NOLINTNEXTLINE (cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    const int materialIndex = _playerModel.model().meshMaterial[0];
+    if (texture && texture->valid()) {
+        _playerModel.setMaterialTexture(materialIndex, MATERIAL_MAP_ALBEDO, *texture);
+    } else if (_defaultPlayerTexture && _defaultPlayerTexture->valid()) {
+        _playerModel.setMaterialTexture(materialIndex, MATERIAL_MAP_ALBEDO, *_defaultPlayerTexture);
+    }
+
+    _playerModel.drawModelEx(position, {0.0F, 1.0F, 0.0F}, rotationAngle, PLAYER_SCALE, raylib::Color::White());
+
+    if (level > 1 && level <= 8) {
+        auto& armorAnim = _armorAnims.at(level - 2);
+        updateAnimationIfValid(armorAnim, _armorModels.at(level - 2), animIndex, animFrame);
+
+        raylib::Color armorTint = raylib::Color::White();
+        if (level == 2) {
+            armorTint = raylib::Color(139, 69, 19, 255);
         }
-        _playerModel.drawModelEx(position, {0.0F, 1.0F, 0.0F}, getRotationAngle(orientation), PLAYER_SCALE,
-                                 raylib::Color::White());
-        if (level > 1 && level <= 8) {
-            _armorModels.at(level - 2).drawModelEx(position, {0.0F, 1.0F, 0.0F}, getRotationAngle(orientation),
-                                                   {ARMOR_SCALE, ARMOR_SCALE, ARMOR_SCALE}, raylib::Color::White());
-        }
+        _armorModels.at(level - 2).drawModelEx(position, {0.0F, 1.0F, 0.0F}, rotationAngle,
+                                               {ARMOR_SCALE, ARMOR_SCALE, ARMOR_SCALE}, armorTint);
     }
 }
 void GameModel::drawEgg(raylib::rmath::Vector3 position, const raylib::Color tint) const {

@@ -32,6 +32,10 @@ struct PlayerNameChanged {
     std::string newName;
 };
 
+struct PlayerFirstPersonRequested {
+    int playerId{0};
+};
+
 struct TileClicked {
     int x{0};
     int y{0};
@@ -41,6 +45,8 @@ struct RequestCyclePlayer {
     int direction{0};
     int currentPlayerId{-1};
 };
+
+struct PlayerUnselected {};
 
 enum class TimeMode : std::uint8_t { MORNING, AFTERNOON, EVENING, NIGHT, CYCLE };
 

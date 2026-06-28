@@ -27,10 +27,10 @@ namespace zappy::gui::ui::components {
 
 using Shapes = raylib::rshapes::Shapes;
 
-const raylib::Color UIDropdown::BackgroundColor{40, 40, 40, 255};
-const raylib::Color UIDropdown::HoverColor{70, 70, 70, 255};
-const raylib::Color UIDropdown::BorderColor{100, 100, 100, 255};
-const raylib::Color UIDropdown::TextColor{255, 255, 255, 255};
+const raylib::Color UIDropdown::BackgroundColor{245, 245, 245, 255};
+const raylib::Color UIDropdown::HoverColor{220, 220, 220, 255};
+const raylib::Color UIDropdown::BorderColor{150, 150, 150, 255};
+const raylib::Color UIDropdown::TextColor{30, 30, 30, 255};
 
 UIDropdown::UIDropdown(float x, float y, float width, float height, std::vector<std::string> options,
                        std::shared_ptr<raylib::rtext::Font> font)

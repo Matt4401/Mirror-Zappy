@@ -51,13 +51,16 @@ AInspectorUI::~AInspectorUI() {
     }
 }
 
-void AInspectorUI::buildInventoryPanel() {
+void AInspectorUI::buildInventoryPanel(bool includeFood) {
     _inventoryTitleText = std::make_shared<components::UIText>("Inventory", _font);
     _inventoryTitleText->setFontSize(static_cast<int>(HeaderFontSize));
     _inventoryTitleText->setColor(raylib::Color::Black());
 
     auto& assetManager = graphics::AssetManager::getInstance();
     for (const auto& asset : InventoryIconAssets) {
+        if (!includeFood && asset.id == "inventory.food"sv) {
+            continue;
+        }
         auto text = std::make_shared<components::UIText>("0", _font);
         text->setFontSize(static_cast<int>(InfoFontSize));
         text->setColor(raylib::Color::White());

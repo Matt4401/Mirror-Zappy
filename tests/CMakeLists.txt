@@ -40,6 +40,7 @@ target_link_libraries(unit_tests PRIVATE
         zappy_shared
         zappy_parser
         zappy_server_objects
+        zappy_gui_audio
         zappy_gui_events
         zappy_gui_network
         zappy_gui_graphics_scene
@@ -52,12 +53,12 @@ target_compile_definitions(unit_tests
         FIXTURES_PATH="${FIXTURES_DIR}"
 )
 #
-#add_test(NAME python_tests
-#        COMMAND ${Python3_EXECUTABLE} -m pytest ${CMAKE_SOURCE_DIR}/tests/src/ai/test_main.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_Connection.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_inventory_class.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_VisionManager.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_Logger.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_TickManager.py
-#)
-#
-#set_tests_properties(python_tests PROPERTIES
-#        ENVIRONMENT "PYTHONPATH=${CMAKE_SOURCE_DIR}/ai/src"
-#)
+add_test(NAME python_tests
+        COMMAND ${Python3_EXECUTABLE} -m pytest ${CMAKE_SOURCE_DIR}/tests/src/ai/test_main.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_Connection.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_inventory_class.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_VisionManager.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_Logger.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_TickManager.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_broadcast_mananger.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_parse_cmd.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_trantorian.py ${CMAKE_SOURCE_DIR}/tests/src/ai/test_send_cmd.py
+)
+
+set_tests_properties(python_tests PROPERTIES
+        ENVIRONMENT "PYTHONPATH=${CMAKE_SOURCE_DIR}/ai/src"
+)
 
 gtest_discover_tests(unit_tests)

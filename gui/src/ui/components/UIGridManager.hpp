@@ -8,7 +8,9 @@
 #pragma once
 
 #include <functional>
+#include <map>
 #include <memory>
+#include <string>
 #include <vector>
 
 #include "UIGamePanel.hpp"
@@ -44,7 +46,10 @@ class UIGridManager : public IUIComponent {
     void setVisible(bool visible) override;
     [[nodiscard]] bool isHovered() const override;
 
-    void addPanel(const std::shared_ptr<UIGamePanel>& panel, int gridX, int gridY, int gridW, int gridH);
+    void addPanel(const std::string& id, const std::shared_ptr<UIGamePanel>& panel, int gridX, int gridY, int gridW,
+                  int gridH);
+    [[nodiscard]] std::map<std::string, std::vector<int>> getLayouts() const;
+    void applyLayouts(const std::map<std::string, std::vector<int>>& layouts);
     void setConfigMode(bool configMode);
     [[nodiscard]] bool isConfigMode() const { return _isConfigMode; }
 
@@ -52,13 +57,13 @@ class UIGridManager : public IUIComponent {
     static constexpr int GridRows = 36;
 
   private:
-    void updateLayout();
     static void drawGrid();
     void drawResizeHandles() const;
     void autoLinkPanels();
     [[nodiscard]] bool checkOverlap(const GridRect& rect, const std::shared_ptr<UIGamePanel>& ignorePanel) const;
 
     struct PanelData {
+        std::string id;
         std::shared_ptr<UIGamePanel> panel;
         GridRect originalGrid;
         GridRect grid;

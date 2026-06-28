@@ -10,9 +10,13 @@
 #include <cstdint>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string>
 
+#include "AudioManager.hpp"
+#include "FirstPerson.hpp"
 #include "Map.hpp"
+#include "SettingsManager.hpp"
 #include "Skybox3D.hpp"
 #include "WorldManager.hpp"
 #include "events/EventDispatcher.hpp"
@@ -29,7 +33,7 @@ class Render {
     static constexpr const std::string WINDOW_NAME = "Zappy GUI";
     static constexpr int FLAG_FULLSCREEN_MODE = 2;
 
-    explicit Render(events::EventDispatcher& dispatcher);
+    Render(events::EventDispatcher& dispatcher, AudioManager& audioManager, SettingsManager& settingsManager);
     ~Render();
     Render(const Render& other) = delete;
     Render& operator=(const Render& other) = delete;
@@ -51,23 +55,54 @@ class Render {
     void render3D();
     void updateCursorState() const;
     void handleInput();
+    void handleEscapeKey();
+    void handleAltKey();
+    void updateCameraState();
+    void updateHUDVisibility() const;
+    void updateInteraction();
+    void updateFreeCamera();
+    void updateFollowCamera();
+    void updateCameraLimits();
 
     raylib::rcore::Window _window{WINDOW_NAME.c_str()};
     raylib::rcore::Camera _camera{raylib::rmath::Vector3{10.0F, 10.0F, 10.0F}};
     scene::Skybox3D _skybox;
     raylib::rcore::Event _event;
     std::reference_wrapper<events::EventDispatcher> _dispatcher;
+    std::reference_wrapper<AudioManager> _audioManager;
+    std::reference_wrapper<SettingsManager> _settingsManager;
     scene::WorldManager _worldManager;
     scene::Map _map;
     ui::UIManager _uiManager;
     std::shared_ptr<ui::hud::GameHUD> _gameHUD;
+    std::unique_ptr<FirstPerson> _firstPerson;
     bool _isExiting{false};
     bool _uiMode{false};
     UpdateMode _updateMode{UpdateMode::All};
+
+    int _followedPlayerId{-1};
+    std::optional<raylib::rmath::Vector3> _lastPlayerPos;
+    events::EventDispatcher::EventToken _playerClickedToken{0};
+    events::EventDispatcher::EventToken _playerUnselectedToken{0};
 
     static constexpr int EscapeKey = 256;
     static constexpr int LeftAltKey = 342;
     static constexpr int DefaultFps = 60;
     static constexpr std::string DefaultFontName = "Minecraft";
+    static constexpr float MinCameraHeight = 1.3F;
+
+    static constexpr float CameraPaddingMin = 50.0F;
+    static constexpr float CameraPaddingMax = 60.0F;
+    static constexpr float CameraHeightMin = 80.0F;
+    static constexpr float CameraHeightMax = 110.0F;
+    static constexpr float CameraPaddingFactor = 0.3F;
+    static constexpr float CameraHeightFactor = 0.6F;
+
+    static constexpr float CameraSpeed = 10.0F;
+    static constexpr float CameraSprintSpeed = 30.0F;
+    static constexpr float CameraZoomSpeed = -2.0F;
+    static constexpr float CameraSensMultiplier = 0.1F;
+    static constexpr int MouseButtonOffset = 500;
+    static constexpr int MaxMouseButtonOffset = 506;
 };
 }  // namespace zappy::gui::graphics

@@ -15,12 +15,6 @@ Event::Event() = default;
 void Event::update() {
     _pressedKeys.clear();
 
-    int key = GetKeyPressed();
-    while (key != 0) {
-        _pressedKeys.push_back(key);
-        key = GetKeyPressed();
-    }
-
     _mousePosition = GetMousePosition();
     _mouseWheelMove = GetMouseWheelMove();
 }

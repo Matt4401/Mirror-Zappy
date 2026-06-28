@@ -10,8 +10,10 @@
 #include <memory>
 #include <span>
 
+#include "AudioManager.hpp"
 #include "EventDispatcher.hpp"
 #include "Render.hpp"
+#include "SettingsManager.hpp"
 #include "network/Client.hpp"
 #include "strategy/GUIStrategy.hpp"
 
@@ -29,11 +31,13 @@ class Core {
 
   private:
     void setup();
-    void loop() const;
+    void loop();
 
     std::span<char*> _args;
     parser::GuiConfig _config;
+    SettingsManager _settingsManager{"assets/config/settings.cfg"};
     events::EventDispatcher _dispatcher;
+    AudioManager _audioManager;
     std::unique_ptr<graphics::Render> _render;
     std::unique_ptr<network::Client> _client;
 };

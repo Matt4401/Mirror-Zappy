@@ -6,7 +6,9 @@ class ParseCommand:
         self.inventory = inventory
 
     def parse_inventory(self, data):
-        items = re.findall(r"(\w+)\s+(\d+)", data)
+        clean_data = data.replace("[", "").replace("]", "").strip()
+        clean_data = clean_data.replace(",", " ")
+        items = re.findall(r"(\w+)\s+(\d+)", clean_data)
         data_dict = {name: int(value) for name, value in items}
         required = [
             "linemate",
@@ -19,7 +21,9 @@ class ParseCommand:
         ]
         missing = [k for k in required if k not in data_dict]
         if missing:
-            raise ValueError(f"Missing inventory fields: {', '.join(missing)}")
+            raise ValueError(
+                f"Missing inventory fields: {', '.join(missing)}. Received raw: '{data}'"
+            )
         linemate = data_dict["linemate"]
         deraumere = data_dict["deraumere"]
         sibur = data_dict["sibur"]

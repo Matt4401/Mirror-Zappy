@@ -19,6 +19,8 @@
 #include "Egg.hpp"
 #include "GameModel.hpp"
 #include "Player.hpp"
+#include "SkinGenerator.hpp"
+#include "game/NameGenerator.hpp"
 #include "graphics/AssetManager.hpp"
 #include "rmath/Vector3.hpp"
 #include "rtextures/Texture2D.hpp"
@@ -29,8 +31,13 @@ void Team::draw(const GameModel& gameModel) const {
         std::shared_ptr<raylib::rtextures::Texture2D> tex = nullptr;
         if (!player.textureId().empty()) {
             tex = graphics::AssetManager::getInstance().getTexture(player.textureId());
+            if (!tex) {
+                graphics::AssetManager::getInstance().loadTexture(player.textureId(), player.textureId());
+                tex = graphics::AssetManager::getInstance().getTexture(player.textureId());
+            }
         }
-        gameModel.drawPlayer(player.position(), player.orientation(), tex, player.level());
+        gameModel.drawPlayer(player.position(), player.renderRotationAngle(), player.action(), player.animFrame(), tex,
+                             player.level());
     }
     for (const auto& egg : _eggs) {
         const auto tint = raylib::Color::lerp(raylib::Color::White(), _teamColor, GameModel::EGG_TINT_STRENGTH);
@@ -42,7 +49,13 @@ Player& Team::addPlayer(int id, raylib::rmath::Vector3 position, Player::cardina
     if (const auto existing = findPlayer(id); existing.has_value()) {
         return existing->get();
     }
-    _players.emplace_back(id, position, _name + std::to_string(id), orientation, level);
+    _players.emplace_back(id, position, NameGenerator::getInstance().getRandomName(), orientation, level);
+
+    std::string const skin = SkinGenerator::getInstance().getRandomSkin();
+    if (!skin.empty()) {
+        _players.back().setTextureId(skin);
+    }
+
     return _players.back();
 }
 
@@ -88,9 +101,7 @@ void Team::removeEgg(int id) {
 
 void Team::movePlayers(const int serverFrequency, const float deltaTime) {
     for (auto& player : _players) {
-        if (player.moving()) {
-            player.move(serverFrequency, deltaTime);
-        }
+        player.move(serverFrequency, deltaTime);
     }
 }
 }  // namespace zappy::gui::game

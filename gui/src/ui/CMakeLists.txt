@@ -11,13 +11,17 @@ add_library(zappy_gui_ui
         components/UITextbox.cpp
         components/UICompass.cpp
         components/EventLogRow.cpp
+        components/UIToggle.cpp
+        components/UIKeybindButton.cpp
         menus/PauseMenu.cpp
+        menus/SettingsMenu.cpp
         menus/PlayerInspectorUI.cpp
         menus/AInspectorUI.cpp
         menus/TileInspectorUI.cpp
         menus/WorldControlUI.cpp
         menus/EventLogUI.cpp
         menus/GlobalStatsUI.cpp
+        menus/GameOverUI.cpp
         hud/GameHUD.cpp
 )
 target_sources(zappy_gui_ui PUBLIC
@@ -37,13 +41,17 @@ target_sources(zappy_gui_ui PUBLIC
         components/UITextbox.hpp
         components/UICompass.hpp
         components/EventLogRow.hpp
+        components/UIToggle.hpp
+        components/UIKeybindButton.hpp
         menus/PauseMenu.hpp
+        menus/SettingsMenu.hpp
         menus/PlayerInspectorUI.hpp
         menus/AInspectorUI.hpp
         menus/TileInspectorUI.hpp
         menus/WorldControlUI.hpp
         menus/EventLogUI.hpp
         menus/GlobalStatsUI.hpp
+        menus/GameOverUI.hpp
         hud/GameHUD.hpp
 )
 target_include_directories(zappy_gui_ui PUBLIC
@@ -55,6 +63,7 @@ target_link_libraries(zappy_gui_ui PUBLIC
         zappy_gui_raylib
         zappy_shared
         zappy_gui_events
+        zappy_gui_audio
 )
 target_link_libraries(zappy_gui_ui PRIVATE
         zappy_gui_assets

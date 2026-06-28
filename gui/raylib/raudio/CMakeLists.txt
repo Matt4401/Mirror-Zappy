@@ -4,7 +4,8 @@ add_library(zappy_gui_raylib_raudio
 target_sources(zappy_gui_raylib_raudio PUBLIC
         FILE_SET HEADERS
         BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/..
-        FILES   Sound.hpp
+        FILES   Music.hpp
+                Sound.hpp
                 Wave.hpp
 )
 target_include_directories(zappy_gui_raylib_raudio PUBLIC
