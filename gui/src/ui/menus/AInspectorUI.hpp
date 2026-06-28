@@ -25,6 +25,7 @@ namespace zappy::gui::ui::menus {
 using std::literals::string_view_literals::operator""sv;
 
 class AInspectorUI : public components::UIGamePanel {
+  public:
     static constexpr float InspectorInitialHeight = 550.0F;
 
     static constexpr float InvGridTotalWidth = 230.0F;
@@ -84,7 +85,7 @@ class AInspectorUI : public components::UIGamePanel {
     void setPosition(float x, float y) override;
 
   protected:
-    void buildInventoryPanel();
+    void buildInventoryPanel(bool includeFood = true);
     void drawInventoryPanel(float& currentY, float startX, float panelW);
 
     [[nodiscard]] events::EventDispatcher& getDispatcher() { return _dispatcher.get(); }

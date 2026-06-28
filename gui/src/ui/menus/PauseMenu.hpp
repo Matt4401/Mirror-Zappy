@@ -44,6 +44,7 @@ class PauseMenu : public IUIComponent {
 
     void setOnExit(std::function<void()> callback);
     void setOnUIConfig(std::function<void()> callback);
+    void setOnResume(std::function<void()> callback);
 
   private:
     void drawMainMenu();
@@ -104,6 +105,7 @@ class PauseMenu : public IUIComponent {
     bool _settingsVisible{false};
     std::function<void()> _onExit;
     std::function<void()> _onUIConfig;
+    std::function<void()> _onResume;
 };
 
 }  // namespace zappy::gui::ui::menus
