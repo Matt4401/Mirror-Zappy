@@ -187,6 +187,7 @@ void Render::handleEscapeKey() {
                             (_gameHUD->getWorldControl() && _gameHUD->getWorldControl()->isConfigMode()))) {
         if (auto grid = _gameHUD->getGridManager()) {
             grid->setConfigMode(false);
+            _gameHUD->saveUILayout();
         }
         if (auto worldControl = _gameHUD->getWorldControl()) {
             worldControl->setConfigMode(false);

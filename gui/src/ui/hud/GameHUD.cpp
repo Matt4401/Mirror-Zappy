@@ -48,19 +48,23 @@ GameHUD::GameHUD(events::EventDispatcher& dispatcher, AudioManager& audioManager
       _worldControl(std::make_shared<menus::WorldControlUI>(0.0F, 0.0F, _dispatcher.get(), _font,
                                                             makeSendCommand(_dispatcher.get()))),
       _eventLog(std::make_shared<menus::EventLogUI>(0.0F, 0.0F, 400.0F, 300.0F, _dispatcher.get(), _font)),
-      _globalStats(std::make_shared<menus::GlobalStatsUI>(0.0F, 0.0F, 400.0F, 300.0F, _dispatcher.get(), _font)) {
+      _globalStats(std::make_shared<menus::GlobalStatsUI>(0.0F, 0.0F, 400.0F, 300.0F, _dispatcher.get(), _font)),
+      _settingsManager(settingsManager) {
     auto* const audio = &audioManager;
     components::UIButton::setClickSoundHandler([audio]() { audio->playSound("button_click"); });
 
-    _gridManager->addPanel(_playerInspector, 52, 16, 10, 15);
+    _gridManager->addPanel("PlayerInspector", _playerInspector, 52, 16, 10, 15);
 
-    _gridManager->addPanel(_tileInspector, 52, 3, 10, 12);
+    _gridManager->addPanel("TileInspector", _tileInspector, 52, 3, 10, 12);
 
-    _gridManager->addPanel(_worldControl, WorldControlX, WorldControlY, WorldControlWidthCols, WorldControlHeightCols);
+    _gridManager->addPanel("WorldControl", _worldControl, WorldControlX, WorldControlY, WorldControlWidthCols,
+                           WorldControlHeightCols);
 
-    _gridManager->addPanel(_eventLog, 2, 16, 13, 15);
+    _gridManager->addPanel("EventLog", _eventLog, 2, 16, 13, 15);
 
-    _gridManager->addPanel(_globalStats, 2, 2, 13, 13);
+    _gridManager->addPanel("GlobalStats", _globalStats, 2, 2, 13, 13);
+
+    _gridManager->applyLayouts(settingsManager.getSettings().uiLayouts);
 }
 
 GameHUD::~GameHUD() { components::UIButton::setClickSoundHandler(nullptr); }
@@ -69,6 +73,11 @@ void GameHUD::registerToUIManager(UIManager& uiManager) {
     uiManager.addComponent(_compass);
     uiManager.addComponent(_gridManager);
     uiManager.addComponent(_pauseMenu);
+}
+
+void GameHUD::saveUILayout() {
+    _settingsManager.get().getSettings().uiLayouts = _gridManager->getLayouts();
+    _settingsManager.get().save();
 }
 
 }  // namespace zappy::gui::ui::hud
