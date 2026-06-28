@@ -27,6 +27,7 @@ The important long-lived objects are:
 | --- | --- | --- |
 | `EventDispatcher` | `Core` | Shared message bus for server commands and GUI events. |
 | `AudioManager` | `Core` | Owns Raylib audio device, music, active sounds. |
+| `SettingsManager` | `Core` | Handles saving, loading, and providing configurable game settings. |
 | `network::Client` | `Core` | Receives server messages and sends GUI commands. |
 | `graphics::Render` | `Core` | Owns window, camera, scene, HUD, and render loop. |
 
@@ -78,9 +79,8 @@ Important controls:
 
 | Input | Behavior |
 | --- | --- |
-| `Escape` | Exit first-person view, exit UI config mode, or toggle pause menu. |
-| `Left Alt` | Toggle UI cursor mode when not in first-person/config mode. |
+| `Pause` (Escape by default) | Exit first-person view, exit UI config mode, or toggle pause menu. |
+| `Toggle UI` (Left Alt by default) | Toggle UI cursor mode when not in first-person/config mode. |
 | Left click | In UI mode, pick players or tiles if the UI is not hovered. |
 
 When the pause menu is visible, `Render` uses `PauseMenuOnly` so camera movement stops. The resume callback must restore `UpdateMode::All`.
-
