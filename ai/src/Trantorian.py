@@ -23,6 +23,7 @@ class Trantorian:
         self.player_id = player_id
         self.port = port
         self.host = host
+        self.leader_id = sum(ord(c) for c in str(player_id))
         self.connection = Connection(host, port, team_name, connect_timeout)
         self.player_state = PlayerState(team_name)
         self.send_command = SendCommand(self.connection)
@@ -73,6 +74,21 @@ class Trantorian:
         for _ in range(free_slots):
             self.launch_client(1)
 
+    def move_one_step_toward(self, direction: int):
+        if direction == 0:
+            return
+        if direction in (1, 2, 8):
+            self.forward()
+        elif direction in (3, 4):
+            self.turn_left()
+            self.forward()
+        elif direction == 5:
+            self.turn_right()
+            self.turn_right()
+            self.forward()
+        elif direction in (6, 7):
+            self.turn_right()
+            self.forward()
 
     def wait_for_response(self, cmd_id, timeout=5.0):
         if cmd_id in (None, 84):
