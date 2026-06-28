@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Client Architecture - Zappy documentation</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Client Architecture";
+        var mkdocs_page_input_path = "ai/architecture.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Zappy documentation
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../network/">Network (Shared)</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Server</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../server/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../server/architecture/">Architecture</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../server/core/">Core Orchestrator</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../server/game_engine/">Game Engine</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">AI</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../">Overview</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">GUI</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gui/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gui/architecture/">Architecture</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gui/core/">Core Orchestrator</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gui/world/">World State</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gui/ui/">User Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gui/rendering/">Rendering</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gui/audio/">Audio</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gui/network/">Networking</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gui/events/">Events</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gui/raylib_wrappers/">Raylib Wrappers</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Zappy documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Client Architecture</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="client-architecture">Client Architecture</h1>
+<h2 id="with-the-aim-to-explain-how-a-trantorian-is-working-read-the-question-and-their-answer">With the aim to explain how a Trantorian is working, read the question and their answer.</h2>
+<h3 id="1-how-to-connect-with-the-server">1. How to connect with the server ?</h3>
+<h3 id="2-how-to-run-a-behaviour">2. How to run a behaviour</h3>
+<h3 id="3-how-to-links-connection-and-behaviour">3. How to links connection and behaviour</h3>
+<hr />
+<h2 id="1-connection-with-the-server">1. Connection with the server</h2>
+<h4 id="the-connection-to-the-server-is-established-and-maintained-by-a-dedicated-connection-class-utilizing-network-sockets-configured-for-a-specific-host-and-port-this-system-is-designed-to-be-asynchronous-and-robust-relying-on-the-following-components">The connection to the server is established and maintained by a dedicated Connection class utilizing network sockets configured for a specific host and port. This system is designed to be asynchronous and robust, relying on the following components:</h4>
+<ul>
+<li>Handshake Protocol: Upon successful socket connection, the client waits to receive a "WELCOME" message from the server. Following this, it sends the designated team name and waits to receive the client number and the map dimensions to finalize the handshake. </li>
+<li>Multi-threading Architecture: The connection relies on threads to prevent blocking operations. One thread is entirely dedicated to continuously reading incoming data from the socket, while another thread is responsible for polling and sending queued commands.  </li>
+<li>Queue Management: As server messages are received, they are parsed and separated into specific queues based on their type, such as broadcasts, server events (e.g., ejections, deaths, elevations), or standard command responses.  </li>
+<li>Command Buffering: The client manages outgoing requests using a command queue, limiting the number of active, pending requests sent to the server to a maximum of 10 at any given time.</li>
+</ul>
+<h3 id="here-is-the-connection-run-method">Here is the Connection run method:</h3>
+<pre><code class="language-python">    def start(self):
+        self.running = True
+        self.reader_thread = threading.Thread(
+            target=self.run_reader, daemon=False, name=&quot;Connection-Reader&quot;
+        )
+        self.reader_thread.start()
+        self.event_thread = threading.Thread(
+            target=self.run_receive_poll_cmd, daemon=False, name=&quot;Connection-Receive&quot;
+        )
+        self.event_thread.start()
+</code></pre>
+<hr />
+<h2 id="2-behaviours">2. Behaviour(s)</h2>
+<h4 id="the-artificial-intelligence-of-a-trantorian-is-driven-by-a-finitestatemachine-fsm-which-continuously-loops-to-evaluate-the-agents-situation-and-select-the-most-appropriate-state">The artificial intelligence of a Trantorian is driven by a FiniteStateMachine (FSM), which continuously loops to evaluate the agent's situation and select the most appropriate state.</h4>
+<ul>
+<li>Routine Updates: The FSM manages game ticks and automatically dispatches essential maintenance commands, specifically "Inventory" and "Look", to keep the internal state synchronized with the server. </li>
+<li>Immediate Reactions: During its execution loop, the FSM actively processes incoming broadcast messages and will immediately take food if it detects it on the current tile, prior to executing other state actions. </li>
+<li>State Evaluation and Transitions: The FSM dynamically assigns the Trantorian's current state by evaluating its inventory and level.  </li>
+<li>Survival: If the Trantorian's food reserves drop below the predefined survival threshold, the system forces a transition into the SurviveState. </li>
+<li>Evolution: If the Trantorian has gathered enough specific resources required to advance to the next level, it transitions into the EvolveState.  </li>
+<li>Gathering and End-Game: If the Trantorian does not have enough resources for the next level, it defaults to the GatherState.</li>
+</ul>
+<h4 id="here-is-a-version-of-our-finitestatemachine">Here is a version of our FiniteStateMachine:</h4>
+<pre><code class="language-python">class FiniteStateMachine:
+    def __init__(self, default_state: AState, trantorian, tick_manager: TickManager):
+        self.state = default_state
+        self.trantorian = trantorian
+        self.tick_manager = tick_manager
+        self.sender = []
+        self.pending_commands = {}
+
+    def run(self):
+        self.trantorian.logger.warning(&quot;===========Start FSM process===========&quot;)
+        while True:
+            meta_cmds = self.tick_manager.tick_update()
+            self.send_auto_cmds(meta_cmds)
+            self.process_broadcasts()
+            self.process_pending_commands()
+            self.eat_current_tile_food()
+            self.update_state()
+            self.execute_state()
+            time.sleep(0.01)
+</code></pre>
+<hr />
+<h2 id="3-bring-parts-together">3. Bring parts together</h2>
+<h4 id="the-trantorian-class-serves-as-the-vital-link-between-the-low-level-connection-mechanics-and-the-high-level-decision-making-of-the-finitestatemachine">The Trantorian class serves as the vital link between the low-level Connection mechanics and the high-level decision-making of the FiniteStateMachine.</h4>
+<ul>
+<li>Centralized State: The Trantorian object initializes and encapsulates the active Connection, the PlayerState (which tracks inventory and vision), and the utilities required to parse and format network commands.  </li>
+<li>Action Abstraction: The class provides concrete, high-level methods (such as forward, take_object, and start_incantation) that the FSM can safely call. These methods abstract the network layer by sending the proper string commands to the Connection queue and optionally waiting for the server's success or failure response.  </li>
+<li>Asynchronous Event Handling: While the Trantorian class provides the tools, the FSM actively polls it to bridge the gap. The FSM checks the Connection queues for pending command responses and server events. If the FSM detects an ejection or an elevation event, it automatically reacts by queuing a new "Look" command via the Trantorian class to refresh the agent's spatial awareness.  </li>
+</ul>
+<p>Here is a version of the trantorian class</p>
+<pre><code class="language-python">class Trantorian:
+    def __init__(self, port, host, team_name, player_id):
+        self.thread = threading.Lock()
+        self.answer_list = []
+        self.data_lock = threading.Lock()
+        self.team_name = team_name
+        self.player_id = player_id
+        self.connection = Connection(host, port, team_name)
+        self.player_state = PlayerState(team_name)
+        self.send_command = SendCommand(self.connection)
+        self.parser = ParseCommand(self.player_state.inventory)
+        self.logger = logging.getLogger(f&quot;player_{player_id}&quot;)
+        self.broadcast_manager = BroadcastMessageManager(
+            self.player_state, self.player_id
+        )
+        self.received_broadcasts = []
+
+</code></pre>
+<h3 id="4-visual-archi">4. Visual archi</h3>
+<p><img alt="no image" src="../asset/image.png" /></p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

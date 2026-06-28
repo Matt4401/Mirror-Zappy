@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+
+<html class="writer-html5" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="../../img/favicon.ico" rel="shortcut icon"/>
+<title>Architecture - Zappy documentation</title>
+<link href="../../css/theme.css" rel="stylesheet"/>
+<link href="../../css/theme_extra.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" rel="stylesheet"/>
+<script>
+        // Current page data
+        var mkdocs_page_name = "Architecture";
+        var mkdocs_page_input_path = "gui/architecture.md";
+        var mkdocs_page_url = null;
+      </script>
+<!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+</head>
+<body class="wy-body-for-nav" role="document">
+<div class="wy-grid-for-nav">
+<nav class="wy-nav-side stickynav" data-toggle="wy-nav-shift">
+<div class="wy-side-scroll">
+<div class="wy-side-nav-search">
+<a class="icon icon-home" href="../.."> Zappy documentation
+        </a><div role="search">
+<form action="../../search.html" class="wy-form" id="rtd-search-form" method="get">
+<input aria-label="Search docs" name="q" placeholder="Search docs" title="Type search term here" type="text"/>
+</form>
+</div>
+</div>
+<div aria-label="Navigation menu" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../network/">Network (Shared)</a>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Server</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../server/">Overview</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../server/architecture/">Architecture</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../server/core/">Core Orchestrator</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../server/game_engine/">Game Engine</a>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">AI</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ai/">Overview</a>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">GUI</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../">Overview</a>
+</li>
+<li class="toctree-l1 current"><a class="reference internal current" href="#">Architecture</a>
+<ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="#system-diagram">System Diagram</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#data-flow">Data Flow</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#ownership-rules">Ownership Rules</a>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../core/">Core Orchestrator</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../world/">World State</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ui/">User Interface</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../rendering/">Rendering</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../audio/">Audio</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../network/">Networking</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../events/">Events</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../raylib_wrappers/">Raylib Wrappers</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+<section class="wy-nav-content-wrap" data-toggle="wy-nav-shift">
+<nav aria-label="Mobile navigation menu" class="wy-nav-top" role="navigation">
+<i class="fa fa-bars" data-toggle="wy-nav-top"></i>
+<a href="../..">Zappy documentation</a>
+</nav>
+<div class="wy-nav-content">
+<div class="rst-content"><div aria-label="breadcrumbs navigation" role="navigation">
+<ul class="wy-breadcrumbs">
+<li><a aria-label="Docs" class="icon icon-home" href="../.."></a></li>
+<li class="breadcrumb-item">GUI</li>
+<li class="breadcrumb-item active">Architecture</li>
+<li class="wy-breadcrumbs-aside">
+</li>
+</ul>
+<hr/>
+</div>
+<div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
+<div class="section" itemprop="articleBody">
+<h1 id="high-level-architecture">High-Level Architecture</h1>
+<p>The GUI uses an event-driven architecture. The network client parses text messages into typed protocol commands, then dispatches them through <code>EventDispatcher</code>. Scene managers subscribe to the commands they own and update local render state.</p>
+<p>This keeps the GUI modular:</p>
+<ul>
+<li><code>network::Client</code> knows about sockets and protocol parsing, but not about rendering.</li>
+<li><code>WorldManager</code> knows about server commands and scene state, but not about the window.</li>
+<li><code>Render</code> owns the window, camera, map renderer, HUD, and update mode.</li>
+<li>UI panels communicate through typed GUI events or through explicit callbacks.</li>
+<li><code>AudioManager</code> is shared by render, world, and UI systems for music and sound effects.</li>
+</ul>
+<h2 id="system-diagram">System Diagram</h2>
+<div class="mermaid">classDiagram
+    class Core {
+        -EventDispatcher _dispatcher
+        -AudioManager _audioManager
+        -Render _render
+        -Client _client
+        +run()
+    }
+
+    class Client {
+        -IClientSocket _socket
+        -EventDispatcher _dispatcher
+        +update()
+    }
+
+    class EventDispatcher {
+        +subscribe~T~()
+        +unsubscribe~T~()
+        +dispatch~T~()
+        +dispatch(ServerCommand)
+    }
+
+    class Render {
+        -WorldManager _worldManager
+        -Map _map
+        -GameHUD _gameHUD
+        -FirstPerson _firstPerson
+        -Camera _camera
+        +renderFrame()
+    }
+
+    class WorldManager {
+        -TileManager _tileManager
+        -PlayerManager _playerManager
+    }
+
+    class Map {
+        -WorldManager _worldManager
+        +draw()
+        +handleEvent()
+    }
+
+    class GameHUD {
+        -UIGridManager _gridManager
+        -PauseMenu _pauseMenu
+        -PlayerInspectorUI _playerInspector
+        -TileInspectorUI _tileInspector
+    }
+
+    Core "1" *-- "1" Client
+    Core "1" *-- "1" Render
+    Core "1" *-- "1" AudioManager
+    Client --&gt; EventDispatcher : dispatches server commands
+    Render *-- WorldManager
+    Render *-- Map
+    Render *-- GameHUD
+    WorldManager --&gt; EventDispatcher : subscribes
+    Map --&gt; EventDispatcher : dispatches clicks
+</div>
+<h2 id="data-flow">Data Flow</h2>
+<ol>
+<li>The server sends a line such as <code>pnw #1 2 3 1 1 team</code>.</li>
+<li><code>Client::update()</code> pops the message from the socket.</li>
+<li><code>shared::protocol::Parser::parseServerCommand()</code> converts it into a typed command variant.</li>
+<li><code>EventDispatcher::dispatch(const ServerCommand&amp;)</code> dispatches the concrete type.</li>
+<li><code>WorldManager</code> routes the command to <code>PlayerManager</code> or <code>TileManager</code>.</li>
+<li>The manager updates local state.</li>
+<li><code>Render::renderFrame()</code> draws the latest state.</li>
+<li>UI and audio systems react to either the same command or derived GUI events.</li>
+</ol>
+<h2 id="ownership-rules">Ownership Rules</h2>
+<p>The GUI deliberately avoids global mutable world state.</p>
+<ul>
+<li><code>Core</code> owns the long-lived dispatcher, audio manager, render system, and network client.</li>
+<li><code>Render</code> owns scene systems that need the camera or window.</li>
+<li><code>WorldManager</code> owns <code>TileManager</code> and <code>PlayerManager</code> through <code>std::unique_ptr</code>.</li>
+<li><code>PlayerManager</code> stores teams, players, eggs, and active incantations.</li>
+<li><code>TileManager</code> stores tiles and tile resources.</li>
+<li><code>UIManager</code> stores shared UI components and updates them in draw/event order.</li>
+</ul>
+<p>When adding a new feature, first ask: "Who owns the state?" Most server-driven world state belongs in <code>TileManager</code> or <code>PlayerManager</code>; most visual interaction state belongs in <code>Render</code>, <code>Map</code>, or a UI panel.</p>
+</div>
+</div><footer>
+<div aria-label="Footer Navigation" class="rst-footer-buttons" role="navigation">
+<a class="btn btn-neutral float-left" href="../" title="Overview"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+<a class="btn btn-neutral float-right" href="../core/" title="Core Orchestrator">Next <span class="icon icon-circle-arrow-right"></span></a>
+</div>
+<hr/>
+<div role="contentinfo">
+<!-- Copyright etc -->
+</div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+</div>
+</div>
+</section>
+</div>
+<div aria-label="Versions" class="rst-versions" role="note">
+<span class="rst-current-version" data-toggle="rst-current-version">
+<span><a href="../" style="color: #fcfcfc">« Previous</a></span>
+<span><a href="../core/" style="color: #fcfcfc">Next »</a></span>
+</span>
+</div>
+<script src="../../js/jquery-3.6.0.min.js"></script>
+<script>var base_url = "../..";</script>
+<script src="../../js/theme_extra.js"></script>
+<script src="../../js/theme.js"></script>
+<script src="../../search/main.js"></script>
+<script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+<script type="module">import mermaid from "https://unpkg.com/mermaid@10.4.0/dist/mermaid.esm.min.mjs";
+mermaid.initialize({});</script></body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Gather - Zappy documentation</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Gather";
+        var mkdocs_page_input_path = "ai/states/gather.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> Zappy documentation
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../network/">Network (Shared)</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Server</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../server/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../server/architecture/">Architecture</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../server/core/">Core Orchestrator</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../server/game_engine/">Game Engine</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">AI</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../">Overview</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">GUI</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../gui/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../gui/architecture/">Architecture</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../gui/core/">Core Orchestrator</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../gui/world/">World State</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../gui/ui/">User Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../gui/rendering/">Rendering</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../gui/audio/">Audio</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../gui/network/">Networking</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../gui/events/">Events</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../gui/raylib_wrappers/">Raylib Wrappers</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">Zappy documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Gather</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h2 id="gatherstate">GatherState</h2>
+<h3 id="the-gatherstate-is-dedicated-to-searching-for-and-collecting-the-missing-resources-for-the-next-elevation">The GatherState is dedicated to searching for and collecting the missing resources for the next elevation.</h3>
+<ul>
+<li>The system generates a list of missing stones required to reach the next level.  </li>
+<li>If food reserves are below the defined threshold (FOOD_OPPORTUNISTIC) and a food source is visible, the Trantorian prioritizes moving to that tile to pick it up.  </li>
+<li>It then looks for the missing stones within its field of vision.  </li>
+<li>If a required stone is visible, it moves to its tile and takes it.  If no required stone is visible, it moves forward by one tile and updates its vision.  </li>
+</ul>
+<pre><code class="language-python">
+class GatherState(AState):
+    def execute(self):
+        self.maybe_eat_food()
+        self.trantorian.logger.info(&quot;===========Entering Gather state===========&quot;)
+        food = self.trantorian.player_state.inventory.get_food()
+        next_level = self.trantorian.player_state.level + 1
+        needed_dict = self.trantorian.get_missing_resources_for(next_level)
+        needed_stones = list(needed_dict.keys())
+
+        if not needed_stones:
+            self.trantorian.logger.info(
+                &quot;[Gather]: Player already get all his needed stones&quot;
+            )
+            return
+
+        if food &lt; FOOD_OPPORTUNISTIC:
+            food_idx = self.trantorian.player_state.vision.get_tile_index_of(&quot;food&quot;)
+            if food_idx is not None:
+                self.trantorian.move_to_tile(food_idx)
+                self.trantorian.take_object(&quot;food&quot;)
+                self.trantorian.inventory()
+                self.trantorian.look()
+                return
+
+        visible = None
+        for stone in needed_stones:
+            tile_index = self.trantorian.player_state.vision.get_tile_index_of(stone)
+            if tile_index is not None:
+                visible = (stone, tile_index)
+                break
+
+        if not visible:
+            self.trantorian.logger.info(
+                &quot;[Gather]: Not stones in vision, go forward and look&quot;
+            )
+            self.trantorian.forward()
+            self.trantorian.look()
+        else:
+            self.trantorian.logger.info(
+                &quot;[Gather]: Stones visibles, go to the tile and take it&quot;
+            )
+            stone, tile_index = visible
+            self.trantorian.move_to_tile(tile_index)
+            self.trantorian.take_object(stone)
+            tiles = self.trantorian.player_state.vision.get_tiles()
+            if tiles and &quot;food&quot; in tiles[0] and food &lt; FOOD_OPPORTUNISTIC:
+                self.trantorian.take_object(&quot;food&quot;)
+            self.trantorian.inventory()
+            self.trantorian.look()
+
+</code></pre>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+  </span>
+</div>
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../..";</script>
+    <script src="../../../js/theme_extra.js"></script>
+    <script src="../../../js/theme.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

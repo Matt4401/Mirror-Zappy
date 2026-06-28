@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>User Interface - Zappy documentation</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "User Interface";
+        var mkdocs_page_input_path = "gui/ui.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Zappy documentation
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../network/">Network (Shared)</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Server</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../server/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../server/architecture/">Architecture</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../server/core/">Core Orchestrator</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../server/game_engine/">Game Engine</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">AI</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai/">Overview</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">GUI</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../architecture/">Architecture</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../core/">Core Orchestrator</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../world/">World State</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">User Interface</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#uimanager">UIManager</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#component-interface">Component Interface</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#gamehud">GameHUD</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#game-over-ui">Game Over UI</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#ui-grid">UI Grid</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#pause-menu">Pause Menu</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#inspectors">Inspectors</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#ainspectorui">AInspectorUI</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#playerinspectorui">PlayerInspectorUI</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#tileinspectorui">TileInspectorUI</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#button-sounds">Button Sounds</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../rendering/">Rendering</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../audio/">Audio</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../network/">Networking</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../events/">Events</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../raylib_wrappers/">Raylib Wrappers</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Zappy documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">GUI</li>
+      <li class="breadcrumb-item active">User Interface</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="ui-system">UI System</h1>
+<p>The GUI UI is built from reusable components and menu panels. It is drawn after the 3D scene and receives events in reverse component order so top-level components get priority.</p>
+<h2 id="uimanager">UIManager</h2>
+<p><code>UIManager</code> owns a list of <code>std::shared_ptr&lt;IUIComponent&gt;</code>.</p>
+<p>Every frame it:</p>
+<ol>
+<li>updates visible components;</li>
+<li>sends events to visible components in reverse order;</li>
+<li>draws visible components;</li>
+<li>reports whether any visible component is hovered.</li>
+</ol>
+<p><code>Render</code> uses <code>UIManager::isHovered()</code> to avoid sending map clicks through UI panels.</p>
+<h2 id="component-interface">Component Interface</h2>
+<p>All UI components implement <code>IUIComponent</code>:</p>
+<ul>
+<li><code>draw()</code></li>
+<li><code>update()</code></li>
+<li><code>handleEvent()</code></li>
+<li><code>setPosition()</code></li>
+<li><code>setSize()</code></li>
+<li><code>isVisible()</code></li>
+<li><code>setVisible()</code></li>
+<li><code>isHovered()</code></li>
+</ul>
+<p>Reusable components include:</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>UIButton</code></td>
+<td>Clickable button, global click sound handler.</td>
+</tr>
+<tr>
+<td><code>UISlider</code></td>
+<td>Drag slider with <code>cancelDrag()</code> support.</td>
+</tr>
+<tr>
+<td><code>UIText</code></td>
+<td>Text rendering.</td>
+</tr>
+<tr>
+<td><code>UIImage</code></td>
+<td>Image rendering.</td>
+</tr>
+<tr>
+<td><code>UIPanel</code></td>
+<td>Basic panel background.</td>
+</tr>
+<tr>
+<td><code>UIGamePanel</code></td>
+<td>Movable/resizable game panel base.</td>
+</tr>
+<tr>
+<td><code>UIDropdown</code></td>
+<td>Selectable dropdown.</td>
+</tr>
+<tr>
+<td><code>UITextbox</code></td>
+<td>Editable text input.</td>
+</tr>
+<tr>
+<td><code>UICompass</code></td>
+<td>Camera direction display.</td>
+</tr>
+<tr>
+<td><code>UIToggle</code></td>
+<td>Checkbox/toggle switch component.</td>
+</tr>
+<tr>
+<td><code>UIKeybindButton</code></td>
+<td>Specialized button for capturing keyboard/mouse inputs for keybindings.</td>
+</tr>
+<tr>
+<td><code>EventLogRow</code></td>
+<td>A single entry in the event log containing formatted text.</td>
+</tr>
+<tr>
+<td><code>UIGridManager</code></td>
+<td>Container that handles grid-based layout and editing for game panels.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="gamehud">GameHUD</h2>
+<p><code>GameHUD</code> constructs the main UI:</p>
+<ul>
+<li><code>UIGridManager</code></li>
+<li><code>UICompass</code></li>
+<li><code>PauseMenu</code></li>
+<li><code>PlayerInspectorUI</code></li>
+<li><code>TileInspectorUI</code></li>
+<li><code>WorldControlUI</code></li>
+<li><code>EventLogUI</code></li>
+<li><code>GlobalStatsUI</code></li>
+<li><code>GameOverUI</code></li>
+</ul>
+<p>It registers only the root components in <code>UIManager</code>:</p>
+<ul>
+<li>compass;</li>
+<li>grid manager;</li>
+<li>pause menu;</li>
+<li>game over UI.</li>
+</ul>
+<p>The grid manager owns the normal HUD panels.</p>
+<h2 id="game-over-ui">Game Over UI</h2>
+<p><code>GameOverUI</code> is a full-screen overlay that appears automatically when the server broadcasts the end of the game (<code>Seg</code> event).</p>
+<p>It provides:</p>
+<ul>
+<li>a full-screen dark overlay to mask the game slightly;</li>
+<li>a centered modal panel displaying the winning team's name;</li>
+<li>a "Spectate" button that hides the menu and returns to a free-camera view;</li>
+<li>a "Quit Game" button that triggers the application exit.</li>
+</ul>
+<p><code>Render</code> uses its callbacks to update the cursor state when returning to the game in spectator mode, and to begin the exit sequence when quitting.</p>
+<h2 id="ui-grid">UI Grid</h2>
+<p><code>UIGridManager</code> uses a 64 x 36 virtual grid. Panels are registered with grid coordinates and dimensions. Config mode lets the user move/resize panels.</p>
+<p>Current default layout:</p>
+<table>
+<thead>
+<tr>
+<th>Panel</th>
+<th>Grid Position</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Player inspector</td>
+<td><code>(52, 16, 10, 15)</code></td>
+</tr>
+<tr>
+<td>Tile inspector</td>
+<td><code>(52, 3, 10, 12)</code></td>
+</tr>
+<tr>
+<td>World control</td>
+<td>centered near bottom</td>
+</tr>
+<tr>
+<td>Event log</td>
+<td><code>(2, 16, 12, 15)</code></td>
+</tr>
+<tr>
+<td>Global stats</td>
+<td><code>(2, 2, 12, 13)</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>Escape</code> exits config mode and automatically saves the updated layout persistently in the settings file.</p>
+<h2 id="pause-menu">Pause Menu</h2>
+<p><code>PauseMenu</code> is a full-screen overlay with:</p>
+<ul>
+<li>resume button;</li>
+<li>settings panel;</li>
+<li>UI configuration entry;</li>
+<li>save and quit action.</li>
+</ul>
+<p>Settings currently expose several tabs:</p>
+<ul>
+<li><strong>Audio</strong>: Master, Music, and SFX volumes, plus a Mute option.</li>
+<li><strong>Video</strong>: Display mode (Windowed, Borderless, Fullscreen), resolution, FPS limit, FOV, camera speed, and render distance.</li>
+<li><strong>Controls</strong>: Fully rebindable actions for movement, sprint, pause, toggle UI, and camera reset, with support for mouse keys.</li>
+<li><strong>Visibility</strong>: Toggles for showing UI, players, minerals, food, and tiles.</li>
+</ul>
+<p>Settings are saved and loaded persistently via <code>SettingsManager</code> which writes atomically to <code>config.ini</code>. When the menu is hidden, slider drag state is cancelled so a drag cannot continue after reopening.</p>
+<p><code>PauseMenu</code> does not directly modify <code>Render</code> state except through callbacks. <code>Render</code> installs:</p>
+<ul>
+<li><code>setOnResume()</code></li>
+<li><code>setOnExit()</code></li>
+<li><code>setOnUIConfig()</code></li>
+</ul>
+<h2 id="inspectors">Inspectors</h2>
+<h3 id="ainspectorui">AInspectorUI</h3>
+<p>Base class for inspector panels. It provides:</p>
+<ul>
+<li>close button;</li>
+<li>shared inventory rendering;</li>
+<li>server frequency subscription;</li>
+<li>token storage for derived subscriptions;</li>
+<li><code>onSendCommand</code> callback for protocol requests.</li>
+</ul>
+<h3 id="playerinspectorui">PlayerInspectorUI</h3>
+<p>Opened by <code>events::PlayerClicked</code>.</p>
+<p>Responsibilities:</p>
+<ul>
+<li>display selected player ID, team, position, orientation, level, health/food, and inventory;</li>
+<li>request <code>ppo</code>/<code>pin</code> synchronization when needed;</li>
+<li>update on <code>Ppo</code>, <code>Pin</code>, and <code>Plv</code>;</li>
+<li>request first-person camera mode;</li>
+<li>allow generated player name updates through <code>PlayerNameChanged</code>.</li>
+</ul>
+<h3 id="tileinspectorui">TileInspectorUI</h3>
+<p>Opened by <code>events::TileClicked</code>.</p>
+<p>Responsibilities:</p>
+<ul>
+<li>display tile coordinates and inventory;</li>
+<li>request <code>bct x y</code> synchronization;</li>
+<li>react to <code>bct</code>, <code>pic</code>, and <code>pie</code>.</li>
+</ul>
+<h2 id="button-sounds">Button Sounds</h2>
+<p>All <code>UIButton</code> instances share a static click sound handler. <code>GameHUD</code> installs it with:</p>
+<pre><code class="language-cpp">UIButton::setClickSoundHandler([audio] {
+    audio-&gt;playSound(&quot;button_click&quot;);
+});
+</code></pre>
+<p>The handler is cleared in <code>GameHUD</code> destructor.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../world/" class="btn btn-neutral float-left" title="World State"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../rendering/" class="btn btn-neutral float-right" title="Rendering">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../world/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../rendering/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

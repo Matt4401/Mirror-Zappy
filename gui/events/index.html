@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Events - Zappy documentation</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Events";
+        var mkdocs_page_input_path = "gui/events.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Zappy documentation
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../network/">Network (Shared)</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Server</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../server/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../server/architecture/">Architecture</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../server/core/">Core Orchestrator</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../server/game_engine/">Game Engine</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">AI</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai/">Overview</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">GUI</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../architecture/">Architecture</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../core/">Core Orchestrator</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../world/">World State</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ui/">User Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../rendering/">Rendering</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../audio/">Audio</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../network/">Networking</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Events</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#typed-subscriptions">Typed Subscriptions</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dispatching">Dispatching</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#gui-events">GUI Events</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#unsubscribe-rules">Unsubscribe Rules</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#where-events-should-be-used">Where Events Should Be Used</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../raylib_wrappers/">Raylib Wrappers</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Zappy documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">GUI</li>
+      <li class="breadcrumb-item active">Events</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="event-system">Event System</h1>
+<p>The GUI uses <code>events::EventDispatcher</code> as a typed message bus. It is the glue between network commands, world managers, rendering interactions, UI panels, and socket send requests.</p>
+<h2 id="typed-subscriptions">Typed Subscriptions</h2>
+<p>Subscribers register a callback for one concrete type:</p>
+<pre><code class="language-cpp">auto token = dispatcher.subscribe&lt;shared::protocol::server::Pnw&gt;(
+    [](const shared::protocol::server::Pnw&amp; command) {
+        // update local state
+    });
+</code></pre>
+<p><code>subscribe&lt;T&gt;()</code> returns an <code>EventToken</code>. Store the token and unsubscribe when the owner is destroyed.</p>
+<h2 id="dispatching">Dispatching</h2>
+<p>Any type can be dispatched:</p>
+<pre><code class="language-cpp">dispatcher.dispatch(events::PlayerClicked{...});
+dispatcher.dispatch(shared::protocol::server::Bct{...});
+</code></pre>
+<p>For network commands, <code>Client</code> dispatches a <code>shared::protocol::ServerCommand</code> variant. <code>EventDispatcher::dispatch(const ServerCommand&amp;)</code> unwraps the variant and forwards the concrete command to <code>dispatch&lt;T&gt;()</code>.</p>
+<h2 id="gui-events">GUI Events</h2>
+<p>GUI-only events live in <code>gui/src/events/GuiEvents.hpp</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PlayerClicked</code></td>
+<td>Map picked a player; player inspector should open/update.</td>
+</tr>
+<tr>
+<td><code>TileClicked</code></td>
+<td>Map picked a tile; tile inspector should open/update.</td>
+</tr>
+<tr>
+<td><code>SendCommand</code></td>
+<td>UI wants to send a text command to the server.</td>
+</tr>
+<tr>
+<td><code>PlayerNameChanged</code></td>
+<td>UI changed a generated player name.</td>
+</tr>
+<tr>
+<td><code>PlayerFirstPersonRequested</code></td>
+<td>Player inspector requested first-person camera.</td>
+</tr>
+<tr>
+<td><code>RequestCyclePlayer</code></td>
+<td>Inspector wants to select previous/next player.</td>
+</tr>
+<tr>
+<td><code>TimeOfDayChanged</code></td>
+<td>World control changed skybox time mode.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="unsubscribe-rules">Unsubscribe Rules</h2>
+<p>Always unsubscribe in destructors for long-lived UI and scene objects.</p>
+<p>Good pattern:</p>
+<pre><code class="language-cpp">if (_token != 0) {
+    _dispatcher.get().unsubscribe&lt;EventType&gt;(_token);
+}
+</code></pre>
+<p><code>WorldManager</code> uses a slightly different pattern: it stores unsubscribe lambdas in <code>_unsubscribers</code>, then runs them in its destructor. This keeps all server command subscriptions centralized.</p>
+<h2 id="where-events-should-be-used">Where Events Should Be Used</h2>
+<p>Use events when systems are peers and should not own each other:</p>
+<ul>
+<li>map click -&gt; inspector panel;</li>
+<li>UI command -&gt; network client;</li>
+<li>first-person request -&gt; render camera controller.</li>
+</ul>
+<p>Use direct method calls when one object clearly owns another:</p>
+<ul>
+<li><code>WorldManager</code> routing server commands to <code>TileManager</code> and <code>PlayerManager</code>;</li>
+<li><code>Render</code> configuring callbacks on <code>PauseMenu</code>.</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../network/" class="btn btn-neutral float-left" title="Networking"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../raylib_wrappers/" class="btn btn-neutral float-right" title="Raylib Wrappers">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../network/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../raylib_wrappers/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

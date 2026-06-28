@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Contributing Guide - Zappy Project - Zappy documentation</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Contributing Guide - Zappy Project";
+        var mkdocs_page_input_path = "CONTRIBUTING.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Zappy documentation
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../network/">Network (Shared)</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Server</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../server/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../server/architecture/">Architecture</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../server/core/">Core Orchestrator</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../server/game_engine/">Game Engine</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">AI</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai/">Overview</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">GUI</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../gui/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../gui/architecture/">Architecture</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../gui/core/">Core Orchestrator</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../gui/world/">World State</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../gui/ui/">User Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../gui/rendering/">Rendering</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../gui/audio/">Audio</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../gui/network/">Networking</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../gui/events/">Events</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../gui/raylib_wrappers/">Raylib Wrappers</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Zappy documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Contributing Guide - Zappy Project</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="contributing-guide-zappy-project">Contributing Guide - Zappy Project</h1>
+<h2 id="1-branching-strategy-git-workflow">1. Branching Strategy (Git Workflow)</h2>
+<p>We <strong>never</strong> push code directly to the <code>main</code> branch. Every new task must have its own dedicated branch, following this naming convention:</p>
+<ul>
+<li><strong><code>feat/23-feature-name</code></strong>: For adding a new core feature (e.g., <code>feat/23-server-elevation</code>).</li>
+<li><strong><code>fix/54-bug-name</code></strong>: For bug fixes (e.g., <code>fix/54-gui-segfault-disconnect</code>).</li>
+<li><strong><code>chore/37-task-name</code></strong>: For configuration, CI/CD, or tooling updates (e.g., <code>chore/37-setup-pre-commit</code>).</li>
+<li><strong><code>docs/87-topic-name</code></strong>: For adding or updating documentation (e.g., <code>docs/87-architecture-map</code>).</li>
+</ul>
+<h2 id="2-pre-commit-formatting-mandatory">2. Pre-commit &amp; Formatting (Mandatory)</h2>
+<p>To avoid action failure, we use <strong>pre-commit</strong> to automatically enforce our coding standards before every commit (Clang-format for C++, Ruff for Python).</p>
+<p><strong>To do immediately after cloning the repository:</strong></p>
+<pre><code class="language-bash">pip install pre-commit
+pre-commit install
+pre-commit install --hook-type commit-msg
+</code></pre>
+<h2 id="3-commit-convention">3. Commit Convention</h2>
+<p>We strictly follow the <strong>Conventional Commits</strong> standard. The pre-commit linter will block any improperly formatted commit.</p>
+<p><strong>Expected format:</strong> <code>type(optional-scope): description in english</code></p>
+<p><strong>Valid Examples:</strong></p>
+<ul>
+<li><code>feat(server): implement poll multiplexing</code></li>
+<li><code>fix(gui): resolve player rendering overlap</code></li>
+<li><code>test(ai): add unit tests for survival state</code></li>
+<li><code>chore(ci): update github actions cache</code></li>
+</ul>
+<h2 id="4-pull-requests-code-reviews">4. Pull Requests &amp; Code Reviews</h2>
+<p>Code quality is everyone's responsibility. A Pull Request (PR) can only be merged if it meets the following validation rules:</p>
+<ul>
+<li><strong>Base Rule (2 Approvals):</strong> Any PR must be approved by <strong>at least 2 people</strong>: the other person working on the same topic (Server or GUI) + 1 person from another sub-group (to prevent knowledge silos).</li>
+<li><strong>AI Edge Case (Solo Developer):</strong> PRs regarding the AI require the approval of the two other people who have knowledge of the topic.</li>
+<li><strong>Core / Critical Features:</strong> Major modifications (e.g., rewriting the server's main loop or changing the network protocol) require a <strong>global review from the entire team</strong>.</li>
+</ul>
+<h2 id="5-testing-quality-assurance-qa">5. Testing &amp; Quality Assurance (QA)</h2>
+<ul>
+<li><strong>Unit Tests (UT):</strong> A minimum test coverage is required to validate a PR touching critical business logic (parsing, elevation, resource management).</li>
+<li><strong>Load Testing (Server):</strong> Since the server must handle non-blocking multiplexing with <code>poll</code>, the Server team commits to validating their architecture using load-testing scripts (simulating dozens of simultaneous connections, malformed requests, and abrupt disconnections).</li>
+</ul>
+<h2 id="6-log-standardization">6. Log Standardization</h2>
+<p>To facilitate cross-debugging between the Server, the GUI, and the AI, <strong>all binaries</strong> must print their logs to the terminal using the following strict format:</p>
+<p><code>[BINARY] [SEVERITY] Message</code></p>
+<p><em>(Note: Adding a <code>[TIMESTAMP]</code> at the beginning of the log is </em><em>optional</em><em> but highly recommended for local debugging of synchronization issues).</em></p>
+<p><strong>Examples:</strong></p>
+<ul>
+<li><code>[SERVER] [INFO] Connection accepted on socket 4</code></li>
+<li><code>[14:32:01.110] [AI_TEAM1] [DEBUG] Sending command: Forward</code></li>
+<li><code>[GUI] [ERROR] Failed to parse player inventory</code></li>
+</ul>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Overview - Zappy documentation</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Overview";
+        var mkdocs_page_input_path = "gui/index.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Zappy documentation
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../network/">Network (Shared)</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Server</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../server/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../server/architecture/">Architecture</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../server/core/">Core Orchestrator</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../server/game_engine/">Game Engine</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">AI</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai/">Overview</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">GUI</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Overview</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#technical-constraints">Technical Constraints</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#documentation-structure">Documentation Structure</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#quick-developer-map">Quick Developer Map</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="architecture/">Architecture</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="core/">Core Orchestrator</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="world/">World State</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="ui/">User Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="rendering/">Rendering</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="audio/">Audio</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="network/">Networking</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="events/">Events</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="raylib_wrappers/">Raylib Wrappers</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Zappy documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">GUI</li>
+      <li class="breadcrumb-item active">Overview</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="zappy-gui-documentation">Zappy GUI Documentation</h1>
+<h2 id="overview">Overview</h2>
+<p>The Zappy GUI is the spectator client of the project. It connects to the server as <code>GRAPHIC</code>, receives server protocol events, keeps a local read-only representation of the world, and renders that state as an interactive 3D scene with UI inspectors, audio feedback, and camera controls.</p>
+<p>The GUI is not authoritative. It never decides game rules. Its job is to:</p>
+<ul>
+<li>connect to the server and parse GUI protocol commands;</li>
+<li>transform those commands into local scene state;</li>
+<li>render the map, resources, teams, players, eggs, animations, and skybox;</li>
+<li>expose interaction tools for developers and spectators;</li>
+<li>send GUI-side requests such as <code>ppo</code>, <code>pin</code>, <code>bct</code>, or <code>sst</code> when a panel needs refreshed data.</li>
+</ul>
+<h2 id="technical-constraints">Technical Constraints</h2>
+<ul>
+<li><strong>Language:</strong> C++23.</li>
+<li><strong>Rendering:</strong> Raylib, wrapped by the local <code>gui/raylib/</code> layer.</li>
+<li><strong>Architecture:</strong> Event-driven GUI state updates through <code>EventDispatcher</code>.</li>
+<li><strong>Networking:</strong> The GUI uses the shared network socket layer and the shared protocol parser.</li>
+<li><strong>Runtime model:</strong> One main loop owned by <code>gui::Core</code>.</li>
+<li><strong>Ownership:</strong> Long-lived systems are owned by <code>Core</code> or <code>Render</code>; scene managers own world state; UI components are shared through <code>UIManager</code>.</li>
+</ul>
+<h2 id="documentation-structure">Documentation Structure</h2>
+<ol>
+<li><strong><a href="architecture/">Architecture</a>:</strong> Main systems and data flow.</li>
+<li><strong><a href="core/">Core Runtime</a>:</strong> Startup, loop, network/render/audio ordering.</li>
+<li><strong><a href="network/">Network and Protocol</a>:</strong> GUI connection lifecycle and command dispatch.</li>
+<li><strong><a href="events/">Event System</a>:</strong> Typed subscriptions, GUI events, and unsubscribe rules.</li>
+<li><strong><a href="world/">World State</a>:</strong> <code>WorldManager</code>, <code>TileManager</code>, <code>PlayerManager</code>, and game models.</li>
+<li><strong><a href="rendering/">Rendering</a>:</strong> 3D scene, camera modes, picking, skybox, and assets.</li>
+<li><strong><a href="ui/">UI System</a>:</strong> HUD, panels, inspectors, pause menu, and layout grid.</li>
+<li><strong><a href="audio/">Audio</a>:</strong> Music, spatial sounds, pitch scaling, and UI sounds.</li>
+<li><strong><a href="raylib_wrappers/">Raylib Wrappers</a>:</strong> Local wrapper conventions.</li>
+<li><strong><a href="../CONTRIBUTING/">Contributing</a>:</strong> How to add features safely.</li>
+</ol>
+<h2 id="quick-developer-map">Quick Developer Map</h2>
+<table>
+<thead>
+<tr>
+<th>Goal</th>
+<th>Start Here</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Understand the GUI startup flow</td>
+<td><code>gui/src/Core.cpp</code>, <a href="core/">Core Runtime</a></td>
+</tr>
+<tr>
+<td>Add a server command handler</td>
+<td><code>WorldManager</code>, <a href="world/">World State</a></td>
+</tr>
+<tr>
+<td>Add or update rendering</td>
+<td><code>Map</code>, <code>GameModel</code>, <a href="rendering/">Rendering</a></td>
+</tr>
+<tr>
+<td>Add UI panel behavior</td>
+<td><code>GameHUD</code>, <code>UIManager</code>, <a href="ui/">UI System</a></td>
+</tr>
+<tr>
+<td>Add a sound</td>
+<td><code>AudioManager</code>, <a href="audio/">Audio</a></td>
+</tr>
+<tr>
+<td>Add a Raylib feature</td>
+<td><code>gui/raylib/</code>, <a href="raylib_wrappers/">Raylib Wrappers</a></td>
+</tr>
+</tbody>
+</table>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../ai/" class="btn btn-neutral float-left" title="Overview"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="architecture/" class="btn btn-neutral float-right" title="Architecture">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../ai/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="architecture/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

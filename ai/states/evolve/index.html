@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Evolve - Zappy documentation</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Evolve";
+        var mkdocs_page_input_path = "ai/states/evolve.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> Zappy documentation
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../network/">Network (Shared)</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Server</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../server/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../server/architecture/">Architecture</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../server/core/">Core Orchestrator</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../server/game_engine/">Game Engine</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">AI</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../">Overview</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">GUI</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../gui/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../gui/architecture/">Architecture</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../gui/core/">Core Orchestrator</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../gui/world/">World State</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../gui/ui/">User Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../gui/rendering/">Rendering</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../gui/audio/">Audio</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../gui/network/">Networking</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../gui/events/">Events</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../gui/raylib_wrappers/">Raylib Wrappers</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">Zappy documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Evolve</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h2 id="evolvestate">EvolveState</h2>
+<h3 id="the-evolvestate-orchestrates-the-complex-process-of-leveling-up">The EvolveState orchestrates the complex process of leveling up.</h3>
+<ul>
+<li>The Trantorian identifies the requirements in terms of stones and number of players to reach the next level.  </li>
+<li>If the food reserve is insufficient (INCANT_FOOD_ABORT), the process is aborted, a completion message is broadcasted, and the Trantorian reclaims the placed stones.  </li>
+<li>The system periodically broadcasts a message (BROADCAST_EVO_PROCESS) to coordinate the gathering of required players.  </li>
+<li>-While waiting for other players, the Trantorian can reproduce (fork) if it has enough food and the cooldown period between two reproductions is respected.  </li>
+<li>Once the required number of players is gathered on the tile, the Trantorian sets down the necessary stones and launches the incantation.  </li>
+<li>If the incantation succeeds, it updates its level, resets its vision, and broadcasts a success message (BROADCAST_DONE).  </li>
+</ul>
+<pre><code class="language-python">
+class EvolveState(AState):
+    def __init__(self, trantorian):
+        super().__init__(trantorian)
+        self.stones_placed = False
+        self.wait_ticks = 0
+        self.finished = False
+
+    # utilitary functions
+    def requirements(self):
+        level = self.trantorian.player_state.level
+        return level, ELEVATION_REQUIREMENTS.get(level + 1, {})
+
+    def players_on_tile(self):
+        tiles = self.trantorian.player_state.vision.get_tiles()
+        return tiles[0].count(&quot;player&quot;) if tiles else 0
+
+    def place_stones(self, req):
+        if self.stones_placed:
+            return
+        for resource, amount in req.items():
+            if resource == &quot;player&quot; or amount == 0:
+                continue
+            for _ in range(amount):
+                self.trantorian.set_object_down(resource)
+        self.stones_placed = True
+
+    def reclaim_stones(self, req):
+        if not self.stones_placed:
+            return
+        for resource, amount in req.items():
+            if resource == &quot;player&quot; or amount == 0:
+                continue
+            for _ in range(amount):
+                self.trantorian.take_object(resource)
+        self.stones_placed = False
+        self.trantorian.inventory()
+
+    def broadcast(self, keyword, level):
+        ps = self.trantorian.player_state
+        self.trantorian.send_command.broadcast(
+            f&quot;{ps.team_name}|{keyword}:{level}:{self.trantorian.leader_id}&quot;
+        )
+
+    def reset(self, reason: str):
+        _, req = self.requirements()
+        self.trantorian.logger.warning(f&quot;[Evolve]: aborting evo process ({reason})&quot;)
+        self.reclaim_stones(req)
+        self.broadcast(BROADCAST_DONE, self.trantorian.player_state.level)
+        self.finished = True
+
+    def request(self, direction, level, leader):
+        _, req = self.requirements()
+        self.trantorian.logger.info(f&quot;[Evolve]: yielding to lower leader {leader}&quot;)
+        self.reclaim_stones(req)
+        self.trantorian.player_state.set_incantation_target(direction, level, leader)
+        self.finished = True
+
+    def execute(self):
+        ps = self.trantorian.player_state
+        level, req = self.requirements()
+        required_players = req.get(&quot;player&quot;, 1)
+
+        if required_players &lt;= 1:
+            self.solo_incantation(req, level)
+            return
+
+        food = ps.inventory.get_food()
+        if food &lt;= INCANT_FOOD_ABORT:
+            self.reset(&quot;food&quot;)
+            return
+
+        self.wait_ticks += 1
+        if self.wait_ticks % EVO_PROCESS_BROADCAST_PERIOD == 0:
+            self.broadcast(BROADCAST_EVO_PROCESS, level)
+
+        self.trantorian.look()
+        count = self.players_on_tile()
+        self.trantorian.logger.info(
+            f&quot;[Evolve]: evo process lvl {level} -&gt; {count}/{required_players} players&quot;
+        )
+
+        if count &gt;= required_players:
+            self.place_stones(req)
+            self.trantorian.look()
+            if self.players_on_tile() &gt;= required_players:
+                self.launch(req, level)
+                return
+            return
+
+       # can reproduce during wait others
+        if (
+                not self.stones_placed
+                and food &gt;= FORK_WHILE_WAITING_FOOD
+                and self.trantorian.can_reproduce()
+                and time.time() - self.trantorian.last_fork_time &gt;= FORK_COOLDOWN_SECONDS
+        ):
+            self.trantorian.logger.info(&quot;[Evolve]: forking to grow population while waiting&quot;)
+            self.trantorian.fork()
+            self.trantorian.inventory()
+
+    def solo_incantation(self, req, level):
+        self.trantorian.logger.info(&quot;[Evolve]: solo incantation&quot;)
+        self.place_stones(req)
+        self.launch(req, level)
+        self.finished = True
+
+    def launch(self, req, level):
+        self.trantorian.logger.info(&quot;[Evolve]: launching incantation&quot;)
+        result = self.trantorian.start_incantation()
+        self.handle_result(result, req, level)
+
+    def handle_result(self, result, req, level):
+        ps = self.trantorian.player_state
+        if result is None:
+            self.trantorian.logger.warning(&quot;[Evolve]: incantation got no answer&quot;)
+            self.reset(&quot;no_answer&quot;)
+            return
+        success, response = result
+        if success and &quot;Current level&quot; in response:
+            match = re.search(r&quot;Current level:\s*(\d+)&quot;, response)
+            if match:
+                new_level = int(match.group(1))
+                if new_level &gt; ps.level:
+                    ps.level = new_level
+                    ps.vision.set_level(new_level)
+                    ps.vision.reset_on_turn()
+            self.trantorian.logger.warning(f&quot;[Evolve]: elevation success -&gt; {ps.level}&quot;)
+            self.stones_placed = False
+            self.broadcast(BROADCAST_DONE, level)
+            self.trantorian.inventory()
+            self.finished = True
+        else:
+            self.trantorian.logger.warning(f&quot;[Evolve]: elevation failed ({response})&quot;)
+            self.reset(&quot;ko&quot;)
+</code></pre>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+  </span>
+</div>
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../..";</script>
+    <script src="../../../js/theme_extra.js"></script>
+    <script src="../../../js/theme.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

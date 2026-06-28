@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Rendering - Zappy documentation</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Rendering";
+        var mkdocs_page_input_path = "gui/rendering.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Zappy documentation
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../network/">Network (Shared)</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Server</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../server/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../server/architecture/">Architecture</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../server/core/">Core Orchestrator</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../server/game_engine/">Game Engine</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">AI</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai/">Overview</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">GUI</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../architecture/">Architecture</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../core/">Core Orchestrator</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../world/">World State</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ui/">User Interface</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Rendering</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#main-classes">Main Classes</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#draw-order">Draw Order</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#map-rendering">Map Rendering</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#floating-island-underworld">Floating Island (Underworld)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#picking">Picking</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#camera-modes">Camera Modes</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#free-camera">Free Camera</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#ui-mode">UI Mode</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#pause-mode">Pause Mode</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#first-person-mode">First-Person Mode</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#follow-mode">Follow Mode</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#procedural-generation-names-skins">Procedural Generation (Names &amp; Skins)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#asset-loading">Asset Loading</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../audio/">Audio</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../network/">Networking</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../events/">Events</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../raylib_wrappers/">Raylib Wrappers</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Zappy documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">GUI</li>
+      <li class="breadcrumb-item active">Rendering</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="rendering">Rendering</h1>
+<p>The render layer owns the window, camera, world scene, map picking, first-person view, skybox, and HUD registration.</p>
+<h2 id="main-classes">Main Classes</h2>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Render</code></td>
+<td>Main frame lifecycle, input modes, camera updates, draw order.</td>
+</tr>
+<tr>
+<td><code>Map</code></td>
+<td>Draws tiles, resources, teams, players, eggs, and handles 3D picking.</td>
+</tr>
+<tr>
+<td><code>GameModel</code></td>
+<td>Draws player and egg models, applies player animations.</td>
+</tr>
+<tr>
+<td><code>FirstPerson</code></td>
+<td>Locks the camera to a selected player's eyes.</td>
+</tr>
+<tr>
+<td><code>Skybox3D</code></td>
+<td>Draws and updates the sky/time environment.</td>
+</tr>
+<tr>
+<td><code>AssetManager</code></td>
+<td>Caches fonts and textures by ID.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="draw-order">Draw Order</h2>
+<p><code>Render::renderFrame()</code>:</p>
+<ol>
+<li>update runtime state;</li>
+<li>begin drawing;</li>
+<li>draw 2D background layer, currently empty;</li>
+<li>draw 3D scene;</li>
+<li>draw UI;</li>
+<li>end drawing.</li>
+</ol>
+<p><code>Render::render3D()</code>:</p>
+<pre><code class="language-cpp">_camera.beginMode3D();
+_skybox.draw();
+_map.draw();
+Camera::endMode3D();
+</code></pre>
+<h2 id="map-rendering">Map Rendering</h2>
+<p><code>Map::draw()</code> renders:</p>
+<ol>
+<li>visible tiles;</li>
+<li>tile resource objects;</li>
+<li>teams, players, and eggs;</li>
+<li>hovered tile bounding box.</li>
+</ol>
+<p>Resources are dispatched by name through <code>_itemDrawFunctions</code>. If you add a new resource object, update both:</p>
+<ul>
+<li><code>TileManager::_resourceFactories</code>;</li>
+<li><code>Map::_itemDrawFunctions</code> and model fields.</li>
+</ul>
+<h2 id="floating-island-underworld">Floating Island (Underworld)</h2>
+<p>To give the map a distinct look, a procedural floating island extends downwards from the map grid.
+The island uses Perlin noise to generate a depth map, bounded by a radial mask to ensure it tapers to a point underneath.
+The island rendering is highly optimized through volume culling: only exterior blocks are sent to the GPU.
+The floating island can be toggled via <code>showFloatingIsland</code> in the settings, and fully respects the camera's render distance frustum culling.</p>
+<h2 id="picking">Picking</h2>
+<p>Picking only runs when <code>Render</code> is in UI mode and the UI is not hovered.</p>
+<p>Flow:</p>
+<ol>
+<li><code>Render::update()</code> calls <code>_map.handleEvent()</code>.</li>
+<li><code>Map</code> builds a mouse ray from the camera.</li>
+<li>If <code>settings.showTiles</code> is true, it tests visible tile bounding boxes for hover.</li>
+<li>On left click, if <code>settings.showPlayers</code> is true, it tests visible player bounding boxes first.</li>
+<li>If a player is hit, dispatch <code>events::PlayerClicked</code>.</li>
+<li>Otherwise, if a tile is hovered, dispatch <code>events::TileClicked</code>.</li>
+</ol>
+<p>Player bounding boxes come from <code>game::Player::boundingBox()</code>. Hidden entities are completely skipped for interaction.</p>
+<h2 id="camera-modes">Camera Modes</h2>
+<h3 id="free-camera">Free Camera</h3>
+<p>Default camera mode uses Raylib <code>CAMERA_FREE</code>. Movement speed is now scaled by delta-time so that it remains consistent regardless of framerate. The user can configure base movement speed in settings. <code>Render</code> clamps the camera to a padded area around the map and prevents going below the ground.</p>
+<h3 id="ui-mode">UI Mode</h3>
+<p><code>Left Alt</code> toggles UI mode. When UI mode is active:</p>
+<ul>
+<li>cursor is enabled;</li>
+<li>camera free movement is disabled;</li>
+<li>clicking the 3D scene selects players/tiles if the UI is not hovered.</li>
+</ul>
+<h3 id="pause-mode">Pause Mode</h3>
+<p><code>Escape</code> toggles the pause menu. While the pause menu is visible:</p>
+<ul>
+<li>cursor is enabled;</li>
+<li><code>_updateMode</code> is <code>PauseMenuOnly</code>;</li>
+<li>camera/world picking does not update.</li>
+</ul>
+<p>The pause menu resume callback must restore <code>_updateMode = UpdateMode::All</code>.</p>
+<h3 id="first-person-mode">First-Person Mode</h3>
+<p>The player inspector can dispatch <code>PlayerFirstPersonRequested</code>. <code>FirstPerson</code> then:</p>
+<ul>
+<li>stores the selected player ID;</li>
+<li>moves camera to <code>player.position() + EyeHeight</code>;</li>
+<li>points camera in the player's rendered direction;</li>
+<li>updates every frame so the camera follows movement and rotation.</li>
+</ul>
+<p><code>Escape</code> exits first-person mode.</p>
+<h3 id="follow-mode">Follow Mode</h3>
+<p>When the user selects a player by clicking on them in the 3D scene, the camera automatically tracks that player's position. While in follow mode:</p>
+<ul>
+<li>The camera's position and target update automatically to match the player's movements.</li>
+<li>The user can still rotate and zoom the camera freely around the tracked player using the mouse.</li>
+<li>Free movement via WASD is disabled to ensure the camera stays anchored to the player.</li>
+<li>Follow mode stops when the Player Inspector UI is closed, or when the followed player dies.</li>
+</ul>
+<h2 id="procedural-generation-names-skins">Procedural Generation (Names &amp; Skins)</h2>
+<p>To give each Trantorian a unique and recognizable identity, the GUI procedurally generates attributes when a new player connects (<code>pnw</code>):</p>
+<ul>
+<li><strong>NameGenerator</strong>: Automatically assigns a unique, lore-friendly name to the player. The names are dynamically generated, making it easier to track individual players in the UI and Event Log without relying purely on their IDs.</li>
+<li><strong>SkinGenerator</strong>: Assigns a random, visually distinct skin (texture ID) to the player's 3D model. This ensures a diverse population of Trantorians on the map.</li>
+</ul>
+<p>These generated attributes are persistently tied to the player's ID for the duration of their life and are used across the rendering and UI systems.</p>
+<h2 id="asset-loading">Asset Loading</h2>
+<p>Static models are generally owned by render classes as wrapper objects. UI textures and dynamic player skins should go through <code>AssetManager</code> so they are cached and reused.</p>
+<p>Common asset locations:</p>
+<ul>
+<li><code>assets/models/environment/</code></li>
+<li><code>assets/models/resources/</code></li>
+<li><code>assets/images/ui/</code></li>
+<li><code>assets/fonts/</code></li>
+<li><code>assets/audio/</code></li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../ui/" class="btn btn-neutral float-left" title="User Interface"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../audio/" class="btn btn-neutral float-right" title="Audio">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../ui/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../audio/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

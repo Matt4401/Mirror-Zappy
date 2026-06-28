@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Game Engine - Zappy documentation</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Game Engine";
+        var mkdocs_page_input_path = "server/game_engine.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Zappy documentation
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../network/">Network (Shared)</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Server</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../architecture/">Architecture</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../core/">Core Orchestrator</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Game Engine</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#the-world-map">The World Map</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#the-player-state-machine">The Player State Machine</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#the-command-queue">The Command Queue</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#the-tick-cycle-_cmdtick">The Tick Cycle (_cmdTick)</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#zero-tick-failures-instant-execution">Zero-Tick Failures &amp; Instant Execution</a>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">AI</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai/">Overview</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">GUI</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gui/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gui/architecture/">Architecture</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gui/core/">Core Orchestrator</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gui/world/">World State</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gui/ui/">User Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gui/rendering/">Rendering</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gui/audio/">Audio</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gui/network/">Networking</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gui/events/">Events</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gui/raylib_wrappers/">Raylib Wrappers</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Zappy documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Server</li>
+      <li class="breadcrumb-item active">Game Engine</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="the-game-engine">The Game Engine</h1>
+<p>The game engine is the deterministic heart of the Zappy server. It is entirely contained within the <code>World</code> and <code>Player</code> classes and is responsible for enforcing all protocol rules, managing resources, and tracking the progression of time.</p>
+<h2 id="the-world-map">The World Map</h2>
+<p>Trantor is represented as a 2D spherical grid (<code>_tiles</code>). If an entity moves off the right edge, it wraps around to the left edge (modulo arithmetic).</p>
+<p>Each <code>Tile</code> is a lightweight structure holding vectors of IDs and resource counts:</p>
+<pre><code class="language-cpp">struct Tile {
+    std::vector&lt;std::size_t&gt; players;
+    std::vector&lt;std::size_t&gt; eggs;
+    std::array&lt;std::size_t, static_cast&lt;uint8_t&gt;(ItemType::COUNT)&gt; resources;
+};
+</code></pre>
+<p>By storing IDs (like <code>std::size_t</code>) rather than full objects, the engine ensures cache-friendly memory access when players Look, Take, or Drop items. The actual <code>Player</code> objects are stored securely in a master hash map (<code>_playerList</code>) managed by the <code>World</code>.</p>
+<h2 id="the-player-state-machine">The Player State Machine</h2>
+<p>Players are not active threads; they are passive state machines updated by the <code>World</code>'s tick cycle.</p>
+<h3 id="the-command-queue">The Command Queue</h3>
+<p>When the network layer receives a command, it is pushed to the player's internal queue.
+According to Zappy protocol rules, <strong>a player can only queue a maximum of 10 commands.</strong> If a client sends an 11th command before the first 10 finish, the engine silently ignores and drops it. This prevents malicious clients from flooding the game's execution queue.</p>
+<h3 id="the-tick-cycle-_cmdtick">The Tick Cycle (<code>_cmdTick</code>)</h3>
+<p>Each player tracks their current action using <code>_cmdTick</code>. 
+1. When <code>World::update()</code> is called, it calls <code>Player::update()</code>, which decrements <code>_cmdTick</code>.
+2. If <code>_cmdTick</code> reaches <code>0</code>, the current command completes. <code>ICommand::execute()</code> is triggered, applying the final effects (like moving the player or updating their inventory) and generating an <code>ok\n</code> response.</p>
+<h2 id="zero-tick-failures-instant-execution">Zero-Tick Failures &amp; Instant Execution</h2>
+<p>To eliminate "active waiting" and guarantee instant GUI feedback, the engine utilizes a <code>tryStartNextCommand()</code> mechanism.</p>
+<p>When a player is idle and a command arrives, or when an executing command finishes, <code>tryStartNextCommand()</code> attempts to pull the next action from the queue.</p>
+<ul>
+<li><strong>Valid Commands:</strong> The command's <code>start()</code> method is called. This instantly starts any necessary GUI events (like <code>pfk</code> for Fork or <code>pic</code> for Incantation) into the network buffer and sets <code>_cmdTick</code> to the required duration (e.g., 42 ticks).</li>
+<li><strong>Invalid Commands:</strong> If the client sends an unknown command, or tries to execute an impossible action, <code>start()</code> returns <code>false</code>. The engine instantly generates a <code>ko\n</code> response and consumes <strong>0 ticks</strong>, looping immediately to the next command in the queue. </li>
+</ul>
+<p>This architecture guarantees that failing commands do not penalize the player's execution time, maintaining perfect alignment with the official Zappy specifications.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../core/" class="btn btn-neutral float-left" title="Core Orchestrator"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../ai/" class="btn btn-neutral float-right" title="Overview">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../core/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../ai/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

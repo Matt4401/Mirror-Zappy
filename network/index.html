@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+
+<html class="writer-html5" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="../img/favicon.ico" rel="shortcut icon"/>
+<title>Network (Shared) - Zappy documentation</title>
+<link href="../css/theme.css" rel="stylesheet"/>
+<link href="../css/theme_extra.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" rel="stylesheet"/>
+<script>
+        // Current page data
+        var mkdocs_page_name = "Network (Shared)";
+        var mkdocs_page_input_path = "network.md";
+        var mkdocs_page_url = null;
+      </script>
+<!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+</head>
+<body class="wy-body-for-nav" role="document">
+<div class="wy-grid-for-nav">
+<nav class="wy-nav-side stickynav" data-toggle="wy-nav-shift">
+<div class="wy-side-scroll">
+<div class="wy-side-nav-search">
+<a class="icon icon-home" href=".."> Zappy documentation
+        </a><div role="search">
+<form action="../search.html" class="wy-form" id="rtd-search-form" method="get">
+<input aria-label="Search docs" name="q" placeholder="Search docs" title="Type search term here" type="text"/>
+</form>
+</div>
+</div>
+<div aria-label="Navigation menu" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+</li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal current" href="#">Network (Shared)</a>
+<ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="#non-blocking-io-and-poll">Non-Blocking I/O and poll()</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#buffer-management-and-security">Buffer Management and Security</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#the-event-queue">The Event Queue</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#asynchronous-writing-pollout">Asynchronous Writing (POLLOUT)</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#system-diagram">System Diagram</a>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Server</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../server/">Overview</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../server/architecture/">Architecture</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../server/core/">Core Orchestrator</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../server/game_engine/">Game Engine</a>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">AI</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ai/">Overview</a>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">GUI</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gui/">Overview</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../gui/architecture/">Architecture</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../gui/core/">Core Orchestrator</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../gui/world/">World State</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../gui/ui/">User Interface</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../gui/rendering/">Rendering</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../gui/audio/">Audio</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../gui/network/">Networking</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../gui/events/">Events</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../gui/raylib_wrappers/">Raylib Wrappers</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+<section class="wy-nav-content-wrap" data-toggle="wy-nav-shift">
+<nav aria-label="Mobile navigation menu" class="wy-nav-top" role="navigation">
+<i class="fa fa-bars" data-toggle="wy-nav-top"></i>
+<a href="..">Zappy documentation</a>
+</nav>
+<div class="wy-nav-content">
+<div class="rst-content"><div aria-label="breadcrumbs navigation" role="navigation">
+<ul class="wy-breadcrumbs">
+<li><a aria-label="Docs" class="icon icon-home" href=".."></a></li>
+<li class="breadcrumb-item active">Network (Shared)</li>
+<li class="wy-breadcrumbs-aside">
+</li>
+</ul>
+<hr/>
+</div>
+<div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
+<div class="section" itemprop="articleBody">
+<h1 id="the-network-layer">The Network Layer</h1>
+<p>The networking layer of the Zappy server is encapsulated within the <code>SessionManager</code>. Its primary responsibility is to handle all TCP socket communications asynchronously, ensuring that the game engine is never blocked by slow clients or network latency.</p>
+<h2 id="non-blocking-io-and-poll">Non-Blocking I/O and <code>poll()</code></h2>
+<p>Because the server must operate on a single thread, it uses the POSIX <code>poll()</code> system call to monitor multiple file descriptors simultaneously. </p>
+<ul>
+<li><strong>The Server Socket:</strong> Listens for incoming TCP connections. When <code>poll()</code> flags this socket as <code>POLLIN</code>, the server accepts the connection, wraps it in a <code>ClientSocket</code>, and adds it to the monitoring list.</li>
+<li><strong>Client Sockets:</strong> Monitored for both reading (<code>POLLIN</code>) and writing (<code>POLLOUT</code>). </li>
+</ul>
+<p>The <code>pollNetwork(int timeout)</code> function is driven entirely by the game clock. If the server is idle, it blocks until a network event occurs. If a game tick is approaching, the timeout is calculated dynamically so the network polling never oversteps the game frequency.</p>
+<h2 id="buffer-management-and-security">Buffer Management and Security</h2>
+<p>To prevent memory exhaustion and buffer overflow attacks from malicious or buggy clients, the <code>SessionManager</code> implements strict buffer management:</p>
+<ol>
+<li><strong>Read Buffers:</strong> Incoming bytes are appended to a client-specific <code>std::string</code> buffer. If a client's read buffer exceeds <strong>42000 bytes</strong> (enough to send the whole maximum map size data), the server instantly throws a <code>SocketError</code> and forcefully disconnects the client.</li>
+<li><strong>Message Extraction:</strong> The server does not pass raw, fragmented bytes to the game engine. The <code>extractCompleteMessages</code> function continuously scans the read buffer for the newline character (<code>\n</code>). Once found, it extracts the complete command and pushes it to the event queue.</li>
+<li><strong>Write Buffers:</strong> Outgoing messages from the game engine are queued in a write buffer. During the polling phase, if a socket is ready for writing, the server flushes as much data as the TCP window allows.</li>
+</ol>
+<h2 id="the-event-queue">The Event Queue</h2>
+<p>The <code>SessionManager</code> communicates with the main server loop via an internal <code>_eventQueue</code>. It translates raw socket activity into actionable <code>NetworkEvent</code> objects:</p>
+<ul>
+<li><code>CLIENT_CONNECTED</code></li>
+<li><code>CLIENT_DISCONNECTED</code></li>
+<li><code>MESSAGE_RECEIVED</code></li>
+</ul>
+<p>This queue creates a perfect abstraction barrier. The rest of the server never interacts with file descriptors; it only processes events.</p>
+<h2 id="asynchronous-writing-pollout">Asynchronous Writing (<code>POLLOUT</code>)</h2>
+<p>In a single-threaded architecture, writing directly to a socket is dangerous; if the client has a slow connection, the <code>send()</code> system call will block the entire server. The <code>SessionManager</code> solves this using Write Buffers.</p>
+<ol>
+<li><strong>Queuing Messages:</strong> When the <code>Core</code> calls <code>sendMessage()</code>, the data is not sent immediately. It is safely appended to the client's <code>_writeBuffer</code>.</li>
+<li><strong>The Write Event:</strong> During the <code>poll()</code> phase, the server monitors all client sockets for the <code>POLLOUT</code> flag, which indicates the OS TCP window has available space.</li>
+<li><strong>Flushing:</strong> If <code>POLLOUT</code> is triggered and the client's write buffer is not empty, the <code>SessionManager</code> performs a non-blocking <code>send()</code>. Any bytes that cannot be sent immediately remain in the buffer for the next polling cycle.</li>
+</ol>
+<h2 id="system-diagram">System Diagram</h2>
+<p>The following diagram illustrates the flow of data through the <code>SessionManager</code>:</p>
+<div class="mermaid">graph TD
+    A[TCP Socket Activity] --&gt; B{poll flag}
+
+    %% The Read Path
+    B -- POLLIN (Data Ready) --&gt; E[Read bytes into Read Buffer]
+    E --&gt; F{Read Buffer &gt; 42000 bytes?}
+    F -- Yes --&gt; G[Force Disconnect to prevent flood]
+    F -- No --&gt; H[Extract complete newline messages]
+    H --&gt; I[Push MESSAGE_RECEIVED to Queue]
+
+    %% The Write Path
+    B -- POLLOUT (Socket Ready) --&gt; W1{Is Write Buffer Empty?}
+    W1 -- No --&gt; W2[Send bytes to Socket]
+    W2 --&gt; W3[Remove sent bytes from Write Buffer]
+    W1 -- Yes --&gt; W4[Do Nothing]
+</div>
+</div>
+</div><footer>
+<div aria-label="Footer Navigation" class="rst-footer-buttons" role="navigation">
+<a class="btn btn-neutral float-left" href=".." title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+<a class="btn btn-neutral float-right" href="../server/" title="Overview">Next <span class="icon icon-circle-arrow-right"></span></a>
+</div>
+<hr/>
+<div role="contentinfo">
+<!-- Copyright etc -->
+</div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+</div>
+</div>
+</section>
+</div>
+<div aria-label="Versions" class="rst-versions" role="note">
+<span class="rst-current-version" data-toggle="rst-current-version">
+<span><a href=".." style="color: #fcfcfc">« Previous</a></span>
+<span><a href="../server/" style="color: #fcfcfc">Next »</a></span>
+</span>
+</div>
+<script src="../js/jquery-3.6.0.min.js"></script>
+<script>var base_url = "..";</script>
+<script src="../js/theme_extra.js"></script>
+<script src="../js/theme.js"></script>
+<script src="../search/main.js"></script>
+<script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+<script type="module">import mermaid from "https://unpkg.com/mermaid@10.4.0/dist/mermaid.esm.min.mjs";
+mermaid.initialize({});</script></body>
+</html>

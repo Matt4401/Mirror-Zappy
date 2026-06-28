@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+
+<html class="writer-html5" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="../../img/favicon.ico" rel="shortcut icon"/>
+<title>Architecture - Zappy documentation</title>
+<link href="../../css/theme.css" rel="stylesheet"/>
+<link href="../../css/theme_extra.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" rel="stylesheet"/>
+<script>
+        // Current page data
+        var mkdocs_page_name = "Architecture";
+        var mkdocs_page_input_path = "server/architecture.md";
+        var mkdocs_page_url = null;
+      </script>
+<!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+</head>
+<body class="wy-body-for-nav" role="document">
+<div class="wy-grid-for-nav">
+<nav class="wy-nav-side stickynav" data-toggle="wy-nav-shift">
+<div class="wy-side-scroll">
+<div class="wy-side-nav-search">
+<a class="icon icon-home" href="../.."> Zappy documentation
+        </a><div role="search">
+<form action="../../search.html" class="wy-form" id="rtd-search-form" method="get">
+<input aria-label="Search docs" name="q" placeholder="Search docs" title="Type search term here" type="text"/>
+</form>
+</div>
+</div>
+<div aria-label="Navigation menu" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../network/">Network (Shared)</a>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Server</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../">Overview</a>
+</li>
+<li class="toctree-l1 current"><a class="reference internal current" href="#">Architecture</a>
+<ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="#core-design-philosophy">Core Design Philosophy</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#system-diagram">System Diagram</a>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../core/">Core Orchestrator</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../game_engine/">Game Engine</a>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">AI</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ai/">Overview</a>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">GUI</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../gui/">Overview</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../gui/architecture/">Architecture</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../gui/core/">Core Orchestrator</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../gui/world/">World State</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../gui/ui/">User Interface</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../gui/rendering/">Rendering</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../gui/audio/">Audio</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../gui/network/">Networking</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../gui/events/">Events</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../gui/raylib_wrappers/">Raylib Wrappers</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+<section class="wy-nav-content-wrap" data-toggle="wy-nav-shift">
+<nav aria-label="Mobile navigation menu" class="wy-nav-top" role="navigation">
+<i class="fa fa-bars" data-toggle="wy-nav-top"></i>
+<a href="../..">Zappy documentation</a>
+</nav>
+<div class="wy-nav-content">
+<div class="rst-content"><div aria-label="breadcrumbs navigation" role="navigation">
+<ul class="wy-breadcrumbs">
+<li><a aria-label="Docs" class="icon icon-home" href="../.."></a></li>
+<li class="breadcrumb-item">Server</li>
+<li class="breadcrumb-item active">Architecture</li>
+<li class="wy-breadcrumbs-aside">
+</li>
+</ul>
+<hr/>
+</div>
+<div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
+<div class="section" itemprop="articleBody">
+<h1 id="high-level-architecture">High-Level Architecture</h1>
+<p>The Zappy server is built using a hybrid of the <strong>Reactor Pattern</strong> for networking and a <strong>Discrete-Time Game Loop</strong> for simulation. </p>
+<p>Because the server must remain strictly single-threaded without dropping network inputs or lagging the game clock, the architecture aggressively separates the unpredictable nature of TCP networking from the deterministic nature of the game rules.</p>
+<h2 id="core-design-philosophy">Core Design Philosophy</h2>
+<ol>
+<li><strong>Isolation of Concerns:</strong> The network layer (<code>SessionManager</code>) knows nothing about the game (players, tiles, food). The game engine (<code>World</code>) knows nothing about file descriptors or sockets.</li>
+<li><strong>The Middleman:</strong> The <code>Core</code> acts as the orchestrator. It maps network IDs to player IDs, translates raw strings into executable commands, and dictates when time moves forward.</li>
+<li><strong>Asynchronous Command Queuing:</strong> Client commands are instantly parsed and pushed to a player's internal queue. They are only executed when the required number of game ticks has elapsed.</li>
+</ol>
+<h2 id="system-diagram">System Diagram</h2>
+<p>The following diagram illustrates the structural relationships between the major components.</p>
+<div class="mermaid">classDiagram
+    class Core {
+        -SessionManager _sessionManager
+        -World _world
+        -CommandFactory _commandFactory
+        -Map _clientStates
+        -Map _clientToPlayer
+        +loop() void
+        +processNetworkEvents() void
+        +processGameTick() void
+    }
+
+    class SessionManager {
+        -ServerSocket _serverSocket
+        -Map _clients
+        -Queue _eventQueue
+        +pollNetwork(timeout)
+        +tryPopMessage()
+        +sendMessage(clientId, msg)
+    }
+
+    class CommandFactory {
+        +createCommand(text) ICommand
+    }
+
+    class World {
+        -Map _playerList
+        -Vector _guiEvents
+        +update() void
+        +pushCommandToPlayer(playerId, cmd) void
+    }
+
+    class Player {
+        -Queue _commands
+        -ICommand _currentCommand
+        -int _cmdTick
+        +update(world) void
+        +tryStartNextCommand(world) void
+    }
+
+    class ICommand {
+        +start(world, player) bool
+        +execute(world, player) void
+    }
+
+    class ServerSocket
+    class ClientSocket
+
+    Core "1" *-- "1" SessionManager : Polls and Flushes
+    Core "1" *-- "1" World : Advances game clock
+    Core "1" *-- "1" CommandFactory : Translates text
+    SessionManager "1" *-- "1" ServerSocket : Binds and listens
+    SessionManager "1" *-- "many" ClientSocket : Reads and Writes
+    World "1" *-- "many" Player : Manages
+    Player "1" *-- "many" ICommand : Queues
+</div>
+</div>
+</div><footer>
+<div aria-label="Footer Navigation" class="rst-footer-buttons" role="navigation">
+<a class="btn btn-neutral float-left" href="../" title="Overview"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+<a class="btn btn-neutral float-right" href="../core/" title="Core Orchestrator">Next <span class="icon icon-circle-arrow-right"></span></a>
+</div>
+<hr/>
+<div role="contentinfo">
+<!-- Copyright etc -->
+</div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+</div>
+</div>
+</section>
+</div>
+<div aria-label="Versions" class="rst-versions" role="note">
+<span class="rst-current-version" data-toggle="rst-current-version">
+<span><a href="../" style="color: #fcfcfc">« Previous</a></span>
+<span><a href="../core/" style="color: #fcfcfc">Next »</a></span>
+</span>
+</div>
+<script src="../../js/jquery-3.6.0.min.js"></script>
+<script>var base_url = "../..";</script>
+<script src="../../js/theme_extra.js"></script>
+<script src="../../js/theme.js"></script>
+<script src="../../search/main.js"></script>
+<script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+<script type="module">import mermaid from "https://unpkg.com/mermaid@10.4.0/dist/mermaid.esm.min.mjs";
+mermaid.initialize({});</script></body>
+</html>

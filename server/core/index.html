@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+
+<html class="writer-html5" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="../../img/favicon.ico" rel="shortcut icon"/>
+<title>Core Orchestrator - Zappy documentation</title>
+<link href="../../css/theme.css" rel="stylesheet"/>
+<link href="../../css/theme_extra.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" rel="stylesheet"/>
+<script>
+        // Current page data
+        var mkdocs_page_name = "Core Orchestrator";
+        var mkdocs_page_input_path = "server/core.md";
+        var mkdocs_page_url = null;
+      </script>
+<!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+</head>
+<body class="wy-body-for-nav" role="document">
+<div class="wy-grid-for-nav">
+<nav class="wy-nav-side stickynav" data-toggle="wy-nav-shift">
+<div class="wy-side-scroll">
+<div class="wy-side-nav-search">
+<a class="icon icon-home" href="../.."> Zappy documentation
+        </a><div role="search">
+<form action="../../search.html" class="wy-form" id="rtd-search-form" method="get">
+<input aria-label="Search docs" name="q" placeholder="Search docs" title="Type search term here" type="text"/>
+</form>
+</div>
+</div>
+<div aria-label="Navigation menu" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../network/">Network (Shared)</a>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Server</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../">Overview</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/">Architecture</a>
+</li>
+<li class="toctree-l1 current"><a class="reference internal current" href="#">Core Orchestrator</a>
+<ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="#the-main-loop-lifecycle">The Main Loop Lifecycle</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#client-state-routing">Client State Routing</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#command-translation">Command Translation</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#system-diagram">System Diagram</a>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../game_engine/">Game Engine</a>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">AI</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ai/">Overview</a>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">GUI</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../gui/">Overview</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../gui/architecture/">Architecture</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../gui/core/">Core Orchestrator</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../gui/world/">World State</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../gui/ui/">User Interface</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../gui/rendering/">Rendering</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../gui/audio/">Audio</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../gui/network/">Networking</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../gui/events/">Events</a>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../gui/raylib_wrappers/">Raylib Wrappers</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+<section class="wy-nav-content-wrap" data-toggle="wy-nav-shift">
+<nav aria-label="Mobile navigation menu" class="wy-nav-top" role="navigation">
+<i class="fa fa-bars" data-toggle="wy-nav-top"></i>
+<a href="../..">Zappy documentation</a>
+</nav>
+<div class="wy-nav-content">
+<div class="rst-content"><div aria-label="breadcrumbs navigation" role="navigation">
+<ul class="wy-breadcrumbs">
+<li><a aria-label="Docs" class="icon icon-home" href="../.."></a></li>
+<li class="breadcrumb-item">Server</li>
+<li class="breadcrumb-item active">Core Orchestrator</li>
+<li class="wy-breadcrumbs-aside">
+</li>
+</ul>
+<hr/>
+</div>
+<div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
+<div class="section" itemprop="articleBody">
+<h1 id="the-core-orchestrator">The Core Orchestrator</h1>
+<p>The <code>Core</code> class is the central nervous system of the Zappy server. It acts as the bridge between the asynchronous network layer and the strict, deterministic clock of the game engine. </p>
+<h2 id="the-main-loop-lifecycle">The Main Loop Lifecycle</h2>
+<p>The <code>Core::loop()</code> executes hundreds of times per second, strictly adhering to the following phased lifecycle:</p>
+<ol>
+<li><strong>Calculate Timeout:</strong> The core checks the real-world system clock (<code>std::chrono</code>) against the next scheduled game tick.</li>
+<li><strong>Poll Network:</strong> <code>SessionManager::pollNetwork()</code> is called. It uses the calculated timeout to wait for network traffic without accidentally skipping the game tick.</li>
+<li><strong>Process Network Events:</strong> Network events are popped from the queue. Text commands are parsed and routed to the appropriate players.</li>
+<li><strong>Process Game Tick:</strong> If enough real-world time has passed to constitute a "tick" (based on the <code>freq</code> parameter), <code>World::update()</code> is called. </li>
+<li><strong>Flush Responses:</strong> Any messages generated during the network parsing or the game tick are immediately flushed to the TCP write buffers.</li>
+</ol>
+<p><em>Note: The flush functions execute continuously on every loop iteration, even if the game engine did not tick. This guarantees that GUI events (like <code>pfk</code> or <code>pnw</code>) are transmitted instantly.</em></p>
+<h2 id="client-state-routing">Client State Routing</h2>
+<p>When a client connects, the <code>SessionManager</code> only knows their integer ID (the file descriptor). <code>Core</code> manages the identity of these clients using a state machine (<code>_clientStates</code>):</p>
+<ul>
+<li><strong><code>WAITING_TEAM_SELECTION</code>:</strong> The client has just connected and received <code>WELCOME\n</code>. The server is waiting for them to send a team name.</li>
+<li><strong><code>GUI</code>:</strong> The client sent <code>GRAPHIC</code>. They are locked into the spectator role and will receive all global game events (map size, time unit, tile updates).</li>
+<li><strong><code>IN_GAME</code>:</strong> The client sent a valid team name. <code>Core</code> maps their network ID to a specific Player ID in the <code>World</code> (<code>_clientToPlayer</code>). All subsequent messages from this client are routed directly to their avatar.</li>
+</ul>
+<h2 id="command-translation">Command Translation</h2>
+<p>To keep the game engine clean, the <code>World</code> does not parse text. <code>Core</code> utilizes a <code>CommandFactory</code> to translate raw strings (e.g., <code>"Forward\n"</code>) into polymorphic <code>std::unique_ptr&lt;ICommand&gt;</code> objects.</p>
+<p><strong>Zero-Tick Failures:</strong> If a client sends an invalid or unknown command, the factory returns a generic <code>Unknown</code> command object. This ensures that malformed commands still enter the player's queue and wait their chronological turn before instantly failing and returning <code>ko\n</code>.</p>
+<h2 id="system-diagram">System Diagram</h2>
+<p>The following diagram illustrates the flow of data through the <code>Core</code> orchestrator:</p>
+<div class="mermaid">graph TD
+    Start((Start Loop Iteration)) --&gt; Calc[Calculate Time to Next Game Tick]
+
+    Calc --&gt; Poll[SessionManager::pollNetwork using timeout]
+    Poll --&gt; ProcessNet[Parse Network Events and Route Commands]
+
+    ProcessNet --&gt; Tick{Is it time for a Game Tick?}
+
+    Tick -- Yes --&gt; Update[World::update and burn _cmdTick]
+    Tick -- No --&gt; Flush[Flush Player and GUI Responses]
+
+    Update --&gt; Flush
+    Flush --&gt; Start
+</div>
+</div>
+</div><footer>
+<div aria-label="Footer Navigation" class="rst-footer-buttons" role="navigation">
+<a class="btn btn-neutral float-left" href="../architecture/" title="Architecture"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+<a class="btn btn-neutral float-right" href="../game_engine/" title="Game Engine">Next <span class="icon icon-circle-arrow-right"></span></a>
+</div>
+<hr/>
+<div role="contentinfo">
+<!-- Copyright etc -->
+</div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+</div>
+</div>
+</section>
+</div>
+<div aria-label="Versions" class="rst-versions" role="note">
+<span class="rst-current-version" data-toggle="rst-current-version">
+<span><a href="../architecture/" style="color: #fcfcfc">« Previous</a></span>
+<span><a href="../game_engine/" style="color: #fcfcfc">Next »</a></span>
+</span>
+</div>
+<script src="../../js/jquery-3.6.0.min.js"></script>
+<script>var base_url = "../..";</script>
+<script src="../../js/theme_extra.js"></script>
+<script src="../../js/theme.js"></script>
+<script src="../../search/main.js"></script>
+<script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+<script type="module">import mermaid from "https://unpkg.com/mermaid@10.4.0/dist/mermaid.esm.min.mjs";
+mermaid.initialize({});</script></body>
+</html>
