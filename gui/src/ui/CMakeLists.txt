@@ -21,6 +21,7 @@ add_library(zappy_gui_ui
         menus/WorldControlUI.cpp
         menus/EventLogUI.cpp
         menus/GlobalStatsUI.cpp
+        menus/GameOverUI.cpp
         hud/GameHUD.cpp
 )
 target_sources(zappy_gui_ui PUBLIC
@@ -50,6 +51,7 @@ target_sources(zappy_gui_ui PUBLIC
         menus/WorldControlUI.hpp
         menus/EventLogUI.hpp
         menus/GlobalStatsUI.hpp
+        menus/GameOverUI.hpp
         hud/GameHUD.hpp
 )
 target_include_directories(zappy_gui_ui PUBLIC

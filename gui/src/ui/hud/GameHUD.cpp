@@ -20,6 +20,7 @@
 #include "components/UIGridManager.hpp"
 #include "events/GuiEvents.hpp"
 #include "menus/EventLogUI.hpp"
+#include "menus/GameOverUI.hpp"
 #include "menus/GlobalStatsUI.hpp"
 #include "menus/PauseMenu.hpp"
 #include "menus/PlayerInspectorUI.hpp"
@@ -41,6 +42,7 @@ GameHUD::GameHUD(events::EventDispatcher& dispatcher, AudioManager& audioManager
       _gridManager(std::make_shared<components::UIGridManager>()),
       _compass(std::make_shared<components::UICompass>(0.0F, 0.0F, 0.0F, 0.0F, camera, _font)),
       _pauseMenu(std::make_shared<menus::PauseMenu>(_dispatcher.get(), audioManager, settingsManager, _font)),
+      _gameOverUI(std::make_shared<menus::GameOverUI>(_dispatcher.get(), _font)),
       _playerInspector(std::make_shared<menus::PlayerInspectorUI>(0.0F, 0.0F, 300.0F, _dispatcher.get(), _font,
                                                                   makeSendCommand(_dispatcher.get()))),
       _tileInspector(std::make_shared<menus::TileInspectorUI>(0.0F, 0.0F, 300.0F, _dispatcher.get(), _font,
@@ -69,6 +71,7 @@ void GameHUD::registerToUIManager(UIManager& uiManager) {
     uiManager.addComponent(_compass);
     uiManager.addComponent(_gridManager);
     uiManager.addComponent(_pauseMenu);
+    uiManager.addComponent(_gameOverUI);
 }
 
 }  // namespace zappy::gui::ui::hud

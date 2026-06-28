@@ -73,6 +73,11 @@ Render::Render(events::EventDispatcher& dispatcher, AudioManager& audioManager, 
             pauseMenu->setVisible(false);
         });
     }
+
+    if (auto gameOverUI = _gameHUD->getGameOverUI()) {
+        gameOverUI->setOnExit([this]() { _isExiting = true; });
+        gameOverUI->setOnSpectate([this]() { updateCursorState(); });
+    }
 }
 
 Render::~Render() {
@@ -154,7 +159,8 @@ void Render::updateFreeCamera() {
 
 void Render::updateCursorState() const {
     if ((_firstPerson && _firstPerson->active()) ||
-        (_gameHUD && _gameHUD->getPauseMenu() && _gameHUD->getPauseMenu()->isVisible()) || _uiMode) {
+        (_gameHUD && _gameHUD->getPauseMenu() && _gameHUD->getPauseMenu()->isVisible()) ||
+        (_gameHUD && _gameHUD->getGameOverUI() && _gameHUD->getGameOverUI()->isVisible()) || _uiMode) {
         raylib::rcore::Window::enableCursor();
     } else {
         raylib::rcore::Window::disableCursor();
