@@ -37,9 +37,6 @@ class BroadcastMessage:
             return None
         return raw_message.split("_", 1)[0]
 
-    def read_own_broadcast(self, raw_message):
-        return self.read_broadcast(raw_message)
-
     def decode(self, encrypted_message):
         try:
             result = []
