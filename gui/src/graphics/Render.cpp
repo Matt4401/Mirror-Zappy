@@ -163,14 +163,19 @@ void Render::updateCursorState() const {
 
 void Render::handleInput() {
     auto& binds = _settingsManager.get().getSettings().keybinds;
-    if (raylib::rcore::Event::isKeyPressed(binds.at("Pause"))) {
+    auto isActionPressed = [](int key) {
+        if (key >= MouseButtonOffset && key <= MaxMouseButtonOffset) {
+            return raylib::rcore::Event::isMouseButtonPressed(key - MouseButtonOffset);
+        }
+        return raylib::rcore::Event::isKeyPressed(key);
+    };
+
+    if (isActionPressed(binds.at("Pause"))) {
         if (!_gameHUD || !_gameHUD->getPauseMenu() || !_gameHUD->getPauseMenu()->isSettingsVisible()) {
             handleEscapeKey();
         }
     }
-    // Still support hardcoded ALT or we can add a bind for UI Config. The user didn't ask to rebind UI Config right
-    // now, but let's keep hardcoded ALT.
-    if (raylib::rcore::Event::isKeyPressed(LeftAltKey)) {
+    if (isActionPressed(binds.at("Toggle UI"))) {
         handleAltKey();
     }
 }

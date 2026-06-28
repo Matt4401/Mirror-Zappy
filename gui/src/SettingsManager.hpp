@@ -27,6 +27,8 @@ struct SettingsData {
     float fov{60.0F};
     int fpsLimit{60};
     float cameraSensitivity{1.0F};
+    float cameraSpeed{6.0F};
+    int renderDistance{100};
 
     bool showUI{true};
     bool showPlayers{true};
@@ -36,7 +38,8 @@ struct SettingsData {
 
     std::map<std::string, int> keybinds{
         {"Move Forward", KEY_Z}, {"Move Backward", KEY_S},      {"Move Left", KEY_Q},  {"Move Right", KEY_D},
-        {"Move Up", KEY_SPACE},  {"Move Down", KEY_LEFT_SHIFT}, {"Pause", KEY_ESCAPE}, {"Sprint", KEY_LEFT_CONTROL}};
+        {"Move Up", KEY_SPACE},  {"Move Down", KEY_LEFT_SHIFT}, {"Pause", KEY_ESCAPE}, {"Sprint", KEY_LEFT_CONTROL},
+        {"Reset Camera", KEY_R}, {"Toggle UI", KEY_LEFT_ALT}};
 };
 
 class SettingsManager {

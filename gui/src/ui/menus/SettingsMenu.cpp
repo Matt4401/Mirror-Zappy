@@ -222,7 +222,8 @@ void SettingsMenu::initControlsTab() {
     float const x = _position.x() + 30.0F;
 
     const std::vector<std::string> orderedActions = {"Move Forward", "Move Backward", "Move Left", "Move Right",
-                                                     "Move Up",      "Move Down",     "Sprint",    "Pause"};
+                                                     "Move Up",      "Move Down",     "Sprint",    "Pause",
+                                                     "Reset Camera", "Toggle UI"};
 
     for (const auto& action : orderedActions) {
         if (keybinds.find(action) == keybinds.end()) {
