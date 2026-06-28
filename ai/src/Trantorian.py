@@ -31,7 +31,7 @@ class Trantorian:
         self.logger = logging.getLogger(f"player_{player_id}")
         self.broadcast_message = BroadcastMessage(self.player_state)
         self.children = []
-        self.last_fork_time = 0.0 # delai
+        self.last_fork_time = 0.0  # delai
         self.generation = 0
         self.fork_count = 0
 
@@ -49,9 +49,18 @@ class Trantorian:
         entry = os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "zappy_ai.py"
         )
-        cmd = [sys.executable, entry, "-p", str(self.port),
-               "-n", self.team_name, "-h", self.host,
-               "-g", str(generation)]
+        cmd = [
+            sys.executable,
+            entry,
+            "-p",
+            str(self.port),
+            "-n",
+            self.team_name,
+            "-h",
+            self.host,
+            "-g",
+            str(generation),
+        ]
         try:
             child = subprocess.Popen(
                 cmd,
@@ -105,8 +114,8 @@ class Trantorian:
         result = self.wait_for_response(cmd_id)
         if result and result[0]:
             new_direction = (
-                                    (self.player_state.get_direction() - 1 + direction_delta) % 8
-                            ) + 1
+                (self.player_state.get_direction() - 1 + direction_delta) % 8
+            ) + 1
             self.player_state.update_direction(new_direction)
             self.invalidate_vision()
         return result
@@ -174,8 +183,7 @@ class Trantorian:
 
     def can_reproduce(self):
         return (
-                self.generation < MAX_REPRODUCE_GEN
-                and self.fork_count < LIFETIME_FORK_CAP
+            self.generation < MAX_REPRODUCE_GEN and self.fork_count < LIFETIME_FORK_CAP
         )
 
     def move_to_tile(self, index):
@@ -209,6 +217,8 @@ class Trantorian:
                 return False
 
         return True
+
+
 from src.Connection import Connection
 from src.PlayerState import PlayerState
 from src.SendCommand import SendCommand
@@ -242,7 +252,7 @@ class Trantorian:
         self.logger = logging.getLogger(f"player_{player_id}")
         self.broadcast_message = BroadcastMessage(self.player_state)
         self.children = []
-        self.last_fork_time = 0.0 # delai
+        self.last_fork_time = 0.0  # delai
         self.generation = 0
         self.fork_count = 0
 
@@ -260,9 +270,18 @@ class Trantorian:
         entry = os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "zappy_ai.py"
         )
-        cmd = [sys.executable, entry, "-p", str(self.port),
-               "-n", self.team_name, "-h", self.host,
-               "-g", str(generation)]
+        cmd = [
+            sys.executable,
+            entry,
+            "-p",
+            str(self.port),
+            "-n",
+            self.team_name,
+            "-h",
+            self.host,
+            "-g",
+            str(generation),
+        ]
         try:
             child = subprocess.Popen(
                 cmd,
@@ -316,8 +335,8 @@ class Trantorian:
         result = self.wait_for_response(cmd_id)
         if result and result[0]:
             new_direction = (
-                                    (self.player_state.get_direction() - 1 + direction_delta) % 8
-                            ) + 1
+                (self.player_state.get_direction() - 1 + direction_delta) % 8
+            ) + 1
             self.player_state.update_direction(new_direction)
             self.invalidate_vision()
         return result
@@ -385,8 +404,7 @@ class Trantorian:
 
     def can_reproduce(self):
         return (
-                self.generation < MAX_REPRODUCE_GEN
-                and self.fork_count < LIFETIME_FORK_CAP
+            self.generation < MAX_REPRODUCE_GEN and self.fork_count < LIFETIME_FORK_CAP
         )
 
     def move_to_tile(self, index):

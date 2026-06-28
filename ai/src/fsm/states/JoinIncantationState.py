@@ -34,7 +34,7 @@ class JoinIncantationState(AState):
             self.trantorian.logger.info("[Join]: on gather tile, waiting for elevation")
             return
         if target is None:
-            return # att broadcast
+            return  # att broadcast
 
         self.trantorian.logger.info(f"[Join]: stepping toward bearing {target}")
         self.trantorian.move_one_step_toward(target)

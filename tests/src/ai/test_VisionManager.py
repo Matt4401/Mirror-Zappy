@@ -1,6 +1,7 @@
 import unittest
 from src.util.VisionManager import VisionManager
 
+
 class TestVisionManager(unittest.TestCase):
     def setUp(self):
         self.vision = VisionManager()

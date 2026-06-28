@@ -206,7 +206,9 @@ class Connection:
                                     )
                                 if has_incantation:
                                     with self.response_lock:
-                                        self.command_responses.append(msg_data["message"])
+                                        self.command_responses.append(
+                                            msg_data["message"]
+                                        )
                         else:
                             with self.response_lock:
                                 self.command_responses.append(msg_data["content"])
