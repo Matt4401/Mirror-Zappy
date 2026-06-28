@@ -4,7 +4,6 @@ from src.SendCommand import SendCommand
 from src.ParseCommand import ParseCommand
 
 from .util.BroadcastMessage import BroadcastMessage
-from .util.BroadcastManager import BroadcastManager
 from .fsm.Constant import ELEVATION_REQUIREMENTS, MAX_REPRODUCE_GEN, LIFETIME_FORK_CAP
 import threading
 import subprocess
@@ -28,7 +27,6 @@ class Trantorian:
         self.parser = ParseCommand(self.player_state.inventory)
         self.logger = logging.getLogger(f"player_{player_id}")
         self.broadcast_message = BroadcastMessage(self.player_state)
-        self.broadcast_manager = BroadcastManager(self.broadcast_message, self.player_state.team_name)
         self.children = []
         self.last_fork_time = 0.0 # delai
         self.generation = 0
