@@ -43,8 +43,7 @@
 - State Evaluation and Transitions: The FSM dynamically assigns the Trantorian's current state by evaluating its inventory and level.  
 - Survival: If the Trantorian's food reserves drop below the predefined survival threshold, the system forces a transition into the SurviveState. 
 - Evolution: If the Trantorian has gathered enough specific resources required to advance to the next level, it transitions into the EvolveState.  
-- Gathering and End-Game: If the Trantorian does not have enough resources for the next level, it defaults to the GatherState. Once the Trantorian reaches the maximum level of 8, it shifts into the HelpTeamMatesState.
-
+- Gathering and End-Game: If the Trantorian does not have enough resources for the next level, it defaults to the GatherState.
 
 #### Here is a version of our FiniteStateMachine:
 ```python
