@@ -51,13 +51,16 @@ AInspectorUI::~AInspectorUI() {
     }
 }
 
-void AInspectorUI::buildInventoryPanel() {
+void AInspectorUI::buildInventoryPanel(bool includeFood) {
     _inventoryTitleText = std::make_shared<components::UIText>("Inventory", _font);
     _inventoryTitleText->setFontSize(static_cast<int>(HeaderFontSize));
     _inventoryTitleText->setColor(raylib::Color::Black());
 
     auto& assetManager = graphics::AssetManager::getInstance();
     for (const auto& asset : InventoryIconAssets) {
+        if (!includeFood && asset.id == "inventory.food"sv) {
+            continue;
+        }
         auto text = std::make_shared<components::UIText>("0", _font);
         text->setFontSize(static_cast<int>(InfoFontSize));
         text->setColor(raylib::Color::White());
@@ -71,14 +74,14 @@ void AInspectorUI::buildInventoryPanel() {
     }
 }
 
-void AInspectorUI::drawInventoryPanel(float& currentY, float startX, float panelW) {
+void AInspectorUI::drawInventoryPanel(float& currentY, float startX, float panelW, int indexStart) {
     float const titleX = startX + ((panelW - InvGridTotalWidth) / 2.0F);
     _inventoryTitleText->setPosition(titleX, currentY);
     _inventoryTitleText->draw();
     currentY += InvTitleToGridSpacing;
 
     float const gridX = startX + ((panelW - InvGridTotalWidth) / 2.0F);
-    for (size_t i = 0; i < _inventoryTexts.size(); ++i) {
+    for (size_t i = indexStart; i < _inventoryTexts.size(); ++i) {
         const int row = static_cast<int>(i) / 3;
         const int col = static_cast<int>(i) % 3;
         auto& invText = _inventoryTexts.at(i);

@@ -54,6 +54,10 @@ Render::Render(events::EventDispatcher& dispatcher, AudioManager& audioManager)
     };
 
     if (auto pauseMenu = _gameHUD->getPauseMenu()) {
+        pauseMenu->setOnResume([this]() {
+            _updateMode = UpdateMode::All;
+            updateCursorState();
+        });
         pauseMenu->setOnExit([this]() { _isExiting = true; });
         pauseMenu->setOnUIConfig([this, pauseMenu]() {
             if (auto grid = _gameHUD->getGridManager()) {

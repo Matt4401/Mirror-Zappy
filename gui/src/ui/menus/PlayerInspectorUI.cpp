@@ -42,7 +42,7 @@ namespace zappy::gui::ui::menus {
 
 namespace {
 constexpr float FirstPersonBtnWidth = 160.0F;
-constexpr float FirstPersonBtnHeight = 40.0F;
+constexpr float FirstPersonBtnHeight = 70.0F;
 constexpr int FirstPersonBtnFontSize = 16;
 
 constexpr float FoodMax = 126.0F;
@@ -85,7 +85,7 @@ constexpr float HeartsToInventorySpacing = 40.0F;
 constexpr int MaxHearts = 10;
 constexpr int MaxXp = 8;
 
-constexpr float InvToBtnSpacing = 20.0F;
+constexpr float InvToBtnSpacing = -52.0F;
 
 constexpr float CameraPosX = 0.0F;
 constexpr float CameraPosY = 4.0F;
@@ -115,7 +115,7 @@ PlayerInspectorUI::PlayerInspectorUI(float x, float y, float width, events::Even
       _previewRenderTexture(std::make_shared<raylib::rtextures::RenderTexture2D>(static_cast<int>(AvatarWidth),
                                                                                  static_cast<int>(AvatarHeight))) {
     buildInfoPanel();
-    buildInventoryPanel();
+    buildInventoryPanel(false);
 
     _previewModel = std::make_shared<raylib::rmodels::Model>("assets/models/player/player.gltf");
 
