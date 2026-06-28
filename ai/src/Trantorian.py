@@ -3,28 +3,62 @@ from src.PlayerState import PlayerState
 from src.SendCommand import SendCommand
 from src.ParseCommand import ParseCommand
 
-# from .util.BroadcastMessage import BroadcastMessage
-# from .util.BroadcastManager import BroadcastManager
-from .fsm.Constant import ELEVATION_REQUIREMENTS
+from .util.BroadcastMessage import BroadcastMessage
+from .util.BroadcastManager import BroadcastManager
+from .fsm.Constant import ELEVATION_REQUIREMENTS, MAX_REPRODUCE_GEN, LIFETIME_FORK_CAP
 import threading
+import subprocess
+import sys
+import os
 import math
 import logging
 
 
 class Trantorian:
-    def __init__(self, port, host, team_name, player_id):
+    def __init__(self, port, host, team_name, player_id, connect_timeout=0.0):
         self.thread = threading.Lock()
         self.answer_list = []
         self.data_lock = threading.Lock()
         self.team_name = team_name
         self.player_id = player_id
-        self.connection = Connection(host, port, team_name)
+        self.connection = Connection(host, port, team_name, connect_timeout)
         self.player_state = PlayerState(team_name)
         self.send_command = SendCommand(self.connection)
         self.parser = ParseCommand(self.player_state.inventory)
         self.logger = logging.getLogger(f"player_{player_id}")
-        # self.broadcast_message = BroadcastMessage(self.player_state)
-        # self.broadcast_manager = BroadcastManager(self.broadcast_message, self.player_state.team_name)
+        self.broadcast_message = BroadcastMessage(self.player_state)
+        self.broadcast_manager = BroadcastManager(self.broadcast_message, self.player_state.team_name)
+        self.children = []
+
+    def launch_client(self, generation: int) -> bool:
+        entry = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "zappy_ai.py"
+        )
+        cmd = [sys.executable, entry, "-p", str(self.port),
+               "-n", self.team_name, "-h", self.host,
+               "-g", str(generation)]
+        try:
+            child = subprocess.Popen(
+                cmd,
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                start_new_session=True,
+            )
+            self.children.append(child)
+            return True
+        except Exception as e:
+            self.logger.warning(f"[Reproduce]: failed to spawn child: {e}")
+            return False
+
+    def fill_initial_team(self):
+        free_slots = getattr(self.connection, "client_num", 0)
+        if free_slots <= 0:
+            return
+        self.logger.info(f"[Init]: founder filling {free_slots} free team slots")
+        for _ in range(free_slots):
+            self.launch_client(1)
+
 
     def wait_for_response(self, cmd_id, timeout=5.0):
         if cmd_id in (None, 84):
@@ -41,8 +75,8 @@ class Trantorian:
         result = self.wait_for_response(cmd_id)
         if result and result[0]:
             new_direction = (
-                (self.player_state.get_direction() - 1 + direction_delta) % 8
-            ) + 1
+                                    (self.player_state.get_direction() - 1 + direction_delta) % 8
+                            ) + 1
             self.player_state.update_direction(new_direction)
             self.invalidate_vision()
         return result
@@ -51,7 +85,7 @@ class Trantorian:
         cmd_id = self.send_command.forward()
         result = self.wait_for_response(cmd_id)
         if result and result[0]:
-            self.player_state.vision.shift_on_forward()
+            self.invalidate_vision()
         return result
 
     def turn_right(self):
@@ -96,7 +130,7 @@ class Trantorian:
 
     def start_incantation(self):
         cmd_id = self.send_command.start_incantation()
-        return self.wait_for_response(cmd_id)
+        return self.wait_for_response(cmd_id, timeout=30.0)
 
     def move_to_tile(self, index):
         if index == 0:
@@ -146,20 +180,4 @@ class Trantorian:
         return missing
 
     def refresh_inventory(self):
-        result = self.inventory()
-        if result is None:
-            return False
-
-        if result:
-            success, response_str = result
-            if success:
-                try:
-                    self.parser.parse_inventory(response_str)
-                    return True
-                except ValueError as e:
-                    print(f"erro while parse inventory : {e}")
-                    return False
-            return None
-        else:
-            print("Timeout server didn't answer to the inventory cmd")
-            return False
+        return self.inventory()
