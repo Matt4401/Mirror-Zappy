@@ -12,6 +12,7 @@
 #include <string>
 
 #include "AudioManager.hpp"
+#include "SettingsManager.hpp"
 #include "events/EventDispatcher.hpp"
 #include "rcore/Camera.hpp"
 #include "rtext/Font.hpp"
@@ -29,7 +30,7 @@ namespace zappy::gui::ui::hud {
 
 class GameHUD {
   public:
-    GameHUD(events::EventDispatcher& dispatcher, AudioManager& audioManager,
+    GameHUD(events::EventDispatcher& dispatcher, AudioManager& audioManager, SettingsManager& settingsManager,
             const std::shared_ptr<raylib::rtext::Font>& font, raylib::rcore::Camera& camera);
     ~GameHUD();
 
@@ -41,6 +42,7 @@ class GameHUD {
     void registerToUIManager(UIManager& uiManager);
 
     [[nodiscard]] std::shared_ptr<components::UIGridManager> getGridManager() const { return _gridManager; }
+    [[nodiscard]] std::shared_ptr<components::UICompass> getCompass() const { return _compass; }
     [[nodiscard]] std::shared_ptr<menus::PauseMenu> getPauseMenu() const { return _pauseMenu; }
     [[nodiscard]] std::shared_ptr<menus::PlayerInspectorUI> getPlayerInspector() const { return _playerInspector; }
     [[nodiscard]] std::shared_ptr<menus::WorldControlUI> getWorldControl() const { return _worldControl; }

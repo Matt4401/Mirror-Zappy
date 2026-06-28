@@ -9,13 +9,13 @@
 
 #include <cstdint>
 #include <functional>
-#include <map>
 #include <memory>
 #include <string>
 
 #include "AudioManager.hpp"
 #include "FirstPerson.hpp"
 #include "Map.hpp"
+#include "SettingsManager.hpp"
 #include "Skybox3D.hpp"
 #include "WorldManager.hpp"
 #include "events/EventDispatcher.hpp"
@@ -32,7 +32,7 @@ class Render {
     static constexpr const std::string WINDOW_NAME = "Zappy GUI";
     static constexpr int FLAG_FULLSCREEN_MODE = 2;
 
-    Render(events::EventDispatcher& dispatcher, AudioManager& audioManager);
+    Render(events::EventDispatcher& dispatcher, AudioManager& audioManager, SettingsManager& settingsManager);
     ~Render();
     Render(const Render& other) = delete;
     Render& operator=(const Render& other) = delete;
@@ -56,15 +56,16 @@ class Render {
     void handleInput();
     void handleEscapeKey();
     void handleAltKey();
+    void updateFreeCamera();
     void updateCameraLimits();
 
-    std::map<int, std::function<void()>> _keyHandlers;
     raylib::rcore::Window _window{WINDOW_NAME.c_str()};
     raylib::rcore::Camera _camera{raylib::rmath::Vector3{10.0F, 10.0F, 10.0F}};
     scene::Skybox3D _skybox;
     raylib::rcore::Event _event;
     std::reference_wrapper<events::EventDispatcher> _dispatcher;
     std::reference_wrapper<AudioManager> _audioManager;
+    std::reference_wrapper<SettingsManager> _settingsManager;
     scene::WorldManager _worldManager;
     scene::Map _map;
     ui::UIManager _uiManager;
@@ -86,5 +87,12 @@ class Render {
     static constexpr float CameraHeightMax = 110.0F;
     static constexpr float CameraPaddingFactor = 0.3F;
     static constexpr float CameraHeightFactor = 0.6F;
+
+    static constexpr float CameraSpeed = 10.0F;
+    static constexpr float CameraSprintSpeed = 30.0F;
+    static constexpr float CameraZoomSpeed = -2.0F;
+    static constexpr float CameraSensMultiplier = 0.1F;
+    static constexpr int MouseButtonOffset = 500;
+    static constexpr int MaxMouseButtonOffset = 506;
 };
 }  // namespace zappy::gui::graphics

@@ -55,18 +55,18 @@ Flow:
 
 1. `Render::update()` calls `_map.handleEvent()`.
 2. `Map` builds a mouse ray from the camera.
-3. It tests tile bounding boxes for hover.
-4. On left click, it tests player bounding boxes first.
+3. If `settings.showTiles` is true, it tests visible tile bounding boxes for hover.
+4. On left click, if `settings.showPlayers` is true, it tests visible player bounding boxes first.
 5. If a player is hit, dispatch `events::PlayerClicked`.
 6. Otherwise, if a tile is hovered, dispatch `events::TileClicked`.
 
-Player bounding boxes come from `game::Player::boundingBox()`.
+Player bounding boxes come from `game::Player::boundingBox()`. Hidden entities are completely skipped for interaction.
 
 ## Camera Modes
 
 ### Free Camera
 
-Default camera mode uses Raylib `CAMERA_FREE`. `Render` clamps the camera to a padded area around the map and prevents going below the ground.
+Default camera mode uses Raylib `CAMERA_FREE`. Movement speed is now scaled by delta-time so that it remains consistent regardless of framerate. The user can configure base movement speed in settings. `Render` clamps the camera to a padded area around the map and prevents going below the ground.
 
 ### UI Mode
 
@@ -108,4 +108,3 @@ Common asset locations:
 * `assets/images/ui/`
 * `assets/fonts/`
 * `assets/audio/`
-

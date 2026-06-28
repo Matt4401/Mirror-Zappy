@@ -38,11 +38,14 @@ add_subdirectory(ui)
 
 add_library(zappy_gui_core
         Core.cpp
+        SettingsManager.cpp
 )
 target_sources(zappy_gui_core PUBLIC
         FILE_SET HEADERS
         BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
-        FILES Core.hpp
+        FILES
+        Core.hpp
+        SettingsManager.hpp
 )
 target_include_directories(zappy_gui_core PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}

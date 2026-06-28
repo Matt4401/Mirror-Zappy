@@ -11,19 +11,19 @@
 #include <memory>
 
 #include "AudioManager.hpp"
+#include "SettingsManager.hpp"
+#include "SettingsMenu.hpp"
 #include "events/EventDispatcher.hpp"
 #include "rtext/Font.hpp"
 #include "ui/IUIComponent.hpp"
 #include "ui/components/UIButton.hpp"
 #include "ui/components/UIPanel.hpp"
-#include "ui/components/UISlider.hpp"
-#include "ui/components/UIText.hpp"
 
 namespace zappy::gui::ui::menus {
 
 class PauseMenu : public IUIComponent {
   public:
-    PauseMenu(events::EventDispatcher& dispatcher, AudioManager& audioManager,
+    PauseMenu(events::EventDispatcher& dispatcher, AudioManager& audioManager, SettingsManager& settingsManager,
               const std::shared_ptr<raylib::rtext::Font>& font);
     ~PauseMenu() override = default;
 
@@ -46,53 +46,22 @@ class PauseMenu : public IUIComponent {
     void setOnUIConfig(std::function<void()> callback);
     void setOnResume(std::function<void()> callback);
 
-  private:
-    void drawMainMenu();
-    void drawSettingsPanel();
-    void updateMainMenu();
-    void updateSettingsPanel();
-    void handleMainMenuEvent();
-    void handleSettingsPanelEvent();
-    void updateVolumeLabels();
+    [[nodiscard]] bool isSettingsVisible() const { return _settingsVisible; }
 
+  private:
     std::reference_wrapper<events::EventDispatcher> _dispatcher;
     std::reference_wrapper<AudioManager> _audioManager;
     std::unique_ptr<components::UIPanel> _backgroundPanel;
-    std::unique_ptr<components::UIPanel> _settingsPanel;
     std::unique_ptr<components::UIButton> _resumeBtn;
     std::unique_ptr<components::UIButton> _exitBtn;
     std::unique_ptr<components::UIButton> _uiConfigBtn;
     std::unique_ptr<components::UIButton> _settingsBtn;
-    std::unique_ptr<components::UIButton> _settingsBackBtn;
-    std::unique_ptr<components::UIText> _titleText;
-    std::unique_ptr<components::UIText> _settingsTitleText;
-    std::unique_ptr<components::UIText> _musicVolumeText;
-    std::unique_ptr<components::UIText> _soundVolumeText;
-    std::unique_ptr<components::UISlider> _musicVolumeSlider;
-    std::unique_ptr<components::UISlider> _soundVolumeSlider;
+
+    std::unique_ptr<SettingsMenu> _settingsMenu;
 
     static constexpr float _panelWidth{400.0F};
-    static constexpr float _settingsPanelWidth{520.0F};
-    static constexpr float _settingsPanelHeight{320.0F};
     static constexpr float _buttonHeight{60.0F};
-    static constexpr float _sliderWidth{300.0F};
-    static constexpr float _sliderHeight{24.0F};
     static constexpr float _buttonSpacing{10.0F};
-    static constexpr float _settingsTitleFontSize{32.0F};
-    static constexpr float _settingsLabelFontSize{24.0F};
-    static constexpr float _settingsTitleOffsetX{24.0F};
-    static constexpr float _settingsTitleOffsetY{22.0F};
-    static constexpr float _musicLabelOffsetX{20.0F};
-    static constexpr float _musicLabelOffsetY{100.0F};
-    static constexpr float _soundLabelOffsetX{10.0F};
-    static constexpr float _soundLabelOffsetY{170.0F};
-    static constexpr float _settingsSliderOffsetX{190.0F};
-    static constexpr float _musicSliderOffsetY{100.0F};
-    static constexpr float _soundSliderOffsetY{170.0F};
-    static constexpr float _settingsBackButtonWidth{180.0F};
-    static constexpr float _settingsBackButtonOffsetY{238.0F};
-    static constexpr float _volumeSliderMin{0.0F};
-    static constexpr float _volumeSliderMax{1.0F};
     static constexpr float _halfRatio{2.0F};
     static constexpr int _mainButtonCount{4};
     static constexpr int _mainButtonGapCount{3};
@@ -106,6 +75,10 @@ class PauseMenu : public IUIComponent {
     std::function<void()> _onExit;
     std::function<void()> _onUIConfig;
     std::function<void()> _onResume;
+
+    int _lastScreenWidth{0};
+    int _lastScreenHeight{0};
+    void recalculateLayout();
 };
 
 }  // namespace zappy::gui::ui::menus

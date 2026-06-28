@@ -13,6 +13,7 @@
 
 #include "AudioManager.hpp"
 #include "EventDispatcher.hpp"
+#include "SettingsManager.hpp"
 #include "UIManager.hpp"
 #include "components/UIButton.hpp"
 #include "components/UICompass.hpp"
@@ -33,13 +34,13 @@ std::function<void(const std::string&)> GameHUD::makeSendCommand(events::EventDi
     return [&dispatcher](const std::string& cmd) { dispatcher.dispatch(events::SendCommand{cmd}); };
 }
 
-GameHUD::GameHUD(events::EventDispatcher& dispatcher, AudioManager& audioManager,
+GameHUD::GameHUD(events::EventDispatcher& dispatcher, AudioManager& audioManager, SettingsManager& settingsManager,
                  const std::shared_ptr<raylib::rtext::Font>& font, raylib::rcore::Camera& camera)
     : _dispatcher(dispatcher),
       _font(font),
       _gridManager(std::make_shared<components::UIGridManager>()),
       _compass(std::make_shared<components::UICompass>(0.0F, 0.0F, 0.0F, 0.0F, camera, _font)),
-      _pauseMenu(std::make_shared<menus::PauseMenu>(_dispatcher.get(), audioManager, _font)),
+      _pauseMenu(std::make_shared<menus::PauseMenu>(_dispatcher.get(), audioManager, settingsManager, _font)),
       _playerInspector(std::make_shared<menus::PlayerInspectorUI>(0.0F, 0.0F, 300.0F, _dispatcher.get(), _font,
                                                                   makeSendCommand(_dispatcher.get()))),
       _tileInspector(std::make_shared<menus::TileInspectorUI>(0.0F, 0.0F, 300.0F, _dispatcher.get(), _font,
@@ -57,9 +58,9 @@ GameHUD::GameHUD(events::EventDispatcher& dispatcher, AudioManager& audioManager
 
     _gridManager->addPanel(_worldControl, WorldControlX, WorldControlY, WorldControlWidthCols, WorldControlHeightCols);
 
-    _gridManager->addPanel(_eventLog, 2, 16, 12, 15);
+    _gridManager->addPanel(_eventLog, 2, 16, 13, 15);
 
-    _gridManager->addPanel(_globalStats, 2, 2, 12, 13);
+    _gridManager->addPanel(_globalStats, 2, 2, 13, 13);
 }
 
 GameHUD::~GameHUD() { components::UIButton::setClickSoundHandler(nullptr); }

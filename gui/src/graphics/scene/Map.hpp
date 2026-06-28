@@ -8,10 +8,12 @@
 #pragma once
 #include <functional>
 #include <map>
+#include <optional>
 #include <string>
 #include <utility>
 
 #include "GuiEvents.hpp"
+#include "SettingsManager.hpp"
 #include "Tile3D.hpp"
 #include "WorldManager.hpp"
 #include "events/EventDispatcher.hpp"
@@ -20,6 +22,7 @@
 #include "game/Team.hpp"
 #include "game/components/IObject.hpp"
 #include "rcore/Camera.hpp"
+#include "rcore/Ray.hpp"
 #include "rmodels/Model.hpp"
 
 namespace zappy::gui::graphics::scene {
@@ -40,7 +43,8 @@ class Map {
     static constexpr const char* MENDIANE_MODEL_RESOURCE = "assets/models/resources/orange-ore/scene.gltf";
     static constexpr const char* FOOD_TEXTURE_RESOURCE = "assets/models/resources/food.glb";
 
-    Map(raylib::rcore::Camera& camera, WorldManager& worldManager, events::EventDispatcher& dispatcher);
+    Map(raylib::rcore::Camera& camera, WorldManager& worldManager, events::EventDispatcher& dispatcher,
+        SettingsManager& settingsManager);
     ~Map();
     Map(const Map& other) = delete;
     Map& operator=(const Map& other) = delete;
@@ -58,11 +62,14 @@ class Map {
     void dispatchClickedPlayer(const game::Team& team, const game::Player& player) const;
     void dispatchClickedTile(const Tile3D& tile) const;
     void handleRequestCyclePlayer(const events::RequestCyclePlayer& e);
+    void updateHoveredTile(const raylib::rcore::Ray& ray, float& nearestDistance);
+    std::optional<SelectedPlayer> getSelectedPlayer(const raylib::rcore::Ray& ray, float& nearestDistance) const;
 
     const Tile3D* _hoveredTile{nullptr};
     std::reference_wrapper<raylib::rcore::Camera> _camera;
     std::reference_wrapper<events::EventDispatcher> _dispatcher;
     std::reference_wrapper<WorldManager> _worldManager;
+    std::reference_wrapper<SettingsManager> _settingsManager;
     game::GameModel _gameModel;
     std::map<std::string, ItemFunc> _itemDrawFunctions;
     raylib::rmodels::Model _tileModel{TILE_MODEL_RESOURCE};

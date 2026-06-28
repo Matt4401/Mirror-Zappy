@@ -88,12 +88,14 @@ Current default layout:
 * UI configuration entry;
 * save and quit action.
 
-Settings currently expose:
+Settings currently expose several tabs:
 
-* music volume;
-* sound volume.
+* **Audio**: Master, Music, and SFX volumes, plus a Mute option.
+* **Video**: Display mode (Windowed, Borderless, Fullscreen), resolution, FPS limit, FOV, camera speed, and render distance.
+* **Controls**: Fully rebindable actions for movement, sprint, pause, toggle UI, and camera reset, with support for mouse keys.
+* **Visibility**: Toggles for showing UI, players, minerals, food, and tiles.
 
-When the menu is hidden, slider drag state is cancelled so a drag cannot continue after reopening.
+Settings are saved and loaded persistently via `SettingsManager` which writes atomically to `config.ini`. When the menu is hidden, slider drag state is cancelled so a drag cannot continue after reopening.
 
 `PauseMenu` does not directly modify `Render` state except through callbacks. `Render` installs:
 
@@ -146,4 +148,3 @@ UIButton::setClickSoundHandler([audio] {
 ```
 
 The handler is cleared in `GameHUD` destructor.
-
