@@ -10,9 +10,11 @@
 #include <algorithm>
 #include <cmath>
 #include <functional>
+#include <map>
 #include <memory>
 #include <optional>
 #include <ranges>
+#include <string>
 #include <vector>
 
 #include "Color.hpp"
@@ -282,7 +284,8 @@ void UIGridManager::handleMouseDrag(const raylib::rmath::Vector2& mousePos, floa
     }
 }
 
-void UIGridManager::addPanel(const std::shared_ptr<UIGamePanel>& panel, int gridX, int gridY, int gridW, int gridH) {
+void UIGridManager::addPanel(const std::string& id, const std::shared_ptr<UIGamePanel>& panel, int gridX, int gridY,
+                             int gridW, int gridH) {
     if (!panel || gridX < 0 || gridY < 0 || gridW <= 0 || gridH <= 0 || gridX + gridW > GridCols ||
         gridY + gridH > GridRows) {
         return;
@@ -291,9 +294,31 @@ void UIGridManager::addPanel(const std::shared_ptr<UIGamePanel>& panel, int grid
     if (checkOverlap(newRect, nullptr)) {
         return;
     }
-    _panels.push_back(PanelData{.panel = panel,
+    _panels.push_back(PanelData{.id = id,
+                                .panel = panel,
                                 .originalGrid = {.x = gridX, .y = gridY, .w = gridW, .h = gridH},
                                 .grid = {.x = gridX, .y = gridY, .w = gridW, .h = gridH}});
+}
+
+std::map<std::string, std::vector<int>> UIGridManager::getLayouts() const {
+    std::map<std::string, std::vector<int>> layouts;
+    for (const auto& p : _panels) {
+        layouts[p.id] = {p.grid.x, p.grid.y, p.grid.w, p.grid.h};
+    }
+    return layouts;
+}
+
+void UIGridManager::applyLayouts(const std::map<std::string, std::vector<int>>& layouts) {
+    for (auto& p : _panels) {
+        if (auto it = layouts.find(p.id); it != layouts.end() && it->second.size() == 4) {
+            GridRect const newRect{
+                .x = it->second.at(0), .y = it->second.at(1), .w = it->second.at(2), .h = it->second.at(3)};
+            if (!checkOverlap(newRect, p.panel)) {
+                p.grid = newRect;
+                p.originalGrid = newRect;
+            }
+        }
+    }
 }
 
 void UIGridManager::setConfigMode(bool configMode) {

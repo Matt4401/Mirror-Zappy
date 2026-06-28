@@ -118,6 +118,17 @@ void SettingsManager::load() {
             try {
                 if (key.starts_with("bind_")) {
                     _settings.keybinds.at(key.substr(5)) = std::stoi(valueStr);
+                } else if (key.starts_with("ui_")) {
+                    std::string const id = key.substr(3);
+                    std::vector<int> layout;
+                    std::stringstream ss2(valueStr);
+                    std::string token;
+                    while (std::getline(ss2, token, ',')) {
+                        layout.push_back(std::stoi(token));
+                    }
+                    if (layout.size() == 4) {
+                        _settings.uiLayouts[id] = layout;
+                    }
                 } else if (auto it = setters.find(key); it != setters.end()) {
                     it->second(valueStr);
                 }
@@ -151,6 +162,14 @@ void SettingsManager::save() const {
     file << "\n[Controls]\n";
     for (const auto& [action, key] : _settings.keybinds) {
         file << "bind_" << action << "=" << key << "\n";
+    }
+
+    file << "\n[UILayout]\n";
+    for (const auto& [id, layout] : _settings.uiLayouts) {
+        if (layout.size() == 4) {
+            file << "ui_" << id << "=" << layout.at(0) << "," << layout.at(1) << "," << layout.at(2) << ","
+                 << layout.at(3) << "\n";
+        }
     }
 
     file.flush();
