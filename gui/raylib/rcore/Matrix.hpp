@@ -56,7 +56,12 @@ class Matrix {
 
     [[nodiscard]] ::Matrix matrix() const { return _matrix; }
 
+    static Matrix rotateX(float angle) { return {MatrixRotateX(angle)}; }
     static Matrix rotateY(float angle) { return {MatrixRotateY(angle)}; }
+    static Matrix rotateZ(float angle) { return {MatrixRotateZ(angle)}; }
+    static Matrix translate(float x, float y, float z) { return {MatrixTranslate(x, y, z)}; }
+
+    Matrix operator*(const Matrix& other) const { return Matrix{MatrixMultiply(_matrix, other._matrix)}; }
 
   protected:
   private:

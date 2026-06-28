@@ -38,7 +38,8 @@ Map::Map(raylib::rcore::Camera& camera, WorldManager& worldManager, events::Even
       _dispatcher(dispatcher),
       _worldManager(worldManager),
       _settingsManager(settingsManager),
-      _gameModel(_camera) {
+      _gameModel(_camera),
+      _floatingIsland(_worldManager, _dispatcher) {
     _itemDrawFunctions["Deraumere"] = [this](const game::IObject& object) { object.draw(_deraumereModel); };
     _itemDrawFunctions["Linemate"] = [this](const game::IObject& object) { object.draw(_linemateModel); };
     _itemDrawFunctions["Sibur"] = [this](const game::IObject& object) { object.draw(_siburModel); };
@@ -80,6 +81,9 @@ void Map::draw() const {
         for (const auto& team : _worldManager.get().teams()) {
             team.draw(_gameModel);
         }
+    }
+    if (settings.showFloatingIsland) {
+        _floatingIsland.draw(_camera.get());
     }
     if (_hoveredTile != nullptr && settings.showTiles) {
         raylib::rshapes::Shapes::drawThickBoundingBox(_hoveredTile->boundingBox(_tileModel.getBoundingBox()),

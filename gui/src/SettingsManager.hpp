@@ -35,6 +35,7 @@ struct SettingsData {
     bool showMinerals{true};
     bool showFood{true};
     bool showTiles{true};
+    bool showFloatingIsland{true};
 
     std::map<std::string, int> keybinds{
         {"Move Forward", KEY_W}, {"Move Backward", KEY_S},      {"Move Left", KEY_A},  {"Move Right", KEY_D},
