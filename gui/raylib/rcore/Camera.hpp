@@ -53,6 +53,9 @@ class Camera {
     void setProjection(int projection) { _camera.projection = projection; }
 
     void updateCamera(int mode) { UpdateCamera(&_camera, mode); }
+    void updateCameraPro(rmath::Vector3 movement, rmath::Vector3 rotation, float zoom) {
+        UpdateCameraPro(&_camera, movement.vector(), rotation.vector(), zoom);
+    }
 
     void cameraYaw(float angle, bool rotateAroundTarget) { CameraYaw(&_camera, angle, rotateAroundTarget); }
     void cameraPitch(float angle, bool lockView, bool rotateAroundTarget, bool rotateUp);
