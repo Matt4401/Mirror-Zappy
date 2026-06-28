@@ -1,5 +1,8 @@
 # If this the food is under this threshold, survive state start
-SURVIVAL_THRESHOLD = 10
+SURVIVAL_THRESHOLD = 8
+FOOD_SAFE_FOR_INCANTATION = 13
+FOOD_SAFE_FOR_FORK = 12
+FOOD_OPPORTUNISTIC = 18
 
 # Number of member for reproduce state to start
 # NUMBER_OF_MEMBER_FOR_REPRODUCE = 0
