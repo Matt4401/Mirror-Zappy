@@ -127,9 +127,9 @@ void Render::updateFreeCamera() {
         up -= 1.0F;
     }
 
-    float speed = CameraSpeed;
+    float speed = CameraSpeed * raylib::rcore::Window::frameTime();
     if (isActionDown(binds.at("Sprint"))) {
-        speed = CameraSprintSpeed;
+        speed = CameraSprintSpeed * raylib::rcore::Window::frameTime();
     }
 
     raylib::rmath::Vector2 const mouseDelta = raylib::rcore::Event::getMouseDeltaStatic();

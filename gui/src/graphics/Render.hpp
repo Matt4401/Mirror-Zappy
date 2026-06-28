@@ -88,8 +88,8 @@ class Render {
     static constexpr float CameraPaddingFactor = 0.3F;
     static constexpr float CameraHeightFactor = 0.6F;
 
-    static constexpr float CameraSpeed = 0.1F;
-    static constexpr float CameraSprintSpeed = 0.3F;
+    static constexpr float CameraSpeed = 10.0F;
+    static constexpr float CameraSprintSpeed = 30.0F;
     static constexpr float CameraZoomSpeed = -2.0F;
     static constexpr float CameraSensMultiplier = 0.1F;
     static constexpr int MouseButtonOffset = 500;
