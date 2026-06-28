@@ -18,6 +18,7 @@ def mainAI():
     parser.add_argument(
         "-h", type=str, required=True, metavar="machine", dest="machine"
     )
+    parser.add_argument("-g", type=int, default=0, metavar="generation")
 
     try:
         args = parser.parse_args()
@@ -26,16 +27,22 @@ def mainAI():
     port = args.p
     team_name = args.n
     host = args.machine
+    generation = args.g
 
     player_id = generate_id(team_name)
-    PlayerLogger.setup_logging(player_id)
+    PlayerLogger.setup_logging(player_id, fresh=(generation == 0))
     print(f"Logger is ok: {player_id}")
 
     trantorian = None
     try:
-        trantorian = Trantorian(port, host, team_name, player_id)
+        connect_timeout = 15.0 if generation > 0 else 3.0
+        trantorian = Trantorian(port, host, team_name, player_id, connect_timeout)
+        trantorian.generation = generation
         print("Trantorian ok")
-        tick_manager = TickManager(10)
+        if generation == 0:
+            trantorian.fill_initial_team()
+        tick_seed = sum(ord(char) for char in player_id)
+        tick_manager = TickManager(tick_seed)
         fsm = FiniteStateMachine(SurviveState, trantorian, tick_manager)
         print("fsm ok")
         fsm.run()

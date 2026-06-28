@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import Mock
 from src.SendCommand import SendCommand
 
+
 class TestSendCommand(unittest.TestCase):
     def setUp(self):
         self.mock_connection = Mock()
