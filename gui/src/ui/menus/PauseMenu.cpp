@@ -10,22 +10,21 @@
 #include <cmath>
 #include <functional>
 #include <memory>
-#include <string>
 #include <utility>
 
 #include "AudioManager.hpp"
 #include "Color.hpp"
 #include "EventDispatcher.hpp"
+#include "SettingsManager.hpp"
+#include "SettingsMenu.hpp"
 #include "rcore/Window.hpp"
 #include "rtext/Font.hpp"
 #include "ui/components/UIButton.hpp"
 #include "ui/components/UIPanel.hpp"
-#include "ui/components/UISlider.hpp"
-#include "ui/components/UIText.hpp"
 
 namespace zappy::gui::ui::menus {
 
-PauseMenu::PauseMenu(events::EventDispatcher& dispatcher, AudioManager& audioManager,
+PauseMenu::PauseMenu(events::EventDispatcher& dispatcher, AudioManager& audioManager, SettingsManager& settingsManager,
                      const std::shared_ptr<raylib::rtext::Font>& font)
     : _dispatcher(dispatcher), _audioManager(audioManager) {
     int const screenWidth = raylib::rcore::Window::screenWidth();
@@ -41,8 +40,6 @@ PauseMenu::PauseMenu(events::EventDispatcher& dispatcher, AudioManager& audioMan
         (static_cast<float>(screenHeight) - ((_buttonHeight * static_cast<float>(_mainButtonCount)) +
                                              (_buttonSpacing * static_cast<float>(_mainButtonGapCount)))) /
         _halfRatio;
-    float const settingsX = (static_cast<float>(screenWidth) - _settingsPanelWidth) / _halfRatio;
-    float const settingsY = (static_cast<float>(screenHeight) - _settingsPanelHeight) / _halfRatio;
 
     _resumeBtn =
         std::make_unique<components::UIButton>(startX, startY, _panelWidth, _buttonHeight, "Back to Game", font);
@@ -55,29 +52,13 @@ PauseMenu::PauseMenu(events::EventDispatcher& dispatcher, AudioManager& audioMan
         startX, startY + ((_buttonHeight + _buttonSpacing) * static_cast<float>(_exitButtonIndex)), _panelWidth,
         _buttonHeight, "Save and Quit to Title", font);
 
-    _settingsPanel = std::make_unique<components::UIPanel>(settingsX, settingsY, _settingsPanelWidth,
-                                                           _settingsPanelHeight, raylib::Color(224, 224, 224, 255));
-    _settingsTitleText = std::make_unique<components::UIText>("Settings", font);
-    _settingsTitleText->setFontSize(_settingsTitleFontSize);
-    _settingsTitleText->setPosition(settingsX + _settingsTitleOffsetX, settingsY + _settingsTitleOffsetY);
-
-    _musicVolumeText = std::make_unique<components::UIText>("Music volume", font);
-    _musicVolumeText->setFontSize(_settingsLabelFontSize);
-    _musicVolumeText->setPosition(settingsX + _musicLabelOffsetX, settingsY + _musicLabelOffsetY);
-
-    _soundVolumeText = std::make_unique<components::UIText>("Sound volume", font);
-    _soundVolumeText->setFontSize(_settingsLabelFontSize);
-    _soundVolumeText->setPosition(settingsX + _soundLabelOffsetX, settingsY + _soundLabelOffsetY);
-
-    _musicVolumeSlider = std::make_unique<components::UISlider>(
-        settingsX + _settingsSliderOffsetX, settingsY + _musicSliderOffsetY, _sliderWidth, _sliderHeight,
-        _volumeSliderMin, _volumeSliderMax, _audioManager.get().musicVolume());
-    _soundVolumeSlider = std::make_unique<components::UISlider>(
-        settingsX + _settingsSliderOffsetX, settingsY + _soundSliderOffsetY, _sliderWidth, _sliderHeight,
-        _volumeSliderMin, _volumeSliderMax, _audioManager.get().soundVolume());
-    _settingsBackBtn = std::make_unique<components::UIButton>(
-        settingsX + ((_settingsPanelWidth - _settingsBackButtonWidth) / _halfRatio),
-        settingsY + _settingsBackButtonOffsetY, _settingsBackButtonWidth, _buttonHeight, "Back", font);
+    _settingsMenu = std::make_unique<SettingsMenu>(_dispatcher.get(), _audioManager.get(), settingsManager, font);
+    _settingsMenu->setPosition((static_cast<float>(screenWidth) - 800.0F) / 2.0F,
+                               (static_cast<float>(screenHeight) - 600.0F) / 2.0F);
+    _settingsMenu->setOnBack([this]() {
+        _settingsVisible = false;
+        _settingsMenu->setVisible(false);
+    });
 
     _resumeBtn->setOnClick([this]() {
         this->setVisible(false);
@@ -86,17 +67,22 @@ PauseMenu::PauseMenu(events::EventDispatcher& dispatcher, AudioManager& audioMan
         }
     });
 
-    _settingsBtn->setOnClick([this]() { this->_settingsVisible = true; });
+    _lastScreenWidth = screenWidth;
+    _lastScreenHeight = screenHeight;
 
-    _musicVolumeSlider->setOnValueChanged([this](const float value) {
-        this->_audioManager.get().setMusicVolume(value);
-        this->updateVolumeLabels();
+    _resumeBtn->setOnClick([this]() {
+        if (_onResume) {
+            _onResume();
+        } else {
+            this->setVisible(false);
+            raylib::rcore::Window::disableCursor();
+        }
     });
-    _soundVolumeSlider->setOnValueChanged([this](const float value) {
-        this->_audioManager.get().setSoundVolume(value);
-        this->updateVolumeLabels();
+
+    _settingsBtn->setOnClick([this]() {
+        this->_settingsVisible = true;
+        this->_settingsMenu->setVisible(true);
     });
-    _settingsBackBtn->setOnClick([this]() { this->_settingsVisible = false; });
 
     _uiConfigBtn->setOnClick([this]() {
         if (this->_onUIConfig) {
@@ -109,7 +95,6 @@ PauseMenu::PauseMenu(events::EventDispatcher& dispatcher, AudioManager& audioMan
             this->_onExit();
         }
     });
-    updateVolumeLabels();
 }
 
 void PauseMenu::draw() {
@@ -118,56 +103,56 @@ void PauseMenu::draw() {
     }
     _backgroundPanel->draw();
     if (_settingsVisible) {
-        drawSettingsPanel();
+        _settingsMenu->draw();
         return;
     }
-    drawMainMenu();
-}
-
-void PauseMenu::drawMainMenu() {
     _resumeBtn->draw();
     _exitBtn->draw();
     _uiConfigBtn->draw();
     _settingsBtn->draw();
 }
 
-void PauseMenu::drawSettingsPanel() {
-    _settingsPanel->draw();
-    _settingsTitleText->draw();
-    _musicVolumeText->draw();
-    _soundVolumeText->draw();
-    _musicVolumeSlider->draw();
-    _soundVolumeSlider->draw();
-    _settingsBackBtn->draw();
-}
-
 void PauseMenu::update() {
     if (!_isVisible) {
         return;
     }
+
+    int const screenWidth = raylib::rcore::Window::screenWidth();
+    int const screenHeight = raylib::rcore::Window::screenHeight();
+    if (screenWidth != _lastScreenWidth || screenHeight != _lastScreenHeight) {
+        _lastScreenWidth = screenWidth;
+        _lastScreenHeight = screenHeight;
+        recalculateLayout();
+    }
+
     _backgroundPanel->update();
     if (_settingsVisible) {
-        updateSettingsPanel();
+        _settingsMenu->update();
         return;
     }
-    updateMainMenu();
-}
-
-void PauseMenu::updateMainMenu() {
     _resumeBtn->update();
     _exitBtn->update();
     _uiConfigBtn->update();
     _settingsBtn->update();
 }
 
-void PauseMenu::updateSettingsPanel() {
-    _settingsPanel->update();
-    _settingsTitleText->update();
-    _musicVolumeText->update();
-    _soundVolumeText->update();
-    _musicVolumeSlider->update();
-    _soundVolumeSlider->update();
-    _settingsBackBtn->update();
+void PauseMenu::recalculateLayout() {
+    _backgroundPanel->setSize(static_cast<float>(_lastScreenWidth), static_cast<float>(_lastScreenHeight));
+
+    float const startX = (static_cast<float>(_lastScreenWidth) - _panelWidth) / _halfRatio;
+    float const startY =
+        (static_cast<float>(_lastScreenHeight) - ((_buttonHeight * static_cast<float>(_mainButtonCount)) +
+                                                  (_buttonSpacing * static_cast<float>(_mainButtonGapCount)))) /
+        _halfRatio;
+
+    _resumeBtn->setPosition(startX, startY);
+    _settingsBtn->setPosition(startX, startY + _buttonHeight + _buttonSpacing);
+    _uiConfigBtn->setPosition(startX,
+                              startY + ((_buttonHeight + _buttonSpacing) * static_cast<float>(_uiConfigButtonIndex)));
+    _exitBtn->setPosition(startX, startY + ((_buttonHeight + _buttonSpacing) * static_cast<float>(_exitButtonIndex)));
+
+    _settingsMenu->setPosition((static_cast<float>(_lastScreenWidth) - 800.0F) / 2.0F,
+                               (static_cast<float>(_lastScreenHeight) - 600.0F) / 2.0F);
 }
 
 void PauseMenu::handleEvent() {
@@ -175,34 +160,23 @@ void PauseMenu::handleEvent() {
         return;
     }
     if (_settingsVisible) {
-        handleSettingsPanelEvent();
+        _settingsMenu->handleEvent();
         return;
     }
-    handleMainMenuEvent();
-}
-
-void PauseMenu::handleMainMenuEvent() {
     _resumeBtn->handleEvent();
     _exitBtn->handleEvent();
     _uiConfigBtn->handleEvent();
     _settingsBtn->handleEvent();
 }
 
-void PauseMenu::handleSettingsPanelEvent() {
-    _musicVolumeSlider->handleEvent();
-    _soundVolumeSlider->handleEvent();
-    _settingsBackBtn->handleEvent();
-}
-
 void PauseMenu::setPosition(float /*x*/, float /*y*/) {}
 void PauseMenu::setSize(float /*width*/, float /*height*/) {}
 
 bool PauseMenu::isVisible() const { return _isVisible; }
+
 void PauseMenu::setVisible(bool visible) {
     _isVisible = visible;
     if (!visible) {
-        _musicVolumeSlider->cancelDrag();
-        _soundVolumeSlider->cancelDrag();
         _settingsVisible = false;
     }
 }
@@ -212,10 +186,7 @@ bool PauseMenu::isHovered() const {
         return false;
     }
     if (_settingsVisible) {
-        return (_backgroundPanel && _backgroundPanel->isHovered()) || (_settingsPanel && _settingsPanel->isHovered()) ||
-               (_musicVolumeSlider && _musicVolumeSlider->isHovered()) ||
-               (_soundVolumeSlider && _soundVolumeSlider->isHovered()) ||
-               (_settingsBackBtn && _settingsBackBtn->isHovered());
+        return _settingsMenu->isHovered() || (_backgroundPanel && _backgroundPanel->isHovered());
     }
     return (_backgroundPanel && _backgroundPanel->isHovered()) || (_resumeBtn && _resumeBtn->isHovered()) ||
            (_exitBtn && _exitBtn->isHovered()) || (_uiConfigBtn && _uiConfigBtn->isHovered()) ||
@@ -225,12 +196,5 @@ bool PauseMenu::isHovered() const {
 void PauseMenu::setOnExit(std::function<void()> callback) { _onExit = std::move(callback); }
 void PauseMenu::setOnUIConfig(std::function<void()> callback) { _onUIConfig = std::move(callback); }
 void PauseMenu::setOnResume(std::function<void()> callback) { _onResume = std::move(callback); }
-
-void PauseMenu::updateVolumeLabels() {
-    auto const musicPercent = static_cast<int>(std::lround(_audioManager.get().musicVolume() * 100.0F));
-    auto const soundPercent = static_cast<int>(std::lround(_audioManager.get().soundVolume() * 100.0F));
-    _musicVolumeText->setText("Music: " + std::to_string(musicPercent) + "%");
-    _soundVolumeText->setText("Sounds: " + std::to_string(soundPercent) + "%");
-}
 
 }  // namespace zappy::gui::ui::menus

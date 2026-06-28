@@ -41,6 +41,10 @@ Reusable components include:
 | `UIDropdown` | Selectable dropdown. |
 | `UITextbox` | Editable text input. |
 | `UICompass` | Camera direction display. |
+| `UIToggle` | Checkbox/toggle switch component. |
+| `UIKeybindButton` | Specialized button for capturing keyboard/mouse inputs for keybindings. |
+| `EventLogRow` | A single entry in the event log containing formatted text. |
+| `UIGridManager` | Container that handles grid-based layout and editing for game panels. |
 
 ## GameHUD
 
@@ -54,14 +58,29 @@ Reusable components include:
 * `WorldControlUI`
 * `EventLogUI`
 * `GlobalStatsUI`
+* `GameOverUI`
 
 It registers only the root components in `UIManager`:
 
 * compass;
 * grid manager;
-* pause menu.
+* pause menu;
+* game over UI.
 
 The grid manager owns the normal HUD panels.
+
+## Game Over UI
+
+`GameOverUI` is a full-screen overlay that appears automatically when the server broadcasts the end of the game (`Seg` event).
+
+It provides:
+
+* a full-screen dark overlay to mask the game slightly;
+* a centered modal panel displaying the winning team's name;
+* a "Spectate" button that hides the menu and returns to a free-camera view;
+* a "Quit Game" button that triggers the application exit.
+
+`Render` uses its callbacks to update the cursor state when returning to the game in spectator mode, and to begin the exit sequence when quitting.
 
 ## UI Grid
 
@@ -77,7 +96,7 @@ Current default layout:
 | Event log | `(2, 16, 12, 15)` |
 | Global stats | `(2, 2, 12, 13)` |
 
-`Escape` exits config mode.
+`Escape` exits config mode and automatically saves the updated layout persistently in the settings file.
 
 ## Pause Menu
 
@@ -88,12 +107,14 @@ Current default layout:
 * UI configuration entry;
 * save and quit action.
 
-Settings currently expose:
+Settings currently expose several tabs:
 
-* music volume;
-* sound volume.
+* **Audio**: Master, Music, and SFX volumes, plus a Mute option.
+* **Video**: Display mode (Windowed, Borderless, Fullscreen), resolution, FPS limit, FOV, camera speed, and render distance.
+* **Controls**: Fully rebindable actions for movement, sprint, pause, toggle UI, and camera reset, with support for mouse keys.
+* **Visibility**: Toggles for showing UI, players, minerals, food, and tiles.
 
-When the menu is hidden, slider drag state is cancelled so a drag cannot continue after reopening.
+Settings are saved and loaded persistently via `SettingsManager` which writes atomically to `config.ini`. When the menu is hidden, slider drag state is cancelled so a drag cannot continue after reopening.
 
 `PauseMenu` does not directly modify `Render` state except through callbacks. `Render` installs:
 
@@ -146,4 +167,3 @@ UIButton::setClickSoundHandler([audio] {
 ```
 
 The handler is cleared in `GameHUD` destructor.
-
