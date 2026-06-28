@@ -4,10 +4,9 @@ class BroadcastMessage:
         self.team = player_state.team_name
         self.key = sum(ord(letter) for letter in self.team)
 
-    def create_message(self, command):
-        content = f"{self.player_state.level} {command}"
-        encrypted_content = self.code(content)
-        return f"{self.team}_{encrypted_content}"
+    def create_message(self) -> str:
+        content = f"{self.player_state.level} alive"
+        return f"{self.team}_{self.code(content)}"
 
     def code(self, message):
         result = []
@@ -25,12 +24,21 @@ class BroadcastMessage:
                 return None
             clear_text = self.decode(encrypted_content)
             if clear_text:
-                parts = clear_text.split(" ", 1)
+                parts = clear_text.split(" ")
                 if len(parts) == 2:
-                    return int(parts[0]), parts[1]
+                    return int(parts[0])
         except Exception:
             pass
         return None
+
+    @staticmethod
+    def extract_team_name(raw_message):
+        if not raw_message or "_" not in raw_message:
+            return None
+        return raw_message.split("_", 1)[0]
+
+    def read_own_broadcast(self, raw_message):
+        return self.read_broadcast(raw_message)
 
     def decode(self, encrypted_message):
         try:
