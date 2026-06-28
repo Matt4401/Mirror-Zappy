@@ -89,6 +89,7 @@ void FloatingIsland::buildDepthGrid(int width, int height, float maxDepth, std::
             float mask = 1.0F - std::pow(dist, DistPower);
             mask = std::max(mask, 0.0F);
 
+            // NOLINTNEXTLINE
             unsigned char const noiseVal = pixels[((z * width) + x)].r;
             float const rawHeight = (static_cast<float>(noiseVal) / PixelNormalization) * maxDepth * mask;
 
@@ -143,7 +144,7 @@ IslandBlockType FloatingIsland::determineBlockType(int y, unsigned char noiseVal
         return IslandBlockType::Cobblestone;
     }
 
-    auto const rockVal = static_cast<unsigned char>((noiseVal + std::abs(y) * NoiseRockMultiplier) %
+    auto const rockVal = static_cast<unsigned char>((noiseVal + (std::abs(y) * NoiseRockMultiplier)) %
                                                     static_cast<int>(PixelNormalization));
     if (rockVal < NoiseDeepslateThreshold) {
         return IslandBlockType::Deepslate;
