@@ -10,6 +10,7 @@ import threading
 import subprocess
 import sys
 import os
+import time
 import math
 import logging
 
@@ -29,6 +30,19 @@ class Trantorian:
         self.broadcast_message = BroadcastMessage(self.player_state)
         self.broadcast_manager = BroadcastManager(self.broadcast_message, self.player_state.team_name)
         self.children = []
+        self.last_fork_time = 0.0 # delai
+        self.generation = 0
+        self.fork_count = 0
+
+    def spawn_child_process(self):
+        self.children = [c for c in self.children if c.poll() is None]
+        if len(self.children) >= 6:
+            return False
+
+        if self.launch_client(self.generation + 1):
+            self.logger.info("[Reproduce]: spawned a new AI client to fill the egg")
+            return True
+        return False
 
     def launch_client(self, generation: int) -> bool:
         entry = os.path.join(
@@ -131,6 +145,22 @@ class Trantorian:
     def start_incantation(self):
         cmd_id = self.send_command.start_incantation()
         return self.wait_for_response(cmd_id, timeout=30.0)
+
+    def fork(self):
+        cmd_id = self.send_command.fork()
+        result = self.wait_for_response(cmd_id, timeout=10.0)
+        if result and result[0]:
+            self.last_fork_time = time.time()
+            self.fork_count += 1
+            self.spawn_child_process()
+            return True
+        return False
+
+    def can_reproduce(self):
+        return (
+                self.generation < MAX_REPRODUCE_GEN
+                and self.fork_count < LIFETIME_FORK_CAP
+        )
 
     def move_to_tile(self, index):
         if index == 0:
