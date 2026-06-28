@@ -102,14 +102,16 @@ class EvolveState(AState):
                 return
             return
 
-       # can reproduce during wait others
+        # can reproduce during wait others
         if (
-                not self.stones_placed
-                and food >= FORK_WHILE_WAITING_FOOD
-                and self.trantorian.can_reproduce()
-                and time.time() - self.trantorian.last_fork_time >= FORK_COOLDOWN_SECONDS
+            not self.stones_placed
+            and food >= FORK_WHILE_WAITING_FOOD
+            and self.trantorian.can_reproduce()
+            and time.time() - self.trantorian.last_fork_time >= FORK_COOLDOWN_SECONDS
         ):
-            self.trantorian.logger.info("[Evolve]: forking to grow population while waiting")
+            self.trantorian.logger.info(
+                "[Evolve]: forking to grow population while waiting"
+            )
             self.trantorian.fork()
             self.trantorian.inventory()
 
