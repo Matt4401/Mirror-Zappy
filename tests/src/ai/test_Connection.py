@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 from src.Connection import Connection
 
+
 class TestConnection(unittest.TestCase):
     @patch("socket.socket")
     def setUp(self, mock_socket_class):

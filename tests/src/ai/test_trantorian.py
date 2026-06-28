@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 from src.Trantorian import Trantorian
 
+
 class TestTrantorian(unittest.TestCase):
     @patch("src.Trantorian.Connection")
     @patch("src.Trantorian.PlayerState")
