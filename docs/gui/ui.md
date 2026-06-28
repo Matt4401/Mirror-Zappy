@@ -77,7 +77,7 @@ Current default layout:
 | Event log | `(2, 16, 12, 15)` |
 | Global stats | `(2, 2, 12, 13)` |
 
-`Escape` exits config mode.
+`Escape` exits config mode and automatically saves the updated layout persistently in the settings file.
 
 ## Pause Menu
 
