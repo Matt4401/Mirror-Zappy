@@ -1,4 +1,4 @@
-# Network and Protocol
+    # Network and Protocol
 
 The GUI network layer is intentionally thin. It connects to the server, identifies as the graphical client, parses incoming messages, and dispatches typed commands.
 

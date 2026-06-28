@@ -1,1 +1,0 @@
-# Zappy AI Documentation
