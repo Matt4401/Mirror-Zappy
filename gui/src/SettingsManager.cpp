@@ -7,6 +7,7 @@
 
 #include "SettingsManager.hpp"
 
+#include <cstdio>
 #include <exception>
 #include <fstream>
 #include <functional>
@@ -121,9 +122,10 @@ void SettingsManager::load() {
 }
 
 void SettingsManager::save() const {
-    std::ofstream file(_configFilePath);
+    const std::string tmpPath = _configFilePath + ".tmp";
+    std::ofstream file(tmpPath);
     if (!file.is_open()) {
-        std::cerr << "SettingsManager: Could not open config file " << _configFilePath << " for writing." << std::endl;
+        std::cerr << "SettingsManager: Could not open config file " << tmpPath << " for writing." << std::endl;
         return;
     }
 
@@ -141,6 +143,18 @@ void SettingsManager::save() const {
     file << "\n[Controls]\n";
     for (const auto& [action, key] : _settings.keybinds) {
         file << "bind_" << action << "=" << key << "\n";
+    }
+
+    file.flush();
+    if (!file.good()) {
+        std::cerr << "SettingsManager: Failed to write to config file." << std::endl;
+        file.close();
+        return;
+    }
+    file.close();
+
+    if (std::rename(tmpPath.c_str(), _configFilePath.c_str()) != 0) {
+        std::cerr << "SettingsManager: Failed to atomically replace config file." << std::endl;
     }
 }
 
