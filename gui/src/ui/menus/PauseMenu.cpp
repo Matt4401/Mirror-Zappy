@@ -81,7 +81,9 @@ PauseMenu::PauseMenu(events::EventDispatcher& dispatcher, AudioManager& audioMan
 
     _resumeBtn->setOnClick([this]() {
         this->setVisible(false);
-        raylib::rcore::Window::disableCursor();
+        if (this->_onResume) {
+            this->_onResume();
+        }
     });
 
     _settingsBtn->setOnClick([this]() { this->_settingsVisible = true; });
@@ -222,6 +224,7 @@ bool PauseMenu::isHovered() const {
 
 void PauseMenu::setOnExit(std::function<void()> callback) { _onExit = std::move(callback); }
 void PauseMenu::setOnUIConfig(std::function<void()> callback) { _onUIConfig = std::move(callback); }
+void PauseMenu::setOnResume(std::function<void()> callback) { _onResume = std::move(callback); }
 
 void PauseMenu::updateVolumeLabels() {
     auto const musicPercent = static_cast<int>(std::lround(_audioManager.get().musicVolume() * 100.0F));
