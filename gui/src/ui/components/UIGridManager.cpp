@@ -311,7 +311,8 @@ std::map<std::string, std::vector<int>> UIGridManager::getLayouts() const {
 void UIGridManager::applyLayouts(const std::map<std::string, std::vector<int>>& layouts) {
     for (auto& p : _panels) {
         if (auto it = layouts.find(p.id); it != layouts.end() && it->second.size() == 4) {
-            GridRect const newRect{.x = it->second[0], .y = it->second[1], .w = it->second[2], .h = it->second[3]};
+            GridRect const newRect{
+                .x = it->second.at(0), .y = it->second.at(1), .w = it->second.at(2), .h = it->second.at(3)};
             if (!checkOverlap(newRect, p.panel)) {
                 p.grid = newRect;
                 p.originalGrid = newRect;

@@ -167,7 +167,8 @@ void SettingsManager::save() const {
     file << "\n[UILayout]\n";
     for (const auto& [id, layout] : _settings.uiLayouts) {
         if (layout.size() == 4) {
-            file << "ui_" << id << "=" << layout[0] << "," << layout[1] << "," << layout[2] << "," << layout[3] << "\n";
+            file << "ui_" << id << "=" << layout.at(0) << "," << layout.at(1) << "," << layout.at(2) << ","
+                 << layout.at(3) << "\n";
         }
     }
 
