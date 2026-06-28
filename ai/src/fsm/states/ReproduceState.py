@@ -16,4 +16,4 @@ class ReproduceState(AState):
         self.trantorian.send_command.available_team_slots()
         self.trantorian.logger.info("[Reproduce]: Forking a new egg")
         self.trantorian.fork()
-        self.trantorian.refresh_inventory()
+        self.trantorian.inventory()
