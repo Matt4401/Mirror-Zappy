@@ -301,15 +301,14 @@ void Render::updateCameraState() {
     if (_followedPlayerId != -1) {
         auto playerOpt = _worldManager.playerById(_followedPlayerId);
         if (playerOpt) {
-            auto pos = playerOpt->get().position();
-            if (_lastPlayerPos.has_value()) {
-                raylib::rmath::Vector3 const delta = pos - *_lastPlayerPos;
-                _camera.setPosition(_camera.position() + delta);
-                _camera.setTarget(_camera.target() + delta);
-            }
+            auto const pos = playerOpt->get().position();
+            raylib::rmath::Vector3 const delta =
+                _lastPlayerPos.has_value() ? pos - *_lastPlayerPos : pos - _camera.target();
+            _camera.setPosition(_camera.position() + delta);
+            _camera.setTarget(pos);
             _lastPlayerPos = pos;
 
-            if (!_uiMode && (!_firstPerson || !_firstPerson->active())) {
+            if (!_firstPerson || !_firstPerson->active()) {
                 updateFollowCamera();
             }
         } else {
