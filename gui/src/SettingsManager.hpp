@@ -68,8 +68,8 @@ class SettingsManager {
         std::string key;
         std::function<std::string()> getter;
     };
-    std::vector<LoadProp> getLoadProperties();
-    std::vector<SaveProp> getSaveProperties() const;
+    [[nodiscard]] std::vector<LoadProp> getLoadProperties();
+    [[nodiscard]] std::vector<SaveProp> getSaveProperties() const;
 
     std::string _configFilePath;
     SettingsData _settings;

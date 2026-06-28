@@ -61,7 +61,7 @@ SettingsMenu::SettingsMenu(events::EventDispatcher& dispatcher, AudioManager& au
     initControlsTab();
     initVisibilityTab();
 
-    setSize(DefaultMenuWidth, DefaultMenuHeight);
+    SettingsMenu::setSize(DefaultMenuWidth, DefaultMenuHeight);
     switchTab(Tab::Audio);
 }
 
@@ -226,7 +226,7 @@ void SettingsMenu::initControlsTab() {
                                                      "Reset Camera", "Toggle UI"};
 
     for (const auto& action : orderedActions) {
-        if (keybinds.find(action) == keybinds.end()) {
+        if (!keybinds.contains(action)) {
             continue;
         }
         int const key = keybinds.at(action);
@@ -295,7 +295,7 @@ void SettingsMenu::setPosition(float x, float y) {
 void SettingsMenu::setSize(float width, float height) {
     _size = {width, height};
     _backgroundPanel->setSize(width, height);
-    setPosition(_position.x(), _position.y());
+    SettingsMenu::setPosition(_position.x(), _position.y());
 }
 
 bool SettingsMenu::isVisible() const { return _isVisible; }
@@ -343,12 +343,12 @@ void SettingsMenu::draw() {
             raylib::rshapes::Shapes::drawRectangleRounded(tabRect, 0.2F, 10, raylib::Color(220, 220, 220, 180));
         }
 
-        raylib::rmath::Vector2 const textSize = _font->measureTextEx(_tabNames[i], 20.0F, 1.0F);
+        raylib::rmath::Vector2 const textSize = _font->measureTextEx(_tabNames.at(i), 20.0F, 1.0F);
         float const textX = tabX + ((TabButtonWidth - textSize.x()) / 2.0F);
         float const textY = tabY + ((TabButtonHeight - textSize.y()) / 2.0F);
 
         raylib::Color const textColor = isActive ? raylib::Color(30, 30, 30, 255) : raylib::Color(120, 120, 120, 255);
-        _font->drawTextEx(_tabNames[i], {textX, textY}, 20.0F, 1.0F, textColor);
+        _font->drawTextEx(_tabNames.at(i), {textX, textY}, 20.0F, 1.0F, textColor);
 
         if (isActive) {
             raylib::rmath::Rectangle const accentRect = {

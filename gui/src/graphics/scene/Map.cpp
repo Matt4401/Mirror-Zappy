@@ -28,6 +28,7 @@
 #include "game/components/IObject.hpp"
 #include "rcore/Camera.hpp"
 #include "rcore/Event.hpp"
+#include "rcore/Ray.hpp"
 #include "rshapes/Shapes.hpp"
 
 namespace zappy::gui::graphics::scene {
